@@ -1,31 +1,21 @@
-# Private and agent directories (requested to be ignored)
+# Interné a privátne priečinky
 docs/
 .agents/
 vault/
 GEMINI.md
 gemini.md
 
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Dependencies
+# Dependencies & Build
 node_modules/
-.pnp
-.pnp.js
-
-# Next.js build
 .next/
 out/
 
-# OS and IDE files
+# Poistka pre lokálne env súbory
+.env*
+
+# Systémové súbory a logy
 .DS_Store
-*.pem
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.idea/
+Thumbs.db
+*.log
 .vscode/
+.idea/
