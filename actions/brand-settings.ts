@@ -70,9 +70,9 @@ export async function updateBrandGeneralAction(
       return { success: false, error: "Password protection requires Company tier or higher." };
     }
 
-    // Whitelabel / Hide badge requires FREELANCER, AGENCY, PLATINUM
-    if (parsed.data.hideLogobookBadge && (userTier === "FREE" || userTier === "COMPANY")) {
-      return { success: false, error: "Hiding Logobook badge requires Freelancer tier or higher." };
+    // Whitelabel / Hide badge requires AGENCY, PLATINUM
+    if (parsed.data.hideLogobookBadge && userTier !== "AGENCY" && userTier !== "PLATINUM") {
+      return { success: false, error: "Hiding Logobook badge requires Agency or Platinum tier." };
     }
 
     // 2. Check slug uniqueness if changed

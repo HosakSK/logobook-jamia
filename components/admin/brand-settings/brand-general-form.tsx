@@ -37,7 +37,7 @@ export function BrandGeneralForm({ brand, userTier, dict }: BrandGeneralFormProp
   const tier = userTier.toUpperCase();
   const canCustomDomain = tier !== "FREE";
   const canPasswordProtect = tier !== "FREE";
-  const canHideBadge = tier === "FREELANCER" || tier === "AGENCY" || tier === "PLATINUM";
+  const canHideBadge = tier === "AGENCY" || tier === "PLATINUM";
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -246,7 +246,7 @@ export function BrandGeneralForm({ brand, userTier, dict }: BrandGeneralFormProp
               </Label>
               {!canHideBadge && (
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-[3px] bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
-                  <Lock className="h-2.5 w-2.5" /> Vyžaduje balíček Freelancer
+                  <Lock className="h-2.5 w-2.5" /> Vyžaduje balíček Agency
                 </span>
               )}
             </div>

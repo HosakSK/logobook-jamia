@@ -9,7 +9,7 @@ import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favico
 import { BrandShapesForm } from "@/components/admin/brand-settings/brand-shapes-form";
 import { BrandDangerZone } from "@/components/admin/brand-settings/brand-danger-zone";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ExternalLink, ArrowLeft, Users, ArrowRight } from "lucide-react";
 
 export default async function BrandSettingsPage({
   params,
@@ -100,6 +100,30 @@ export default async function BrandSettingsPage({
           <Link href={`/m/${brand.slug || brandId}`} target="_blank">
             <span>{dict.admin.viewLiveManual}</span>
             <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
+      </div>
+
+      {/* Team Collaborators Link Card */}
+      <div className="border border-border/40 rounded-[3px] p-5 bg-card shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-[3px] bg-neutral-900 border border-border/60 flex items-center justify-center text-[#c8d400]">
+            <Users className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+              <span>{dict.admin.teamTitle}</span>
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {dict.admin.teamSubtitle}
+            </p>
+          </div>
+        </div>
+
+        <Button asChild variant="outline" size="sm" className="h-9 px-4 text-xs font-semibold rounded-[3px] border-border/60 self-start sm:self-auto gap-1.5">
+          <Link href={`/admin/brand/${brandId}/settings/team`}>
+            <span>{dict.admin.manageTeam}</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </Button>
       </div>

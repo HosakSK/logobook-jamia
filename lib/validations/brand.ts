@@ -1,11 +1,25 @@
 import { z } from "zod";
 
+/**
+ * Brand project limits by subscription tier (Single Source of Truth)
+ */
 export const TIER_LIMITS: Record<string, number> = {
   FREE: 1,
-  COMPANY: 2,
-  FREELANCER: 10,
-  AGENCY: 50,
-  PLATINUM: 100,
+  COMPANY: 3,
+  FREELANCER: 8,
+  AGENCY: 30,
+  PLATINUM: 999999,
+};
+
+/**
+ * Team member limits by subscription tier (Owner + invited collaborators)
+ */
+export const TEAM_LIMITS: Record<string, number> = {
+  FREE: 1, // 1 user (Owner only, 0 invitations)
+  COMPANY: 3, // 3 members (Owner + 2 collaborators, e.g. client + freelancer)
+  FREELANCER: 3, // 3 members (Owner + 2 collaborators)
+  AGENCY: 10, // 10 members
+  PLATINUM: 999999, // Unlimited team members
 };
 
 export const createBrandSchema = z.object({
