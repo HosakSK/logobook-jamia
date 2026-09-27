@@ -34,7 +34,7 @@ export default async function AdminLayout({
     : null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-muted/20">
+    <div className="min-h-screen flex flex-col bg-canvas-dark text-foreground">
       {isUnverified && user?.email && (
         <VerificationBanner email={user.email} locale={currentLocale} />
       )}

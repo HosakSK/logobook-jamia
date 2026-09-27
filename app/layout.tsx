@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "600", "800"],
+  variable: "--font-plus-jakarta-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Logobook.sk | Moderný online brand manuál",
   description:
     "Profesionálna platforma pre tvorbu, správu a zdieľanie dizajn manuálov a digitálnych identít.",
+  icons: {
+    icon: "/logo/logo-symbol-dark.svg",
+    shortcut: "/logo/logo-symbol-dark.svg",
+    apple: "/logo/logo-symbol-dark.svg",
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +30,9 @@ export default function RootLayout({
     <html
       lang="sk"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={plusJakartaSans.variable}
     >
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground">
+      <body className="min-h-screen font-sans bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground font-light">
         <Providers>{children}</Providers>
       </body>
     </html>

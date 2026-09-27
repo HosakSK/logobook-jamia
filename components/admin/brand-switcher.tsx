@@ -46,11 +46,11 @@ export function BrandSwitcher({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border bg-card hover:bg-neutral-50 dark:hover:bg-neutral-800/60 transition-colors text-left shadow-2xs cursor-pointer"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-[3px] border border-border bg-card hover:bg-elevated transition-colors text-left shadow-2xs cursor-pointer"
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2.5 truncate">
-          <div className="h-6 w-6 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-[10px] shrink-0 shadow-2xs">
+          <div className="h-6 w-6 rounded-[3px] bg-primary text-primary-foreground flex items-center justify-center font-bold text-[10px] shrink-0 shadow-2xs">
             {currentBrand.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="truncate">
@@ -66,7 +66,7 @@ export function BrandSwitcher({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-1.5 w-64 rounded-xl shadow-lg bg-card border z-50 py-1.5 animate-in fade-in-50 zoom-in-95">
+        <div className="absolute left-0 mt-1.5 w-64 rounded-[3px] shadow-lg bg-surface border border-border z-50 py-1.5 animate-in fade-in-50 zoom-in-95">
           <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
             {dict.admin.brandsListTitle}
           </div>
@@ -80,12 +80,12 @@ export function BrandSwitcher({
                   onClick={() => handleSelect(brand)}
                   className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer ${
                     isSelected
-                      ? "bg-neutral-100 dark:bg-neutral-800 text-foreground font-semibold"
-                      : "text-muted-foreground hover:bg-neutral-50 dark:hover:bg-neutral-800/50 hover:text-foreground"
+                      ? "bg-elevated text-primary font-semibold"
+                      : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <div className="h-5 w-5 rounded bg-muted flex items-center justify-center font-bold text-[9px]">
+                    <div className="h-5 w-5 rounded-[3px] bg-secondary border border-border flex items-center justify-center font-bold text-[9px]">
                       {brand.name.slice(0, 2).toUpperCase()}
                     </div>
                     <span className="truncate">{brand.name}</span>
@@ -96,12 +96,12 @@ export function BrandSwitcher({
             })}
           </div>
 
-          <div className="border-t pt-1.5 mt-1 px-1">
+          <div className="border-t border-border pt-1.5 mt-1 px-1">
             <Link
               href={`/m/${currentBrand.slug}`}
               target="_blank"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-elevated rounded-[3px] transition-colors"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>{dict.admin.viewLiveManual}</span>

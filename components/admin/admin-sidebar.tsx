@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useBrandStore } from "@/lib/store/brand-store";
 import { BrandSwitcher } from "@/components/admin/brand-switcher";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/brand/logo";
 import { getDictionary, Locale, DEFAULT_LOCALE } from "@/lib/i18n";
 import {
   FolderKanban,
@@ -92,20 +92,15 @@ export function AdminSidebar({
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-card border-r w-64 p-5 space-y-6">
+    <div className="flex flex-col h-full bg-card border-r border-border w-64 p-5 space-y-6">
       {/* Brand Switcher Header */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <Link href="/admin" className="flex items-center gap-2 font-bold tracking-tight text-base">
-            <div className="h-7 w-7 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-black text-xs shadow-xs">
-              LB
-            </div>
-            <span>Logobook<span className="text-neutral-400 font-normal"> Studio</span></span>
-          </Link>
+          <Logo variant="full" mode="dark" href="/admin" priority />
           {onMobileClose && (
             <button
               onClick={onMobileClose}
-              className="md:hidden p-1 rounded-md text-muted-foreground hover:text-foreground"
+              className="md:hidden p-1 rounded-[3px] text-muted-foreground hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>
@@ -122,7 +117,7 @@ export function AdminSidebar({
           <div className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>{dict.admin.brandSection}</span>
             {activeBrand && (
-              <span className="text-[9px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+              <span className="text-[9px] font-mono text-[#009f80] font-bold bg-[#009f80]/10 border border-[#009f80]/30 px-1.5 py-0.5 rounded-[3px]">
                 ACTIVE
               </span>
             )}
@@ -137,10 +132,10 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[3px] text-xs font-medium transition-colors ${
                   isActive
-                    ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 font-semibold shadow-2xs"
-                    : "text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800/60 hover:text-foreground"
+                    ? "bg-elevated text-primary font-semibold border border-primary/30"
+                    : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -165,10 +160,10 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[3px] text-xs font-medium transition-colors ${
                   isActive
-                    ? "bg-neutral-100 dark:bg-neutral-800 text-foreground font-semibold"
-                    : "text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800/60 hover:text-foreground"
+                    ? "bg-elevated text-primary font-semibold border border-primary/30"
+                    : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -180,9 +175,9 @@ export function AdminSidebar({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 border-t flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="font-mono">v0.0.1.9</span>
-        <ThemeToggle />
+      <div className="pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
+        <span className="font-mono">v0.0.1.10</span>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Logobook Studio</span>
       </div>
     </div>
   );

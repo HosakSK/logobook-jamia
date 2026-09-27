@@ -1,53 +1,133 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+}
+
 @layer base {
   :root {
-    --background: #ffffff;
-    --foreground: #09090b;
-    --card: #ffffff;
-    --card-foreground: #09090b;
-    --popover: #ffffff;
-    --popover-foreground: #09090b;
-    --primary: #18181b;
-    --primary-foreground: #fafafa;
-    --secondary: #f4f4f5;
-    --secondary-foreground: #18181b;
-    --muted: #f4f4f5;
-    --muted-foreground: #71717a;
-    --accent: #f4f4f5;
-    --accent-foreground: #18181b;
-    --destructive: #ef4444;
-    --destructive-foreground: #fafafa;
-    --border: #e4e4e7;
-    --input: #e4e4e7;
-    --ring: #18181b;
-    --radius: 0.5rem;
+    /* Strict border radius according to design_rules.md */
+    --radius: 3px;
+    --radius-base: 3px;
+
+    /* Brand Accents */
+    --color-accent-red: #bb4934;
+    --color-accent-lime: #c8d400;
+    --color-accent-teal: #009f80;
+
+    /* Default UI is Dark (Admin, Homepage, Catalog) */
+    --background: #070b0f;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #1f2c36;
+    --popover-foreground: #fafbfc;
+    --primary: #c8d400;
+    --primary-foreground: #070b0f;
+    --secondary: #17212a;
+    --secondary-foreground: #fafbfc;
+    --muted: #17212a;
+    --muted-foreground: #96abbe;
+    --accent: #1f2c36;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
+    --destructive-foreground: #fafbfc;
+    --border: rgba(63, 85, 102, 0.6);
+    --input: rgba(7, 11, 15, 0.85);
+    --ring: #c8d400;
+
+    /* Background Gradients */
+    --bg-page-start: #070b0f;
+    --bg-page-end: #0e161d;
+    --bg-card: rgba(23, 33, 42, 0.75);
+    --bg-card-hover: rgba(31, 44, 54, 0.85);
+    --bg-elevated: #1f2c36;
+    --bg-surface: #2b3b48;
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(250, 251, 252, 0.05);
   }
 
-  .dark {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card: #09090b;
-    --card-foreground: #fafafa;
-    --popover: #09090b;
-    --popover-foreground: #fafafa;
-    --primary: #fafafa;
-    --primary-foreground: #18181b;
-    --secondary: #27272a;
-    --secondary-foreground: #fafafa;
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
-    --accent: #27272a;
-    --accent-foreground: #fafafa;
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fafafa;
-    --border: #27272a;
-    --input: #27272a;
-    --ring: #d4d4d8;
+  /* Explicit dark mode class */
+  .dark, [data-theme="dark"] {
+    --background: #070b0f;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #1f2c36;
+    --popover-foreground: #fafbfc;
+    --primary: #c8d400;
+    --primary-foreground: #070b0f;
+    --secondary: #17212a;
+    --secondary-foreground: #fafbfc;
+    --muted: #17212a;
+    --muted-foreground: #96abbe;
+    --accent: #1f2c36;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
+    --destructive-foreground: #fafbfc;
+    --border: rgba(63, 85, 102, 0.6);
+    --input: rgba(7, 11, 15, 0.85);
+    --ring: #c8d400;
+  }
+
+  /* Context 2: Light UI (Default for Logobook detail presentation) */
+  .theme-light, [data-context="logobook"], [data-theme="light"] {
+    --background: #fafbfc;
+    --foreground: #0e161d;
+    --card: #ffffff;
+    --card-foreground: #0e161d;
+    --popover: #ffffff;
+    --popover-foreground: #0e161d;
+    --primary: #c8d400;
+    --primary-foreground: #070b0f;
+    --secondary: #f1f4f7;
+    --secondary-foreground: #0e161d;
+    --muted: #f1f4f7;
+    --muted-foreground: #587489;
+    --accent: #f1f4f7;
+    --accent-foreground: #0e161d;
+    --destructive: #bb4934;
+    --destructive-foreground: #fafbfc;
+    --border: #bac8d6;
+    --input: #ffffff;
+    --ring: #c8d400;
+
+    --bg-page-start: #fafbfc;
+    --bg-page-end: #eef2f6;
+    --bg-card: #ffffff;
+    --bg-card-hover: #fcfdfe;
+    --bg-elevated: #f1f4f7;
+    --shadow-card: 0 4px 18px rgba(14, 22, 29, 0.06), 0 1px 3px rgba(14, 22, 29, 0.04);
   }
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Custom utility classes according to design_rules.md */
+.bg-canvas-dark {
+  background: linear-gradient(180deg, #070b0f 0%, #0e161d 100%);
+}
+
+.bg-canvas-light {
+  background: linear-gradient(180deg, #fafbfc 0%, #eef2f6 100%);
+}
+
+.card-dark {
+  background: rgba(23, 33, 42, 0.75);
+  border: 1px solid rgba(63, 85, 102, 0.6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(250, 251, 252, 0.05);
+  border-radius: 3px;
+}
+
+.card-dark:hover {
+  background: rgba(31, 44, 54, 0.85);
 }

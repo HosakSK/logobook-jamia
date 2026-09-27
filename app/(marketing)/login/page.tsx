@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Logo } from "@/components/brand/logo";
 import { pb } from "@/lib/pocketbase";
 import { getDictionary, Locale, DEFAULT_LOCALE, isValidLocale } from "@/lib/i18n";
-import { ShieldCheck, BookOpen, AlertCircle, ArrowLeft, Loader2, UserPlus } from "lucide-react";
+import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -60,19 +60,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900">
+    <div className="min-h-screen flex flex-col bg-canvas-dark text-foreground">
       {/* Top Header */}
-      <header className="border-b bg-background/80 backdrop-blur-md">
+      <header className="border-b border-border bg-card/85 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 font-bold tracking-tight text-lg">
-            <div className="h-8 w-8 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-xs">
-              <BookOpen className="h-4 w-4" />
-            </div>
-            <span>Logobook<span className="text-neutral-400 font-normal">.sk</span></span>
-          </Link>
+          <Logo variant="full" mode="dark" href="/" priority />
           <div className="flex items-center gap-2">
             <LanguageSwitcher currentLocale={currentLocale} />
-            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -84,15 +78,15 @@ export default function LoginPage() {
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               {dict.login.title}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground font-light">
               {dict.login.subtitle}
             </p>
           </div>
 
-          <div className="bg-card border rounded-2xl p-8 shadow-xs space-y-6">
+          <div className="card-dark p-8 space-y-6">
             {error && (
-              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 shrink-0" />
+              <div className="p-3 rounded-[3px] bg-[#bb4934]/15 border border-[#bb4934]/40 text-[#fafbfc] text-xs flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 shrink-0 text-[#bb4934]" />
                 <span>{error}</span>
               </div>
             )}

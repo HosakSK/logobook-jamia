@@ -23,12 +23,12 @@ export function AdminTopbar({
   onMenuToggle,
 }: AdminTopbarProps) {
   return (
-    <header className="h-16 border-b bg-card flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 backdrop-blur-md">
+    <header className="h-16 border-b border-border bg-card/90 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 backdrop-blur-md">
       {/* Left: Mobile hamburger + Dynamic Breadcrumbs */}
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuToggle}
-          className="md:hidden p-2 rounded-lg text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+          className="md:hidden p-2 rounded-[3px] text-muted-foreground hover:bg-elevated hover:text-foreground transition-colors cursor-pointer"
           aria-label="Toggle navigation menu"
         >
           <Menu className="h-5 w-5" />

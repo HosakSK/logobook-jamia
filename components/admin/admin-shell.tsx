@@ -24,7 +24,7 @@ export function AdminShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-muted/20">
+    <div className="flex min-h-screen bg-canvas-dark text-foreground">
       {/* Sidebar (Desktop + Mobile Drawer) */}
       <AdminSidebar
         locale={locale}

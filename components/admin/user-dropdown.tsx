@@ -45,10 +45,10 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+        className="flex items-center gap-2 p-1.5 rounded-[3px] hover:bg-elevated transition-colors cursor-pointer"
         aria-expanded={isOpen}
       >
-        <div className="h-8 w-8 rounded-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center font-bold text-xs shadow-xs">
+        <div className="h-8 w-8 rounded-[3px] bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shadow-2xs">
           {initials}
         </div>
         <div className="hidden sm:block text-left">
@@ -63,17 +63,17 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-card border z-50 py-1.5 animate-in fade-in-50 zoom-in-95">
+        <div className="absolute right-0 mt-2 w-56 rounded-[3px] shadow-lg bg-surface border border-border z-50 py-1.5 animate-in fade-in-50 zoom-in-95">
           {/* User Header */}
-          <div className="px-3.5 py-2.5 border-b space-y-1">
+          <div className="px-3.5 py-2.5 border-b border-border space-y-1">
             <p className="text-xs font-semibold text-foreground truncate">{displayName}</p>
             <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
             <div className="flex items-center gap-1.5 pt-1">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200">
+              <span className="px-2 py-0.5 rounded-[3px] text-[10px] font-semibold bg-secondary border border-border text-foreground">
                 {tier} Tier
               </span>
               {user?.verified && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                <span className="inline-flex items-center gap-0.5 text-[10px] text-[#009f80] font-medium">
                   <ShieldCheck className="h-3 w-3" /> Verified
                 </span>
               )}
@@ -85,7 +85,7 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
             <Link
               href="/admin/profile"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-3.5 py-2 text-xs text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-elevated transition-colors"
             >
               <User className="h-3.5 w-3.5" />
               <span>{dict.admin.profile}</span>
@@ -93,7 +93,7 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
             <Link
               href="/admin/billing"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-3.5 py-2 text-xs text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-elevated transition-colors"
             >
               <CreditCard className="h-3.5 w-3.5" />
               <span>{dict.admin.billing}</span>
@@ -101,11 +101,11 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
           </div>
 
           {/* Logout */}
-          <div className="border-t pt-1">
+          <div className="border-t border-border pt-1">
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="w-full flex items-center gap-2 px-3.5 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                className="w-full flex items-center gap-2 px-3.5 py-2 text-xs text-[#bb4934] hover:bg-[#bb4934]/15 transition-colors cursor-pointer"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span>{dict.admin.logout}</span>

@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { Logo } from "@/components/brand/logo";
 import { registerAction, resendVerificationAction } from "@/actions/auth";
 import { getDictionary, Locale, DEFAULT_LOCALE, isValidLocale } from "@/lib/i18n";
-import { BookOpen, AlertCircle, ArrowLeft, MailCheck, Loader2, CheckCircle2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, MailCheck, Loader2, CheckCircle2 } from "lucide-react";
 
 export default function RegisterPage() {
   const searchParams = useSearchParams();
@@ -80,19 +80,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900">
+    <div className="min-h-screen flex flex-col bg-canvas-dark text-foreground">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-md">
+      <header className="border-b border-border bg-card/85 backdrop-blur-md">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 font-bold tracking-tight text-lg">
-            <div className="h-8 w-8 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 flex items-center justify-center shadow-xs">
-              <BookOpen className="h-4 w-4" />
-            </div>
-            <span>Logobook<span className="text-neutral-400 font-normal">.sk</span></span>
-          </Link>
+          <Logo variant="full" mode="dark" href="/" priority />
           <div className="flex items-center gap-2">
             <LanguageSwitcher currentLocale={currentLocale} />
-            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -102,18 +96,18 @@ export default function RegisterPage() {
         <div className="w-full max-w-md space-y-6">
           {isSuccess ? (
             /* Check Email Confirmation Card */
-            <div className="bg-card border rounded-2xl p-8 shadow-xs text-center space-y-6 animate-in fade-in-50">
-              <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
+            <div className="card-dark p-8 text-center space-y-6 animate-in fade-in-50">
+              <div className="h-14 w-14 rounded-[3px] bg-[#009f80]/15 text-[#009f80] mx-auto flex items-center justify-center border border-[#009f80]/40">
                 <MailCheck className="h-7 w-7" />
               </div>
               <div className="space-y-2">
                 <h1 className="text-2xl font-bold tracking-tight">
                   {dict.register.checkEmailTitle}
                 </h1>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed font-light">
                   {dict.register.checkEmailDesc}
                 </p>
-                <div className="p-2.5 bg-muted/60 rounded-lg text-xs font-mono font-medium text-foreground">
+                <div className="p-2.5 bg-input border border-border rounded-[3px] text-xs font-mono font-medium text-foreground">
                   {email}
                 </div>
               </div>
@@ -133,7 +127,7 @@ export default function RegisterPage() {
                     {dict.register.resendLink}
                   </button>
                   {resendStatus && (
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+                    <p className="text-xs text-[#009f80] mt-1 font-medium">
                       {resendStatus}
                     </p>
                   )}
@@ -147,15 +141,15 @@ export default function RegisterPage() {
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {dict.register.title}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground font-light">
                   {dict.register.subtitle}
                 </p>
               </div>
 
-              <div className="bg-card border rounded-2xl p-8 shadow-xs space-y-6">
+              <div className="card-dark p-8 space-y-6">
                 {error && (
-                  <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 shrink-0" />
+                  <div className="p-3 rounded-[3px] bg-[#bb4934]/15 border border-[#bb4934]/40 text-[#fafbfc] text-xs flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 text-[#bb4934]" />
                     <span>{error}</span>
                   </div>
                 )}
