@@ -1,0 +1,50 @@
+# ==============================================================================
+# Docker Compose for Logobook.sk
+# Stack: Next.js + PocketBase (SQLite) + Cloudflare R2
+# Compatible with Coolify & local Docker Compose
+# ==============================================================================
+
+services:
+  pocketbase:
+    image: ghcr.io/coollabsio/pocketbase:latest
+    container_name: logobook-pocketbase
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - pb_data:/app/pb_data
+      - pb_hooks:/app/pb_hooks
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - logobook-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: logobook-web
+    restart: unless-stopped
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL:-http://pocketbase:8080}
+      - POCKETBASE_INTERNAL_URL=http://pocketbase:8080
+    networks:
+      - logobook-network
+
+volumes:
+  pb_data:
+  pb_hooks:
+
+networks:
+  logobook-network:
+    driver: bridge

@@ -4,6 +4,7 @@ docs/
 vault/
 GEMINI.md
 gemini.md
+/archive/
 
 # Dependencies & Build
 node_modules/
@@ -12,6 +13,12 @@ out/
 
 # Poistka pre lokálne env súbory
 .env*
+
+# PocketBase lokálne dáta
+pb_data/
+pb_public/
+pocketbase
+pocketbase.exe
 
 # Systémové súbory a logy
 .DS_Store
