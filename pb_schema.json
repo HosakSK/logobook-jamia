@@ -1,0 +1,798 @@
+﻿[
+    {
+        "id":  "_pb_users_auth_",
+        "listRule":  "id = @request.auth.id",
+        "viewRule":  "id = @request.auth.id",
+        "createRule":  "",
+        "updateRule":  "id = @request.auth.id",
+        "deleteRule":  "id = @request.auth.id",
+        "name":  "users",
+        "type":  "auth",
+        "fields":  [
+                       {
+                           "autogeneratePattern":  "[a-z0-9]{15}",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3208210256",
+                           "max":  15,
+                           "min":  15,
+                           "name":  "id",
+                           "pattern":  "^[a-z0-9]+$",
+                           "presentable":  false,
+                           "primaryKey":  true,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "cost":  0,
+                           "help":  "",
+                           "hidden":  true,
+                           "id":  "password901924565",
+                           "max":  0,
+                           "min":  8,
+                           "name":  "password",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "password"
+                       },
+                       {
+                           "autogeneratePattern":  "[a-zA-Z0-9]{50}",
+                           "help":  "",
+                           "hidden":  true,
+                           "id":  "text2504183744",
+                           "max":  60,
+                           "min":  30,
+                           "name":  "tokenKey",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "exceptDomains":  [
+
+                                             ],
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "email3885137012",
+                           "name":  "email",
+                           "onlyDomains":  [
+
+                                           ],
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "email"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "bool1547992806",
+                           "name":  "emailVisibility",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  true,
+                           "type":  "bool"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "bool256245529",
+                           "name":  "verified",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  true,
+                           "type":  "bool"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text1579384326",
+                           "max":  255,
+                           "min":  0,
+                           "name":  "name",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "file376926767",
+                           "maxSelect":  1,
+                           "maxSize":  0,
+                           "mimeTypes":  [
+                                             "image/jpeg",
+                                             "image/png",
+                                             "image/svg+xml",
+                                             "image/gif",
+                                             "image/webp"
+                                         ],
+                           "name":  "avatar",
+                           "presentable":  false,
+                           "protected":  false,
+                           "required":  false,
+                           "system":  false,
+                           "thumbs":  [
+
+                                      ],
+                           "type":  "file"
+                       },
+                       {
+                           "hidden":  false,
+                           "id":  "autodate2990389176",
+                           "name":  "created",
+                           "onCreate":  true,
+                           "onUpdate":  false,
+                           "presentable":  false,
+                           "system":  false,
+                           "type":  "autodate"
+                       },
+                       {
+                           "hidden":  false,
+                           "id":  "autodate3332085495",
+                           "name":  "updated",
+                           "onCreate":  true,
+                           "onUpdate":  true,
+                           "presentable":  false,
+                           "system":  false,
+                           "type":  "autodate"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "select1098958488",
+                           "maxSelect":  1,
+                           "name":  "locale",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "select",
+                           "values":  [
+                                          "sk",
+                                          "en",
+                                          "de"
+                                      ]
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "select614373258",
+                           "maxSelect":  1,
+                           "name":  "tier",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "select",
+                           "values":  [
+                                          "FREE",
+                                          "COMPANY",
+                                          "FREELANCER",
+                                          "AGENCY",
+                                          "PLATINUM"
+                                      ]
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text2490713792",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "lemonCustomerId",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text959317209",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "lemonSubId",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       }
+                   ],
+        "indexes":  [
+                        "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+                        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != \u0027\u0027"
+                    ],
+        "created":  "2026-09-27 06:27:40.099Z",
+        "updated":  "2026-09-27 06:43:45.484Z",
+        "system":  false,
+        "authRule":  "",
+        "manageRule":  null,
+        "authAlert":  {
+                          "enabled":  true,
+                          "emailTemplate":  {
+                                                "subject":  "Login from a new location",
+                                                "body":  "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eWe noticed a login to your {APP_NAME} account from a new location:\u003c/p\u003e\n\u003cp\u003e\u003cem\u003e{ALERT_INFO}\u003c/em\u003e\u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eIf this wasn\u0027t you, you should immediately change your {APP_NAME} account password to revoke access from all other locations.\u003c/strong\u003e\u003c/p\u003e\n\u003cp\u003eIf this was you, you may disregard this email.\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
+                                            }
+                      },
+        "oauth2":  {
+                       "providers":  [
+
+                                     ],
+                       "mappedFields":  {
+                                            "id":  "",
+                                            "name":  "name",
+                                            "username":  "",
+                                            "avatarURL":  "avatar"
+                                        },
+                       "enabled":  false
+                   },
+        "passwordAuth":  {
+                             "enabled":  true,
+                             "identityFields":  [
+                                                    "email"
+                                                ]
+                         },
+        "mfa":  {
+                    "enabled":  false,
+                    "duration":  600,
+                    "rule":  ""
+                },
+        "otp":  {
+                    "enabled":  false,
+                    "duration":  180,
+                    "length":  8,
+                    "emailTemplate":  {
+                                          "subject":  "OTP for {APP_NAME}",
+                                          "body":  "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eYour one-time password is: \u003cstrong\u003e{OTP}\u003c/strong\u003e\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn\u0027t ask for the one-time password, you can ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
+                                      }
+                },
+        "authToken":  {
+                          "duration":  432000
+                      },
+        "passwordResetToken":  {
+                                   "duration":  1800
+                               },
+        "emailChangeToken":  {
+                                 "duration":  1800
+                             },
+        "verificationToken":  {
+                                  "duration":  86400
+                              },
+        "fileToken":  {
+                          "duration":  180
+                      },
+        "verificationTemplate":  {
+                                     "subject":  "Verify your {APP_NAME} email",
+                                     "body":  "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eThank you for joining us at {APP_NAME}.\u003c/p\u003e\n\u003cp\u003eClick on the button below to verify your email address.\u003c/p\u003e\n\u003cp\u003e\n  \u003ca class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-verification/{TOKEN}\" target=\"_blank\" rel=\"noopener\"\u003eVerify\u003c/a\u003e\n\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn\u0027t recently register, please ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
+                                 },
+        "resetPasswordTemplate":  {
+                                      "subject":  "Reset your {APP_NAME} password",
+                                      "body":  "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eClick on the button below to reset your password.\u003c/p\u003e\n\u003cp\u003e\n  \u003ca class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-password-reset/{TOKEN}\" target=\"_blank\" rel=\"noopener\"\u003eReset password\u003c/a\u003e\n\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn\u0027t ask to reset your password, please ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
+                                  },
+        "confirmEmailChangeTemplate":  {
+                                           "subject":  "Confirm your {APP_NAME} new email address",
+                                           "body":  "\u003cp\u003eHello,\u003c/p\u003e\n\u003cp\u003eClick on the button below to confirm your new email address.\u003c/p\u003e\n\u003cp\u003e\n  \u003ca class=\"btn\" href=\"{APP_URL}/_/#/auth/confirm-email-change/{TOKEN}\" target=\"_blank\" rel=\"noopener\"\u003eConfirm new email\u003c/a\u003e\n\u003c/p\u003e\n\u003cp\u003e\u003ci\u003eIf you didn\u0027t ask to change your email address, please ignore this email.\u003c/i\u003e\u003c/p\u003e\n\u003cp\u003e\n  Thanks,\u003cbr/\u003e\n  {APP_NAME} team\n\u003c/p\u003e"
+                                       }
+    },
+    {
+        "id":  "pbc_1236351354",
+        "listRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 (user = @request.auth.id || @collection.teamMembers.brand ?= id \u0026\u0026 @collection.teamMembers.user ?= @request.auth.id)",
+        "viewRule":  "status = \u0027LIVE\u0027 || (@request.auth.id != \u0027\u0027 \u0026\u0026 (user = @request.auth.id || @collection.teamMembers.brand ?= id \u0026\u0026 @collection.teamMembers.user ?= @request.auth.id))",
+        "createRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "updateRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 (user = @request.auth.id || (@collection.teamMembers.brand ?= id \u0026\u0026 @collection.teamMembers.user ?= @request.auth.id \u0026\u0026 @collection.teamMembers.role ?= \u0027OWNER\u0027))",
+        "deleteRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "name":  "brands",
+        "type":  "base",
+        "fields":  [
+                       {
+                           "autogeneratePattern":  "[a-z0-9]{15}",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3208210256",
+                           "max":  15,
+                           "min":  15,
+                           "name":  "id",
+                           "pattern":  "^[a-z0-9]+$",
+                           "presentable":  false,
+                           "primaryKey":  true,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "cascadeDelete":  false,
+                           "collectionId":  "_pb_users_auth_",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "relation2375276105",
+                           "maxSelect":  1,
+                           "minSelect":  0,
+                           "name":  "user",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "relation"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text1579384326",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "name",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text2560465762",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "slug",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3912241096",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "customDomain",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "bool1674779884",
+                           "name":  "isDomainVerified",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "bool"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "select2063623452",
+                           "maxSelect":  1,
+                           "name":  "status",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "select",
+                           "values":  [
+                                          "LIVE",
+                                          "DEV",
+                                          "ARCHIVED"
+                                      ]
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json2835264165",
+                           "maxSize":  0,
+                           "name":  "publishedConfig",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3144156336",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "passwordHash",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "bool3245270139",
+                           "name":  "hideLogobookBadge",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "bool"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "select624065340",
+                           "maxSelect":  1,
+                           "name":  "defaultLocale",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "select",
+                           "values":  [
+                                          "sk",
+                                          "en",
+                                          "de"
+                                      ]
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json2824568318",
+                           "maxSize":  0,
+                           "name":  "enabledLocales",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3928352701",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "headerLogo",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text2229311990",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "favicon",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json1843675174",
+                           "maxSize":  0,
+                           "name":  "description",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       }
+                   ],
+        "indexes":  [
+                        "CREATE UNIQUE INDEX `idx_brands_slug` ON `brands` (`slug`)",
+                        "CREATE UNIQUE INDEX `idx_brands_customDomain` ON `brands` (`customDomain`) WHERE customDomain != \u0027\u0027"
+                    ],
+        "created":  "2026-09-27 06:43:59.809Z",
+        "updated":  "2026-09-27 06:44:12.841Z",
+        "system":  false
+    },
+    {
+        "id":  "pbc_3511955875",
+        "listRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "viewRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "createRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "updateRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "deleteRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id",
+        "name":  "agencyDefaults",
+        "type":  "base",
+        "fields":  [
+                       {
+                           "autogeneratePattern":  "[a-z0-9]{15}",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3208210256",
+                           "max":  15,
+                           "min":  15,
+                           "name":  "id",
+                           "pattern":  "^[a-z0-9]+$",
+                           "presentable":  false,
+                           "primaryKey":  true,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "cascadeDelete":  false,
+                           "collectionId":  "_pb_users_auth_",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "relation2375276105",
+                           "maxSelect":  1,
+                           "minSelect":  0,
+                           "name":  "user",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "relation"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json2733769083",
+                           "maxSize":  0,
+                           "name":  "defaultClearanceZone",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json3651003617",
+                           "maxSize":  0,
+                           "name":  "defaultMinSize",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json1351613733",
+                           "maxSize":  0,
+                           "name":  "defaultRules",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json3915592423",
+                           "maxSize":  0,
+                           "name":  "defaultPageTree",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json3340793766",
+                           "maxSize":  0,
+                           "name":  "defaultTexts",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       }
+                   ],
+        "indexes":  [
+                        "CREATE UNIQUE INDEX `idx_agencyDefaults_user` ON `agencyDefaults` (`user`)"
+                    ],
+        "created":  "2026-09-27 06:44:00.081Z",
+        "updated":  "2026-09-27 06:44:00.081Z",
+        "system":  false
+    },
+    {
+        "id":  "pbc_2863824924",
+        "listRule":  "isSystem = true || (@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id)",
+        "viewRule":  "isSystem = true || (@request.auth.id != \u0027\u0027 \u0026\u0026 user = @request.auth.id)",
+        "createRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 isSystem = false \u0026\u0026 user = @request.auth.id",
+        "updateRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 isSystem = false \u0026\u0026 user = @request.auth.id",
+        "deleteRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 isSystem = false \u0026\u0026 user = @request.auth.id",
+        "name":  "pageTemplates",
+        "type":  "base",
+        "fields":  [
+                       {
+                           "autogeneratePattern":  "[a-z0-9]{15}",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3208210256",
+                           "max":  15,
+                           "min":  15,
+                           "name":  "id",
+                           "pattern":  "^[a-z0-9]+$",
+                           "presentable":  false,
+                           "primaryKey":  true,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "cascadeDelete":  false,
+                           "collectionId":  "_pb_users_auth_",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "relation2375276105",
+                           "maxSelect":  1,
+                           "minSelect":  0,
+                           "name":  "user",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "relation"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "bool136649553",
+                           "name":  "isSystem",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "bool"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json1579384326",
+                           "maxSize":  0,
+                           "name":  "name",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json1843675174",
+                           "maxSize":  0,
+                           "name":  "description",
+                           "presentable":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "json"
+                       },
+                       {
+                           "autogeneratePattern":  "",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text105650625",
+                           "max":  0,
+                           "min":  0,
+                           "name":  "category",
+                           "pattern":  "",
+                           "presentable":  false,
+                           "primaryKey":  false,
+                           "required":  false,
+                           "system":  false,
+                           "type":  "text"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "json1862350826",
+                           "maxSize":  0,
+                           "name":  "structure",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "json"
+                       }
+                   ],
+        "indexes":  [
+
+                    ],
+        "created":  "2026-09-27 06:44:00.128Z",
+        "updated":  "2026-09-27 06:44:00.128Z",
+        "system":  false
+    },
+    {
+        "id":  "pbc_4123289677",
+        "listRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 (user = @request.auth.id || brand.user = @request.auth.id)",
+        "viewRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 (user = @request.auth.id || brand.user = @request.auth.id)",
+        "createRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 brand.user = @request.auth.id",
+        "updateRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 brand.user = @request.auth.id",
+        "deleteRule":  "@request.auth.id != \u0027\u0027 \u0026\u0026 (brand.user = @request.auth.id || user = @request.auth.id)",
+        "name":  "teamMembers",
+        "type":  "base",
+        "fields":  [
+                       {
+                           "autogeneratePattern":  "[a-z0-9]{15}",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "text3208210256",
+                           "max":  15,
+                           "min":  15,
+                           "name":  "id",
+                           "pattern":  "^[a-z0-9]+$",
+                           "presentable":  false,
+                           "primaryKey":  true,
+                           "required":  true,
+                           "system":  true,
+                           "type":  "text"
+                       },
+                       {
+                           "cascadeDelete":  false,
+                           "collectionId":  "_pb_users_auth_",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "relation2375276105",
+                           "maxSelect":  1,
+                           "minSelect":  0,
+                           "name":  "user",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "relation"
+                       },
+                       {
+                           "cascadeDelete":  true,
+                           "collectionId":  "pbc_1236351354",
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "relation475199832",
+                           "maxSelect":  1,
+                           "minSelect":  0,
+                           "name":  "brand",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "relation"
+                       },
+                       {
+                           "help":  "",
+                           "hidden":  false,
+                           "id":  "select1466534506",
+                           "maxSelect":  1,
+                           "name":  "role",
+                           "presentable":  false,
+                           "required":  true,
+                           "system":  false,
+                           "type":  "select",
+                           "values":  [
+                                          "OWNER",
+                                          "EDITOR",
+                                          "VIEWER"
+                                      ]
+                       }
+                   ],
+        "indexes":  [
+                        "CREATE UNIQUE INDEX idx_teamMembers_brand_user ON teamMembers (brand, user)"
+                    ],
+        "created":  "2026-09-27 06:44:06.184Z",
+        "updated":  "2026-09-27 06:44:06.184Z",
+        "system":  false
+    }
+]
