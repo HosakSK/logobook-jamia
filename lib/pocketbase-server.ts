@@ -17,7 +17,11 @@ export async function getServerPocketBase() {
 
   if (authCookie?.value) {
     try {
-      pb.authStore.loadFromCookie(`pb_auth=${authCookie.value}`);
+      let cookieVal = authCookie.value;
+      if (cookieVal.startsWith("%25") || cookieVal.includes("%2522")) {
+        cookieVal = decodeURIComponent(cookieVal);
+      }
+      pb.authStore.loadFromCookie(`pb_auth=${cookieVal}`);
       // Refresh token if expired or about to expire
       if (pb.authStore.isValid) {
         try {
@@ -58,7 +62,9 @@ export async function savePocketBaseCookie(pb: PocketBase) {
   // Parse cookie string returned by pb.authStore.exportToCookie
   const match = rawCookie.match(/pb_auth=([^;]+)/);
   if (match && match[1]) {
-    cookieStore.set("pb_auth", match[1], {
+    // Decode pre-encoded string so Next.js does not double-encode it in the Set-Cookie header
+    const cleanValue = decodeURIComponent(match[1]);
+    cookieStore.set("pb_auth", cleanValue, {
       httpOnly: false,
       sameSite: "lax",
       secure: isHttps,

@@ -21,7 +21,6 @@ export default async function AdminGlobalTeamPage() {
   try {
     ownedBrands = await pb.collection("brands").getFullList({
       filter: `user = "${currentUserId}"`,
-      sort: "-created",
     });
   } catch {
     // empty
@@ -33,7 +32,6 @@ export default async function AdminGlobalTeamPage() {
     sharedTeamRecords = await pb.collection("teamMembers").getFullList({
       filter: `user = "${currentUserId}"`,
       expand: "brand,brand.user",
-      sort: "-created",
     });
   } catch {
     // empty

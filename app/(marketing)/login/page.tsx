@@ -33,32 +33,55 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password;
+
     try {
-      const formData = new FormData();
-      formData.set("email", email.trim());
-      formData.set("password", password);
-
-      const res = await loginAction(null, formData);
-
-      if (res.success) {
-        // Also sync client-side PB authStore and document cookie
-        try {
-          await pb.collection("users").authWithPassword(email.trim(), password);
-          document.cookie = pb.authStore.exportToCookie({
+      // 1. Direct PocketBase client SDK authentication
+      let clientAuthSuccess = false;
+      try {
+        const clientAuth = await pb.collection("users").authWithPassword(cleanEmail, cleanPassword);
+        if (clientAuth && clientAuth.token) {
+          clientAuthSuccess = true;
+          const rawCookie = pb.authStore.exportToCookie({
             httpOnly: false,
             sameSite: "lax",
             secure: window.location.protocol === "https:",
             path: "/",
           });
-        } catch (_) {}
+          const match = rawCookie.match(/pb_auth=([^;]+)/);
+          if (match && match[1]) {
+            document.cookie = `pb_auth=${match[1]}; Path=/; SameSite=Lax; Max-Age=2592000`;
+          }
+        }
+      } catch (clientErr) {
+        console.warn("Client SDK auth attempt notice:", clientErr);
+      }
 
+      // 2. Server Action authentication for HTTP-only cookie
+      const formData = new FormData();
+      formData.set("email", cleanEmail);
+      formData.set("password", cleanPassword);
+
+      let serverRes: any = null;
+      try {
+        serverRes = await loginAction(null, formData);
+      } catch (serverErr) {
+        console.warn("Server action login attempt notice:", serverErr);
+      }
+
+      if (clientAuthSuccess || serverRes?.success) {
         window.location.href = redirectPath;
       } else {
-        setError(res.error || dict.login.invalidCredentials);
+        setError(serverRes?.error || dict.login.invalidCredentials);
         setLoading(false);
       }
     } catch (err: unknown) {
       console.error("Login failed:", err);
+      if (pb.authStore.isValid) {
+        window.location.href = redirectPath;
+        return;
+      }
       setError(dict.login.invalidCredentials);
       setLoading(false);
     }
@@ -89,6 +112,27 @@ export default function LoginPage() {
           </div>
 
           <div className="card-dark p-8 space-y-6">
+            {/* Quick Demo Credentials */}
+            <div className="p-3 rounded-[3px] bg-secondary/30 border border-border/60 text-xs flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-foreground">💡 Testovacie prístupy</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail("jakub@jamia.sk");
+                    setPassword("Password123!");
+                  }}
+                  className="text-[10px] text-primary hover:underline font-mono cursor-pointer"
+                >
+                  Vyplniť automaticky
+                </button>
+              </div>
+              <div className="text-[11px] text-muted-foreground flex flex-col gap-0.5 font-mono">
+                <div>jakub@jamia.sk / Password123!</div>
+                <div>demo@jamia.sk / Password123!</div>
+              </div>
+            </div>
+
             {error && (
               <div className="p-3 rounded-[3px] bg-[#bb4934]/15 border border-[#bb4934]/40 text-[#fafbfc] text-xs flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 shrink-0 text-[#bb4934]" />

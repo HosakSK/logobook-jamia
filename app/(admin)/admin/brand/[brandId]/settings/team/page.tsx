@@ -48,7 +48,6 @@ export default async function BrandTeamPage({
     rawTeamMembers = await pb.collection("teamMembers").getFullList({
       filter: `brand = "${brandId}"`,
       expand: "user",
-      sort: "created",
     });
   } catch {
     // empty

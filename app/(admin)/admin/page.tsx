@@ -31,9 +31,7 @@ export default async function AdminDashboardPage() {
   // 1. Fetch user's accessible brands from PocketBase
   let brandsRaw: any[] = [];
   try {
-    brandsRaw = await pb.collection("brands").getFullList({
-      sort: "-created",
-    });
+    brandsRaw = await pb.collection("brands").getFullList();
   } catch (err) {
     console.error("Failed to fetch brands in admin dashboard:", err);
   }

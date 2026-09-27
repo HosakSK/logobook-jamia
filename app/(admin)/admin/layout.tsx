@@ -36,9 +36,7 @@ export default async function AdminLayout({
   let availableBrands: { id: string; slug: string; name: string }[] = [];
   if (user) {
     try {
-      const records = await pb.collection("brands").getFullList({
-        sort: "-created",
-      });
+      const records = await pb.collection("brands").getFullList();
       availableBrands = records.map((b) => ({
         id: b.id,
         slug: b.slug,

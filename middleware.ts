@@ -55,7 +55,14 @@ export function middleware(req: NextRequest) {
     let isAuthenticated = false;
     if (pbAuthCookie && pbAuthCookie.trim() !== "" && pbAuthCookie !== "{}") {
       try {
-        const parsed = JSON.parse(pbAuthCookie);
+        let cookieVal = pbAuthCookie;
+        if (cookieVal.startsWith("%")) {
+          cookieVal = decodeURIComponent(cookieVal);
+        }
+        if (cookieVal.startsWith("%")) {
+          cookieVal = decodeURIComponent(cookieVal);
+        }
+        const parsed = JSON.parse(cookieVal);
         if (parsed.token && typeof parsed.token === "string" && parsed.token.length > 10) {
           isAuthenticated = true;
         }
