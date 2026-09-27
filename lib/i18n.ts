@@ -87,7 +87,6 @@ export const DICTIONARIES = {
       signUp: "Create an account",
       backToHome: "← Back to Homepage",
       securityNotice: "Protected by PocketBase Edge session validation.",
-      demoCredentialsNotice: "Default superuser: jakub@jamia.sk",
       invalidCredentials: "Invalid email or password. Please try again.",
     },
     register: {
@@ -373,7 +372,6 @@ export const DICTIONARIES = {
       signUp: "Zaregistrujte sa",
       backToHome: "← Späť na domovskú stránku",
       securityNotice: "Chránené bezpečným overením PocketBase session na Edge.",
-      demoCredentialsNotice: "Východiskový superuser: jakub@jamia.sk",
       invalidCredentials: "Nesprávny e-mail alebo heslo. Skúste to znova.",
     },
     register: {
@@ -659,7 +657,6 @@ export const DICTIONARIES = {
       signUp: "Zaregistrujte se",
       backToHome: "← Zpět na domovskou stránku",
       securityNotice: "Chráněno bezpečným ověřením PocketBase session na Edge.",
-      demoCredentialsNotice: "Výchozí superuser: jakub@jamia.sk",
       invalidCredentials: "Nesprávný e-mail nebo heslo. Zkuste to znovu.",
     },
     register: {

@@ -112,26 +112,6 @@ export default function LoginPage() {
           </div>
 
           <div className="card-dark p-8 space-y-6">
-            {/* Quick Demo Credentials */}
-            <div className="p-3 rounded-[3px] bg-secondary/30 border border-border/60 text-xs flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-foreground">💡 Testovacie prístupy</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("jakub@jamia.sk");
-                    setPassword("Password123!");
-                  }}
-                  className="text-[10px] text-primary hover:underline font-mono cursor-pointer"
-                >
-                  Vyplniť automaticky
-                </button>
-              </div>
-              <div className="text-[11px] text-muted-foreground flex flex-col gap-0.5 font-mono">
-                <div>jakub@jamia.sk / Password123!</div>
-              </div>
-            </div>
-
             {error && (
               <div className="p-3 rounded-[3px] bg-[#bb4934]/15 border border-[#bb4934]/40 text-[#fafbfc] text-xs flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 shrink-0 text-[#bb4934]" />
