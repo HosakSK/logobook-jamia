@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/brand/logo";
 import { pb } from "@/lib/pocketbase";
+import { loginAction } from "@/actions/auth";
 import { getDictionary, Locale, DEFAULT_LOCALE, isValidLocale } from "@/lib/i18n";
 import { AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
 
@@ -33,28 +34,32 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Authenticate with PocketBase JS SDK
-      const authData = await pb.collection("users").authWithPassword(email, password);
+      const formData = new FormData();
+      formData.set("email", email.trim());
+      formData.set("password", password);
 
-      if (authData.token) {
-        // 2. Export cookie for Edge middleware
-        document.cookie = pb.authStore.exportToCookie({
-          httpOnly: false,
-          sameSite: "lax",
-          secure: window.location.protocol === "https:",
-          path: "/",
-        });
+      const res = await loginAction(null, formData);
 
-        // 3. Redirect to destination
-        router.push(redirectPath);
-        router.refresh();
+      if (res.success) {
+        // Also sync client-side PB authStore and document cookie
+        try {
+          await pb.collection("users").authWithPassword(email.trim(), password);
+          document.cookie = pb.authStore.exportToCookie({
+            httpOnly: false,
+            sameSite: "lax",
+            secure: window.location.protocol === "https:",
+            path: "/",
+          });
+        } catch (_) {}
+
+        window.location.href = redirectPath;
       } else {
-        setError(dict.login.invalidCredentials);
+        setError(res.error || dict.login.invalidCredentials);
+        setLoading(false);
       }
     } catch (err: unknown) {
       console.error("Login failed:", err);
       setError(dict.login.invalidCredentials);
-    } finally {
       setLoading(false);
     }
   };

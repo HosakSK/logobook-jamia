@@ -1,5 +1,5 @@
 import PocketBase from "pocketbase";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 const pbUrl =
   process.env.NEXT_PUBLIC_POCKETBASE_URL ||
@@ -35,14 +35,23 @@ export async function getServerPocketBase() {
 }
 
 /**
- * Persists the current PocketBase authStore session into HTTP-Only Next.js cookies
+ * Persists the current PocketBase authStore session into Next.js cookies
  */
 export async function savePocketBaseCookie(pb: PocketBase) {
   const cookieStore = await cookies();
+  let isHttps = false;
+  try {
+    const headerList = await headers();
+    const proto = headerList.get("x-forwarded-proto");
+    isHttps = proto === "https";
+  } catch {
+    // fallback
+  }
+
   const rawCookie = pb.authStore.exportToCookie({
-    httpOnly: true,
+    httpOnly: false,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isHttps,
     path: "/",
   });
 
@@ -50,9 +59,9 @@ export async function savePocketBaseCookie(pb: PocketBase) {
   const match = rawCookie.match(/pb_auth=([^;]+)/);
   if (match && match[1]) {
     cookieStore.set("pb_auth", match[1], {
-      httpOnly: true,
+      httpOnly: false,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isHttps,
       path: "/",
       maxAge: 30 * 24 * 60 * 60, // 30 days
     });
