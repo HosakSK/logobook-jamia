@@ -14,29 +14,40 @@ const TIER_STORAGE_LIMITS_BYTES = {
 };
 
 onRecordCreateRequest((e) => {
-  // Superusers bypass storage quotas
-  if (e.hasSuperuserAuth && e.hasSuperuserAuth()) {
-    return e.next();
-  }
-  if (e.auth && e.auth.collectionName === "_superusers") {
-    return e.next();
-  }
-
-  const authRecord = e.auth;
-  if (!authRecord) {
-    return e.next();
-  }
-
-  const userTier = authRecord.get("tier") || "FREE";
-  const quotaLimit = TIER_STORAGE_LIMITS_BYTES[userTier] || TIER_STORAGE_LIMITS_BYTES.FREE;
-
-  // In PB 0.23+, uploaded files can be inspected via request or e.record
   try {
-    const uploadedFiles = e.findUploadedFiles ? e.findUploadedFiles("file") : [];
-    if (uploadedFiles && uploadedFiles.length > 0) {
-      for (let i = 0; i < uploadedFiles.length; i++) {
-        if (uploadedFiles[i].size > quotaLimit) {
-          throw new BadRequestError(`Súbor presahuje maximálny limit úložiska pre balíček ${userTier}.`);
+    // Superusers bypass storage quotas
+    if (e.hasSuperuserAuth && e.hasSuperuserAuth()) {
+      return e.next();
+    }
+    if (e.auth && e.auth.collectionName === "_superusers") {
+      return e.next();
+    }
+
+    const authRecord = e.auth;
+    if (!authRecord) {
+      return e.next();
+    }
+
+    let userTier = "FREE";
+    try {
+      if (typeof authRecord.get === "function") {
+        userTier = authRecord.get("tier") || "FREE";
+      } else if (authRecord.tier) {
+        userTier = authRecord.tier || "FREE";
+      } else if (typeof authRecord.getString === "function") {
+        userTier = authRecord.getString("tier") || "FREE";
+      }
+    } catch (_) {}
+
+    const quotaLimit = TIER_STORAGE_LIMITS_BYTES[userTier] || TIER_STORAGE_LIMITS_BYTES.FREE;
+
+    if (typeof e.findUploadedFiles === "function") {
+      const uploadedFiles = e.findUploadedFiles("file");
+      if (uploadedFiles && uploadedFiles.length > 0) {
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          if (uploadedFiles[i] && uploadedFiles[i].size > quotaLimit) {
+            throw new BadRequestError(`Súbor presahuje maximálny limit úložiska pre balíček ${userTier}.`);
+          }
         }
       }
     }
@@ -44,6 +55,7 @@ onRecordCreateRequest((e) => {
     if (err instanceof BadRequestError) {
       throw err;
     }
+    console.log("[StorageQuotaHook Error]:", err);
   }
 
   return e.next();
