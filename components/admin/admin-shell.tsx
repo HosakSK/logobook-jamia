@@ -12,12 +12,14 @@ interface AdminShellProps {
     tier?: string;
     verified?: boolean;
   } | null;
+  brands?: { id: string; slug: string; name: string }[];
   locale?: Locale;
   children: React.ReactNode;
 }
 
 export function AdminShell({
   user,
+  brands,
   locale = DEFAULT_LOCALE,
   children,
 }: AdminShellProps) {
@@ -27,6 +29,7 @@ export function AdminShell({
     <div className="flex min-h-screen bg-canvas-dark text-foreground">
       {/* Sidebar (Desktop + Mobile Drawer) */}
       <AdminSidebar
+        availableBrands={brands}
         locale={locale}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}

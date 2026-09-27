@@ -1,16 +1,19 @@
-import Link from "next/link";
 import { cookies } from "next/headers";
-import { Button } from "@/components/ui/button";
-import { LocaleBadge } from "@/components/locale-badge";
+import { redirect } from "next/navigation";
+import { getServerPocketBase } from "@/lib/pocketbase-server";
+import { CreateBrandModal } from "@/components/admin/create-brand-modal";
+import { BrandGrid, BrandItem } from "@/components/admin/brand-grid";
+import { TIER_LIMITS } from "@/lib/validations/brand";
 import {
   getDictionary,
   DEFAULT_LOCALE,
   isValidLocale,
   Locale,
-  calculateLocaleCompletion,
-  SUPPORTED_LOCALES,
+  getLocalizedValue,
 } from "@/lib/i18n";
-import { Plus, FolderKanban, ExternalLink, Globe2, ShieldCheck, HardDrive } from "lucide-react";
+import { FolderKanban, HardDrive, ShieldCheck, Zap } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const cookieStore = await cookies();
@@ -18,120 +21,138 @@ export default async function AdminDashboardPage() {
   const currentLocale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const dict = getDictionary(currentLocale);
 
-  // Mock sample dataset to demonstrate LocaleBadge calculation on live brand manuals
-  const demoBrandFields = [
-    {
-      name: { en: "Logobook Global Design System", sk: "Logobook Globálny Dizajn Systém", cs: "Logobook Globální Design Systém" },
-      tagline: { en: "Living Brand Manual", sk: "Živý brand manuál", cs: "Živý brand manuál" },
-      description: {
-        en: "Official identity guidelines and digital assets",
-        sk: "Oficiálne smernice vizuálnej identity a digitálne podklady",
-        cs: "Oficiální směrnice vizuální identity a digitální podklady",
-      },
-    },
-    {
-      title: { en: "Primary Logo Guidelines", sk: "Pravidlá pre primárne logo", cs: "Pravidla pro primární logo" },
-      content: { en: "Clearspace must equal 50% of symbol height.", sk: "Ochranná zóna musí byť 50% výšky symbolu." },
-    },
-  ];
+  const pb = await getServerPocketBase();
+  const user = pb.authStore.record;
 
-  const completionEN = calculateLocaleCompletion(demoBrandFields, "en", "en");
-  const completionSK = calculateLocaleCompletion(demoBrandFields, "sk", "en");
-  const completionCS = calculateLocaleCompletion(demoBrandFields, "cs", "en");
+  if (!user || !pb.authStore.isValid) {
+    redirect("/login?redirect=/admin");
+  }
+
+  // 1. Fetch user's accessible brands from PocketBase
+  let brandsRaw: any[] = [];
+  try {
+    brandsRaw = await pb.collection("brands").getFullList({
+      sort: "-created",
+    });
+  } catch (err) {
+    console.error("Failed to fetch brands in admin dashboard:", err);
+  }
+
+  // 2. Fetch team memberships for role distinction (Owner vs Editor)
+  const teamMemberships: Record<string, string> = {};
+  try {
+    const tm = await pb.collection("teamMembers").getFullList({
+      filter: `user = "${user.id}"`,
+    });
+    tm.forEach((item) => {
+      teamMemberships[item.brand] = item.role;
+    });
+  } catch (err) {
+    console.error("Failed to fetch team memberships:", err);
+  }
+
+  // 3. Map into clean BrandItem objects
+  const brands: BrandItem[] = brandsRaw.map((b) => {
+    const isOwner = b.user === user.id;
+    const role = isOwner ? "OWNER" : (teamMemberships[b.id] || "EDITOR");
+    return {
+      id: b.id,
+      name: b.name,
+      slug: b.slug,
+      customDomain: b.customDomain || undefined,
+      isDomainVerified: b.isDomainVerified || false,
+      status: b.status || "DEV",
+      role,
+      description: getLocalizedValue(b.description, currentLocale) || undefined,
+      updated: b.updated,
+    };
+  });
+
+  // 4. Calculate subscription tier metrics
+  const userTier = (user.tier as string)?.toUpperCase() || "FREE";
+  const maxBrands = TIER_LIMITS[userTier] ?? 1;
+  const ownedBrandsCount = brands.filter((b) => b.role === "OWNER").length;
+  const liveBrandsCount = brands.filter((b) => b.status === "LIVE").length;
+
+  // Storage quota representation per tier
+  const storageLimits: Record<string, string> = {
+    FREE: "500 MB",
+    COMPANY: "2 GB",
+    FREELANCER: "10 GB",
+    AGENCY: "50 GB",
+    PLATINUM: "200 GB",
+  };
+  const tierStorage = storageLimits[userTier] || "500 MB";
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Header bar with CreateBrand button */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border/40">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{dict.admin.title}</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {dict.admin.brandsListTitle}
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {dict.admin.title}
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 font-light">
+            {dict.admin.subtitle}
           </p>
         </div>
-        <Button className="gap-2 self-start sm:self-auto text-xs">
-          <Plus className="h-4 w-4" /> {dict.admin.newBrand}
-        </Button>
+
+        <CreateBrandModal
+          userTier={userTier}
+          ownedBrandsCount={ownedBrandsCount}
+          maxBrands={maxBrands}
+          locale={currentLocale}
+        />
       </div>
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="border rounded-xl p-5 bg-card shadow-xs space-y-1">
+        {/* Metric 1: Brands count */}
+        <div className="card-dark p-5 rounded-[3px] space-y-1">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium">{dict.admin.activeBrands}</span>
-            <FolderKanban className="h-4 w-4" />
+            <span className="text-xs font-semibold">{dict.admin.activeBrands}</span>
+            <FolderKanban className="h-4 w-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold">1</div>
-          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-            1 {dict.admin.statusLive}
+          <div className="text-2xl font-extrabold text-foreground">{brands.length}</div>
+          <span className="text-[11px] text-[#009f80] font-medium block">
+            {liveBrandsCount} {dict.admin.statusLive}
           </span>
         </div>
 
-        <div className="border rounded-xl p-5 bg-card shadow-xs space-y-1">
+        {/* Metric 2: Subscription Plan & Limit */}
+        <div className="card-dark p-5 rounded-[3px] space-y-1">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium">{dict.admin.storageQuota}</span>
-            <HardDrive className="h-4 w-4" />
+            <span className="text-xs font-semibold">{dict.admin.currentPlan}</span>
+            <Zap className="h-4 w-4 text-primary" />
           </div>
-          <div className="text-2xl font-bold">12.4 MB</div>
-          <span className="text-[11px] text-muted-foreground">
-            500 MB limit (Tier: Free)
+          <div className="text-2xl font-extrabold text-foreground">{userTier}</div>
+          <span className="text-[11px] text-muted-foreground font-light block">
+            {ownedBrandsCount} / {maxBrands} {dict.admin.allBrands.toLowerCase()}
           </span>
         </div>
 
-        <div className="border rounded-xl p-5 bg-card shadow-xs space-y-1">
+        {/* Metric 3: Storage Quota */}
+        <div className="card-dark p-5 rounded-[3px] space-y-1">
           <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-medium">{dict.admin.languageStatus}</span>
-            <Globe2 className="h-4 w-4" />
+            <span className="text-xs font-semibold">{dict.admin.storageQuota}</span>
+            <HardDrive className="h-4 w-4 text-primary" />
           </div>
-          <div className="flex items-center gap-1.5 pt-1">
-            <LocaleBadge status={completionEN} />
-            <LocaleBadge status={completionSK} />
-            <LocaleBadge status={completionCS} />
-          </div>
-          <span className="text-[11px] text-muted-foreground block pt-0.5">
-            {dict.admin.completionBadgeNote}
+          <div className="text-2xl font-extrabold text-foreground">0 MB</div>
+          <span className="text-[11px] text-muted-foreground font-light block">
+            Max {tierStorage} limit
           </span>
         </div>
       </div>
 
-      {/* Active Brand Cards List */}
+      {/* Main Brands Section */}
       <div className="space-y-4">
-        <h2 className="text-base font-semibold tracking-tight">
-          {dict.admin.activeBrands}
-        </h2>
-
-        <div className="border rounded-2xl p-6 bg-card shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-lg">{dict.admin.demoBrandName}</h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                {dict.admin.statusLive}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Slug: <span className="font-mono font-medium text-foreground">demo</span> • Domain: <span className="font-mono font-medium text-foreground">demo.logobook.sk</span>
-            </p>
-            {/* Translation Coverage Badges */}
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-xs text-muted-foreground font-medium">{dict.admin.completionBadgeTitle}:</span>
-              <LocaleBadge status={completionEN} showDetails />
-              <LocaleBadge status={completionSK} showDetails />
-              <LocaleBadge status={completionCS} showDetails />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 self-end md:self-center">
-            <Button asChild variant="outline" size="sm" className="text-xs gap-1.5">
-              <Link href="/m/demo">
-                <span>{dict.admin.viewManual}</span>
-                <ExternalLink className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-            <Button size="sm" className="text-xs">
-              {dict.admin.editBrand}
-            </Button>
-          </div>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold tracking-tight">
+            {dict.admin.brandsListTitle}
+          </h2>
         </div>
+
+        <BrandGrid brands={brands} locale={currentLocale} />
       </div>
     </div>
   );

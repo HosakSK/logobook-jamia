@@ -21,12 +21,14 @@ import {
 } from "lucide-react";
 
 interface AdminSidebarProps {
+  availableBrands?: { id: string; slug: string; name: string }[];
   locale?: Locale;
   mobileOpen?: boolean;
   onMobileClose?: () => void;
 }
 
 export function AdminSidebar({
+  availableBrands,
   locale = DEFAULT_LOCALE,
   mobileOpen = false,
   onMobileClose,
@@ -107,7 +109,7 @@ export function AdminSidebar({
           )}
         </div>
 
-        <BrandSwitcher locale={locale} />
+        <BrandSwitcher availableBrands={availableBrands} locale={locale} />
       </div>
 
       {/* Navigation Sections */}
@@ -176,7 +178,7 @@ export function AdminSidebar({
 
       {/* Footer */}
       <div className="pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="font-mono">v0.0.1.10</span>
+        <span className="font-mono">v0.0.1.11</span>
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Logobook Studio</span>
       </div>
     </div>

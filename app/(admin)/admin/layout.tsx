@@ -33,12 +33,28 @@ export default async function AdminLayout({
       }
     : null;
 
+  let availableBrands: { id: string; slug: string; name: string }[] = [];
+  if (user) {
+    try {
+      const records = await pb.collection("brands").getFullList({
+        sort: "-created",
+      });
+      availableBrands = records.map((b) => ({
+        id: b.id,
+        slug: b.slug,
+        name: b.name,
+      }));
+    } catch (err) {
+      console.error("Failed to load user brands in layout:", err);
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-canvas-dark text-foreground">
       {isUnverified && user?.email && (
         <VerificationBanner email={user.email} locale={currentLocale} />
       )}
-      <AdminShell user={userData} locale={currentLocale}>
+      <AdminShell user={userData} brands={availableBrands} locale={currentLocale}>
         {children}
       </AdminShell>
     </div>
