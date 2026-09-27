@@ -18,8 +18,8 @@ FROM base AS deps
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml* ./
-RUN if [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile; \
-    else pnpm i; \
+RUN if [ -f pnpm-lock.yaml ]; then pnpm i --frozen-lockfile --ignore-scripts; \
+    else pnpm i --ignore-scripts; \
     fi
 
 # ------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy public directory and standalone build
-COPY --from=builder /app/public ./public 2>/dev/null || true
+COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
