@@ -15,6 +15,7 @@ import {
   Palette,
   Type,
   Image as ImageIcon,
+  FolderOpen,
   LayoutGrid,
   Settings,
   Sparkles,
@@ -86,6 +87,11 @@ export function AdminSidebar({
       label: dict.admin.brandTypography,
       href: `/admin/brand/${brandId}/typography`,
       icon: Type,
+    },
+    {
+      label: dict.admin.brandMedia,
+      href: `/admin/brand/${brandId}/media`,
+      icon: FolderOpen,
     },
     {
       label: dict.admin.brandBuilder,
