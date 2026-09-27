@@ -16,3 +16,11 @@ export function getPocketBase() {
  * Shared singleton instance for client-side usage
  */
 export const pb = new PocketBase(pbUrl);
+
+/**
+ * Generates direct URL for files stored in PocketBase collections
+ */
+export function getFileUrl(collectionNameOrId: string, recordId: string, filename?: string): string {
+  if (!filename) return "";
+  return `${pbUrl}/api/files/${collectionNameOrId}/${recordId}/${filename}`;
+}

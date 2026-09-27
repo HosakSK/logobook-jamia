@@ -16,6 +16,7 @@ import {
   Type,
   Image as ImageIcon,
   LayoutGrid,
+  Settings,
   Sparkles,
   X,
 } from "lucide-react";
@@ -90,6 +91,11 @@ export function AdminSidebar({
       label: dict.admin.brandBuilder,
       href: `/admin/brand/${brandId}/builder`,
       icon: LayoutGrid,
+    },
+    {
+      label: dict.admin.brandSettings,
+      href: `/admin/brand/${brandId}/settings`,
+      icon: Settings,
     },
   ];
 

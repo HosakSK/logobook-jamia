@@ -1,0 +1,122 @@
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getServerPocketBase } from "@/lib/pocketbase-server";
+import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
+import { getFileUrl } from "@/lib/pocketbase";
+import { BrandGeneralForm } from "@/components/admin/brand-settings/brand-general-form";
+import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favicon-form";
+import { BrandShapesForm } from "@/components/admin/brand-settings/brand-shapes-form";
+import { BrandDangerZone } from "@/components/admin/brand-settings/brand-danger-zone";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, ArrowLeft } from "lucide-react";
+
+export default async function BrandSettingsPage({
+  params,
+}: {
+  params: Promise<{ brandId: string }>;
+}) {
+  const { brandId } = await params;
+  const cookieStore = await cookies();
+  const rawLocale = cookieStore.get("NEXT_LOCALE")?.value || "";
+  const currentLocale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
+  const dict = getDictionary(currentLocale);
+
+  const pb = await getServerPocketBase();
+  const user = pb.authStore.record;
+  const userTier = (user?.tier as string)?.toUpperCase() || "FREE";
+
+  let brand: any = null;
+  try {
+    brand = await pb.collection("brands").getOne(brandId, { expand: "favicon" });
+  } catch {
+    notFound();
+  }
+
+  // Check if current user is owner
+  const isOwner = brand.user === user?.id;
+
+  // Resolve Favicon URL
+  let faviconUrl: string | null = null;
+  if (brand.expand?.favicon) {
+    const favAsset = brand.expand.favicon;
+    faviconUrl = getFileUrl(favAsset.collectionId || "mediaAssets", favAsset.id, favAsset.file);
+  }
+
+  // Fetch Global Shapes record
+  let globalShapes: any = null;
+  try {
+    globalShapes = await pb.collection("globalShapes").getFirstListItem(`brand = "${brandId}"`);
+  } catch {
+    // defaults will be used
+  }
+
+  const serializedBrand = {
+    id: brand.id,
+    name: brand.name,
+    slug: brand.slug,
+    customDomain: brand.customDomain || "",
+    isDomainVerified: brand.isDomainVerified || false,
+    hideLogobookBadge: brand.hideLogobookBadge || false,
+    hasPassword: !!brand.passwordHash,
+    description: typeof brand.description === "object" ? brand.description : {},
+  };
+
+  const serializedShapes = globalShapes
+    ? {
+        radiusMode: globalShapes.radiusMode || "rounded",
+        customRadiusPx: globalShapes.customRadiusPx ?? 3,
+        borderWidthPx: globalShapes.borderWidthPx ?? 1,
+        semanticSuccess: globalShapes.semanticSuccess || "#009f80",
+        semanticWarning: globalShapes.semanticWarning || "#c8d400",
+        semanticDanger: globalShapes.semanticDanger || "#bb4934",
+        semanticInfo: globalShapes.semanticInfo || "#2b3b48",
+      }
+    : null;
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Link
+              href={`/admin/brand/${brandId}`}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              <span>{dict.admin.brandOverview}</span>
+            </Link>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {dict.admin.brandSettings}: <span className="text-primary">{brand.name}</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Spravujte nastavenia projektu, domény, SEO a globálny vizuálny štýl manuálu.
+          </p>
+        </div>
+
+        <Button asChild variant="outline" size="sm" className="gap-2 self-start sm:self-auto text-xs rounded-[3px]">
+          <Link href={`/m/${brand.slug || brandId}`} target="_blank">
+            <span>{dict.admin.viewLiveManual}</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
+      </div>
+
+      {/* 1. General Settings (Name, Slug, SEO, Tier features) */}
+      <BrandGeneralForm brand={serializedBrand} userTier={userTier} dict={dict} />
+
+      {/* 2. Favicon Upload */}
+      <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />
+
+      {/* 3. Global Shapes (Corner radius, border width, semantic colors) */}
+      <BrandShapesForm brandId={brand.id} initialShapes={serializedShapes} dict={dict} />
+
+      {/* 4. Danger Zone (Delete Brand) - Only for Owner */}
+      {isOwner && (
+        <BrandDangerZone brandId={brand.id} brandName={brand.name} dict={dict} />
+      )}
+    </div>
+  );
+}
