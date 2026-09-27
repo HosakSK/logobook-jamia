@@ -2,8 +2,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { VerificationBanner } from "@/components/verification-banner";
+import { getServerPocketBase } from "@/lib/pocketbase-server";
+import { logoutAction } from "@/actions/auth";
 import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
-import { BookOpen, FolderKanban, LogOut, ShieldAlert, Sparkles } from "lucide-react";
+import { FolderKanban, LogOut, Sparkles, UserCheck } from "lucide-react";
 
 export default async function AdminLayout({
   children,
@@ -14,6 +17,10 @@ export default async function AdminLayout({
   const rawLocale = cookieStore.get("NEXT_LOCALE")?.value || "";
   const currentLocale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
   const dict = getDictionary(currentLocale);
+
+  const pb = await getServerPocketBase();
+  const user = pb.authStore.record;
+  const isUnverified = user && user.verified === false;
 
   return (
     <div className="flex min-h-screen bg-muted/20">
@@ -47,8 +54,27 @@ export default async function AdminLayout({
         </nav>
 
         <div className="border-t pt-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-muted-foreground font-mono">v0.0.1.7</span>
+          {user && (
+            <div className="px-1 text-[11px] text-muted-foreground truncate">
+              <span className="block font-medium text-foreground truncate">{user.email}</span>
+              <span className="text-[10px] uppercase font-semibold text-neutral-400">
+                Tier: {user.tier || "Free"}
+              </span>
+            </div>
+          )}
+
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>{dict.admin.logout}</span>
+            </button>
+          </form>
+
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[11px] text-muted-foreground font-mono">v0.0.1.8</span>
             <ThemeToggle />
           </div>
         </div>
@@ -72,6 +98,12 @@ export default async function AdminLayout({
             </Link>
           </div>
         </header>
+
+        {/* Soft-Blocker Verification Banner */}
+        {isUnverified && user?.email && (
+          <VerificationBanner email={user.email} locale={currentLocale} />
+        )}
+
         <main className="flex-1 p-6 md:p-10">{children}</main>
       </div>
     </div>

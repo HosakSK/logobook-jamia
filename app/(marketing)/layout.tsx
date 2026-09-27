@@ -35,6 +35,9 @@ export default async function MarketingLayout({
             </Link>
             <LanguageSwitcher currentLocale={currentLocale} />
             <ThemeToggle />
+            <Button asChild size="sm" variant="ghost" className="text-xs hidden sm:inline-flex">
+              <Link href="/register">{dict.common.register}</Link>
+            </Button>
             <Button asChild size="sm" variant="default" className="text-xs">
               <Link href="/login">{dict.common.login}</Link>
             </Button>

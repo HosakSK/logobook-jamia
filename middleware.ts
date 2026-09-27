@@ -82,9 +82,17 @@ export function middleware(req: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. Public /login or /register routes
+  // 2. Public auth routes: /login, /register, /reset-password, /auth/*
   // ---------------------------------------------------------------------------
-  if (pathname === "/login" || pathname.startsWith("/login/")) {
+  if (
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/register" ||
+    pathname.startsWith("/register/") ||
+    pathname === "/reset-password" ||
+    pathname.startsWith("/reset-password/") ||
+    pathname.startsWith("/auth/")
+  ) {
     return NextResponse.next();
   }
 

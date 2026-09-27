@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { pb } from "@/lib/pocketbase";
 import { getDictionary, Locale, DEFAULT_LOCALE, isValidLocale } from "@/lib/i18n";
-import { ShieldCheck, BookOpen, AlertCircle, ArrowLeft, Loader2 } from "lucide-react";
+import { ShieldCheck, BookOpen, AlertCircle, ArrowLeft, Loader2, UserPlus } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Authenticate with PocketBase
+      // 1. Authenticate with PocketBase JS SDK
       const authData = await pb.collection("users").authWithPassword(email, password);
 
       if (authData.token) {
@@ -118,9 +118,12 @@ export default function LoginPage() {
                   <label className="font-medium text-foreground">
                     {dict.login.passwordLabel}
                   </label>
-                  <span className="text-muted-foreground hover:underline cursor-pointer">
+                  <Link
+                    href={`/reset-password${queryLocale ? `?locale=${queryLocale}` : ""}`}
+                    className="text-muted-foreground hover:underline"
+                  >
                     {dict.login.forgotPassword}
-                  </span>
+                  </Link>
                 </div>
                 <Input
                   type="password"
@@ -156,11 +159,14 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="pt-4 border-t space-y-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{dict.login.securityNotice}</span>
-              </div>
+            <div className="pt-4 border-t flex items-center justify-center text-xs text-muted-foreground gap-1">
+              <span>{dict.login.noAccount}</span>
+              <Link
+                href={`/register${queryLocale ? `?locale=${queryLocale}` : ""}`}
+                className="font-semibold text-foreground underline hover:text-primary transition-colors"
+              >
+                {dict.login.signUp}
+              </Link>
             </div>
           </div>
 
