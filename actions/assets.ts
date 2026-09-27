@@ -27,7 +27,7 @@ export async function getBrandAssetsAction(
 
     const assetRecords = await pb.collection("assets").getFullList({
       filter: `brand = "${brandId}"`,
-      sort: "order,-created",
+      sort: "order",
     });
 
     if (assetRecords.length === 0) {
@@ -38,7 +38,7 @@ export async function getBrandAssetsAction(
     const assetIdsFilter = assetRecords.map((a: any) => `asset = "${a.id}"`).join(" || ");
     const fileRecords = await pb.collection("assetFiles").getFullList({
       filter: assetIdsFilter,
-      sort: "order,-created",
+      sort: "order",
     });
 
     // Map files by asset ID

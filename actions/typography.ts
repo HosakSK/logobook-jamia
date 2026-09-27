@@ -24,7 +24,7 @@ export async function getBrandTypographyAction(
 
     const records = await pb.collection("globalTypography").getFullList({
       filter: `brand = "${brandId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const typography: BrandTypography[] = records.map((rec: any, idx: number) => {

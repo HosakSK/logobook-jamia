@@ -25,7 +25,7 @@ export async function getBrandColorsAction(
 
     const records = await pb.collection("globalColors").getFullList({
       filter: `brand = "${brandId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const colors: BrandColor[] = records.map((rec: any, idx: number) => {
