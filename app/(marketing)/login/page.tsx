@@ -129,7 +129,6 @@ export default function LoginPage() {
               </div>
               <div className="text-[11px] text-muted-foreground flex flex-col gap-0.5 font-mono">
                 <div>jakub@jamia.sk / Password123!</div>
-                <div>demo@jamia.sk / Password123!</div>
               </div>
             </div>
 
