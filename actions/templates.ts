@@ -713,7 +713,7 @@ export async function savePageAsTemplateAction(
     // 2. Fetch all containers for the page
     const containerRecords = await pb.collection("containers").getFullList({
       filter: `page = "${pageId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     if (containerRecords.length === 0) {
@@ -727,7 +727,7 @@ export async function savePageAsTemplateAction(
       const cRec = containerRecords[cIdx];
       const colRecords = await pb.collection("columns").getFullList({
         filter: `container = "${cRec.id}"`,
-        sort: "order,created",
+        sort: "order",
       });
 
       const templateCols = [];
@@ -735,7 +735,7 @@ export async function savePageAsTemplateAction(
         const colRec = colRecords[colIdx];
         const moduleRecords = await pb.collection("modules").getFullList({
           filter: `column = "${colRec.id}"`,
-          sort: "order,created",
+          sort: "order",
         });
 
         const templateModules = moduleRecords.map((mRec: any, mIdx: number) => ({

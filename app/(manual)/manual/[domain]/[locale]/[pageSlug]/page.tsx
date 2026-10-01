@@ -4,18 +4,14 @@ import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { PublishedManualView } from "@/components/manual/published-manual-view";
 
-interface LocalizedManualPageProps {
-  params: Promise<{ domain: string; locale: string }>;
-  searchParams: Promise<{ page?: string }>;
+interface LocalizedManualSubPageProps {
+  params: Promise<{ domain: string; locale: string; pageSlug: string }>;
 }
 
-export default async function LocalizedManualPage({
+export default async function LocalizedManualSubPage({
   params,
-  searchParams,
-}: LocalizedManualPageProps) {
-  const { domain, locale } = await params;
-  const { page: requestedPageSlug } = await searchParams;
-
+}: LocalizedManualSubPageProps) {
+  const { domain, locale, pageSlug } = await params;
   const currentLocale: Locale = isValidLocale(locale) ? locale : DEFAULT_LOCALE;
 
   const pb = await getServerPocketBase();
@@ -39,7 +35,7 @@ export default async function LocalizedManualPage({
     <PublishedManualView
       snapshot={publishedConfig}
       brandSlug={brandRecord.slug || domain}
-      initialPageSlug={requestedPageSlug}
+      initialPageSlug={pageSlug}
       locale={currentLocale}
     />
   );

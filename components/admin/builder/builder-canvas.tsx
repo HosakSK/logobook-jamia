@@ -32,6 +32,7 @@ import { ContainerLayoutType } from "@/types/pocketbase-types";
 import { InlineEditableText } from "./inline-editable-text";
 import { TemplateBrowserModal } from "./template-browser-modal";
 import { SaveTemplateModal } from "./save-template-modal";
+import { PublishBrandButton } from "./publish-brand-button";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
 import {
   updatePageAction,
@@ -464,6 +465,11 @@ export function BuilderCanvas({
                 </>
               )}
             </div>
+
+            <PublishBrandButton
+              brandId={brandId}
+              brandSlug={brandSlug}
+            />
 
             <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-[2px]">
               <Link href={`/m/${brandSlug}`} target="_blank">

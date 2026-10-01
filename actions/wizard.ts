@@ -102,7 +102,7 @@ export async function generateBrandTreeAction(
     // 3. Fetch existing brand pages to ensure incremental safety (skip existing slugs!)
     const existingPages = await pb.collection("pages").getFullList({
       filter: `brand = "${brandId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const existingSlugMap = new Map<string, any>(existingPages.map((p: any) => [p.slug, p]));

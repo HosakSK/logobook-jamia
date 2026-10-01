@@ -63,7 +63,7 @@ export async function getBrandPagesAction(brandId: string): Promise<{
 
     const records = await pb.collection("pages").getFullList({
       filter: `brand = "${brandId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const pages: PageItem[] = records.map((rec: any) => {
@@ -163,7 +163,7 @@ export async function getPageDetailAction(pageId: string): Promise<{
     // 1. Fetch containers for page
     const containerRecords = await pb.collection("containers").getFullList({
       filter: `page = "${pageId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     // 2. Fetch columns for each container
@@ -171,7 +171,7 @@ export async function getPageDetailAction(pageId: string): Promise<{
       containerRecords.map(async (cRec: any) => {
         const colRecords = await pb.collection("columns").getFullList({
           filter: `container = "${cRec.id}"`,
-          sort: "order,created",
+          sort: "order",
         });
 
         // 3. Fetch modules for each column
@@ -179,7 +179,7 @@ export async function getPageDetailAction(pageId: string): Promise<{
           colRecords.map(async (colRec: any) => {
             const modRecords = await pb.collection("modules").getFullList({
               filter: `column = "${colRec.id}"`,
-              sort: "order,created",
+              sort: "order",
             });
 
             const modules = modRecords.map((m: any) => {
@@ -821,7 +821,7 @@ export async function updateContainerLayoutAction(
     // Get existing columns
     const columns = await pb.collection("columns").getFullList({
       filter: `container = "${containerId}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     if (columns.length < targetCount) {
@@ -849,7 +849,7 @@ export async function updateContainerLayoutAction(
       for (const col of columnsToRemove) {
         const modules = await pb.collection("modules").getFullList({
           filter: `column = "${col.id}"`,
-          sort: "order,created",
+          sort: "order",
         });
 
         for (const mod of modules) {
@@ -952,7 +952,7 @@ export async function moveContainerAction(
 
     const siblings = await pb.collection("containers").getFullList({
       filter: `page = "${page.id}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const currentIndex = siblings.findIndex((c) => c.id === containerId);
@@ -997,7 +997,7 @@ export async function moveModuleAction(
     const mod = await pb.collection("modules").getOne(moduleId);
     const siblings = await pb.collection("modules").getFullList({
       filter: `column = "${mod.column}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     const currentIndex = siblings.findIndex((m) => m.id === moduleId);
@@ -1313,7 +1313,7 @@ async function generateUniqueSlug(pb: any, brandId: string, baseSlug: string): P
 async function cloneContainersAndModules(pb: any, sourcePageId: string, targetPageId: string) {
   const containers = await pb.collection("containers").getFullList({
     filter: `page = "${sourcePageId}"`,
-    sort: "order,created",
+    sort: "order",
   });
 
   for (const c of containers) {
@@ -1332,7 +1332,7 @@ async function cloneContainersAndModules(pb: any, sourcePageId: string, targetPa
 
     const columns = await pb.collection("columns").getFullList({
       filter: `container = "${c.id}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     for (const col of columns) {
@@ -1344,7 +1344,7 @@ async function cloneContainersAndModules(pb: any, sourcePageId: string, targetPa
 
       const modules = await pb.collection("modules").getFullList({
         filter: `column = "${col.id}"`,
-        sort: "order,created",
+        sort: "order",
       });
 
       for (const m of modules) {
@@ -1415,7 +1415,7 @@ export async function duplicatePageAction(
     // 3. Deep-duplicate all child sub-pages if this is a parent chapter (User requirement 2)
     const childPages = await pb.collection("pages").getFullList({
       filter: `parent = "${sourcePage.id}"`,
-      sort: "order,created",
+      sort: "order",
     });
 
     for (const child of childPages) {
