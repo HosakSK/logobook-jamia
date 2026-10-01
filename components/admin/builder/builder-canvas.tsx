@@ -23,10 +23,15 @@ import {
   Check,
   Search,
   Globe,
+  LayoutTemplate,
+  BookmarkPlus,
+  ArrowRight,
 } from "lucide-react";
 import { PageDetail, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
 import { InlineEditableText } from "./inline-editable-text";
+import { TemplateBrowserModal } from "./template-browser-modal";
+import { SaveTemplateModal } from "./save-template-modal";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
 import {
   updatePageAction,
@@ -123,6 +128,11 @@ export function BuilderCanvas({
 
   const [activeLocale, setActiveLocale] = useState<string>("en"); // English is primary by default!
   const pageTitle = page.title?.[activeLocale] || page.title?.en || page.title?.sk || "Untitled";
+
+  // Template Engine States
+  const [isTemplateBrowserOpen, setIsTemplateBrowserOpen] = useState(false);
+  const [isSaveTemplateOpen, setIsSaveTemplateOpen] = useState(false);
+  const [isTemplatesMenuOpen, setIsTemplatesMenuOpen] = useState(false);
 
   // Load existing brand link groups when opening link dialog
   useEffect(() => {
@@ -401,6 +411,60 @@ export function BuilderCanvas({
               ))}
             </div>
 
+            {/* Templates Menu */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsTemplatesMenuOpen((prev) => !prev)}
+                className="h-7 px-2.5 text-xs font-medium rounded-[2px] border border-border/60 bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <LayoutTemplate className="h-3.5 w-3.5 text-primary" />
+                <span>Šablóny</span>
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </button>
+
+              {isTemplatesMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-30"
+                    onClick={() => setIsTemplatesMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1 z-40 w-52 bg-card border border-border/70 rounded-md shadow-xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsTemplatesMenuOpen(false);
+                        setIsTemplateBrowserOpen(true);
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-muted/50 flex items-center gap-2 text-foreground cursor-pointer"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <div>
+                        <div className="font-semibold">Galéria šablón</div>
+                        <div className="text-[10px] text-muted-foreground">Načítať hotové rozloženie</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={page.containers.length === 0}
+                      onClick={() => {
+                        setIsTemplatesMenuOpen(false);
+                        setIsSaveTemplateOpen(true);
+                      }}
+                      className="w-full text-left px-3 py-2 hover:bg-muted/50 flex items-center gap-2 text-foreground disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-border/40"
+                    >
+                      <BookmarkPlus className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <div>
+                        <div className="font-semibold">Uložiť ako šablónu</div>
+                        <div className="text-[10px] text-muted-foreground">Uložiť celú túto stránku</div>
+                      </div>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
             <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-[2px]">
               <Link href={`/m/${brandSlug}`} target="_blank">
                 <span>Verejný náhľad</span>
@@ -414,15 +478,55 @@ export function BuilderCanvas({
       {/* Containers (Rows) Stack */}
       <div className="space-y-6">
         {page.containers.length === 0 ? (
-          <div className="border border-dashed border-border/60 rounded-[3px] p-10 text-center space-y-3 bg-neutral-900/20">
-            <Rows className="h-6 w-6 text-muted-foreground mx-auto" />
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-foreground">
-                Táto stránka zatiaľ nemá žiadne riadky
+          <div className="border border-dashed border-border/60 rounded-xl p-10 text-center space-y-6 bg-card/20 shadow-2xs">
+            <div className="space-y-2 max-w-md mx-auto">
+              <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
+                <LayoutTemplate className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-foreground">
+                Táto stránka zatiaľ nemá žiadny obsah
               </h3>
-              <p className="text-xs text-muted-foreground">
-                Pridajte prvý kontajner (mriežku stĺpcov) pre umiestnenie modulov.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Začnite výberom pripravenej systémovej šablóny z knižnice, alebo si vytvorte vlastné rozloženie od nuly.
               </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto text-left">
+              {/* Option 1: Start from template */}
+              <button
+                type="button"
+                onClick={() => setIsTemplateBrowserOpen(true)}
+                className="p-4 rounded-lg border border-primary/50 bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer flex flex-col justify-between space-y-2 group shadow-xs"
+              >
+                <div className="flex items-center justify-between text-xs font-bold text-primary">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4" />
+                    Začať zo šablóny
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Predpripravené rozloženie pre logo, farby, typografiu, vizitku alebo pravidlá.
+                </p>
+              </button>
+
+              {/* Option 2: Add blank row */}
+              <button
+                type="button"
+                onClick={() => handleAddContainer("FULL")}
+                className="p-4 rounded-lg border border-border/60 bg-muted/20 hover:bg-muted/40 transition-all cursor-pointer flex flex-col justify-between space-y-2 group shadow-xs"
+              >
+                <div className="flex items-center justify-between text-xs font-bold text-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 text-primary" />
+                    Prázdny riadok
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Vytvorí čistý riadok s 1 stĺpcom pre manuálne skladanie vlastných modulov.
+                </p>
+              </button>
             </div>
           </div>
         ) : (
@@ -1029,6 +1133,33 @@ export function BuilderCanvas({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Template Browser Modal */}
+      {isTemplateBrowserOpen && (
+        <TemplateBrowserModal
+          pageId={page.id}
+          hasExistingContent={page.containers.length > 0}
+          locale={activeLocale}
+          onClose={() => setIsTemplateBrowserOpen(false)}
+          onApplied={() => {
+            setIsTemplateBrowserOpen(false);
+            router.refresh();
+          }}
+        />
+      )}
+
+      {/* Save Template Modal */}
+      {isSaveTemplateOpen && (
+        <SaveTemplateModal
+          pageId={page.id}
+          defaultName={pageTitle}
+          onClose={() => setIsSaveTemplateOpen(false)}
+          onSuccess={() => {
+            setIsSaveTemplateOpen(false);
+            alert("Šablóna bola úspešne uložená do vašich osobných šablón!");
+          }}
+        />
       )}
     </div>
   );
