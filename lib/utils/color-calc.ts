@@ -5,6 +5,8 @@
  * - Nearest RAL Classic matching
  */
 
+import { Hsluv } from "hsluv";
+
 export interface RgbColor {
   r: number;
   g: number;
@@ -272,4 +274,70 @@ export function findNearestRal(hex: string): RalMatch | null {
     hex: bestMatch.hex,
     similarity,
   };
+}
+
+export interface TonalStepItem {
+  step: number;
+  hex: string;
+  lightness: number;
+}
+
+export const TONAL_STEP_NUMBERS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
+export type TonalStepNumber = (typeof TONAL_STEP_NUMBERS)[number];
+
+const LIGHTNESS_MAP: Record<number, number> = {
+  50: 97,
+  100: 93,
+  200: 86,
+  300: 76,
+  400: 64,
+  500: 52,
+  600: 42,
+  700: 32,
+  800: 22,
+  900: 14,
+};
+
+const SATURATION_SCALE: Record<number, number> = {
+  50: 0.4,
+  100: 0.7,
+  200: 0.9,
+  300: 1.0,
+  400: 1.0,
+  500: 1.0,
+  600: 0.95,
+  700: 0.9,
+  800: 0.85,
+  900: 0.8,
+};
+
+/**
+ * Generates a perceptually uniform 10-step tonal scale (50 - 900) using HSLuv.
+ */
+export function generateTonalSteps(baseHex: string): TonalStepItem[] {
+  const conv = new Hsluv();
+  conv.hex = baseHex.startsWith("#") ? baseHex : `#${baseHex}`;
+  try {
+    conv.hexToHsluv();
+  } catch {
+    conv.hex = "#3B82F6";
+    conv.hexToHsluv();
+  }
+  const baseH = conv.hsluv_h;
+  const baseS = conv.hsluv_s;
+
+  return TONAL_STEP_NUMBERS.map((step) => {
+    const l = LIGHTNESS_MAP[step];
+    const s = Math.min(100, Math.max(0, baseS * (SATURATION_SCALE[step] ?? 1.0)));
+    conv.hsluv_h = baseH;
+    conv.hsluv_s = s;
+    conv.hsluv_l = l;
+    conv.hsluvToHex();
+
+    return {
+      step,
+      hex: conv.hex.toUpperCase(),
+      lightness: l,
+    };
+  });
 }

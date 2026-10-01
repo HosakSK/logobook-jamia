@@ -181,6 +181,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      hsluv:
+        specifier: ^1.0.2
+        version: 1.0.2
       isomorphic-dompurify:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1731,6 +1734,9 @@ packages:
 
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
+
+  hsluv@1.0.2:
+    resolution: {integrity: sha512-HTYvUWwnkH63bzIWEz0wek//GCqSRv6Tqeo9RWhEvra3dVsjiPVIvPYZs7/LbCkEuR03lfJvqRyCSI5HXAMpqA==}
 
   html-encoding-sniffer@7.0.0:
     resolution: {integrity: sha512-UikN5yr7xsCDAq87Or5or0PAlD3HJJOKVzM05az588WnpDJ4Ux7a2A53Qi6gofGg2/EtvF/H4hCi/TXfCW4Y6w==}
@@ -4288,6 +4294,8 @@ snapshots:
   hermes-parser@0.25.1:
     dependencies:
       hermes-estree: 0.25.1
+
+  hsluv@1.0.2: {}
 
   html-encoding-sniffer@7.0.0:
     dependencies:
