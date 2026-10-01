@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { ChevronRight, ChevronDown, FileText, Search, Folder, FolderOpen, BookOpen } from "lucide-react";
 import { PublishedPageItem } from "@/actions/publish";
 
@@ -22,6 +23,10 @@ export function PublicManualSidebar({
   onPageSelect,
   className = "",
 }: PublicManualSidebarProps) {
+  const params = useParams();
+  const routePageSlug = params?.pageSlug as string | undefined;
+  const activeSlug = currentPageSlug || routePageSlug || (pages[0]?.slug);
+
   const [search, setSearch] = useState("");
   const [collapsedParents, setCollapsedParents] = useState<Record<string, boolean>>({});
 
@@ -99,7 +104,7 @@ export function PublicManualSidebar({
               </div>
             ) : (
               filteredPages.map((page) => {
-                const isActive = page.slug === currentPageSlug;
+                const isActive = page.slug === activeSlug;
                 const title = getLocalized(page.title) || page.slug;
 
                 return (
@@ -126,7 +131,7 @@ export function PublicManualSidebar({
             const children = childrenMap.get(rootPage.id) || [];
             const hasChildren = children.length > 0;
             const isCollapsed = collapsedParents[rootPage.id] || false;
-            const isActive = rootPage.slug === currentPageSlug;
+            const isActive = rootPage.slug === activeSlug;
             const rootTitle = getLocalized(rootPage.title) || rootPage.slug;
 
             return (
@@ -171,7 +176,7 @@ export function PublicManualSidebar({
                 {hasChildren && !isCollapsed && (
                   <div className="pl-4 ml-2 border-l border-border/40 space-y-0.5">
                     {children.map((child) => {
-                      const isChildActive = child.slug === currentPageSlug;
+                      const isChildActive = child.slug === activeSlug;
                       const childTitle = getLocalized(child.title) || child.slug;
 
                       return (

@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen, Layers, ShieldAlert, Sparkles, ChevronRight, Hash } from "lucide-react";
-import { PublishedBrandSnapshot, PublishedPageItem, PublishedContainerItem } from "@/actions/publish";
-import { ModuleDispatcher } from "@/components/modules/dispatcher";
+import { PublishedBrandSnapshot } from "@/actions/publish";
+import { PageRenderer } from "./page-renderer";
 
 interface PublishedManualViewProps {
   snapshot: PublishedBrandSnapshot | null;
@@ -67,11 +67,9 @@ export function PublishedManualView({
     return textObj[locale] || textObj.en || textObj.sk || Object.values(textObj)[0] || "";
   };
 
-  const activePageTitle = getLocalized(activePage.title) || "Kapitola";
-
   return (
     <div className="container mx-auto px-4 sm:px-6 py-8 max-w-6xl space-y-8">
-      {/* Chapter Navigation Tabs */}
+      {/* Chapter Navigation Tabs (Horizontal quick-jump) */}
       <nav className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60 scrollbar-none">
         {pages
           .filter((p) => p.isInMenu !== false)
@@ -96,82 +94,13 @@ export function PublishedManualView({
           })}
       </nav>
 
-      {/* Active Page Header */}
-      <div className="space-y-2 border-b border-border/30 pb-6">
-        <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-          <span>{snapshot.brand.name}</span>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground font-semibold">{activePageTitle}</span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-          {activePageTitle}
-        </h1>
-      </div>
-
-      {/* Containers Stack */}
-      <div className="space-y-10">
-        {activePage.containers.length === 0 ? (
-          <div className="py-12 text-center text-xs text-muted-foreground italic">
-            Táto kapitola neobsahuje žiadny obsah.
-          </div>
-        ) : (
-          activePage.containers.map((container, cIdx) => {
-            const h2TitleText = getLocalized(container.h2Title);
-
-            return (
-              <section key={container.id} className="space-y-4">
-                {/* Optional H2 Section Heading */}
-                {container.showH2 && h2TitleText && (
-                  <div className="pt-2">
-                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground border-b border-border/40 pb-2">
-                      {h2TitleText}
-                    </h2>
-                  </div>
-                )}
-
-                {/* Columns Grid */}
-                <div
-                  className={`grid gap-6 ${
-                    container.layoutType === "FULL"
-                      ? "grid-cols-1"
-                      : container.layoutType === "HALF_HALF"
-                      ? "grid-cols-1 md:grid-cols-2"
-                      : container.layoutType === "THREE_EQUAL"
-                      ? "grid-cols-1 md:grid-cols-3"
-                      : container.layoutType === "ONE_THIRD_TWO_THIRDS"
-                      ? "grid-cols-1 md:grid-cols-3 [&>*:first-child]:md:col-span-1 [&>*:last-child]:md:col-span-2"
-                      : container.layoutType === "TWO_THIRDS_ONE_THIRD"
-                      ? "grid-cols-1 md:grid-cols-3 [&>*:first-child]:md:col-span-2 [&>*:last-child]:md:col-span-1"
-                      : "grid-cols-1 md:grid-cols-2"
-                  }`}
-                >
-                  {container.columns.map((column) => (
-                    <div key={column.id} className="space-y-6">
-                      {column.modules.map((mod) => (
-                        <div key={mod.id} className="space-y-2">
-                          <ModuleDispatcher
-                            module={{
-                              id: mod.id,
-                              moduleType: mod.moduleType,
-                              order: mod.order,
-                              showH3: mod.showH3,
-                              h3Title: mod.h3Title,
-                              config: mod.config,
-                              linkGroupId: undefined, // linkGroupId je na verejnom webe ignorované
-                            }}
-                            locale={locale}
-                            isEditor={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            );
-          })
-        )}
-      </div>
+      {/* Recursive Page Tree & Container Grid Renderer */}
+      <PageRenderer
+        page={activePage}
+        locale={locale}
+        brandName={snapshot.brand.name}
+        showPageHeader={true}
+      />
     </div>
   );
 }
