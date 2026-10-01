@@ -26,6 +26,7 @@ import {
   LayoutTemplate,
   BookmarkPlus,
   ArrowRight,
+  FileArchive,
 } from "lucide-react";
 import { PageDetail, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
@@ -33,6 +34,7 @@ import { InlineEditableText } from "./inline-editable-text";
 import { TemplateBrowserModal } from "./template-browser-modal";
 import { SaveTemplateModal } from "./save-template-modal";
 import { PublishBrandButton } from "./publish-brand-button";
+import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
 import {
   updatePageAction,
@@ -134,6 +136,7 @@ export function BuilderCanvas({
   const [isTemplateBrowserOpen, setIsTemplateBrowserOpen] = useState(false);
   const [isSaveTemplateOpen, setIsSaveTemplateOpen] = useState(false);
   const [isTemplatesMenuOpen, setIsTemplatesMenuOpen] = useState(false);
+  const [isOfflineExportOpen, setIsOfflineExportOpen] = useState(false);
 
   // Load existing brand link groups when opening link dialog
   useEffect(() => {
@@ -470,6 +473,19 @@ export function BuilderCanvas({
               brandId={brandId}
               brandSlug={brandSlug}
             />
+
+            {/* Offline ZIP Export */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsOfflineExportOpen(true)}
+              className="h-7 text-xs gap-1.5 rounded-[2px] cursor-pointer"
+              title="Stiahnuť offline ZIP balíček"
+            >
+              <FileArchive className="h-3.5 w-3.5 text-primary" />
+              <span className="hidden sm:inline">Offline ZIP</span>
+            </Button>
 
             <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-[2px]">
               <Link href={`/m/${brandSlug}`} target="_blank">
@@ -1167,6 +1183,15 @@ export function BuilderCanvas({
           }}
         />
       )}
+
+      {/* Offline ZIP Export Modal */}
+      <OfflineExportModal
+        isOpen={isOfflineExportOpen}
+        onClose={() => setIsOfflineExportOpen(false)}
+        brandId={brandId}
+        brandSlug={brandSlug}
+        brandName={brandSlug}
+      />
     </div>
   );
 }

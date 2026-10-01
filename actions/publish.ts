@@ -336,3 +336,30 @@ export async function getBrandPublishStatusAction(brandId: string): Promise<{
     };
   }
 }
+
+/**
+ * Získa kompletný publikovaný snapshot brandu (pre offline ZIP export a integrácie)
+ */
+export async function getBrandPublishedSnapshotAction(brandId: string): Promise<{
+  success: boolean;
+  snapshot: PublishedBrandSnapshot | null;
+  error?: string;
+}> {
+  try {
+    const pb = await getServerPocketBase();
+    const brand = await pb.collection("brands").getOne(brandId);
+    const pubConfig = (brand.publishedConfig as PublishedBrandSnapshot) || null;
+
+    return {
+      success: true,
+      snapshot: pubConfig,
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      snapshot: null,
+      error: err instanceof Error ? err.message : "Nepodarilo sa načítať publikovaný snapshot.",
+    };
+  }
+}
+

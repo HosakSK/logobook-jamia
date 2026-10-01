@@ -10,15 +10,18 @@ import {
   Sparkles,
   FileCode,
   FileJson,
+  FileArchive,
   Layers,
   Terminal,
   Cpu,
   Info,
   CheckCircle2,
   AlertCircle,
+  Download,
 } from "lucide-react";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { Button } from "@/components/ui/button";
+import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
 
 interface IntegrationsHubViewProps {
   brand: {
@@ -45,6 +48,7 @@ export function IntegrationsHubView({
   const [activeTabCss, setActiveTabCss] = useState<"link" | "import">("link");
   const [isCssPreviewOpen, setIsCssPreviewOpen] = useState(false);
   const [isJsonPreviewOpen, setIsJsonPreviewOpen] = useState(false);
+  const [isOfflineModalOpen, setIsOfflineModalOpen] = useState(false);
 
   const isPublished = Boolean(snapshot && snapshot.pages && snapshot.pages.length > 0);
   const effectiveSlug = brand.slug || brand.id;
@@ -394,6 +398,50 @@ module.exports = {
           <code>{tailwindSnippet}</code>
         </pre>
       </div>
+
+      {/* Section 4: Offline HTML & ZIP Export Engine */}
+      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-[2px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <FileArchive className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Offline HTML & ZIP Export Engine</h3>
+              <p className="text-[11px] text-muted-foreground">
+                Klientska archivácia celej značky (100% Client-Side JSZip / Zero VPS overhead)
+              </p>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            onClick={() => setIsOfflineModalOpen(true)}
+            className="h-8 text-xs gap-1.5 rounded-[2px] cursor-pointer"
+            variant="default"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>Vygenerovať Offline ZIP</span>
+          </Button>
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Stiahne kompletný archív obsahujúci statické HTML stránky (<code>index.html</code>), relatívne
+          prelinkované obrázky a logá (<code>/assets/...</code>), fonty spĺňajúce licenciu (<code>/fonts/...</code>)
+          a design tokeny (<code>tokens/theme.css</code>, <code>tokens/tokens.json</code>). Archív funguje bez
+          pripojenia k internetu a bez webového servera (otvorením cez súborový prehliadač).
+        </p>
+      </div>
+
+      {/* Offline Export Modal */}
+      <OfflineExportModal
+        isOpen={isOfflineModalOpen}
+        onClose={() => setIsOfflineModalOpen(false)}
+        brandId={brand.id}
+        brandSlug={effectiveSlug}
+        brandName={brand.name}
+        snapshot={snapshot}
+      />
     </div>
   );
 }
