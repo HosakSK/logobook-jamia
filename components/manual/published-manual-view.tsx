@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen, Layers, ShieldAlert, Sparkles, ChevronRight, Hash } from "lucide-react";
 import { PublishedBrandSnapshot, PublishedPageItem, PublishedContainerItem } from "@/actions/publish";
@@ -49,6 +49,15 @@ export function PublishedManualView({
   // 2. Active Page Resolution
   const defaultPage = pages.find((p) => p.slug === initialPageSlug) || pages[0];
   const [activePageId, setActivePageId] = useState<string>(defaultPage.id);
+
+  useEffect(() => {
+    if (initialPageSlug) {
+      const match = pages.find((p) => p.slug === initialPageSlug);
+      if (match) {
+        setActivePageId(match.id);
+      }
+    }
+  }, [initialPageSlug, pages]);
 
   const activePage = pages.find((p) => p.id === activePageId) || defaultPage;
 

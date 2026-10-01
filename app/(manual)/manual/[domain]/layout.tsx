@@ -1,10 +1,11 @@
-import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
+import { cookies } from "next/headers";
+import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { getBrandCascadeTokensAction } from "@/actions/cascade";
 import { BrandCascadeProvider } from "@/components/modules/cascade";
+import { ManualLockScreen } from "@/components/manual/manual-lock-screen";
+import { PublicManualShell } from "@/components/manual/public-manual-shell";
+import { PublishedBrandSnapshot } from "@/actions/publish";
 
 export default async function ManualLayout({
   children,
@@ -15,88 +16,82 @@ export default async function ManualLayout({
 }) {
   const { domain, locale } = await params;
   const currentLocale: Locale = locale && isValidLocale(locale) ? locale : DEFAULT_LOCALE;
-  const dict = getDictionary(currentLocale);
 
-  // Attempt to resolve brand and fetch cascade tokens
-  let brandName = domain;
+  const pb = await getServerPocketBase();
+  let brandRecord: any = null;
   let brandTokens;
   let cssVariables: Record<string, string> = {};
 
   try {
-    const pb = await getServerPocketBase();
-    let brandRecord = null;
+    brandRecord = await pb
+      .collection("brands")
+      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`);
+  } catch {
+    // Brand record not matched directly by slug
+  }
 
+  const brandName = brandRecord?.name || domain;
+  const brandSlug = brandRecord?.slug || domain;
+  const hideLogobookBadge = brandRecord?.hideLogobookBadge || false;
+
+  if (brandRecord) {
     try {
-      brandRecord = await pb
-        .collection("brands")
-        .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`);
-    } catch {
-      // Brand record not matched directly by slug
-    }
-
-    if (brandRecord) {
-      brandName = brandRecord.name || domain;
       const res = await getBrandCascadeTokensAction(brandRecord.id);
       if (res.success) {
         brandTokens = res.tokens;
         cssVariables = res.cssVariables;
       }
+    } catch {
+      // cascade fallback
     }
-  } catch (err) {
-    console.error("Error resolving brand in ManualLayout:", err);
   }
+
+  // ---------------------------------------------------------------------------
+  // 17.01 Password Protection Gate
+  // ---------------------------------------------------------------------------
+  if (brandRecord?.passwordHash && brandRecord.passwordHash.trim() !== "") {
+    const cookieStore = await cookies();
+    const authCookie = cookieStore.get(`manual_auth_${brandSlug}`)?.value;
+
+    if (authCookie !== "authorized") {
+      // Locked: Render focused Lock Screen inside cascade context (with brand branding)
+      return (
+        <BrandCascadeProvider
+          tokens={brandTokens}
+          style={cssVariables as unknown as React.CSSProperties}
+          className="min-h-screen bg-background"
+        >
+          <ManualLockScreen
+            brandSlug={brandSlug}
+            brandName={brandName}
+            locale={currentLocale}
+          />
+        </BrandCascadeProvider>
+      );
+    }
+  }
+
+  const publishedConfig = (brandRecord?.publishedConfig || null) as PublishedBrandSnapshot | null;
 
   return (
     <BrandCascadeProvider
       tokens={brandTokens}
       style={cssVariables as unknown as React.CSSProperties}
-      className="min-h-screen flex flex-col bg-background selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900"
+      className="min-h-screen bg-background"
     >
-      {/* Brand Manual Header */}
-      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="h-8 w-8 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs transition-all"
-              style={{
-                backgroundColor: "var(--brand-color-primary, #c8d400)",
-                borderRadius: "var(--brand-radius, 3px)",
-              }}
-            >
-              {domain.slice(0, 2).toUpperCase()}
-            </div>
-            <span className="font-bold tracking-tight text-base sm:text-lg uppercase">
-              {brandName}
-            </span>
-            <span className="text-xs text-muted-foreground border-l pl-3 hidden sm:inline-block">
-              {dict.manual.brandManual}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher currentLocale={currentLocale} />
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* Manual Content */}
-      <main className="flex-1">{children}</main>
-
-      {/* Manual Footer */}
-      <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        <div className="container mx-auto px-4 space-y-2">
-          <p>{dict.manual.allRightsReserved}</p>
-          <p>
-            Powered by{" "}
-            <Link
-              href="/"
-              className="font-medium underline hover:text-foreground transition-colors"
-            >
-              Logobook.sk
-            </Link>
-          </p>
-        </div>
-      </footer>
+      <PublicManualShell
+        brand={{
+          id: brandRecord?.id || domain,
+          name: brandName,
+          slug: brandSlug,
+          hideLogobookBadge,
+        }}
+        snapshot={publishedConfig}
+        domain={domain}
+        locale={currentLocale}
+      >
+        {children}
+      </PublicManualShell>
     </BrandCascadeProvider>
   );
 }

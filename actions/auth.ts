@@ -10,6 +10,7 @@ import {
   manualPasswordSchema,
 } from "@/lib/validations/auth";
 import PocketBase from "pocketbase";
+import crypto from "crypto";
 
 export interface ActionState {
   success: boolean;
@@ -189,40 +190,49 @@ export async function verifyManualPasswordAction(
   brandSlug: string,
   formData: FormData
 ): Promise<ActionState> {
-  const password = String(formData.get("password") || "");
+  const password = String(formData.get("password") || "").trim();
 
   const validation = manualPasswordSchema.safeParse({ brandSlug, password });
   if (!validation.success) {
-    return { success: false, error: "Password is required" };
+    return { success: false, error: "Zadajte prosím heslo." };
   }
 
   try {
     const pb = await getServerPocketBase();
-    const brand = await pb.collection("brands").getFirstListItem(`slug="${brandSlug}"`);
+    let brand = null;
+    try {
+      brand = await pb.collection("brands").getFirstListItem(
+        `slug="${brandSlug}" || id="${brandSlug}" || customDomain="${brandSlug}"`
+      );
+    } catch {
+      return { success: false, error: "Brand manuál nebol nájdený." };
+    }
 
     // Check if brand has passwordHash set
     if (!brand.passwordHash) {
-      // Not locked
       return { success: true };
     }
 
-    // Direct password match or verification
-    if (brand.passwordHash === password) {
+    // Direct password match or SHA-256 hash match
+    const hashedAttempt = crypto.createHash("sha256").update(password).digest("hex");
+    const isMatch = brand.passwordHash === password || brand.passwordHash === hashedAttempt;
+
+    if (isMatch) {
       const cookieStore = await cookies();
-      cookieStore.set(`manual_auth_${brandSlug}`, "authorized", {
+      cookieStore.set(`manual_auth_${brand.slug}`, "authorized", {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        path: `/manual/${brandSlug}`,
+        path: "/",
         maxAge: 30 * 24 * 60 * 60, // 30 days
       });
       return { success: true };
     }
 
-    return { success: false, error: "Incorrect password." };
+    return { success: false, error: "Zadané heslo nie je správne." };
   } catch (err: unknown) {
     console.error("verifyManualPasswordAction error:", err);
-    return { success: false, error: "Authentication failed." };
+    return { success: false, error: "Chyba pri overovaní hesla." };
   }
 }
 

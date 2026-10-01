@@ -1,0 +1,173 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { Menu, X, BookOpen, ExternalLink, Globe, Moon, Sun } from "lucide-react";
+import { PublishedBrandSnapshot } from "@/actions/publish";
+import { PublicManualSidebar } from "./public-manual-sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { Locale } from "@/lib/i18n";
+
+interface PublicManualShellProps {
+  children: React.ReactNode;
+  brand: {
+    id: string;
+    name: string;
+    slug: string;
+    headerLogoUrl?: string;
+    hideLogobookBadge?: boolean;
+  };
+  snapshot: PublishedBrandSnapshot | null;
+  domain: string;
+  locale: string;
+  currentPageSlug?: string;
+}
+
+export function PublicManualShell({
+  children,
+  brand,
+  snapshot,
+  domain,
+  locale,
+  currentPageSlug,
+}: PublicManualShellProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pages = snapshot?.pages || [];
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900">
+      {/* Sticky Top Header */}
+      <header className="sticky top-0 z-40 h-16 border-b border-border bg-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
+        {/* Left: Mobile hamburger + Brand Title / Logo */}
+        <div className="flex items-center gap-3">
+          {pages.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+              aria-label="Open manual navigation"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
+
+          <Link
+            href={`/manual/${domain}/${locale}`}
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+          >
+            {brand.headerLogoUrl ? (
+              <img
+                src={brand.headerLogoUrl}
+                alt={brand.name}
+                className="h-8 w-auto max-w-[140px] sm:max-w-[180px] object-contain"
+              />
+            ) : (
+              <div
+                className="h-8 w-8 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs"
+                style={{
+                  backgroundColor: "var(--brand-color-primary, #c8d400)",
+                  borderRadius: "var(--brand-radius, 3px)",
+                }}
+              >
+                {brand.name.slice(0, 2).toUpperCase()}
+              </div>
+            )}
+
+            <div className="hidden sm:block">
+              <span className="font-bold tracking-tight text-sm sm:text-base uppercase">
+                {brand.name}
+              </span>
+              <span className="text-[11px] text-muted-foreground ml-2 border-l border-border/60 pl-2">
+                Brand Manual
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Right: Language switcher & Theme toggle */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher currentLocale={locale as Locale} />
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* Main Body Layout */}
+      <div className="flex-1 flex w-full">
+        {/* Desktop Fixed Sidebar */}
+        {pages.length > 0 && (
+          <div className="hidden md:block w-64 shrink-0 border-r border-border bg-card/40 sticky top-16 h-[calc(100vh-4rem)]">
+            <PublicManualSidebar
+              pages={pages}
+              currentPageSlug={currentPageSlug}
+              domain={domain}
+              locale={locale}
+            />
+          </div>
+        )}
+
+        {/* Center Main Content Area */}
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+      </div>
+
+      {/* Mobile Sidebar Drawer / Sheet */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+
+          {/* Drawer content */}
+          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-card border-r border-border p-0 shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Navigácia manuálu
+              </span>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <PublicManualSidebar
+                pages={pages}
+                currentPageSlug={currentPageSlug}
+                domain={domain}
+                locale={locale}
+                onPageSelect={() => setMobileMenuOpen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Public Footer */}
+      <footer className="border-t border-border/50 py-6 text-center text-xs text-muted-foreground bg-card/20">
+        <div className="container mx-auto px-4 space-y-1.5">
+          <p>© {new Date().getFullYear()} {brand.name}. Všetky práva vyhradené.</p>
+          {!brand.hideLogobookBadge && (
+            <p className="text-[11px] text-muted-foreground/80">
+              Vytvorené na{" "}
+              <Link
+                href="/"
+                className="font-medium underline hover:text-foreground transition-colors"
+                target="_blank"
+              >
+                Logobook.sk
+              </Link>
+            </p>
+          )}
+        </div>
+      </footer>
+    </div>
+  );
+}
