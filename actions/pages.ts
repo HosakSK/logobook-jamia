@@ -11,6 +11,7 @@ import {
   ContainerWithColumns,
   ColumnWithModules,
 } from "@/lib/types/page";
+import { I18nRecord } from "@/lib/types/module";
 import {
   createPageSchema,
   updatePageSchema,
@@ -781,11 +782,13 @@ export async function createModuleAction(
 }
 
 /**
- * Updates a module's JSON config.
+ * Updates a container's layoutType and adjusts columns accordingly.
+ * Choice A: If column count is reduced, modules from removed columns are
+ * safely moved to the end of the last remaining column.
  */
-export async function updateModuleConfigAction(
-  moduleId: string,
-  config: Record<string, unknown>
+export async function updateContainerLayoutAction(
+  containerId: string,
+  newLayoutType: ContainerLayoutType
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const pb = await getServerPocketBase();
@@ -794,13 +797,434 @@ export async function updateModuleConfigAction(
       return { success: false, error: "Neautorizovaná relácia." };
     }
 
-    await pb.collection("modules").update(moduleId, { config });
+    const container = await pb.collection("containers").getOne(containerId);
+    const page = await pb.collection("pages").getOne(container.page);
+    await verifyBrandAccess(pb, page.brand, user.id);
+
+    let targetCount = 1;
+    switch (newLayoutType) {
+      case "HALF_HALF":
+      case "ONE_THIRD_TWO_THIRDS":
+      case "TWO_THIRDS_ONE_THIRD":
+      case "CUSTOM":
+        targetCount = 2;
+        break;
+      case "THREE_EQUAL":
+        targetCount = 3;
+        break;
+      case "FULL":
+      default:
+        targetCount = 1;
+        break;
+    }
+
+    // Get existing columns
+    const columns = await pb.collection("columns").getFullList({
+      filter: `container = "${containerId}"`,
+      sort: "order,created",
+    });
+
+    if (columns.length < targetCount) {
+      // Create missing columns
+      for (let i = columns.length; i < targetCount; i++) {
+        await pb.collection("columns").create({
+          container: containerId,
+          order: i,
+        });
+      }
+    } else if (columns.length > targetCount) {
+      // Kept columns and removed columns
+      const keptColumns = columns.slice(0, targetCount);
+      const columnsToRemove = columns.slice(targetCount);
+      const lastKeptCol = keptColumns[keptColumns.length - 1];
+
+      // Find max order in last kept column
+      const existingInLast = await pb.collection("modules").getFullList({
+        filter: `column = "${lastKeptCol.id}"`,
+        sort: "-order",
+      });
+      let nextOrder = existingInLast.length > 0 ? (existingInLast[0].order ?? 0) + 1 : 0;
+
+      // Move modules from removed columns to last kept column (Choice A)
+      for (const col of columnsToRemove) {
+        const modules = await pb.collection("modules").getFullList({
+          filter: `column = "${col.id}"`,
+          sort: "order,created",
+        });
+
+        for (const mod of modules) {
+          await pb.collection("modules").update(mod.id, {
+            column: lastKeptCol.id,
+            order: nextOrder++,
+          });
+        }
+
+        // Delete the emptied column
+        await pb.collection("columns").delete(col.id);
+      }
+    }
+
+    // Update container layoutType and columnCount
+    await pb.collection("containers").update(containerId, {
+      layoutType: newLayoutType,
+      columnCount: targetCount,
+    });
+
+    revalidatePath(`/admin/brand/${page.brand}/builder/${page.id}`);
     return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to update container layout:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri zmene rozloženia riadku",
+    };
+  }
+}
+
+/**
+ * Updates container metadata (showH2, h2Title, backgroundColor, etc.).
+ */
+export async function updateContainerAction(
+  containerId: string,
+  data: {
+    showH2?: boolean;
+    h2Title?: string | I18nRecord;
+    backgroundColor?: string;
+    layoutType?: ContainerLayoutType;
+    columnWidths?: number[];
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const container = await pb.collection("containers").getOne(containerId);
+    const page = await pb.collection("pages").getOne(container.page);
+    await verifyBrandAccess(pb, page.brand, user.id);
+
+    const payload: Record<string, unknown> = {};
+    if (data.showH2 !== undefined) payload.showH2 = data.showH2;
+    if (data.backgroundColor !== undefined) payload.backgroundColor = data.backgroundColor;
+    if (data.columnWidths !== undefined) payload.columnWidths = data.columnWidths;
+    if (data.layoutType !== undefined) payload.layoutType = data.layoutType;
+
+    if (data.h2Title !== undefined) {
+      if (typeof data.h2Title === "string") {
+        const existing = typeof container.h2Title === "object" ? container.h2Title : {};
+        payload.h2Title = { ...existing, sk: data.h2Title, en: data.h2Title };
+      } else {
+        payload.h2Title = data.h2Title;
+      }
+    }
+
+    await pb.collection("containers").update(containerId, payload);
+    revalidatePath(`/admin/brand/${page.brand}/builder/${page.id}`);
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to update container:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri úprave riadku",
+    };
+  }
+}
+
+/**
+ * Swaps order of a container with its adjacent sibling (up or down).
+ */
+export async function moveContainerAction(
+  containerId: string,
+  direction: "up" | "down"
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const container = await pb.collection("containers").getOne(containerId);
+    const page = await pb.collection("pages").getOne(container.page);
+    await verifyBrandAccess(pb, page.brand, user.id);
+
+    const siblings = await pb.collection("containers").getFullList({
+      filter: `page = "${page.id}"`,
+      sort: "order,created",
+    });
+
+    const currentIndex = siblings.findIndex((c) => c.id === containerId);
+    if (currentIndex === -1) return { success: false, error: "Kontajner nenájdený." };
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= siblings.length) {
+      return { success: true }; // already at boundary
+    }
+
+    const currentOrder = siblings[currentIndex].order ?? currentIndex;
+    const targetOrder = siblings[targetIndex].order ?? targetIndex;
+
+    await pb.collection("containers").update(siblings[currentIndex].id, { order: targetOrder });
+    await pb.collection("containers").update(siblings[targetIndex].id, { order: currentOrder });
+
+    revalidatePath(`/admin/brand/${page.brand}/builder/${page.id}`);
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to move container:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri posune riadku",
+    };
+  }
+}
+
+/**
+ * Swaps order of a module with its adjacent sibling inside the same column.
+ */
+export async function moveModuleAction(
+  moduleId: string,
+  direction: "up" | "down"
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const mod = await pb.collection("modules").getOne(moduleId);
+    const siblings = await pb.collection("modules").getFullList({
+      filter: `column = "${mod.column}"`,
+      sort: "order,created",
+    });
+
+    const currentIndex = siblings.findIndex((m) => m.id === moduleId);
+    if (currentIndex === -1) return { success: false, error: "Modul nenájdený." };
+
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= siblings.length) {
+      return { success: true }; // already at boundary
+    }
+
+    const currentOrder = siblings[currentIndex].order ?? currentIndex;
+    const targetOrder = siblings[targetIndex].order ?? targetIndex;
+
+    await pb.collection("modules").update(siblings[currentIndex].id, { order: targetOrder });
+    await pb.collection("modules").update(siblings[targetIndex].id, { order: currentOrder });
+
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to move module:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri posune modulu",
+    };
+  }
+}
+
+/**
+ * Updates a module's JSON config and optional header.
+ * CRITICAL (Linked Sync): If moduleId has linkGroupId, all modules
+ * with the same linkGroupId across the entire brand are updated synchronously!
+ */
+export async function updateModuleConfigAction(
+  moduleId: string,
+  config: Record<string, unknown>,
+  h3Title?: string | I18nRecord,
+  showH3?: boolean
+): Promise<{ success: boolean; updatedCount?: number; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const mod = await pb.collection("modules").getOne(moduleId);
+
+    const payload: Record<string, unknown> = { config };
+    if (h3Title !== undefined) {
+      if (typeof h3Title === "string") {
+        const existing = typeof mod.h3Title === "object" ? mod.h3Title : {};
+        payload.h3Title = { ...existing, sk: h3Title, en: h3Title };
+      } else {
+        payload.h3Title = h3Title;
+      }
+    }
+    if (showH3 !== undefined) {
+      payload.showH3 = showH3;
+    }
+
+    if (mod.linkGroupId && mod.linkGroupId.trim() !== "") {
+      // Find all modules in the same linkGroup
+      const linked = await pb.collection("modules").getFullList({
+        filter: `linkGroupId = "${mod.linkGroupId}"`,
+      });
+
+      for (const m of linked) {
+        await pb.collection("modules").update(m.id, payload);
+      }
+
+      return { success: true, updatedCount: linked.length };
+    } else {
+      await pb.collection("modules").update(moduleId, payload);
+      return { success: true, updatedCount: 1 };
+    }
   } catch (err: unknown) {
     console.error("Failed to update module config:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Chyba pri ukladaní konfigurácie modulu",
+    };
+  }
+}
+
+/**
+ * Links a module to a linkGroupId (mirroring across pages).
+ * If other modules already exist in that group, synchronizes this module's config
+ * with the existing group's config.
+ */
+export async function linkModuleAction(
+  moduleId: string,
+  linkGroupId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const cleanGroupId = linkGroupId
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9_-]+/g, "-");
+
+    if (!cleanGroupId) {
+      return { success: false, error: "Neplatný identifikátor skupiny zrkadlenia." };
+    }
+
+    // Check if other modules already exist in this linkGroup
+    const existing = await pb.collection("modules").getFullList({
+      filter: `linkGroupId = "${cleanGroupId}" && id != "${moduleId}"`,
+    });
+
+    const payload: Record<string, unknown> = { linkGroupId: cleanGroupId };
+    if (existing.length > 0) {
+      // Sync config from existing master module
+      payload.config = existing[0].config;
+      if (existing[0].h3Title) payload.h3Title = existing[0].h3Title;
+      if (existing[0].showH3 !== undefined) payload.showH3 = existing[0].showH3;
+    }
+
+    await pb.collection("modules").update(moduleId, payload);
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to link module:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri prepojení modulu",
+    };
+  }
+}
+
+/**
+ * Detaches (unlinks) a module from its linkGroupId, making it independent.
+ */
+export async function unlinkModuleAction(
+  moduleId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    await pb.collection("modules").update(moduleId, { linkGroupId: "" });
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to unlink module:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri odpojení modulu",
+    };
+  }
+}
+
+/**
+ * Returns distinct linkGroups used in the brand, with module count.
+ */
+export async function getBrandLinkGroupsAction(
+  brandId: string
+): Promise<{
+  success: boolean;
+  groups?: Array<{ linkGroupId: string; count: number; moduleType: string }>;
+  error?: string;
+}> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    await verifyBrandAccess(pb, brandId, user.id);
+
+    // Fetch all pages for brand
+    const pages = await pb.collection("pages").getFullList({
+      filter: `brand = "${brandId}"`,
+      fields: "id",
+    });
+    const pageIds = pages.map((p) => p.id);
+    if (pageIds.length === 0) return { success: true, groups: [] };
+
+    // Fetch containers
+    const containers = await pb.collection("containers").getFullList({
+      filter: pageIds.map((id) => `page = "${id}"`).join(" || "),
+      fields: "id",
+    });
+    const containerIds = containers.map((c) => c.id);
+    if (containerIds.length === 0) return { success: true, groups: [] };
+
+    // Fetch columns
+    const columns = await pb.collection("columns").getFullList({
+      filter: containerIds.map((id) => `container = "${id}"`).join(" || "),
+      fields: "id",
+    });
+    const columnIds = columns.map((c) => c.id);
+    if (columnIds.length === 0) return { success: true, groups: [] };
+
+    // Fetch modules with linkGroupId
+    const modules = await pb.collection("modules").getFullList({
+      filter: `linkGroupId != "" && (${columnIds.map((id) => `column = "${id}"`).join(" || ")})`,
+    });
+
+    const map = new Map<string, { count: number; moduleType: string }>();
+    for (const m of modules) {
+      if (!m.linkGroupId) continue;
+      const existing = map.get(m.linkGroupId);
+      if (existing) {
+        existing.count++;
+      } else {
+        map.set(m.linkGroupId, { count: 1, moduleType: m.moduleType });
+      }
+    }
+
+    const groups = Array.from(map.entries()).map(([linkGroupId, val]) => ({
+      linkGroupId,
+      count: val.count,
+      moduleType: val.moduleType,
+    }));
+
+    return { success: true, groups };
+  } catch (err: unknown) {
+    console.error("Failed to get link groups:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri načítaní skupín zrkadlenia",
     };
   }
 }
