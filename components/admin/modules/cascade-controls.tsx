@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CascadeRadiusMode } from "@/lib/types/module";
 import { computeBrandRadiusValue } from "@/lib/utils/cascade";
+import { WcagContrastBadge } from "./wcag-contrast-badge";
 
 /**
  * Reusable wrapper providing the Level 1/2 vs Level 3 toggle UX.
@@ -108,6 +109,7 @@ export function CascadeColorPicker({
   inheritedColor = "#c8d400",
   inheritedRoleName = "Brand Primary",
   palette = [],
+  compareContrastWithHex,
   onChange,
 }: {
   label: string;
@@ -116,6 +118,7 @@ export function CascadeColorPicker({
   inheritedColor?: string;
   inheritedRoleName?: string;
   palette?: Array<{ hex: string; role: string; name: string }>;
+  compareContrastWithHex?: string;
   onChange: (color: string | undefined) => void;
 }) {
   const isOverridden = Boolean(value && value.trim().length > 0);
@@ -222,6 +225,16 @@ export function CascadeColorPicker({
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Live WCAG Contrast Evaluation if background color comparison is requested */}
+        {compareContrastWithHex && (
+          <div className="pt-2 border-t border-border/30">
+            <WcagContrastBadge
+              foregroundHex={localColor}
+              backgroundHex={compareContrastWithHex}
+            />
           </div>
         )}
       </div>

@@ -8,18 +8,16 @@ import {
   Code,
   ShieldCheck,
   CheckCircle2,
-  ExternalLink,
+  Bug,
+  Cpu,
 } from "lucide-react";
 import { BrandCascadeTokens, CascadeStyleOverrides } from "@/lib/types/module";
 import {
   CascadeColorPicker,
   CascadeRadiusPicker,
 } from "@/components/admin/modules/cascade-controls";
-import {
-  BrandCascadeProvider,
-  useBrandCascade,
-} from "@/components/modules/cascade";
-import { computeBrandRadiusValue } from "@/lib/utils/cascade";
+import { BrandCascadeProvider } from "@/components/modules/cascade";
+import { ModuleDispatcher } from "@/components/modules/dispatcher";
 import { Button } from "@/components/ui/button";
 
 interface BuilderCascadeSandboxProps {
@@ -45,7 +43,12 @@ export function BuilderCascadeSandbox({
     textColor: undefined,
   });
 
+  const [activeModuleType, setActiveModuleType] = useState<string>("M03_Banner");
+  const [simulateCrash, setSimulateCrash] = useState(false);
   const [activeTab, setActiveTab] = useState<"preview" | "json">("preview");
+
+  // Effective background color for WCAG contrast comparison
+  const effectiveBgColor = styleOverrides.backgroundColor || tokens.colors.secondary;
 
   return (
     <BrandCascadeProvider
@@ -62,10 +65,10 @@ export function BuilderCascadeSandbox({
             </div>
             <div>
               <h2 className="text-base font-bold text-foreground">
-                Trojúrovňová Kaskáda Štýlov (Level 1 → Level 2 → Level 3)
+                Trojúrovňová Kaskáda Štýlov & Technické Štandardy (WCAG + Code Splitting)
               </h2>
               <p className="text-xs text-muted-foreground">
-                Architektúra dedičnosti zabezpečuje jednotu identity a flexibilitu pre moduly M01 - M25.
+                Dedičnosť tokenov, automatický code-splitting cez next/dynamic, Error Boundary a živé sledovanie WCAG kontrastu.
               </p>
             </div>
           </div>
@@ -73,7 +76,7 @@ export function BuilderCascadeSandbox({
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[2px] text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              Token Engine Aktívny
+              Dynamic Dispatcher Aktívny
             </span>
           </div>
         </div>
@@ -129,12 +132,65 @@ export function BuilderCascadeSandbox({
 
       {/* Main Workspace Split: Controls vs Live Preview */}
       <div className="grid lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Level 3 Override Controls */}
+        {/* Left Column: Level 3 Override Controls & Tools */}
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between pb-1 border-b border-border/40">
             <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               <span>Editor modulu (Úroveň 3: Overrides)</span>
+            </div>
+          </div>
+
+          {/* Module Selector */}
+          <div className="p-3 border border-border/40 rounded-[3px] bg-card/40 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-foreground">
+                Vybrať modul na otestovanie:
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground">
+                Code-split via next/dynamic
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { type: "M01_Nadpis", label: "M01 Nadpis" },
+                { type: "M03_Banner", label: "M03 Banner" },
+                { type: "M05_DownloadTlacidlo", label: "M05 Sťahovanie" },
+                { type: "M25_KniznicaIkon", label: "M25 Ikony (Virtual)" },
+              ].map((m) => (
+                <button
+                  key={m.type}
+                  type="button"
+                  onClick={() => {
+                    setActiveModuleType(m.type);
+                    setSimulateCrash(false);
+                  }}
+                  className={`p-1.5 rounded-[2px] text-xs font-medium border text-left transition-all ${
+                    activeModuleType === m.type && !simulateCrash
+                      ? "border-primary bg-primary/10 text-primary font-bold"
+                      : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Error Boundary Simulator Button */}
+            <div className="pt-2 border-t border-border/30 flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground">
+                Test záchrannej brzdy:
+              </span>
+              <Button
+                type="button"
+                variant={simulateCrash ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => setSimulateCrash(!simulateCrash)}
+                className="h-6 px-2 text-[11px] rounded-[2px] gap-1"
+              >
+                <Bug className="h-3 w-3" />
+                <span>{simulateCrash ? "Vypnúť simuláciu" : "Simulovať pád modulu"}</span>
+              </Button>
             </div>
           </div>
 
@@ -171,14 +227,15 @@ export function BuilderCascadeSandbox({
             }}
           />
 
-          {/* Cascade Color Control: Accent / Button */}
+          {/* Cascade Color Control: Text / Accent with live WCAG tracking */}
           <CascadeColorPicker
-            label="Akcentová farba / Tlačidlo"
-            description="Predvolene dedí primárnu farbu značky."
+            label="Farba textu a akcentov (WCAG Kontrola)"
+            description="Automaticky overuje WCAG 2.1 kontrast voči zvolenému pozadiu."
             value={styleOverrides.textColor}
             inheritedColor={tokens.colors.primary}
             inheritedRoleName="Brand Primary"
             palette={tokens.palette}
+            compareContrastWithHex={effectiveBgColor}
             onChange={(color) => {
               setStyleOverrides((prev) => ({
                 ...prev,
@@ -193,7 +250,7 @@ export function BuilderCascadeSandbox({
           <div className="flex items-center justify-between pb-1 border-b border-border/40">
             <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
               <Eye className="h-3.5 w-3.5 text-primary" />
-              <span>Živý náhľad modulu v manuáli</span>
+              <span>Živý náhľad cez ModuleDispatcher</span>
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -217,11 +274,51 @@ export function BuilderCascadeSandbox({
           </div>
 
           {activeTab === "preview" ? (
-            <ModuleInteractivePreview
-              overrides={styleOverrides}
-              brandName={brandName}
-              tokens={tokens}
-            />
+            <div className="space-y-4">
+              {/* Dynamic Module Rendered through ModuleDispatcher */}
+              {simulateCrash ? (
+                <CrashTestModule />
+              ) : (
+                <ModuleDispatcher
+                  module={{
+                    id: "mod-test-1",
+                    moduleType: activeModuleType,
+                    showH3: true,
+                    h3Title: {
+                      sk: `Živý modul: ${activeModuleType}`,
+                      en: `Live Module: ${activeModuleType}`,
+                    },
+                    config: {
+                      styleOverrides,
+                    },
+                  }}
+                  isEditor={true}
+                  locale="sk"
+                />
+              )}
+
+              {/* Technical Standards Summary Card */}
+              <div className="border border-border/40 rounded-[3px] p-4 bg-neutral-900/40 text-xs space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-foreground">
+                  <Cpu className="h-4 w-4 text-primary" />
+                  <span>Splnené technické štandardy (Tiket 12_01):</span>
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground text-[11px] leading-relaxed">
+                  <li>
+                    <strong className="text-foreground">Module-level Code Splitting:</strong> Všetkých 25 modulov sa do <code className="font-mono text-primary">ModuleDispatcher</code> importuje dynamicky cez <code className="font-mono text-primary">next/dynamic</code>.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">React Error Boundary:</strong> Ak modul zlyhá, systém zabráni bielej smrti a v admine zobrazí presný report chyby s možnosťou reštartu.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">WCAG 2.1 AA Kontrola:</strong> Živý výpočet luminiscencie a kontrastného pomeru v reálnom čase pri úprave farieb.
+                  </li>
+                  <li>
+                    <strong className="text-foreground">Optimalizácia assetov:</strong> Zavedené komponenty <code className="font-mono text-primary">OptimizedAssetImage</code> a <code className="font-mono text-primary">VirtualGrid</code> s <code className="font-mono text-primary">IntersectionObserver</code>.
+                  </li>
+                </ul>
+              </div>
+            </div>
           ) : (
             <div className="border border-border/60 rounded-[3px] p-4 bg-neutral-950 font-mono text-xs text-neutral-300 overflow-x-auto space-y-2">
               <div className="text-[11px] text-muted-foreground">
@@ -230,15 +327,14 @@ export function BuilderCascadeSandbox({
               <pre className="text-primary leading-relaxed">
                 {JSON.stringify(
                   {
-                    moduleType: "M03_Banner",
+                    moduleType: activeModuleType,
                     styleOverrides: Object.fromEntries(
                       Object.entries(styleOverrides).filter(
                         ([_, v]) => v !== undefined && v !== ""
                       )
                     ),
                     content: {
-                      title: { sk: "Vitajte v našom manuáli", en: "Welcome to our brand book" },
-                      subtitle: { sk: "Oficiálna vizuálna identita", en: "Official visual guidelines" },
+                      title: { sk: `Ukážka modulu ${activeModuleType}`, en: `Demo of ${activeModuleType}` },
                     },
                   },
                   null,
@@ -254,119 +350,16 @@ export function BuilderCascadeSandbox({
 }
 
 /**
- * Interactive Mock Module Component rendering via BrandCascadeContext
+ * Component used specifically to test and demonstrate ModuleErrorBoundary
  */
-function ModuleInteractivePreview({
-  overrides,
-  brandName,
-  tokens,
-}: {
-  overrides: CascadeStyleOverrides;
-  brandName: string;
-  tokens: BrandCascadeTokens;
-}) {
-  const { resolveRadius, resolveColor } = useBrandCascade();
-
-  // Resolve radius through 3-tier cascade
-  const effectiveRadius = resolveRadius(overrides);
-
-  // Resolve colors through 3-tier cascade
-  const effectiveBg = resolveColor(overrides.backgroundColor, "secondary");
-  const effectiveAccent = resolveColor(overrides.textColor, "primary");
-
-  const isRadiusOverridden = overrides.radiusMode && overrides.radiusMode !== "inherit";
-  const isBgOverridden = Boolean(overrides.backgroundColor);
-  const isAccentOverridden = Boolean(overrides.textColor);
-
+function CrashTestModule() {
   return (
-    <div className="space-y-4">
-      {/* Sample Module: M03 Banner / Card */}
-      <div
-        className="p-6 border transition-all duration-200 shadow-sm relative overflow-hidden"
-        style={{
-          borderRadius: effectiveRadius,
-          backgroundColor: effectiveBg,
-          borderColor: "rgba(255, 255, 255, 0.12)",
-          borderWidth: tokens.borderWidth,
-        }}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span
-              className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5"
-              style={{
-                borderRadius: effectiveRadius,
-                backgroundColor: "rgba(255, 255, 255, 0.08)",
-                color: "#fafbfc",
-              }}
-            >
-              Ukážkový modul (M03_Banner)
-            </span>
-            <div className="flex items-center gap-1.5 text-[10px]">
-              {isRadiusOverridden && (
-                <span className="px-1.5 py-0.5 rounded-[2px] bg-amber-500/20 text-amber-300 font-mono">
-                  Radius Override: {effectiveRadius}
-                </span>
-              )}
-              {isBgOverridden && (
-                <span className="px-1.5 py-0.5 rounded-[2px] bg-amber-500/20 text-amber-300 font-mono">
-                  Bg Override
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <h3 className="text-xl font-black tracking-tight text-white">
-              Vizuálna identita {brandName}
-            </h3>
-            <p className="text-xs text-neutral-300/80 leading-relaxed max-w-md">
-              Tento obsahový blok automaticky dedí globálne zaoblenie rohov a farebnú paletu. Ak je aktívny lokálny override (Úroveň 3), okamžite prebíja globálne pravidlá.
-            </p>
-          </div>
-
-          <div className="pt-2 flex items-center gap-3">
-            <button
-              type="button"
-              className="px-4 py-2 text-xs font-bold text-neutral-950 transition-all shadow-xs flex items-center gap-1.5 hover:opacity-90"
-              style={{
-                borderRadius: effectiveRadius,
-                backgroundColor: effectiveAccent,
-              }}
-            >
-              <span>Stiahnuť vektorové podklady</span>
-            </button>
-            <button
-              type="button"
-              className="px-3 py-2 text-xs font-medium text-neutral-300 border border-neutral-700 hover:bg-neutral-800/60 transition-all"
-              style={{
-                borderRadius: effectiveRadius,
-              }}
-            >
-              Čítať pravidlá
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Verification explanation card */}
-      <div className="border border-border/40 rounded-[3px] p-4 bg-neutral-900/40 text-xs space-y-2">
-        <div className="flex items-center gap-2 font-semibold text-foreground">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          <span>Princíp Trojúrovňovej Kaskády:</span>
-        </div>
-        <ul className="list-disc list-inside space-y-1 text-muted-foreground text-[11px] leading-relaxed">
-          <li>
-            <strong className="text-foreground">Úroveň 1 (Global):</strong> Tvar rohov a farebná paleta značky je uložená centrálne.
-          </li>
-          <li>
-            <strong className="text-foreground">Úroveň 2 (Modul Default):</strong> Modul automaticky aplikuje <code className="font-mono text-primary">rounded-[var(--brand-radius)]</code> a dedí globálnu identitu bez zásahu dizajnéra.
-          </li>
-          <li>
-            <strong className="text-foreground">Úroveň 3 (Local Override):</strong> Po kliknutí na <em>„Odpojiť“</em> sa hodnota zapíše do <code className="font-mono text-primary">module.config.styleOverrides</code> a prebije predvolený štýl.
-          </li>
-        </ul>
-      </div>
-    </div>
+    <ModuleDispatcher
+      module={{
+        id: "crash-test",
+        moduleType: "CRASH_SIMULATION",
+      }}
+      isEditor={true}
+    />
   );
 }

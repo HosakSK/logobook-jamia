@@ -131,6 +131,70 @@ export function getWcagContrast(hex: string): WcagContrastResult {
   };
 }
 
+export interface ContrastBetweenResult {
+  ratio: number;
+  score: "AAA" | "AA" | "AA Large" | "Fail";
+  isAccessibleNormal: boolean; // >= 4.5
+  isAccessibleLarge: boolean;  // >= 3.0
+  warning?: string;
+}
+
+/**
+ * Calculates WCAG 2.1 contrast ratio and rating directly between two HEX colors
+ * (e.g. text color vs container background color).
+ */
+export function getContrastBetween(
+  foregroundHex?: string | null,
+  backgroundHex?: string | null
+): ContrastBetweenResult {
+  if (!foregroundHex || !backgroundHex) {
+    return {
+      ratio: 1,
+      score: "Fail",
+      isAccessibleNormal: false,
+      isAccessibleLarge: false,
+      warning: "Missing color inputs",
+    };
+  }
+
+  const fgRgb = hexToRgb(foregroundHex);
+  const bgRgb = hexToRgb(backgroundHex);
+
+  if (!fgRgb || !bgRgb) {
+    return {
+      ratio: 1,
+      score: "Fail",
+      isAccessibleNormal: false,
+      isAccessibleLarge: false,
+      warning: "Invalid HEX format",
+    };
+  }
+
+  const fgLum = getRelativeLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
+  const bgLum = getRelativeLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+  const ratio = calculateContrastRatio(fgLum, bgLum);
+  const score = evaluateScore(ratio);
+  const isAccessibleNormal = ratio >= 4.5;
+  const isAccessibleLarge = ratio >= 3.0;
+
+  let warning: string | undefined;
+  if (!isAccessibleNormal) {
+    if (isAccessibleLarge) {
+      warning = "Nedostatočný kontrast pre bežný text (min. 4.5:1). Povolené iba pre veľké nadpisy (>18pt).";
+    } else {
+      warning = "Kriticky nízky kontrast podľa WCAG 2.1 AA (menej ako 3.0:1). Text bude pre mnohých používateľov nečitateľný.";
+    }
+  }
+
+  return {
+    ratio,
+    score,
+    isAccessibleNormal,
+    isAccessibleLarge,
+    warning,
+  };
+}
+
 /**
  * Common RAL Classic colors palette with standard HEX matches.
  */
