@@ -1,0 +1,399 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import {
+  Code2,
+  Copy,
+  Check,
+  ExternalLink,
+  Sparkles,
+  FileCode,
+  FileJson,
+  Layers,
+  Terminal,
+  Cpu,
+  Info,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
+import { PublishedBrandSnapshot } from "@/actions/publish";
+import { Button } from "@/components/ui/button";
+
+interface IntegrationsHubViewProps {
+  brand: {
+    id: string;
+    name: string;
+    slug: string;
+    customDomain?: string;
+    status?: string;
+  };
+  snapshot: PublishedBrandSnapshot | null;
+  appBaseUrl: string;
+  cssPreview: string;
+  jsonPreview: string;
+}
+
+export function IntegrationsHubView({
+  brand,
+  snapshot,
+  appBaseUrl,
+  cssPreview,
+  jsonPreview,
+}: IntegrationsHubViewProps) {
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [activeTabCss, setActiveTabCss] = useState<"link" | "import">("link");
+  const [isCssPreviewOpen, setIsCssPreviewOpen] = useState(false);
+  const [isJsonPreviewOpen, setIsJsonPreviewOpen] = useState(false);
+
+  const isPublished = Boolean(snapshot && snapshot.pages && snapshot.pages.length > 0);
+  const effectiveSlug = brand.slug || brand.id;
+
+  const cssUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/theme.css`;
+  const jsonUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/tokens.json`;
+
+  const copyToClipboard = async (text: string, key: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 2000);
+    } catch (e) {
+      console.error("Copy failed", e);
+    }
+  };
+
+  const htmlSnippet = `<link rel="stylesheet" href="${cssUrl}" />`;
+  const cssImportSnippet = `@import url("${cssUrl}");`;
+
+  const tailwindSnippet = `// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary: 'var(--color-primary)',
+          secondary: 'var(--color-secondary)',
+          accent: 'var(--color-accent)',
+          neutral: 'var(--color-neutral)',
+          50: 'var(--color-primary-50)',
+          500: 'var(--color-primary-500)',
+          900: 'var(--color-primary-900)',
+        },
+      },
+      fontFamily: {
+        heading: 'var(--font-family-heading)',
+        body: 'var(--font-family-body)',
+      },
+    },
+  },
+};`;
+
+  return (
+    <div className="space-y-8 max-w-5xl">
+      {/* Header Banner */}
+      <div className="border border-border/60 rounded-[3px] p-6 bg-card/60 shadow-2xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] bg-primary/10 text-primary border border-primary/20 flex items-center gap-1.5">
+                <Code2 className="h-3 w-3" />
+                <span>Integration Hub</span>
+              </span>
+              {isPublished ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/30 border border-emerald-500/30 px-2 py-0.5 rounded-[2px]">
+                  <CheckCircle2 className="h-3 w-3" />
+                  <span>Publikované v{snapshot?.version || 1}</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-400 bg-amber-950/30 border border-amber-500/30 px-2 py-0.5 rounded-[2px]">
+                  <AlertCircle className="h-3 w-3" />
+                  <span>Koncept (Zatiaľ nepublikované)</span>
+                </span>
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+              Integrácie & Design Tokens API
+            </h1>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/admin/brand/${brand.id}/builder`}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+            >
+              Prejsť do Page Buildera &rarr;
+            </Link>
+          </div>
+        </div>
+
+        <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl leading-relaxed">
+          Premeňte dizajn manuál na živý zdroj pravdy (<strong>Single Source of Truth</strong>). Tieto
+          strojovo-čitateľné endpointy umožňujú vývojárom a softvérom (ako Figma alebo Tailwind)
+          automaticky sťahovať firemné farby a typografiu priamo do kódu a grafických šablón.
+        </p>
+
+        {!isPublished && (
+          <div className="p-3.5 rounded-[2px] bg-amber-950/20 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+            <Info className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <strong>Upozornenie:</strong> Tento brand manuál ešte nebol publikovaný. Endpointy
+              budú vracať HTTP 404, kým v Page Builderi nekliknete na tlačidlo <em>Publikovať</em>.
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Grid of Integration Endpoints */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Endpoint 1: CSS Theme */}
+        <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 flex flex-col justify-between space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-[2px] bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <FileCode className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">CSS Custom Properties</h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">theme.css</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-muted/60 text-muted-foreground border border-border/40">
+                :root variables
+              </span>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Štandardný CSS súbor s premennými pre farby, HSLuv odtiene (50–900) a typografiu.
+              Vložte ho priamo do hlavičky webu.
+            </p>
+
+            {/* URL Box */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-foreground">URL Endpointu</label>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-[2px] bg-neutral-950 border border-border/70 font-mono text-xs">
+                <span className="truncate flex-1 px-1.5 text-neutral-300">{cssUrl}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => copyToClipboard(cssUrl, "css-url")}
+                  className="h-6 px-2 text-[10px] cursor-pointer"
+                  title="Skopírovať URL"
+                >
+                  {copiedKey === "css-url" ? (
+                    <Check className="h-3 w-3 text-emerald-400" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Button>
+                <a
+                  href={cssUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground"
+                  title="Otvoriť v novom okne"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+
+            {/* Code Snippets */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex gap-2 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTabCss("link")}
+                    className={`pb-0.5 transition-colors cursor-pointer ${
+                      activeTabCss === "link"
+                        ? "text-primary border-b border-primary font-bold"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    HTML &lt;link&gt;
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTabCss("import")}
+                    className={`pb-0.5 transition-colors cursor-pointer ${
+                      activeTabCss === "import"
+                        ? "text-primary border-b border-primary font-bold"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    CSS @import
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(
+                      activeTabCss === "link" ? htmlSnippet : cssImportSnippet,
+                      "css-snippet"
+                    )
+                  }
+                  className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1 cursor-pointer"
+                >
+                  {copiedKey === "css-snippet" ? (
+                    <>
+                      <Check className="h-2.5 w-2.5 text-emerald-400" />
+                      <span className="text-emerald-400">Skopírované</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-2.5 w-2.5" />
+                      <span>Kopírovať kód</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <pre className="p-2.5 rounded-[2px] bg-neutral-950/80 border border-border/50 text-[11px] font-mono text-neutral-300 overflow-x-auto">
+                <code>{activeTabCss === "link" ? htmlSnippet : cssImportSnippet}</code>
+              </pre>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border/30">
+            <button
+              type="button"
+              onClick={() => setIsCssPreviewOpen(!isCssPreviewOpen)}
+              className="text-xs text-primary hover:underline cursor-pointer flex items-center gap-1"
+            >
+              {isCssPreviewOpen ? "Skryť náhľad vygenerovaného CSS" : "Zobraziť náhľad vygenerovaného CSS"}
+            </button>
+
+            {isCssPreviewOpen && (
+              <pre className="mt-3 p-3 rounded-[2px] bg-neutral-950 border border-border/70 text-[10px] font-mono text-neutral-300 max-h-56 overflow-y-auto scrollbar-thin">
+                <code>{cssPreview}</code>
+              </pre>
+            )}
+          </div>
+        </div>
+
+        {/* Endpoint 2: W3C DTCG Tokens JSON */}
+        <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 flex flex-col justify-between space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-[2px] bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <FileJson className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">W3C Design Tokens</h3>
+                  <span className="text-[10px] font-mono text-muted-foreground">tokens.json</span>
+                </div>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                W3C DTCG Standard
+              </span>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Formát podľa špecifikácie W3C Design Tokens Community Group. Ideálny pre{" "}
+              <strong>Tokens Studio for Figma</strong> a Style Dictionary transformácie.
+            </p>
+
+            {/* URL Box */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold text-foreground">URL Endpointu</label>
+              <div className="flex items-center gap-1.5 p-1.5 rounded-[2px] bg-neutral-950 border border-border/70 font-mono text-xs">
+                <span className="truncate flex-1 px-1.5 text-neutral-300">{jsonUrl}</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => copyToClipboard(jsonUrl, "json-url")}
+                  className="h-6 px-2 text-[10px] cursor-pointer"
+                  title="Skopírovať URL"
+                >
+                  {copiedKey === "json-url" ? (
+                    <Check className="h-3 w-3 text-emerald-400" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Button>
+                <a
+                  href={jsonUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground"
+                  title="Otvoriť v novom okne"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+
+            {/* Instructions for Figma */}
+            <div className="space-y-1.5 p-3 rounded-[2px] bg-muted/20 border border-border/40 text-xs">
+              <div className="font-semibold text-foreground flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                <span>Návod: Tokens Studio for Figma</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                V plugine Tokens Studio otvorte <em>Settings &rarr; Add New Token Storage</em>, vyberte{" "}
+                <em>URL / Remote Storage</em> a vložte URL tohto endpointu. Všetky farby a rezervačné
+                tokeny sa okamžite synchronizujú do Figmy.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border/30">
+            <button
+              type="button"
+              onClick={() => setIsJsonPreviewOpen(!isJsonPreviewOpen)}
+              className="text-xs text-primary hover:underline cursor-pointer flex items-center gap-1"
+            >
+              {isJsonPreviewOpen ? "Skryť náhľad W3C JSON" : "Zobraziť náhľad W3C JSON"}
+            </button>
+
+            {isJsonPreviewOpen && (
+              <pre className="mt-3 p-3 rounded-[2px] bg-neutral-950 border border-border/70 text-[10px] font-mono text-neutral-300 max-h-56 overflow-y-auto scrollbar-thin">
+                <code>{jsonPreview}</code>
+              </pre>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Section 3: Tailwind Integration Code Snippet */}
+      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Terminal className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-bold text-foreground">Integrácia s Tailwind CSS</h3>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => copyToClipboard(tailwindSnippet, "tailwind")}
+            className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 cursor-pointer"
+          >
+            {copiedKey === "tailwind" ? (
+              <>
+                <Check className="h-3 w-3 text-emerald-400" />
+                <span className="text-emerald-400">Skopírované</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-3 w-3" />
+                <span>Kopírovať Tailwind config</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <p className="text-xs text-muted-foreground">
+          Vložte nasledujúce rozšírenie do svojho <code>tailwind.config.js</code>. Používaním CSS
+          premenných získate automatickú synchronizáciu dizajnu bez nutnosti meniť zdrojový kód.
+        </p>
+
+        <pre className="p-3.5 rounded-[2px] bg-neutral-950 border border-border/70 text-xs font-mono text-neutral-300 overflow-x-auto">
+          <code>{tailwindSnippet}</code>
+        </pre>
+      </div>
+    </div>
+  );
+}

@@ -19,6 +19,7 @@ import {
   LayoutGrid,
   Settings,
   Sparkles,
+  Code2,
   X,
 } from "lucide-react";
 
@@ -97,6 +98,11 @@ export function AdminSidebar({
       label: dict.admin.brandBuilder,
       href: `/admin/brand/${brandId}/builder`,
       icon: LayoutGrid,
+    },
+    {
+      label: dict.admin.brandIntegrations || "Integrácie a API",
+      href: `/admin/brand/${brandId}/integrations`,
+      icon: Code2,
     },
     {
       label: dict.admin.brandSettings,

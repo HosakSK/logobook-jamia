@@ -271,11 +271,16 @@ export async function publishBrandAction(brandId: string): Promise<{
 
     // 5. Revalidate cache
     revalidatePath(`/admin/brand/${brandId}/builder`);
+    revalidatePath(`/admin/brand/${brandId}/integrations`);
     revalidatePath(`/manual/${brand.slug}`);
     revalidatePath(`/m/${brand.slug}`);
+    revalidatePath(`/api/brand/${brand.slug}/theme.css`);
+    revalidatePath(`/api/brand/${brand.slug}/tokens.json`);
     if (brand.customDomain) {
       revalidatePath(`/manual/${brand.customDomain}`);
       revalidatePath(`/m/${brand.customDomain}`);
+      revalidatePath(`/api/brand/${brand.customDomain}/theme.css`);
+      revalidatePath(`/api/brand/${brand.customDomain}/tokens.json`);
     }
 
     return {
