@@ -4,3 +4,4 @@ export { BuilderEmptyState } from "./builder-empty-state";
 export { BuilderCanvas } from "./builder-canvas";
 export { TemplateBrowserModal } from "./template-browser-modal";
 export { SaveTemplateModal } from "./save-template-modal";
+export { DimensionMatrixWizardModal } from "./dimension-matrix-wizard-modal";

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { seedInitialBrandPagesAction, createPageAction } from "@/actions/pages";
+import { DimensionMatrixWizardModal } from "./dimension-matrix-wizard-modal";
 
 interface BuilderEmptyStateProps {
   brandId: string;
@@ -15,6 +16,7 @@ interface BuilderEmptyStateProps {
 
 export function BuilderEmptyState({ brandId, brandName }: BuilderEmptyStateProps) {
   const router = useRouter();
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
   const [isCreatingBlank, setIsCreatingBlank] = useState(false);
   const [blankTitle, setBlankTitle] = useState("");
@@ -109,16 +111,11 @@ export function BuilderEmptyState({ brandId, brandName }: BuilderEmptyStateProps
 
           <Button
             type="button"
-            onClick={handleSeed}
-            disabled={isSeeding}
-            className="w-full text-xs font-bold rounded-[2px] bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5 shadow-xs"
+            onClick={() => setIsWizardOpen(true)}
+            className="w-full text-xs font-bold rounded-[2px] bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5 shadow-xs cursor-pointer"
           >
-            {isSeeding ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-3.5 w-3.5" />
-            )}
-            <span>{isSeeding ? "Generujem štruktúru..." : "Vygenerovať štruktúru"}</span>
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Spustiť Sprievodcu (Wizard)</span>
           </Button>
         </div>
 
@@ -171,6 +168,22 @@ export function BuilderEmptyState({ brandId, brandName }: BuilderEmptyStateProps
           </form>
         </div>
       </div>
+
+      {isWizardOpen && (
+        <DimensionMatrixWizardModal
+          brandId={brandId}
+          brandName={brandName}
+          onClose={() => setIsWizardOpen(false)}
+          onSuccess={(firstPageId) => {
+            setIsWizardOpen(false);
+            if (firstPageId) {
+              router.push(`/admin/brand/${brandId}/builder/${firstPageId}`);
+            } else {
+              router.refresh();
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

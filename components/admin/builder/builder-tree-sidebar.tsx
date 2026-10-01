@@ -17,7 +17,9 @@ import {
   Copy,
   Edit2,
   FolderPlus,
+  Sparkles,
 } from "lucide-react";
+import { DimensionMatrixWizardModal } from "./dimension-matrix-wizard-modal";
 import { PageItem, PageHierarchyItem } from "@/lib/types/page";
 import {
   createPageAction,
@@ -59,6 +61,7 @@ export function BuilderTreeSidebar({
     position: "before" | "after" | "inside";
   } | null>(null);
   const [isUpdatingTree, setIsUpdatingTree] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   // Context menu state
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
@@ -393,22 +396,36 @@ export function BuilderTreeSidebar({
           )}
         </div>
 
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            setNewParentId("");
-            setNewTitle("");
-            setNewSlug("");
-            setNewMenuStyle("main");
-            setIsCreating(true);
-          }}
-          className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-border/60 hover:border-primary/50 text-foreground"
-        >
-          <Plus className="h-3 w-3" />
-          <span>Pridať</span>
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setIsWizardOpen(true)}
+            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-primary/40 bg-primary/5 hover:bg-primary/15 text-primary cursor-pointer shadow-2xs"
+            title="Spustiť generátor stromu (Dimension Matrix Wizard)"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>Wizard</span>
+          </Button>
+
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setNewParentId("");
+              setNewTitle("");
+              setNewSlug("");
+              setNewMenuStyle("main");
+              setIsCreating(true);
+            }}
+            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-border/60 hover:border-primary/50 text-foreground cursor-pointer"
+          >
+            <Plus className="h-3 w-3" />
+            <span>Pridať</span>
+          </Button>
+        </div>
       </div>
 
       {/* Creation Modal / Inline Drawer */}
@@ -953,6 +970,21 @@ export function BuilderTreeSidebar({
           })
         )}
       </nav>
+
+      {isWizardOpen && (
+        <DimensionMatrixWizardModal
+          brandId={brandId}
+          onClose={() => setIsWizardOpen(false)}
+          onSuccess={(firstPageId) => {
+            setIsWizardOpen(false);
+            if (firstPageId) {
+              router.push(`/admin/brand/${brandId}/builder/${firstPageId}`);
+            } else {
+              router.refresh();
+            }
+          }}
+        />
+      )}
     </aside>
   );
 }
