@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   Check,
   Search,
+  Globe,
 } from "lucide-react";
 import { PageDetail, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
@@ -120,7 +121,8 @@ export function BuilderCanvas({
   const [configJsonError, setConfigJsonError] = useState<string | null>(null);
   const [isSavingConfig, setIsSavingConfig] = useState(false);
 
-  const pageTitle = page.title?.sk || page.title?.en || "Bez názvu";
+  const [activeLocale, setActiveLocale] = useState<string>("en"); // English is primary by default!
+  const pageTitle = page.title?.[activeLocale] || page.title?.en || page.title?.sk || "Untitled";
 
   // Load existing brand link groups when opening link dialog
   useEffect(() => {
@@ -136,9 +138,13 @@ export function BuilderCanvas({
     }
   }, [linkingModuleId, brandId]);
 
-  // Page title update
+  // Page title update for active locale
   const handleUpdatePageTitle = async (newTitle: string) => {
-    await updatePageAction(page.id, { title: newTitle });
+    const updatedTitleRecord = {
+      ...(typeof page.title === "object" ? page.title : {}),
+      [activeLocale]: newTitle,
+    };
+    await updatePageAction(page.id, { title: updatedTitleRecord });
     router.refresh();
   };
 
@@ -371,6 +377,30 @@ export function BuilderCanvas({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Active Canvas Language Switcher (EN Primary) */}
+            <div className="flex items-center gap-1 bg-neutral-900 border border-border/50 rounded-[2px] p-0.5">
+              <Globe className="h-3 w-3 text-muted-foreground ml-1.5 mr-0.5" />
+              {[
+                { code: "en", label: "EN" },
+                { code: "sk", label: "SK" },
+                { code: "cs", label: "CS" },
+              ].map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setActiveLocale(l.code)}
+                  className={`px-2 py-0.5 text-xs font-mono rounded-[2px] transition-colors ${
+                    activeLocale === l.code
+                      ? "bg-primary text-primary-foreground font-bold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                  }`}
+                  title={`Prepnúť editáciu a náhľad do jazyka ${l.label}`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+
             <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-[2px]">
               <Link href={`/m/${brandSlug}`} target="_blank">
                 <span>Verejný náhľad</span>
@@ -647,7 +677,11 @@ export function BuilderCanvas({
                             <ModuleDispatcher
                               module={mod}
                               isEditor={true}
-                              locale="sk"
+                              locale={activeLocale}
+                              onConfigChange={async (newConfig) => {
+                                await updateModuleConfigAction(mod.id, newConfig);
+                                router.refresh();
+                              }}
                             />
                           </div>
                         ))
