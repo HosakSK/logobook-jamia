@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
 import {
   Check,
@@ -15,6 +15,9 @@ import {
   Palette,
   LayoutGrid,
   RotateCcw,
+  Upload,
+  FileText,
+  Loader2,
 } from "lucide-react";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import {
@@ -30,6 +33,7 @@ import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandAssetsAction } from "@/actions/assets";
+import { uploadMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
 
 /**
@@ -149,6 +153,7 @@ export default function M20DosAndDontsModule({
       };
     }
     return {
+      layout: "cards" as const,
       doColor: null,
       dontColor: null,
       warningColor: null,
@@ -166,6 +171,10 @@ export default function M20DosAndDontsModule({
   const [activeFilter, setActiveFilter] = useState<"all" | "do" | "dont" | "warning">("all");
   const [brandAssets, setBrandAssets] = useState<BrandAsset[]>([]);
   const [assetPickerRuleIndex, setAssetPickerRuleIndex] = useState<number | null>(null);
+  const [uploadingRuleIndex, setUploadingRuleIndex] = useState<number | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const targetUploadIndexRef = useRef<number | null>(null);
 
   useEffect(() => {
     setCfg(parsedConfig);
@@ -199,6 +208,48 @@ export default function M20DosAndDontsModule({
     }
   };
 
+  // Handle direct file upload for a rule card
+  const handleFileUpload = async (index: number, file: File) => {
+    setUploadingRuleIndex(index);
+    try {
+      if (brandId) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", file.name);
+        formData.append("fileType", "IMAGE");
+        const res = await uploadMediaAction(brandId, formData);
+        if (res.success && res.asset?.fileUrl) {
+          const updated = [...cfg.items];
+          updated[index] = {
+            ...updated[index],
+            imageUrl: res.asset.fileUrl,
+          };
+          handleSaveConfig({ ...cfg, items: updated });
+          return;
+        }
+      }
+
+      // Offline / fallback to local Data URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (dataUrl) {
+          const updated = [...cfg.items];
+          updated[index] = {
+            ...updated[index],
+            imageUrl: dataUrl,
+          };
+          handleSaveConfig({ ...cfg, items: updated });
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error("Failed to upload image in M20:", err);
+    } finally {
+      setUploadingRuleIndex(null);
+    }
+  };
+
   // Reorder items
   const moveItem = (index: number, direction: "up" | "down") => {
     const list = [...cfg.items];
@@ -229,7 +280,7 @@ export default function M20DosAndDontsModule({
     return cfg.items.filter((item) => item.type === activeFilter);
   }, [cfg.items, cfg.showFilter, activeFilter]);
 
-  // Compute CSS column classes
+  // Compute CSS column classes for cards layout
   const gridColumnClass = useMemo(() => {
     switch (cfg.columns) {
       case 1:
@@ -277,6 +328,11 @@ export default function M20DosAndDontsModule({
     }
   };
 
+  // Grouped items for minimalist text view
+  const doItems = useMemo(() => cfg.items.filter((i) => i.type === "do"), [cfg.items]);
+  const dontItems = useMemo(() => cfg.items.filter((i) => i.type === "dont"), [cfg.items]);
+  const warningItems = useMemo(() => cfg.items.filter((i) => i.type === "warning"), [cfg.items]);
+
   return (
     <div
       className="relative group/m20 transition-all duration-200"
@@ -285,9 +341,49 @@ export default function M20DosAndDontsModule({
         ...resolveStyles(cfg.styleOverrides),
       }}
     >
+      {/* Hidden file input for direct file upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && targetUploadIndexRef.current !== null) {
+            handleFileUpload(targetUploadIndexRef.current, file);
+          }
+          e.target.value = "";
+        }}
+      />
+
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m20:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/90 backdrop-blur-md border border-border/80 px-2 py-1 rounded-[3px] shadow-md">
+        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m20:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/95 backdrop-blur-md border border-border/80 px-2.5 py-1.5 rounded-[3px] shadow-md">
+          {/* Quick toggle between visual cards and minimal summary */}
+          <button
+            type="button"
+            onClick={() =>
+              handleSaveConfig({
+                ...cfg,
+                layout: cfg.layout === "minimal" ? "cards" : "minimal",
+              })
+            }
+            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors border-r border-border/60 pr-2 mr-1"
+            title="Prepnúť režim zobrazenia (Karty vs Minimalistický text)"
+          >
+            {cfg.layout === "minimal" ? (
+              <>
+                <LayoutGrid className="w-3.5 h-3.5 text-primary" />
+                <span>Karty</span>
+              </>
+            ) : (
+              <>
+                <FileText className="w-3.5 h-3.5 text-primary" />
+                <span>Minimal</span>
+              </>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -309,8 +405,8 @@ export default function M20DosAndDontsModule({
         </div>
       )}
 
-      {/* Client Filter Controls */}
-      {cfg.showFilter && (
+      {/* Client Filter Controls (applicable in cards mode) */}
+      {cfg.layout === "cards" && cfg.showFilter && (
         <div className="flex flex-wrap items-center gap-1.5 mb-6">
           <button
             type="button"
@@ -356,179 +452,367 @@ export default function M20DosAndDontsModule({
             Zakázané ({cfg.items.filter((i) => i.type === "dont").length})
           </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveFilter("warning")}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
-              activeFilter === "warning"
-                ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-                : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: resolvedWarningColor }}
-            />
-            Pozor ({cfg.items.filter((i) => i.type === "warning").length})
-          </button>
+          {cfg.items.some((i) => i.type === "warning") && (
+            <button
+              type="button"
+              onClick={() => setActiveFilter("warning")}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
+                activeFilter === "warning"
+                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
+                  : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: resolvedWarningColor }}
+              />
+              Pozor ({cfg.items.filter((i) => i.type === "warning").length})
+            </button>
+          )}
         </div>
       )}
 
-      {/* Cards Grid */}
-      <div className={`grid ${gridColumnClass} gap-5 sm:gap-6`}>
-        {displayedItems.map((item, index) => {
-          const itemTitle = resolveI18nText(item.title, locale);
-          const itemDescription = resolveI18nText(item.description, locale);
+      {/* ======================================================== */}
+      {/* MODE 1: VISUAL CARDS (S OBRÁZKAMI A DIAGRAMMI)           */}
+      {/* ======================================================== */}
+      {cfg.layout === "cards" && (
+        <div className={`grid ${gridColumnClass} gap-5 sm:gap-6`}>
+          {displayedItems.map((item, index) => {
+            const itemTitle = resolveI18nText(item.title, locale);
+            const itemDescription = resolveI18nText(item.description, locale);
 
-          // Badge properties
-          let badgeBg = resolvedDontColor;
-          let badgeIcon = <X className="w-4 h-4 text-white stroke-[2.5]" />;
-          let badgeLabel = "DON'T";
+            // Badge properties
+            let badgeBg = resolvedDontColor;
+            let badgeIcon = <X className="w-4 h-4 text-white stroke-[2.5]" />;
+            let badgeLabel = "DON'T";
 
-          if (item.type === "do") {
-            badgeBg = resolvedDoColor;
-            badgeIcon = <Check className="w-4 h-4 text-white stroke-[2.5]" />;
-            badgeLabel = "DO";
-          } else if (item.type === "warning") {
-            badgeBg = resolvedWarningColor;
-            badgeIcon = <AlertTriangle className="w-4 h-4 text-white stroke-[2.5]" />;
-            badgeLabel = "POZOR";
-          }
+            if (item.type === "do") {
+              badgeBg = resolvedDoColor;
+              badgeIcon = <Check className="w-4 h-4 text-white stroke-[2.5]" />;
+              badgeLabel = "DO";
+            } else if (item.type === "warning") {
+              badgeBg = resolvedWarningColor;
+              badgeIcon = <AlertTriangle className="w-4 h-4 text-white stroke-[2.5]" />;
+              badgeLabel = "POZOR";
+            }
 
-          const badgePositionClass =
-            cfg.badgePosition === "top-right" ? "top-3 right-3" : "top-3 left-3";
+            const badgePositionClass =
+              cfg.badgePosition === "top-right" ? "top-3 right-3" : "top-3 left-3";
 
-          return (
-            <div
-              key={item.id}
-              className="flex flex-col bg-[#17212a] border border-border/60 overflow-hidden shadow-xs hover:border-border transition-all duration-200"
-              style={{ borderRadius: brandRadius }}
-            >
-              {/* Visual Preview Box */}
+            return (
               <div
-                className="relative w-full aspect-[16/10] sm:aspect-[4/3] flex items-center justify-center overflow-hidden border-b border-border/40"
-                style={getCardBackgroundStyle(item)}
+                key={item.id}
+                className="flex flex-col bg-[#17212a] border border-border/60 overflow-hidden shadow-xs hover:border-border transition-all duration-200"
+                style={{ borderRadius: brandRadius }}
               >
-                {/* Visual Status Badge */}
+                {/* Visual Preview Box */}
                 <div
-                  className={`absolute ${badgePositionClass} z-20 flex items-center gap-1.5 shadow-md`}
+                  className="relative w-full aspect-[16/10] sm:aspect-[4/3] flex items-center justify-center overflow-hidden border-b border-border/40"
+                  style={getCardBackgroundStyle(item)}
                 >
+                  {/* Visual Status Badge */}
                   <div
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ring-2 ring-black/40 transition-transform"
-                    style={{ backgroundColor: badgeBg }}
+                    className={`absolute ${badgePositionClass} z-20 flex items-center gap-1.5 shadow-md`}
                   >
-                    {badgeIcon}
+                    <div
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ring-2 ring-black/40 transition-transform"
+                      style={{ backgroundColor: badgeBg }}
+                    >
+                      {badgeIcon}
+                    </div>
+                    <span
+                      className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-[2px] text-white tracking-wider shadow-sm ring-1 ring-black/20"
+                      style={{ backgroundColor: badgeBg }}
+                    >
+                      {badgeLabel}
+                    </span>
                   </div>
-                  <span
-                    className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-[2px] text-white tracking-wider shadow-sm ring-1 ring-black/20"
-                    style={{ backgroundColor: badgeBg }}
-                  >
-                    {badgeLabel}
+
+                  {/* Artwork / Image / Fallback Graphic */}
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={itemTitle}
+                      className="max-w-[78%] max-h-[75%] object-contain drop-shadow-sm select-none transition-transform duration-300"
+                    />
+                  ) : (
+                    <DefaultRuleGraphic type={item.type} ruleId={item.id} />
+                  )}
+                </div>
+
+                {/* Text Info Section */}
+                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-2">
+                  <div className="space-y-1.5">
+                    {/* Title */}
+                    {isEditor ? (
+                      <InlineEditableText
+                        value={itemTitle}
+                        as="h4"
+                        className="font-bold text-sm sm:text-base text-foreground tracking-tight leading-snug"
+                        onSave={(val) => {
+                          const updated = [...cfg.items];
+                          const realIdx = cfg.items.findIndex((i) => i.id === item.id);
+                          if (realIdx >= 0) {
+                            updated[realIdx] = {
+                              ...updated[realIdx],
+                              title: setI18nText(updated[realIdx].title, val, locale),
+                            };
+                            handleSaveConfig({ ...cfg, items: updated });
+                          }
+                        }}
+                      />
+                    ) : (
+                      <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight leading-snug">
+                        {itemTitle}
+                      </h4>
+                    )}
+
+                    {/* Description */}
+                    {isEditor ? (
+                      <InlineEditableText
+                        value={itemDescription || ""}
+                        as="p"
+                        multiline
+                        placeholder="Kliknite pre pridanie vysvetľujúceho popisu pravidla..."
+                        className="text-xs sm:text-sm text-muted-foreground leading-relaxed"
+                        onSave={(val) => {
+                          const updated = [...cfg.items];
+                          const realIdx = cfg.items.findIndex((i) => i.id === item.id);
+                          if (realIdx >= 0) {
+                            updated[realIdx] = {
+                              ...updated[realIdx],
+                              description: setI18nText(updated[realIdx].description, val, locale),
+                            };
+                            handleSaveConfig({ ...cfg, items: updated });
+                          }
+                        }}
+                      />
+                    ) : (
+                      itemDescription && (
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                          {itemDescription}
+                        </p>
+                      )
+                    )}
+                  </div>
+
+                  {/* Editor fast controls */}
+                  {isEditor && (
+                    <div className="pt-2 flex items-center justify-between border-t border-border/20 text-[10px] font-mono text-muted-foreground">
+                      <span className="uppercase tracking-wider">
+                        Typ:{" "}
+                        <strong
+                          style={{
+                            color:
+                              item.type === "do"
+                                ? resolvedDoColor
+                                : item.type === "dont"
+                                ? resolvedDontColor
+                                : resolvedWarningColor,
+                          }}
+                        >
+                          {item.type}
+                        </strong>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsSettingsModalOpen(true)}
+                        className="hover:text-primary transition-colors underline"
+                      >
+                        Konfigurovať kartu
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODE 2: MINIMALIST TEXT SUMMARY (ČISTÉ ZHRNUTIE VETAMI) */}
+      {/* ======================================================== */}
+      {cfg.layout === "minimal" && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* DO COLUMN: ČO DODRŽIAVAŤ */}
+            <div
+              className="bg-[#17212a] border rounded-lg p-5 sm:p-6 space-y-4"
+              style={{
+                borderColor: `${resolvedDoColor}40`,
+                borderRadius: brandRadius,
+              }}
+            >
+              <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-white"
+                  style={{ backgroundColor: resolvedDoColor }}
+                >
+                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
+                    Čo dodržiavať (Povolené)
+                  </h4>
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Schválené zásady práce s identitou
                   </span>
                 </div>
-
-                {/* Artwork / Image / Fallback Graphic */}
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt={itemTitle}
-                    className="max-w-[78%] max-h-[75%] object-contain drop-shadow-sm select-none transition-transform duration-300"
-                  />
-                ) : (
-                  <DefaultRuleGraphic type={item.type} ruleId={item.id} />
-                )}
               </div>
 
-              {/* Text Info Section */}
-              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-2">
-                <div className="space-y-1.5">
-                  {/* Title */}
-                  {isEditor ? (
-                    <InlineEditableText
-                      value={itemTitle}
-                      as="h4"
-                      className="font-bold text-sm sm:text-base text-foreground tracking-tight leading-snug"
-                      onSave={(val) => {
-                        const updated = [...cfg.items];
-                        const realIdx = cfg.items.findIndex((i) => i.id === item.id);
-                        if (realIdx >= 0) {
-                          updated[realIdx] = {
-                            ...updated[realIdx],
-                            title: setI18nText(updated[realIdx].title, val, locale),
-                          };
-                          handleSaveConfig({ ...cfg, items: updated });
-                        }
-                      }}
-                    />
-                  ) : (
-                    <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight leading-snug">
-                      {itemTitle}
-                    </h4>
-                  )}
-
-                  {/* Description */}
-                  {isEditor ? (
-                    <InlineEditableText
-                      value={itemDescription || ""}
-                      as="p"
-                      multiline
-                      placeholder="Kliknite pre pridanie vysvetľujúceho popisu pravidla..."
-                      className="text-xs sm:text-sm text-muted-foreground leading-relaxed"
-                      onSave={(val) => {
-                        const updated = [...cfg.items];
-                        const realIdx = cfg.items.findIndex((i) => i.id === item.id);
-                        if (realIdx >= 0) {
-                          updated[realIdx] = {
-                            ...updated[realIdx],
-                            description: setI18nText(updated[realIdx].description, val, locale),
-                          };
-                          handleSaveConfig({ ...cfg, items: updated });
-                        }
-                      }}
-                    />
-                  ) : (
-                    itemDescription && (
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        {itemDescription}
-                      </p>
-                    )
-                  )}
-                </div>
-
-                {/* Editor fast type indicator */}
-                {isEditor && (
-                  <div className="pt-2 flex items-center justify-between border-t border-border/20 text-[10px] font-mono text-muted-foreground">
-                    <span className="uppercase tracking-wider">
-                      Typ:{" "}
-                      <strong
-                        style={{
-                          color:
-                            item.type === "do"
-                              ? resolvedDoColor
-                              : item.type === "dont"
-                              ? resolvedDontColor
-                              : resolvedWarningColor,
-                        }}
+              <div className="space-y-3">
+                {doItems.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    Žiadne schválené pravidlá neboli zadefinované.
+                  </p>
+                ) : (
+                  doItems.map((item) => {
+                    const itemTitle = resolveI18nText(item.title, locale);
+                    const itemDesc = resolveI18nText(item.description, locale);
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-start gap-2.5 p-2 rounded hover:bg-neutral-800/20 transition-colors"
                       >
-                        {item.type}
-                      </strong>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsSettingsModalOpen(true)}
-                      className="hover:text-primary transition-colors underline"
-                    >
-                      Konfigurovať kartu
-                    </button>
-                  </div>
+                        <div
+                          className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                          style={{ backgroundColor: resolvedDoColor }}
+                        />
+                        <div className="space-y-0.5 flex-1">
+                          <strong className="text-xs sm:text-sm font-semibold text-foreground block">
+                            {itemTitle}
+                          </strong>
+                          {itemDesc && (
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {itemDesc}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* ADMIN SETTINGS MODAL / SHEET */}
+            {/* DON'T COLUMN: ČOHO SA VYVAROVAŤ */}
+            <div
+              className="bg-[#17212a] border rounded-lg p-5 sm:p-6 space-y-4"
+              style={{
+                borderColor: `${resolvedDontColor}40`,
+                borderRadius: brandRadius,
+              }}
+            >
+              <div className="flex items-center gap-2 border-b border-border/40 pb-3">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-white"
+                  style={{ backgroundColor: resolvedDontColor }}
+                >
+                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
+                    Čoho sa vyvarovať (Zakázané)
+                  </h4>
+                  <span className="text-[10px] font-mono text-muted-foreground block">
+                    Nepovolené deformácie a manipulácie
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {dontItems.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    Žiadne zakázané manipulácie neboli zadefinované.
+                  </p>
+                ) : (
+                  dontItems.map((item) => {
+                    const itemTitle = resolveI18nText(item.title, locale);
+                    const itemDesc = resolveI18nText(item.description, locale);
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-start gap-2.5 p-2 rounded hover:bg-neutral-800/20 transition-colors"
+                      >
+                        <div
+                          className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                          style={{ backgroundColor: resolvedDontColor }}
+                        />
+                        <div className="space-y-0.5 flex-1">
+                          <strong className="text-xs sm:text-sm font-semibold text-foreground block">
+                            {itemTitle}
+                          </strong>
+                          {itemDesc && (
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              {itemDesc}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* WARNING SECTION (AK SÚ DEFINOVANÉ VÝSTRAHY) */}
+          {warningItems.length > 0 && (
+            <div
+              className="bg-[#17212a] border rounded-lg p-4 sm:p-5 space-y-3"
+              style={{
+                borderColor: `${resolvedWarningColor}40`,
+                borderRadius: brandRadius,
+              }}
+            >
+              <div className="flex items-center gap-2 border-b border-border/40 pb-2">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-white"
+                  style={{ backgroundColor: resolvedWarningColor }}
+                >
+                  <AlertTriangle className="w-3 h-3 stroke-[2.5]" />
+                </div>
+                <h5 className="font-bold text-xs sm:text-sm text-foreground tracking-tight">
+                  Výnimočné a obmedzené situácie (Pozor)
+                </h5>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {warningItems.map((item) => {
+                  const itemTitle = resolveI18nText(item.title, locale);
+                  const itemDesc = resolveI18nText(item.description, locale);
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-start gap-2 p-2 rounded bg-[#0e161d] border border-border/40"
+                    >
+                      <div
+                        className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
+                        style={{ backgroundColor: resolvedWarningColor }}
+                      />
+                      <div className="space-y-0.5 flex-1">
+                        <strong className="text-xs font-semibold text-foreground block">
+                          {itemTitle}
+                        </strong>
+                        {itemDesc && (
+                          <p className="text-[11px] text-muted-foreground leading-relaxed">
+                            {itemDesc}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* ADMIN SETTINGS MODAL / SHEET                             */}
+      {/* ======================================================== */}
       {isSettingsModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -822,30 +1106,57 @@ export default function M20DosAndDontsModule({
                             />
                           </div>
 
-                          {/* Image source */}
-                          <div className="space-y-1">
+                          {/* Image source with direct file upload */}
+                          <div className="space-y-1 sm:col-span-2">
                             <div className="flex items-center justify-between">
                               <label className="text-[10px] font-mono text-muted-foreground block">
-                                URL obrázka ukážky:
+                                Obrázok ukážky (JPG, PNG, SVG):
                               </label>
-                              {brandAssets.length > 0 && (
+                              <div className="flex items-center gap-2">
+                                {/* Direct File Upload Button */}
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    setAssetPickerRuleIndex(
-                                      assetPickerRuleIndex === index ? null : index
-                                    )
-                                  }
-                                  className="text-[10px] text-primary hover:underline flex items-center gap-1"
+                                  disabled={uploadingRuleIndex === index}
+                                  onClick={() => {
+                                    targetUploadIndexRef.current = index;
+                                    fileInputRef.current?.click();
+                                  }}
+                                  className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold"
                                 >
-                                  <ImageIcon className="w-3 h-3" />
-                                  <span>Vybrať z logotypov</span>
+                                  {uploadingRuleIndex === index ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                      <span>Nahrávam...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-3 h-3" />
+                                      <span>Nahrať JPG/PNG</span>
+                                    </>
+                                  )}
                                 </button>
-                              )}
+
+                                {/* Select from Brand Assets */}
+                                {brandAssets.length > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setAssetPickerRuleIndex(
+                                        assetPickerRuleIndex === index ? null : index
+                                      )
+                                    }
+                                    className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                  >
+                                    <ImageIcon className="w-3 h-3" />
+                                    <span>Z knižnice log</span>
+                                  </button>
+                                )}
+                              </div>
                             </div>
+
                             <input
                               type="text"
-                              placeholder="https://... alebo nechajte prázdne pre SVG grafiku"
+                              placeholder="https://... alebo nahrajte súbor tlačidlom vyššie"
                               value={item.imageUrl}
                               onChange={(e) => {
                                 const val = e.target.value;
@@ -853,12 +1164,12 @@ export default function M20DosAndDontsModule({
                                 updated[index] = { ...updated[index], imageUrl: val };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
                             />
                           </div>
 
                           {/* Card background selector */}
-                          <div className="space-y-1">
+                          <div className="space-y-1 sm:col-span-2">
                             <label className="text-[10px] font-mono text-muted-foreground block">
                               Podklad plátna náhľadu:
                             </label>
@@ -973,6 +1284,50 @@ export default function M20DosAndDontsModule({
               {/* TAB 2: COLORS & LAYOUT SETTINGS */}
               {modalTab === "settings" && (
                 <div className="space-y-6">
+                  {/* Layout Display Mode: Cards vs Minimal Text Summary */}
+                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
+                    <span className="font-semibold text-foreground text-xs block">
+                      Štýl prezentácie pravidiel:
+                    </span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleSaveConfig({ ...cfg, layout: "cards" })}
+                        className={`p-3 rounded border text-left transition-all ${
+                          cfg.layout === "cards"
+                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
+                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <LayoutGrid className="w-4 h-4 text-primary" />
+                          <span className="font-bold text-xs">Vizuálne karty</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground leading-normal block">
+                          Veľké karty s obrázkami, náhľadmi chýb a statusovými odznakmi.
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSaveConfig({ ...cfg, layout: "minimal" })}
+                        className={`p-3 rounded border text-left transition-all ${
+                          cfg.layout === "minimal"
+                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
+                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <span className="font-bold text-xs">Minimalistické zhrnutie</span>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground leading-normal block">
+                          Kompaktný textový prehľad rozdelený na DO a DON'T iba v niekoľkých vetách.
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Semantic Color Overrides */}
                   <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
                     <div>
@@ -1140,113 +1495,115 @@ export default function M20DosAndDontsModule({
                     </div>
                   </div>
 
-                  {/* Grid Layout & General Settings */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
-                    <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
-                      <LayoutGrid className="w-4 h-4 text-primary" />
-                      <span>Rozloženie mriežky a zobrazenie</span>
-                    </h4>
+                  {/* Grid Layout & General Settings (for cards mode) */}
+                  {cfg.layout === "cards" && (
+                    <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
+                      <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                        <LayoutGrid className="w-4 h-4 text-primary" />
+                        <span>Rozloženie mriežky a zobrazenie</span>
+                      </h4>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Columns count */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground block">
-                          Počet stĺpcov kariet:
-                        </label>
-                        <div className="flex items-center gap-2">
-                          {[1, 2, 3, 4].map((cols) => (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Columns count */}
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-foreground block">
+                            Počet stĺpcov kariet:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            {[1, 2, 3, 4].map((cols) => (
+                              <button
+                                key={cols}
+                                type="button"
+                                onClick={() => handleSaveConfig({ ...cfg, columns: cols })}
+                                className={`flex-1 py-1.5 rounded border text-xs font-bold transition-all ${
+                                  cfg.columns === cols
+                                    ? "bg-primary text-primary-foreground border-primary"
+                                    : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Badge position */}
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-foreground block">
+                            Umiestnenie stavového odznaku:
+                          </label>
+                          <div className="grid grid-cols-2 gap-2">
                             <button
-                              key={cols}
                               type="button"
-                              onClick={() => handleSaveConfig({ ...cfg, columns: cols })}
-                              className={`flex-1 py-1.5 rounded border text-xs font-bold transition-all ${
-                                cfg.columns === cols
+                              onClick={() =>
+                                handleSaveConfig({ ...cfg, badgePosition: "top-left" })
+                              }
+                              className={`py-1.5 rounded border text-xs font-bold transition-all ${
+                                cfg.badgePosition === "top-left"
                                   ? "bg-primary text-primary-foreground border-primary"
                                   : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
                               }`}
                             >
-                              {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
+                              Vľavo hore
                             </button>
-                          ))}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleSaveConfig({ ...cfg, badgePosition: "top-right" })
+                              }
+                              className={`py-1.5 rounded border text-xs font-bold transition-all ${
+                                cfg.badgePosition === "top-right"
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              Vpravo hore
+                            </button>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Badge position */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground block">
-                          Umiestnenie stavového odznaku:
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleSaveConfig({ ...cfg, badgePosition: "top-left" })
-                            }
-                            className={`py-1.5 rounded border text-xs font-bold transition-all ${
-                              cfg.badgePosition === "top-left"
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Vľavo hore
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleSaveConfig({ ...cfg, badgePosition: "top-right" })
-                            }
-                            className={`py-1.5 rounded border text-xs font-bold transition-all ${
-                              cfg.badgePosition === "top-right"
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            Vpravo hore
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Default Preview Background */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground block">
-                          Predvolený podklad plátna:
-                        </label>
-                        <select
-                          value={cfg.defaultBackground}
-                          onChange={(e) =>
-                            handleSaveConfig({
-                              ...cfg,
-                              defaultBackground: e.target.value as M20BackgroundMode,
-                            })
-                          }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
-                        >
-                          <option value="auto">Auto (Neutrálne tmavé s jemnou mriežkou)</option>
-                          <option value="dark">Tmavé (#0E161D)</option>
-                          <option value="light">Svetlé (#FFFFFF)</option>
-                          <option value="checkerboard">Šachovnica (Transparentné)</option>
-                        </select>
-                      </div>
-
-                      {/* Category Filter Toggle */}
-                      <div className="space-y-1.5 flex flex-col justify-end">
-                        <label className="text-xs font-semibold text-foreground flex items-center justify-between cursor-pointer">
-                          <span>Zobraziť filter kategórií</span>
-                          <input
-                            type="checkbox"
-                            checked={cfg.showFilter}
+                        {/* Default Preview Background */}
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-semibold text-foreground block">
+                            Predvolený podklad plátna:
+                          </label>
+                          <select
+                            value={cfg.defaultBackground}
                             onChange={(e) =>
-                              handleSaveConfig({ ...cfg, showFilter: e.target.checked })
+                              handleSaveConfig({
+                                ...cfg,
+                                defaultBackground: e.target.value as M20BackgroundMode,
+                              })
                             }
-                            className="rounded border-border/60 bg-[#0e161d] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
-                          />
-                        </label>
-                        <span className="text-[11px] text-muted-foreground">
-                          Umožní návštevníkom rýchlo filtrovať karty podľa DO, DON'T alebo POZOR.
-                        </span>
+                            className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          >
+                            <option value="auto">Auto (Neutrálne tmavé s jemnou mriežkou)</option>
+                            <option value="dark">Tmavé (#0E161D)</option>
+                            <option value="light">Svetlé (#FFFFFF)</option>
+                            <option value="checkerboard">Šachovnica (Transparentné)</option>
+                          </select>
+                        </div>
+
+                        {/* Category Filter Toggle */}
+                        <div className="space-y-1.5 flex flex-col justify-end">
+                          <label className="text-xs font-semibold text-foreground flex items-center justify-between cursor-pointer">
+                            <span>Zobraziť filter kategórií</span>
+                            <input
+                              type="checkbox"
+                              checked={cfg.showFilter}
+                              onChange={(e) =>
+                                handleSaveConfig({ ...cfg, showFilter: e.target.checked })
+                              }
+                              className="rounded border-border/60 bg-[#0e161d] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                            />
+                          </label>
+                          <span className="text-[11px] text-muted-foreground">
+                            Umožní návštevníkom rýchlo filtrovať karty podľa DO, DON'T alebo POZOR.
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
             </div>

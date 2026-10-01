@@ -97,6 +97,7 @@ export const DEFAULT_M20_ITEMS: M20RuleItem[] = [
 ];
 
 export const m20DosAndDontsSchema = z.object({
+  layout: z.enum(["cards", "minimal"]).default("cards"),
   doColor: z.string().nullable().default(null),
   dontColor: z.string().nullable().default(null),
   warningColor: z.string().nullable().default(null),
