@@ -4,6 +4,7 @@ import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { getBrandCascadeTokensAction } from "@/actions/cascade";
 import { generateBrandCssTheme, generateBrandW3cTokens } from "@/lib/tokens/generator";
+import { generateBrandAiContext } from "@/lib/export/ai-context-generator";
 import { IntegrationsHubView } from "@/components/admin/integrations/integrations-hub-view";
 
 export default async function BrandIntegrationsPage({
@@ -74,6 +75,12 @@ export default async function BrandIntegrationsPage({
   });
   const jsonPreview = JSON.stringify(jsonTokens, null, 2);
 
+  const aiPreview = generateBrandAiContext({
+    snapshot: mockSnapshot,
+    cascadeTokens,
+    appBaseUrl,
+  });
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       <IntegrationsHubView
@@ -88,6 +95,7 @@ export default async function BrandIntegrationsPage({
         appBaseUrl={appBaseUrl}
         cssPreview={cssPreview}
         jsonPreview={jsonPreview}
+        aiPreview={aiPreview}
       />
     </div>
   );

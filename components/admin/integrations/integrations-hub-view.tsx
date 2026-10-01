@@ -18,7 +18,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Download,
+  Bot,
+  FileText,
 } from "lucide-react";
+import { saveAs } from "file-saver";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { Button } from "@/components/ui/button";
 import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
@@ -35,6 +38,7 @@ interface IntegrationsHubViewProps {
   appBaseUrl: string;
   cssPreview: string;
   jsonPreview: string;
+  aiPreview: string;
 }
 
 export function IntegrationsHubView({
@@ -43,18 +47,31 @@ export function IntegrationsHubView({
   appBaseUrl,
   cssPreview,
   jsonPreview,
+  aiPreview,
 }: IntegrationsHubViewProps) {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeTabCss, setActiveTabCss] = useState<"link" | "import">("link");
   const [isCssPreviewOpen, setIsCssPreviewOpen] = useState(false);
   const [isJsonPreviewOpen, setIsJsonPreviewOpen] = useState(false);
   const [isOfflineModalOpen, setIsOfflineModalOpen] = useState(false);
+  const [isAiPreviewOpen, setIsAiPreviewOpen] = useState(false);
 
   const isPublished = Boolean(snapshot && snapshot.pages && snapshot.pages.length > 0);
   const effectiveSlug = brand.slug || brand.id;
 
   const cssUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/theme.css`;
   const jsonUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/tokens.json`;
+  const aiTxtUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/llms.txt`;
+  const aiMdUrl = `${appBaseUrl}/api/brand/${effectiveSlug}/ai.md`;
+
+  const handleDownloadAiMd = () => {
+    try {
+      const blob = new Blob([aiPreview], { type: "text/markdown;charset=utf-8" });
+      saveAs(blob, `${effectiveSlug}-ai-context.md`);
+    } catch (e) {
+      console.error("Failed to download ai.md", e);
+    }
+  };
 
   const copyToClipboard = async (text: string, key: string) => {
     try {
@@ -359,6 +376,169 @@ module.exports = {
               </pre>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Section: AI Context Generator & LLM Prompt (llms.txt / ai.md) */}
+      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-[2px] bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <Bot className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-foreground">
+                  AI Context Generator &amp; LLM Ready Prompt
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                  llms.txt &amp; ai.md
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Optimalizovaný štruktúrovaný Markdown pre ChatGPT, Claude, Cursor a Copilot
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => copyToClipboard(aiPreview, "ai-markdown")}
+              className="h-8 text-xs gap-1.5 rounded-[2px] cursor-pointer"
+            >
+              {copiedKey === "ai-markdown" ? (
+                <>
+                  <Check className="h-3 w-3 text-emerald-400" />
+                  <span className="text-emerald-400">Skopírované!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3" />
+                  <span>Kopírovať Markdown</span>
+                </>
+              )}
+            </Button>
+
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              onClick={handleDownloadAiMd}
+              className="h-8 text-xs gap-1.5 rounded-[2px] cursor-pointer"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Stiahnuť ai.md</span>
+            </Button>
+          </div>
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Premeňte dizajn manuál na okamžitý prompt kontext pre umelú inteligenciu. Výsledný text obsahuje
+          presné Hex a RGB farebné kódy, tonálne kroky, typografiu, priame odkazy na stiahnutie SVG lôg a
+          pravidlá identity (Do&apos;s &amp; Don&apos;ts).
+        </p>
+
+        {/* URLs Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          {/* llms.txt */}
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-semibold text-foreground flex items-center justify-between">
+              <span>Štandardný endpoint (llms.txt)</span>
+              <span className="text-[10px] text-muted-foreground font-mono">text/plain</span>
+            </div>
+            <div className="flex items-center gap-1.5 p-1.5 rounded-[2px] bg-neutral-950 border border-border/70 font-mono text-xs">
+              <span className="truncate flex-1 px-1.5 text-neutral-300">{aiTxtUrl}</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => copyToClipboard(aiTxtUrl, "ai-txt-url")}
+                className="h-6 px-2 text-[10px] cursor-pointer"
+                title="Skopírovať URL"
+              >
+                {copiedKey === "ai-txt-url" ? (
+                  <Check className="h-3 w-3 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </Button>
+              <a
+                href={aiTxtUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground"
+                title="Otvoriť v novom okne"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+
+          {/* ai.md */}
+          <div className="space-y-1.5">
+            <div className="text-[11px] font-semibold text-foreground flex items-center justify-between">
+              <span>Markdown endpoint (ai.md)</span>
+              <span className="text-[10px] text-muted-foreground font-mono">text/markdown</span>
+            </div>
+            <div className="flex items-center gap-1.5 p-1.5 rounded-[2px] bg-neutral-950 border border-border/70 font-mono text-xs">
+              <span className="truncate flex-1 px-1.5 text-neutral-300">{aiMdUrl}</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => copyToClipboard(aiMdUrl, "ai-md-url")}
+                className="h-6 px-2 text-[10px] cursor-pointer"
+                title="Skopírovať URL"
+              >
+                {copiedKey === "ai-md-url" ? (
+                  <Check className="h-3 w-3 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </Button>
+              <a
+                href={aiMdUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground"
+                title="Otvoriť v novom okne"
+              >
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Prompt Usage Guide */}
+        <div className="p-3.5 rounded-[2px] bg-purple-950/20 border border-purple-500/30 text-xs space-y-2">
+          <div className="font-semibold text-purple-300 flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+            <span>Ako použiť s AI asistentmi (ChatGPT, Claude, Cursor)</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed">
+            Skopírujte URL adresu <code>{aiTxtUrl}</code> a vložte ju do sekcie <strong>Custom Instructions</strong> v
+            ChatGPT, do systémového promptu v Claude Projects, alebo do pravidiel <strong>.cursorrules</strong> v
+            editore Cursor. AI model bude pri generovaní kódu a grafiky automaticky rešpektovať všetky farby,
+            veľkosti a pravidlá identity.
+          </p>
+        </div>
+
+        {/* Live Preview Toggle */}
+        <div className="pt-1 border-t border-border/30">
+          <button
+            type="button"
+            onClick={() => setIsAiPreviewOpen(!isAiPreviewOpen)}
+            className="text-xs text-primary hover:underline cursor-pointer flex items-center gap-1"
+          >
+            {isAiPreviewOpen ? "Skryť náhľad AI Markdownu" : "Zobraziť vygenerovaný AI Markdown kontext"}
+          </button>
+
+          {isAiPreviewOpen && (
+            <pre className="mt-3 p-3.5 rounded-[2px] bg-neutral-950 border border-border/70 text-[11px] font-mono text-neutral-300 max-h-72 overflow-y-auto scrollbar-thin whitespace-pre-wrap">
+              <code>{aiPreview}</code>
+            </pre>
+          )}
         </div>
       </div>
 
