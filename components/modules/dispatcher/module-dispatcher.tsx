@@ -118,6 +118,7 @@ const MODULE_REGISTRY: Record<string, React.ComponentType<ModuleRenderProps<Base
   M23_SocialMedia,
   M24_FiremneTapetyAPozadia,
   M25_KniznicaIkon,
+  M25_ICON_LIBRARY: M25_KniznicaIkon,
 };
 
 export interface ModuleData {
