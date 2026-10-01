@@ -828,3 +828,245 @@ export async function deleteModuleAction(
     };
   }
 }
+
+/**
+ * Updates page tree hierarchy and ordering in a batch (after drag & drop event).
+ */
+export async function updatePageTreeAction(
+  brandId: string,
+  updates: Array<{ id: string; parentId: string | null; order: number }>
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    await verifyBrandAccess(pb, brandId, user.id);
+
+    // Apply updates sequentially
+    for (const update of updates) {
+      await pb.collection("pages").update(update.id, {
+        parent: update.parentId || null,
+        order: update.order,
+      });
+    }
+
+    revalidatePath(`/admin/brand/${brandId}/builder`);
+    return { success: true };
+  } catch (err: unknown) {
+    console.error("Failed to update page tree:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri zmene poradia stránok",
+    };
+  }
+}
+
+// Helper: Generates a guaranteed unique slug within the brand
+async function generateUniqueSlug(pb: any, brandId: string, baseSlug: string): Promise<string> {
+  let candidate = `${baseSlug}-kopia`;
+  let counter = 1;
+
+  while (true) {
+    try {
+      const existing = await pb.collection("pages").getFirstListItem(
+        `brand = "${brandId}" && slug = "${candidate}"`
+      );
+      if (existing) {
+        counter++;
+        candidate = `${baseSlug}-kopia-${counter}`;
+      }
+    } catch {
+      // Slug does not exist -> it is unique and available
+      return candidate;
+    }
+  }
+}
+
+// Helper: Deep-clones containers, columns, and modules from one page to another
+async function cloneContainersAndModules(pb: any, sourcePageId: string, targetPageId: string) {
+  const containers = await pb.collection("containers").getFullList({
+    filter: `page = "${sourcePageId}"`,
+    sort: "order,created",
+  });
+
+  for (const c of containers) {
+    const newContainer = await pb.collection("containers").create({
+      page: targetPageId,
+      order: c.order,
+      layoutType: c.layoutType,
+      columnCount: c.columnCount,
+      columnWidths: c.columnWidths,
+      showH2: c.showH2,
+      h2Title: c.h2Title,
+      backgroundColor: c.backgroundColor,
+      heightMode: c.heightMode,
+      fixedHeight: c.fixedHeight,
+    });
+
+    const columns = await pb.collection("columns").getFullList({
+      filter: `container = "${c.id}"`,
+      sort: "order,created",
+    });
+
+    for (const col of columns) {
+      const newCol = await pb.collection("columns").create({
+        container: newContainer.id,
+        order: col.order,
+        backgroundColor: col.backgroundColor,
+      });
+
+      const modules = await pb.collection("modules").getFullList({
+        filter: `column = "${col.id}"`,
+        sort: "order,created",
+      });
+
+      for (const m of modules) {
+        await pb.collection("modules").create({
+          column: newCol.id,
+          moduleType: m.moduleType,
+          order: m.order,
+          showH3: m.showH3,
+          h3Title: m.h3Title,
+          config: m.config,
+          linkGroupId: m.linkGroupId,
+        });
+      }
+    }
+  }
+}
+
+/**
+ * Deep-duplicates a page, including all its containers, columns, modules,
+ * and recursively all its child subpages (User requirement 2).
+ */
+export async function duplicatePageAction(
+  pageId: string
+): Promise<{ success: boolean; newPageId?: string; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const sourcePage = await pb.collection("pages").getOne(pageId);
+    await verifyBrandAccess(pb, sourcePage.brand, user.id);
+
+    // Build title with (Kópia) indicator
+    let sourceTitle = sourcePage.title;
+    if (typeof sourceTitle === "string") {
+      try {
+        sourceTitle = JSON.parse(sourceTitle);
+      } catch {
+        sourceTitle = { sk: sourceTitle, en: sourceTitle };
+      }
+    }
+    const skTitle = (sourceTitle?.sk || sourceTitle?.en || "Stránka") + " (Kópia)";
+    const enTitle = (sourceTitle?.en || sourceTitle?.sk || "Page") + " (Copy)";
+
+    // Generate unique slug
+    const newSlug = await generateUniqueSlug(pb, sourcePage.brand, sourcePage.slug);
+
+    // Determine next order
+    let nextOrder = (sourcePage.order ?? 0) + 1;
+
+    // 1. Create duplicated root page
+    const newPage = await pb.collection("pages").create({
+      brand: sourcePage.brand,
+      parent: sourcePage.parent || null,
+      title: { sk: skTitle, en: enTitle },
+      slug: newSlug,
+      isInMenu: sourcePage.isInMenu ?? true,
+      menuStyle: sourcePage.menuStyle || "main",
+      order: nextOrder,
+      templateId: sourcePage.templateId || undefined,
+    });
+
+    // 2. Clone all containers, columns, and modules for the root page
+    await cloneContainersAndModules(pb, sourcePage.id, newPage.id);
+
+    // 3. Deep-duplicate all child sub-pages if this is a parent chapter (User requirement 2)
+    const childPages = await pb.collection("pages").getFullList({
+      filter: `parent = "${sourcePage.id}"`,
+      sort: "order,created",
+    });
+
+    for (const child of childPages) {
+      let childTitle = child.title;
+      if (typeof childTitle === "string") {
+        try {
+          childTitle = JSON.parse(childTitle);
+        } catch {
+          childTitle = { sk: childTitle, en: childTitle };
+        }
+      }
+      const childSkTitle = (childTitle?.sk || childTitle?.en || "Podstránka") + " (Kópia)";
+      const childEnTitle = (childTitle?.en || childTitle?.sk || "Subpage") + " (Copy)";
+      const childSlug = await generateUniqueSlug(pb, sourcePage.brand, child.slug);
+
+      const newChildPage = await pb.collection("pages").create({
+        brand: sourcePage.brand,
+        parent: newPage.id, // linked to the newly duplicated parent!
+        title: { sk: childSkTitle, en: childEnTitle },
+        slug: childSlug,
+        isInMenu: child.isInMenu ?? true,
+        menuStyle: child.menuStyle || "submenu",
+        order: child.order ?? 0,
+        templateId: child.templateId || undefined,
+      });
+
+      // Clone child containers and modules
+      await cloneContainersAndModules(pb, child.id, newChildPage.id);
+    }
+
+    revalidatePath(`/admin/brand/${sourcePage.brand}/builder`);
+    revalidatePath(`/admin/brand/${sourcePage.brand}/builder/${newPage.id}`);
+
+    return { success: true, newPageId: newPage.id };
+  } catch (err: unknown) {
+    console.error("Failed to duplicate page:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri duplikovaní stránky",
+    };
+  }
+}
+
+/**
+ * Toggles a page's menu visibility between 'main' and 'hidden'.
+ */
+export async function togglePageMenuVisibilityAction(
+  pageId: string
+): Promise<{ success: boolean; isInMenu?: boolean; menuStyle?: PageMenuStyle; error?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Neautorizovaná relácia." };
+    }
+
+    const page = await pb.collection("pages").getOne(pageId);
+    await verifyBrandAccess(pb, page.brand, user.id);
+
+    const isCurrentlyHidden = page.menuStyle === "hidden" || page.isInMenu === false;
+    const newStyle: PageMenuStyle = isCurrentlyHidden ? "main" : "hidden";
+    const newInMenu = isCurrentlyHidden;
+
+    await pb.collection("pages").update(pageId, {
+      menuStyle: newStyle,
+      isInMenu: newInMenu,
+    });
+
+    revalidatePath(`/admin/brand/${page.brand}/builder`);
+    return { success: true, isInMenu: newInMenu, menuStyle: newStyle };
+  } catch (err: unknown) {
+    console.error("Failed to toggle menu visibility:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Chyba pri zmene viditeľnosti v menu",
+    };
+  }
+}
