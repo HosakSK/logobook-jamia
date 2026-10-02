@@ -50,27 +50,71 @@ export const DICTIONARIES = {
       dashboard: "Dashboard",
     },
     marketing: {
-      badge: "Next-Gen Brand Manual Platform",
-      heroTitle: "The Modern Living Brand Manual for Agile Teams",
+      badge: "Living Brand Manual & Design System Platform",
+      heroTitle: "Professional Brand Manuals in Minutes",
       heroSubtitle:
-        "Centralize, govern, and distribute your brand assets, design tokens, logos, and guidelines with zero friction and enterprise-grade multi-tenancy.",
-      ctaDemo: "Explore Demo Manual",
-      ctaAdmin: "Open Admin Studio",
-      featuresTitle: "Engineered for speed, scale & brand consistency",
+        "Say goodbye to static, outdated PDFs. Logobook is the modern living design guidelines CMS with interactive color palettes, type testers, design tokens, and AI-ready exports.",
+      ctaDemo: "View Live DEMO",
+      ctaRegister: "Create Your Logobook",
+      navFeatures: "Features",
+      navHowItWorks: "How It Works",
+      navPricing: "Pricing",
+      navRegister: "Create Account",
+
+      featuresTitle: "Engineered for designers, creative agencies & modern brands",
       featuresSubtitle:
-        "Single-instance multi-tenancy, real-time fallback translations, and automated edge routing.",
-      feature1Title: "Multi-Tenant Edge Routing",
+        "Everything you need to deliver, manage, and scale living visual identities without code.",
+
+      feature1Badge: "Interactive Typography",
+      feature1Title: "Live Type Tester in Browser",
       feature1Desc:
-        "Each client or brand gets their own isolated subdomain or custom CNAME domain powered by Next.js edge rewrites.",
-      feature2Title: "Strict i18n Fallback",
+        "Test brand typefaces in real time. Adjust weight, size, line-height, and preview responsive heading scales without installing font files.",
+
+      feature2Badge: "Automated Structure",
+      feature2Title: "Automated CMS Tree Generation",
       feature2Desc:
-        "Multilingual content with instant automatic fallback ensuring no missing translation ever breaks your manual layout.",
-      feature3Title: "Enterprise Asset Storage",
+        "Upload your core logos and the Dimension Matrix automatically builds your entire manual: primary & secondary lockups, clearspace zones, monochrome variants, and rules.",
+
+      feature3Badge: "Developers & AI Agents",
+      feature3Title: "Export to Figma, Code & AI Models",
       feature3Desc:
-        "Store high-resolution vector logos, typography palettes, and brand guidelines safely in S3-compatible cloud storage.",
-      readyTitle: "Ready to launch your brand manual?",
-      readySubtitle: "Experience the fastest and cleanest brand guideline system available.",
+        "One click exports your brand tokens to Figma Tokens (W3C DTCG JSON), CSS Custom Properties, and Tailwind CSS v4. Seamlessly integrate with Cursor, Claude, and ChatGPT via llms.txt and ai.md endpoints.",
+
+      feature4Badge: "Team & Stationery",
+      feature4Title: "Employee Email Signatures & Collateral",
+      feature4Desc:
+        "Generate unified HTML email signatures with official brand logos and colors for all team members. Distribute stationery templates with password protection.",
+
+      pricingTitle: "Simple, transparent pricing",
+      pricingSubtitle:
+        "Choose the plan that fits your studio or company. Cancel or upgrade anytime.",
+      billingMonthly: "Monthly",
+      billingYearly: "Yearly",
+      saveDiscount: "Save 20%",
+      perMonth: "/ month",
+      billedAnnually: "billed annually",
+      billedMonthly: "billed monthly",
+      foreverFree: "free forever",
+      choosePlan: "Get Started",
+
+      freeTierTitle: "Free",
+      freeTierDesc: "For trying out and quick personal showcase.",
+      companyTierTitle: "Company",
+      companyTierDesc: "For companies managing their internal brand.",
+      freelancerTierTitle: "Freelancer",
+      freelancerTierDesc: "For independent graphic designers and studios.",
+      agencyTierTitle: "Agency / Platinum",
+      agencyTierDesc: "For creative agencies and unlimited client brands.",
+
+      popularBadge: "Most Popular",
+      whiteLabelBadge: "100% White-Label",
+
       footerRights: "Logobook.sk — All rights reserved.",
+      footerOperator: "Operated by JAMIA s.r.o. | Logobook.sk",
+      footerCookies: "Cookies",
+      footerPrivacy: "Privacy Policy",
+      footerTerms: "Terms of Service",
+      footerOpenSource: "Open-Source on GitHub",
     },
     login: {
       title: "Welcome back",
@@ -356,27 +400,71 @@ export const DICTIONARIES = {
       dashboard: "Nástenka",
     },
     marketing: {
-      badge: "Platforma novej generácie pre brand manuály",
-      heroTitle: "Moderný online brand manuál pre agilné tímy",
+      badge: "Living Brand Manual & Design System Platform",
+      heroTitle: "Profesionálne dizajn manuály za zlomok času",
       heroSubtitle:
-        "Centralizujte, spravujte a distribuujte vizuálnu identitu, dizajn manuály, logá a pravidlá bez trenia s podnikovou multi-tenanciou.",
-      ctaDemo: "Preskúmať Demo Manuál",
-      ctaAdmin: "Otvoriť Admin Štúdio",
-      featuresTitle: "Navrhnuté pre rýchlosť, škálovateľnosť a konzistenciu",
+        "Zabudnite na statické a zastarané PDF súbory. Logobook je moderný online systém pre dizajn manuály, interaktívne vzorkovníky, pravidlá značky a automatické exporty pre vývojárov a AI.",
+      ctaDemo: "Zobraziť DEMO",
+      ctaRegister: "Vytvoriť vlastný logobook",
+      navFeatures: "Funkcie",
+      navHowItWorks: "Ako to funguje",
+      navPricing: "Cenník",
+      navRegister: "Vytvoriť účet",
+
+      featuresTitle: "Vytvorené pre dizajnérov, agentúry a moderné firmy",
       featuresSubtitle:
-        "Single-database architektúra, preklady v reálnom čase s prísnym fallbackom a bleskový edge routing.",
-      feature1Title: "Multi-tenant Edge Routing",
+        "Všetko potrebné na tvorbu, správu a distribúciu živej vizuálnej identity bez programovania.",
+
+      feature1Badge: "Interaktívna typografia",
+      feature1Title: "Živý Type Tester priamo v prehliadači",
       feature1Desc:
-        "Každý klient alebo značka má vlastnú subdoménu alebo vlastnú CNAME doménu riadenú Next.js middleware prepisom.",
-      feature2Title: "Prísny Jazykový Fallback",
+        "Klienti a copywriteri si môžu v reálnom čase vyskúšať firemné písma, meniť rezy, veľkosti aj riadkovanie bez nutnosti inštalácie fontov. Obsahuje modular scale a licenčné DRM pravidlá.",
+
+      feature2Badge: "Automatizácia štruktúry",
+      feature2Title: "Automatický CMS strom a generovanie manuálu",
       feature2Desc:
-        "Viacjazyčný obsah s okamžitým automatickým fallbackom zabezpečuje, že chýbajúci preklad nikdy nepokazí vzhľad manuálu.",
-      feature3Title: "Enterprise Úložisko Assetov",
+        "Vložte základné verzie loga a systém za vás vygeneruje štruktúru kapitol: primárne, sekundárne a symbolické verzie, ochranné zóny, svetlý aj tmavý variant a pravidlá zakázaného používania.",
+
+      feature3Badge: "Vývojári & AI Agenti",
+      feature3Title: "Exporty pre Figmu, kód aj AI modely",
       feature3Desc:
-        "Bezpečné ukladanie vektorových logotypov vo vysokom rozlíšení, farebných tokenov a typografie v S3 cloude.",
-      readyTitle: "Pripravení spustiť svoj vlastný brand manuál?",
-      readySubtitle: "Vyskúšajte najrýchlejší a najprehľadnejší systém pre vizuálnu identitu na trhu.",
+        "Jeden klik a celá farebná paleta, typografia aj rozmery sú pripravené vo formáte W3C Design Tokens pre Figma Tokens, CSS premenné a Tailwind v4 config. Zároveň generuje štandard llms.txt a ai.md pre Cursor, Claude a ChatGPT.",
+
+      feature4Badge: "Firemné šablóny & Tím",
+      feature4Title: "E-mailové podpisy a šablóny pre zamestnancov",
+      feature4Desc:
+        "Každý člen tímu si môže vygenerovať vlastný HTML podpis do e-mailu s oficiálnym logom a farbami značky. Všetky materiály sú chránené heslom a pripravené na okamžité stiahnutie.",
+
+      pricingTitle: "Transparentný cenník pre štúdiá aj firmy",
+      pricingSubtitle:
+        "Vyberte si plán, ktorý zodpovedá vašim potrebám. Bez skrytých poplatkov, kedykoľvek zrušiteľné.",
+      billingMonthly: "Mesačne",
+      billingYearly: "Ročne",
+      saveDiscount: "Ušetríte 20%",
+      perMonth: "/ mesiac",
+      billedAnnually: "účtované ročne",
+      billedMonthly: "účtované mesačne",
+      foreverFree: "zadarmo navždy",
+      choosePlan: "Začať teraz",
+
+      freeTierTitle: "Free",
+      freeTierDesc: "Pre vyskúšanie a jednoduchú osobnú prezentáciu.",
+      companyTierTitle: "Company",
+      companyTierDesc: "Pre vlastnú firmu a tímovú značku.",
+      freelancerTierTitle: "Freelancer",
+      freelancerTierDesc: "Pre nezávislých grafických dizajnérov.",
+      agencyTierTitle: "Agency / Platinum",
+      agencyTierDesc: "Pre brandingové agentúry a kreatívne štúdiá.",
+
+      popularBadge: "Najobľúbenejšie",
+      whiteLabelBadge: "100% White-Label",
+
       footerRights: "Logobook.sk — Všetky práva vyhradené.",
+      footerOperator: "Prevádzkovateľ: JAMIA s.r.o. | Logobook.sk",
+      footerCookies: "Cookies",
+      footerPrivacy: "Ochrana osobných údajov",
+      footerTerms: "Obchodné podmienky",
+      footerOpenSource: "Open-Source na GitHub",
     },
     login: {
       title: "Vitajte späť",
@@ -662,27 +750,71 @@ export const DICTIONARIES = {
       dashboard: "Nástěnka",
     },
     marketing: {
-      badge: "Platforma nové generace pro brand manuály",
-      heroTitle: "Moderní online brand manuál pro agilní týmy",
+      badge: "Living Brand Manual & Design System Platform",
+      heroTitle: "Profesionální design manuály za zlomek času",
       heroSubtitle:
-        "Centralizujte, spravujte a distribuujte vizuální identitu, design manuály, loga a pravidla bez tření s podnikovou multi-tenancí.",
-      ctaDemo: "Prozkoumat Demo Manuál",
-      ctaAdmin: "Otevřít Admin Studio",
-      featuresTitle: "Navrženo pro rychlost, škálovatelnost a konzistenci",
+        "Zapomeňte na statické a zastaralé PDF soubory. Logobook je moderní online systém pro design manuály, interaktivní vzorníky, pravidla značky a automatické exporty pro vývojáře a AI.",
+      ctaDemo: "Zobrazit DEMO",
+      ctaRegister: "Vytvořit vlastní logobook",
+      navFeatures: "Funkce",
+      navHowItWorks: "Jak to funguje",
+      navPricing: "Ceník",
+      navRegister: "Vytvořit účet",
+
+      featuresTitle: "Vytvořeno pro designéry, agentury a moderní firmy",
       featuresSubtitle:
-        "Single-database architektura, překlady v reálném čase s přísným fallbackem a bleskový edge routing.",
-      feature1Title: "Multi-tenant Edge Routing",
+        "Vše potřebné pro tvorbu, správu a distribuci živé vizuální identity bez programování.",
+
+      feature1Badge: "Interaktivní typografie",
+      feature1Title: "Živý Type Tester přímo v prohlížeči",
       feature1Desc:
-        "Každý klient nebo značka má vlastní subdoménu nebo vlastní CNAME doménu řízenou Next.js middleware přepisem.",
-      feature2Title: "Přísný Jazykový Fallback",
+        "Klienti a copywriteři si mohou v reálném čase vyzkoušet firemní písma, měnit řezy, velikosti i řádkování bez nutnosti instalace fontů. Obsahuje modular scale a licenční DRM pravidla.",
+
+      feature2Badge: "Automatizace struktury",
+      feature2Title: "Automatický CMS strom a generování manuálu",
       feature2Desc:
-        "Vícejazyčný obsah s okamžitým automatickým fallbackem zajišťuje, že chybějící překlad nikdy nepokazí vzhled manuálu.",
-      feature3Title: "Enterprise Úložiště Assetů",
+        "Vložte základní verze loga a systém za vás vygeneruje strukturu kapitol: primární, sekundární a symbolické verze, ochranné zóny, světlou i tmavou variantu a pravidla zakázaného užití.",
+
+      feature3Badge: "Vývojáři & AI Agenti",
+      feature3Title: "Exporty pro Figmu, kód i AI modely",
       feature3Desc:
-        "Bezpečné ukládání vektorových logotypů ve vysokém rozlišení, barevných tokenů a typografie v S3 cloudu.",
-      readyTitle: "Připraveni spustit svůj vlastní brand manuál?",
-      readySubtitle: "Vyzkoušejte nejrychlejší a nejpřehlednější systém pro vizuální identitu na trhu.",
+        "Jedno kliknutí a celá barevná paleta, typografie i rozměry jsou připraveny ve formátu W3C Design Tokens pro Figma Tokens, CSS proměnné a Tailwind v4 config. Zároveň generuje standard llms.txt a ai.md pro Cursor, Claude a ChatGPT.",
+
+      feature4Badge: "Firemní šablony & Tým",
+      feature4Title: "E-mailové podpisy a šablony pro zaměstnance",
+      feature4Desc:
+        "Každý člen týmu si může vygenerovat vlastní HTML podpis do e-mailu s oficiálním logem a barvami značky. Všechny materiály jsou chráněny heslem a připraveny k okamžitému stažení.",
+
+      pricingTitle: "Transparentní ceník pro studia i firmy",
+      pricingSubtitle:
+        "Vyberte si plán, který odpovídá vašim potřebám. Bez skrytých poplatků, kdykoliv zrušitelné.",
+      billingMonthly: "Měsíčně",
+      billingYearly: "Ročně",
+      saveDiscount: "Ušetříte 20%",
+      perMonth: "/ měsíc",
+      billedAnnually: "účtováno ročně",
+      billedMonthly: "účtováno měsíčně",
+      foreverFree: "zdarma navždy",
+      choosePlan: "Začít nyní",
+
+      freeTierTitle: "Free",
+      freeTierDesc: "Pro vyzkoušení a jednoduchou osobní prezentaci.",
+      companyTierTitle: "Company",
+      companyTierDesc: "Pro vlastní firmu a týmovou značku.",
+      freelancerTierTitle: "Freelancer",
+      freelancerTierDesc: "Pro nezávislé grafické designéry.",
+      agencyTierTitle: "Agency / Platinum",
+      agencyTierDesc: "Pro brandingové agentury a kreativní studia.",
+
+      popularBadge: "Nejoblíbenější",
+      whiteLabelBadge: "100% White-Label",
+
       footerRights: "Logobook.sk — Všechna práva vyhrazena.",
+      footerOperator: "Provozovatel: JAMIA s.r.o. | Logobook.sk",
+      footerCookies: "Cookies",
+      footerPrivacy: "Ochrana osobních údajů",
+      footerTerms: "Obchodní podmínky",
+      footerOpenSource: "Open-Source na GitHub",
     },
     login: {
       title: "Vítejte zpět",
