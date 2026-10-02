@@ -261,7 +261,7 @@ export default function M11MaticaLogotypovModule({
     return brandAssets.map((asset) => {
       const bg = bgMap[asset.background] || "light";
       const svgUrl =
-        asset.preview ||
+        asset.previewUrl ||
         asset.files.find((f) => f.fileFormat === "SVG")?.fileUrl ||
         "/logo/Logobook_symbol_RGB_D.svg";
 
@@ -613,25 +613,27 @@ export default function M11MaticaLogotypovModule({
                     />
                   )}
 
-                  {/* Copy SVG Action Pill */}
-                  <button
-                    type="button"
-                    onClick={() => handleCopySvg(item)}
-                    className="absolute bottom-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-[2px] bg-[#070b0f]/80 hover:bg-black text-foreground border border-border/60 text-[10px] font-medium backdrop-blur-xs transition-colors shadow-sm"
-                    title="Kopírovať SVG kód"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3 h-3 text-primary" />
-                        <span className="text-primary font-bold">Skopírované!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3 text-muted-foreground" />
-                        <span>Kopírovať SVG</span>
-                      </>
-                    )}
-                  </button>
+                  {/* Copy SVG Action Pill (only for real SVG items) */}
+                  {item.svgUrl && !item.svgUrl.includes(".png") && !item.svgUrl.includes(".webp") && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopySvg(item)}
+                      className="absolute bottom-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-[2px] bg-[#070b0f]/80 hover:bg-black text-foreground border border-border/60 text-[10px] font-medium backdrop-blur-xs transition-colors shadow-sm"
+                      title="Kopírovať SVG kód"
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="w-3 h-3 text-primary" />
+                          <span className="text-primary font-bold">Skopírované!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3 text-muted-foreground" />
+                          <span>Kopírovať SVG</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
 
                 {/* Info & Metadata */}

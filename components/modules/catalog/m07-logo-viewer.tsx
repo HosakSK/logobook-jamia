@@ -282,7 +282,7 @@ export default function M07ZobrazenieLogaModule({
       },
       directPreview: {
         ...cfg.directPreview,
-        svgUrl: selectedAsset.preview || selectedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl || cfg.directPreview.svgUrl,
+        svgUrl: selectedAsset.previewUrl || selectedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl || cfg.directPreview.svgUrl,
       },
       formats: mappedFormats.length > 0 ? mappedFormats : cfg.formats,
     };
