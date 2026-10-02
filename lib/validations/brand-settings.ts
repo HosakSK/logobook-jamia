@@ -26,10 +26,9 @@ export const globalShapesSchema = z.object({
     .optional()
     .transform((val) => {
       const lower = (val || "rounded").toLowerCase().trim();
-      if (lower === "sharp" || lower === "pill" || lower === "rounded") {
-        return lower as "sharp" | "rounded" | "pill";
-      }
-      return "rounded";
+      if (lower === "sharp" || lower === "square") return "sharp" as const;
+      if (lower === "pill") return "pill" as const;
+      return "rounded" as const;
     })
     .default("rounded"),
   customRadiusPx: z.coerce.number().min(0).max(64).default(3),

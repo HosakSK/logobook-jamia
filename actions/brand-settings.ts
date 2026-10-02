@@ -216,9 +216,16 @@ export async function updateGlobalShapesAction(
       return { success: false, error: parsed.error.issues[0]?.message || "Invalid global shapes input" };
     }
 
+    const pbRadiusMode =
+      parsed.data.radiusMode === "sharp"
+        ? "SQUARE"
+        : parsed.data.radiusMode === "pill"
+        ? "PILL"
+        : "ROUNDED";
+
     const payload = {
       brand: brand.id,
-      radiusMode: parsed.data.radiusMode,
+      radiusMode: pbRadiusMode,
       customRadiusPx: parsed.data.customRadiusPx,
       borderWidthPx: parsed.data.borderWidthPx,
       semanticSuccess: parsed.data.semanticSuccess || "",

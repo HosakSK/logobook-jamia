@@ -18,8 +18,10 @@ export function computeBrandRadiusValue(
   mode: string = "rounded",
   customPx: number = 3
 ): string {
-  switch (mode) {
+  const normalized = String(mode).toLowerCase();
+  switch (normalized) {
     case "sharp":
+    case "square":
       return "0px";
     case "pill":
       return "9999px";
@@ -114,7 +116,9 @@ export function buildBrandCascadeTokens(
   colors?: Array<Partial<GlobalColorsRecord> | BrandColor> | null,
   typography?: Array<Partial<GlobalTypographyRecord>> | null
 ): BrandCascadeTokens {
-  const radiusMode = (shapes?.radiusMode as "sharp" | "rounded" | "pill") || "rounded";
+  const rawMode = String(shapes?.radiusMode || "rounded").toLowerCase();
+  const radiusMode: "sharp" | "rounded" | "pill" =
+    rawMode === "square" || rawMode === "sharp" ? "sharp" : rawMode === "pill" ? "pill" : "rounded";
   const customRadiusPx = shapes?.customRadiusPx ?? 3;
   const borderWidthPx = shapes?.borderWidthPx ?? 1;
   const manualBgColor = (shapes as any)?.manualBgColor || "#0e161d";
