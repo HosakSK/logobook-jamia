@@ -83,6 +83,55 @@ function getBaseKey(fileName: string): string {
   return withoutExt.trim().toLowerCase();
 }
 
+async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: string; width: number; height: number } | null> {
+  try {
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjs.getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useSystemFonts: true,
+    });
+    const pdfDoc = await loadingTask.promise;
+    if (pdfDoc.numPages < 1) return null;
+
+    const page = await pdfDoc.getPage(1);
+    const unscaledViewport = page.getViewport({ scale: 1 });
+    
+    // Scale up for high DPI crispness (max 1000px dimension)
+    const maxDim = Math.max(unscaledViewport.width, unscaledViewport.height) || 500;
+    const targetScale = Math.min(2.5, 1200 / maxDim);
+    const viewport = page.getViewport({ scale: targetScale });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // Render transparent / clean
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: viewport,
+      canvas: canvas,
+    };
+    await page.render(renderContext).promise;
+
+    const dataUrl = canvas.toDataURL("image/png");
+    return {
+      dataUrl,
+      width: Math.floor(viewport.width),
+      height: Math.floor(viewport.height),
+    };
+  } catch (err) {
+    console.error("PDF thumbnail rendering failed:", err);
+    return null;
+  }
+}
+
 export function BulkUploadModal({
   brandId,
   brandName = "logobook",
@@ -224,10 +273,11 @@ export function BulkUploadModal({
       return updatedQueue;
     });
 
-    // Asynchronously parse SVGs / images for preview in queue
+    // Asynchronously parse SVGs / images / PDFs for preview in queue
     for (const [baseKey, groupFiles] of groups.entries()) {
       const svgFile = groupFiles.find((f) => f.name.toLowerCase().endsWith(".svg"));
       const pngFile = groupFiles.find((f) => /\.(png|jpg|jpeg|webp)$/i.test(f.name));
+      const pdfFile = groupFiles.find((f) => f.name.toLowerCase().endsWith(".pdf"));
 
       if (svgFile) {
         try {
@@ -252,6 +302,28 @@ export function BulkUploadModal({
           reader.readAsDataURL(pngFile);
         } catch (err) {
           console.error("Failed to read PNG preview:", err);
+        }
+      } else if (pdfFile) {
+        try {
+          const rendered = await renderPdfFirstPageToDataUrl(pdfFile);
+          if (rendered) {
+            const pdfSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rendered.width} ${rendered.height}"><image href="${rendered.dataUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
+            setQueue((curr) =>
+              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: pdfSvg } : it))
+            );
+          } else {
+            // Fallback document SVG
+            const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
+            setQueue((curr) =>
+              curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
+            );
+          }
+        } catch (err) {
+          console.error("Failed to render PDF preview:", err);
+          const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
+          setQueue((curr) =>
+            curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
+          );
         }
       } else {
         // Fallback document SVG
