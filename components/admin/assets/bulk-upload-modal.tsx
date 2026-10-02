@@ -2,6 +2,7 @@
 
 import { useState, useRef, useTransition } from "react";
 import { uploadBrandAssetAction } from "@/actions/assets";
+import { normalizeAndScopeSvg } from "@/lib/utils/svg";
 import {
   ASSET_MEDIUMS,
   ASSET_ORIENTATIONS,
@@ -75,6 +76,8 @@ export function BulkUploadModal({
 
       try {
         const svgText = await file.text();
+        const itemId = Math.random().toString(36).substring(2, 9);
+        const scopedSvg = normalizeAndScopeSvg(svgText, `bulk_${itemId}`);
         const baseName = file.name
           .replace(/\.svg$/i, "")
           .replace(/[-_]/g, " ")
@@ -106,14 +109,14 @@ export function BulkUploadModal({
         }
 
         newItems.push({
-          id: Math.random().toString(36).substring(2, 9),
+          id: itemId,
           file,
           name: baseName,
           medium,
           orientation,
           hasClaim: orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan"),
           background,
-          svgContent: svgText,
+          svgContent: scopedSvg,
         });
       } catch (err) {
         console.error("Failed to read SVG file:", err);

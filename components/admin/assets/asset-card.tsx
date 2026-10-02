@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { BrandAsset, BrandAssetFile } from "@/lib/types/asset";
 import { deleteBrandAssetAction } from "@/actions/assets";
+import { normalizeAndScopeSvg } from "@/lib/utils/svg";
 import { Button } from "@/components/ui/button";
 import { Dictionary } from "@/lib/i18n";
 import {
@@ -45,6 +46,12 @@ export function AssetCard({
   const [copied, setCopied] = useState(false);
   const [isDeleting, startDelete] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Memoize isolated scoped SVG to eliminate class collisions with other cards
+  const scopedSvg = useMemo(() => {
+    if (!asset.svgContent) return "";
+    return normalizeAndScopeSvg(asset.svgContent, `card_${asset.id}`);
+  }, [asset.svgContent, asset.id]);
 
   // Compute display name based on current locale
   const displayName =
@@ -264,10 +271,10 @@ export function AssetCard({
       <div
         className={`h-48 w-full flex items-center justify-center p-6 relative transition-colors ${canvasBgClass}`}
       >
-        {asset.svgContent ? (
+        {scopedSvg ? (
           <div
             className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain drop-shadow-xs"
-            dangerouslySetInnerHTML={{ __html: asset.svgContent }}
+            dangerouslySetInnerHTML={{ __html: scopedSvg }}
           />
         ) : (
           <div className="text-center text-xs text-muted-foreground">

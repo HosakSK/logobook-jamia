@@ -3,6 +3,7 @@
 import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { revalidatePath } from "next/cache";
 import { BrandAsset, BrandAssetFile } from "@/lib/types/asset";
+import { normalizeAndScopeSvg } from "@/lib/utils/svg";
 import {
   createAssetSchema,
   updateAssetSchema,
@@ -154,6 +155,7 @@ export async function uploadBrandAssetAction(
     };
 
     // Prepare asset record data
+    const scopedSvg = normalizeAndScopeSvg(svgContent.trim());
     const assetData = new FormData();
     assetData.append("brand", brandId);
     assetData.append("name", JSON.stringify(nameObj));
@@ -161,7 +163,7 @@ export async function uploadBrandAssetAction(
     assetData.append("orientation", orientation);
     assetData.append("hasClaim", orientation === "SYMBOL" ? "false" : String(hasClaim));
     assetData.append("background", background);
-    assetData.append("svgContent", svgContent.trim());
+    assetData.append("svgContent", scopedSvg);
 
     // Check if thumbnail preview image was generated
     const previewFile = formData.get("previewFile");
