@@ -28,14 +28,23 @@ import {
 
 // Helper: verify user permissions for a brand
 async function verifyBrandAccess(pb: any, brandId: string, userId: string) {
-  const brand = await pb.collection("brands").getOne(brandId);
+  let brand: any = null;
+  try {
+    brand = await pb.collection("brands").getOne(brandId);
+  } catch {
+    try {
+      brand = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+    } catch {
+      throw new Error("Brand projekt nebol nájdený.");
+    }
+  }
   const isOwner = brand.user === userId;
 
   if (isOwner) return { brand, role: "OWNER" };
 
   try {
     const tm = await pb.collection("teamMembers").getFirstListItem(
-      `brand = "${brandId}" && user = "${userId}"`
+      `brand = "${brand.id}" && user = "${userId}"`
     );
     if (tm.role === "VIEWER") {
       throw new Error("Čitatelia (VIEWER) nemajú oprávnenie upravovať manuál.");
@@ -156,7 +165,17 @@ export async function getPageDetailAction(pageId: string): Promise<{
       return { success: false, error: "Unauthorized session." };
     }
 
-    const pageRecord = await pb.collection("pages").getOne(pageId);
+    let pageRecord: any = null;
+    try {
+      pageRecord = await pb.collection("pages").getOne(pageId);
+    } catch {
+      try {
+        pageRecord = await pb.collection("pages").getFirstListItem(`id = "${pageId}" || slug = "${pageId}"`);
+      } catch {
+        return { success: false, error: "Stránka nebola nájdená." };
+      }
+    }
+
     let parsedTitle: Record<string, string> = { en: "Untitled", sk: "Bez názvu" };
     if (typeof pageRecord.title === "object" && pageRecord.title !== null) {
       parsedTitle = pageRecord.title;
@@ -170,7 +189,7 @@ export async function getPageDetailAction(pageId: string): Promise<{
 
     // 1. Fetch containers for page
     const containerRecords = await pb.collection("containers").getFullList({
-      filter: `page = "${pageId}"`,
+      filter: `page = "${pageRecord.id}"`,
       sort: "order",
     });
 
@@ -304,7 +323,8 @@ export async function createPageAction(
       return { success: false, error: "Neautorizovaná relácia." };
     }
 
-    await verifyBrandAccess(pb, brandId, user.id);
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
+    const targetBrandId = brand.id;
 
     const parsed = createPageSchema.safeParse(input);
     if (!parsed.success) {
@@ -315,7 +335,7 @@ export async function createPageAction(
     const cleanSlug = parsed.data.slug.toLowerCase().trim();
     try {
       const existing = await pb.collection("pages").getFirstListItem(
-        `brand = "${brandId}" && slug = "${cleanSlug}"`
+        `brand = "${targetBrandId}" && slug = "${cleanSlug}"`
       );
       if (existing) {
         return { success: false, error: `Stránka so slugom "${cleanSlug}" už v tomto manuáli existuje.` };
@@ -328,7 +348,7 @@ export async function createPageAction(
     let nextOrder = 0;
     try {
       const last = await pb.collection("pages").getFirstListItem(
-        `brand = "${brandId}"`,
+        `brand = "${targetBrandId}"`,
         { sort: "-order" }
       );
       if (last && typeof last.order === "number") {
@@ -347,7 +367,7 @@ export async function createPageAction(
 
     // 1. Create page
     const page = await pb.collection("pages").create({
-      brand: brandId,
+      brand: targetBrandId,
       parent: parsed.data.parentId || null,
       title: titlePayload,
       slug: cleanSlug,
@@ -370,6 +390,7 @@ export async function createPageAction(
       order: 0,
     });
 
+    revalidatePath(`/admin/brand/${targetBrandId}/builder`);
     revalidatePath(`/admin/brand/${brandId}/builder`);
     return { success: true, pageId: page.id };
   } catch (err: unknown) {
@@ -394,7 +415,8 @@ export async function seedInitialBrandPagesAction(
       return { success: false, error: "Neautorizovaná relácia." };
     }
 
-    await verifyBrandAccess(pb, brandId, user.id);
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
+    const targetBrandId = brand.id;
 
     const starterPages = [
       {
@@ -440,7 +462,7 @@ export async function seedInitialBrandPagesAction(
     for (const pData of starterPages) {
       // Create Page
       const page = await pb.collection("pages").create({
-        brand: brandId,
+        brand: targetBrandId,
         title: pData.title,
         slug: pData.slug,
         order: pData.order,
