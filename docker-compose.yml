@@ -36,8 +36,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL:-http://pocketbase:8080}
+      - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL:-http://localhost:8080}
       - POCKETBASE_INTERNAL_URL=http://pocketbase:8080
+      - NEXT_PUBLIC_GITHUB_REPO=${NEXT_PUBLIC_GITHUB_REPO:-HosakSK/logobook-jamia}
     networks:
       - logobook-network
 

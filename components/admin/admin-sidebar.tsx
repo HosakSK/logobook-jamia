@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useBrandStore } from "@/lib/store/brand-store";
 import { BrandSwitcher } from "@/components/admin/brand-switcher";
+import { VersionChecker } from "@/components/admin/version-checker";
 import { Logo } from "@/components/brand/logo";
 import { getDictionary, Locale, DEFAULT_LOCALE } from "@/lib/i18n";
 import {
@@ -196,7 +197,7 @@ export function AdminSidebar({
 
       {/* Footer */}
       <div className="pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
-        <span className="font-mono">v0.0.1.11</span>
+        <VersionChecker />
         <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Logobook Studio</span>
       </div>
     </div>

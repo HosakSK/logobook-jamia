@@ -13,6 +13,7 @@ out/
 
 # Poistka pre lokálne env súbory
 .env*
+!.env.example
 
 # PocketBase lokálne dáta
 pb_data/
