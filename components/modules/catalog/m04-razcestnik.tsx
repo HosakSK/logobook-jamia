@@ -227,42 +227,73 @@ export default function M04RazcestnikModule({
     }
   };
 
+  const currentBrand =
+    brandId ||
+    (typeof window !== "undefined"
+      ? window.location.pathname.match(/\/admin\/brand\/([^/]+)/)?.[1] ||
+        (window.location.pathname.startsWith("/m/")
+          ? window.location.pathname.split("/")[2]
+          : "")
+      : "") ||
+    "logobook";
+
   // Link resolver for card
   const getCardHref = (card: M04CardItem & { url?: string; subtitle?: any }) => {
     if (isEditor) {
       if (card.targetPageId) {
-        return `/admin/brand/${brandId}/builder/${card.targetPageId}`;
-      }
-      if (card.targetUrl && card.targetUrl !== "#") {
-        return card.targetUrl;
-      }
-      if (card.url && card.url !== "#") {
-        return card.url;
-      }
-      return "#";
-    } else {
-      // Public manual mode
-      if (card.targetPageId) {
-        const matched = brandPages.find((p) => p.id === card.targetPageId);
-        if (matched?.slug) return `/${matched.slug}`;
+        return `/admin/brand/${currentBrand}/builder/${card.targetPageId}`;
       }
       if (card.targetUrl && card.targetUrl !== "#") {
         if (card.targetUrl.includes("/builder/")) {
-          const parts = card.targetUrl.split("/builder/");
-          const matched = brandPages.find((p) => p.id === parts[1]);
-          return matched?.slug ? `/${matched.slug}` : `/${parts[1]}`;
+          const targetId = card.targetUrl.split("/builder/")[1];
+          return `/admin/brand/${currentBrand}/builder/${targetId}`;
         }
         return card.targetUrl;
       }
       if (card.url && card.url !== "#") {
         if (card.url.includes("/builder/")) {
-          const parts = card.url.split("/builder/");
-          const matched = brandPages.find((p) => p.id === parts[1]);
-          return matched?.slug ? `/${matched.slug}` : `/${parts[1]}`;
+          const targetId = card.url.split("/builder/")[1];
+          return `/admin/brand/${currentBrand}/builder/${targetId}`;
         }
         return card.url;
       }
       return "#";
+    } else {
+      // Public manual mode
+      let prefix = "";
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        if (path.startsWith("/m/")) {
+          const parts = path.split("/").filter(Boolean);
+          const domainPart = parts[1] || currentBrand;
+          prefix = `/m/${domainPart}`;
+        }
+      }
+
+      let slug = "";
+      if (card.targetPageId) {
+        const matched = brandPages.find((p) => p.id === card.targetPageId);
+        slug = matched?.slug || card.targetPageId;
+      } else if (card.targetUrl && card.targetUrl !== "#") {
+        if (card.targetUrl.includes("/builder/")) {
+          const targetId = card.targetUrl.split("/builder/")[1];
+          const matched = brandPages.find((p) => p.id === targetId);
+          slug = matched?.slug || targetId;
+        } else {
+          slug = card.targetUrl.replace(/^\/+/, "");
+        }
+      } else if (card.url && card.url !== "#") {
+        if (card.url.includes("/builder/")) {
+          const targetId = card.url.split("/builder/")[1];
+          const matched = brandPages.find((p) => p.id === targetId);
+          slug = matched?.slug || targetId;
+        } else {
+          slug = card.url.replace(/^\/+/, "");
+        }
+      }
+
+      if (!slug) return "#";
+      return prefix ? `${prefix}/${slug}` : `/${slug}`;
     }
   };
 
