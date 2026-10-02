@@ -28,6 +28,7 @@ interface AssetCardProps {
   dict: Dictionary;
   onOpenFiles: (asset: BrandAsset) => void;
   onEdit: (asset: BrandAsset) => void;
+  onDelete?: (assetId: string) => void;
 }
 
 export function AssetCard({
@@ -37,6 +38,7 @@ export function AssetCard({
   dict,
   onOpenFiles,
   onEdit,
+  onDelete,
 }: AssetCardProps) {
   // Local background toggle: "auto" (from asset.background), "light", "dark", or "checkered"
   const [bgMode, setBgMode] = useState<"auto" | "light" | "dark" | "checkered">("auto");
@@ -102,13 +104,31 @@ export function AssetCard({
     if (!confirm(`Naozaj chcete vymazať logo „${displayName}“ a všetky jeho súbory z Cloudflare R2?`)) {
       return;
     }
+    setMenuOpen(false);
     startDelete(async () => {
-      await deleteBrandAssetAction(asset.id, brandId);
+      try {
+        const res = await deleteBrandAssetAction(asset.id, brandId);
+        if (res.success) {
+          onDelete?.(asset.id);
+        } else {
+          alert(res.message || "Nepodarilo sa vymazať logo.");
+        }
+      } catch (err: any) {
+        console.error("Delete error:", err);
+        alert(err.message || "Chyba pri odstraňovaní loga.");
+      }
     });
   };
 
   return (
     <div className="border border-border/40 rounded-[3px] bg-card overflow-hidden flex flex-col justify-between transition-all hover:border-border/80 shadow-xs relative group">
+      {/* Deleting overlay */}
+      {isDeleting && (
+        <div className="absolute inset-0 z-40 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-[#c8d400]" />
+          <span className="text-xs font-semibold text-white">Odstraňujem logo...</span>
+        </div>
+      )}
       {/* 1. Header with title & badges */}
       <div className="p-4 border-b border-border/30 flex items-start justify-between gap-2">
         <div className="min-w-0">

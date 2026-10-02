@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrandAsset, BrandAssetFile } from "@/lib/types/asset";
 import { AssetCard } from "@/components/admin/assets/asset-card";
 import { BulkUploadModal } from "@/components/admin/assets/bulk-upload-modal";
@@ -42,10 +42,21 @@ export function AssetsGalleryView({
   const [orientationFilter, setOrientationFilter] = useState<string>("ALL");
   const [backgroundFilter, setBackgroundFilter] = useState<string>("ALL");
 
+  // Keep assets in sync when server component revalidates
+  useEffect(() => {
+    setAssets(initialAssets);
+  }, [initialAssets]);
+
   // Modal states
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const [activeFilesAsset, setActiveFilesAsset] = useState<BrandAsset | null>(null);
   const [activeEditAsset, setActiveEditAsset] = useState<BrandAsset | null>(null);
+
+  // Handle asset deletion immediately in client state + server sync
+  const handleDeleteAsset = (assetId: string) => {
+    setAssets((prev) => prev.filter((a) => a.id !== assetId));
+    router.refresh();
+  };
 
   // Filter assets
   const filteredAssets = assets.filter((asset) => {
@@ -213,6 +224,7 @@ export function AssetsGalleryView({
               dict={dict}
               onOpenFiles={(a) => setActiveFilesAsset(a)}
               onEdit={(a) => setActiveEditAsset(a)}
+              onDelete={handleDeleteAsset}
             />
           ))}
         </div>

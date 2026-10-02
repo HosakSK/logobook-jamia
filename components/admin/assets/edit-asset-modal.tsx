@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { BrandAsset } from "@/lib/types/asset";
 import { updateBrandAssetAction } from "@/actions/assets";
 import {
@@ -40,6 +40,18 @@ export function EditAssetModal({
 
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (asset) {
+      setName(asset.name.en || asset.name.sk || "");
+      setNameSk(asset.name.sk || "");
+      setMedium(asset.medium || "UNIVERSAL");
+      setOrientation(asset.orientation || "HORIZONTAL");
+      setBackground(asset.background || "LIGHT");
+      setHasClaim(Boolean(asset.hasClaim));
+      setError(null);
+    }
+  }, [asset]);
 
   if (!isOpen || !asset) return null;
 
