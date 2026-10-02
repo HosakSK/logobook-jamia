@@ -72,7 +72,7 @@ export function BrandDangerZone({ brandId, brandName, dict }: BrandDangerZonePro
       {/* Confirmation Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-          <div className="bg-[#0e161d] border border-red-500/40 rounded-[3px] max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in-0 zoom-in-95">
+          <div className="bg-[#1f2c36] border border-red-500/40 rounded-[3px] max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in-0 zoom-in-95">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2 text-red-400 font-bold text-base">
                 <AlertTriangle className="h-5 w-5" />

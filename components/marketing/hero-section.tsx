@@ -38,7 +38,7 @@ export function HeroSection({ currentLocale }: HeroSectionProps) {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <Link
             href="/m/demo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#05080c] font-bold text-sm shadow-[0_4px_24px_rgba(200,212,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_8px_32px_rgba(200,212,0,0.45)] hover:brightness-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#070b0f] font-bold text-sm shadow-[0_4px_24px_rgba(200,212,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_8px_32px_rgba(200,212,0,0.45)] hover:brightness-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
           >
             <Play className="w-4 h-4 fill-current" />
             <span>{dict.marketing.ctaDemo}</span>
@@ -128,9 +128,9 @@ export function HeroSection({ currentLocale }: HeroSectionProps) {
               <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-[11px] space-y-1.5 shadow-inner">
                 <div className="text-muted-foreground font-medium">Export formáty:</div>
                 <div className="flex flex-wrap gap-1 font-mono text-[10px]">
-                  <span className="bg-[#05080c] px-2 py-0.5 rounded-md text-primary border border-white/[0.08]">JSON</span>
-                  <span className="bg-[#05080c] px-2 py-0.5 rounded-md text-[#009f80] border border-white/[0.08]">CSS</span>
-                  <span className="bg-[#05080c] px-2 py-0.5 rounded-md text-foreground/80 border border-white/[0.08]">llms.txt</span>
+                  <span className="bg-[#17212a] px-2 py-0.5 rounded-md text-primary border border-[#2b3b48]/60">JSON</span>
+                  <span className="bg-[#17212a] px-2 py-0.5 rounded-md text-[#009f80] border border-[#2b3b48]/60">CSS</span>
+                  <span className="bg-[#17212a] px-2 py-0.5 rounded-md text-foreground/80 border border-[#2b3b48]/60">llms.txt</span>
                 </div>
               </div>
             </div>
@@ -138,12 +138,12 @@ export function HeroSection({ currentLocale }: HeroSectionProps) {
             {/* Main Stage Preview */}
             <div className="md:col-span-8 p-6 space-y-6">
               {/* Logo with Clearspace visual lines */}
-              <div className="p-6 rounded-xl bg-[#060a10]/80 border border-white/[0.06] relative overflow-hidden flex flex-col items-center justify-center shadow-inner">
+              <div className="p-6 rounded-xl bg-[#0e161d] border border-[#2b3b48]/60 relative overflow-hidden flex flex-col items-center justify-center shadow-inner">
                 <div className="absolute top-2.5 left-3 text-[9px] font-mono text-muted-foreground/60 uppercase">
-                  M03 Ochranná zóna loga
+                  M08 Ochranná zóna loga
                 </div>
                 <div className="relative border border-dashed border-primary/40 p-7 rounded-lg my-2 bg-primary/[0.02]">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-mono text-primary bg-[#060a10] px-1.5 py-0.5 rounded-full border border-primary/30">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[9px] font-mono text-primary bg-[#0e161d] px-1.5 py-0.5 rounded-full border border-primary/30">
                     min 1.5X
                   </span>
                   <span className="text-xl sm:text-2xl font-black tracking-widest text-foreground">
@@ -155,15 +155,15 @@ export function HeroSection({ currentLocale }: HeroSectionProps) {
               {/* Color swatches preview */}
               <div>
                 <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-2">
-                  M08 Primárna farebná paleta (WCAG 2.1 AAA)
+                  M13 Primárna farebná paleta (WCAG 2.1 AAA)
                 </div>
                 <div className="grid grid-cols-4 gap-2.5">
-                  <div className="bg-white/[0.02] border border-white/[0.08] p-2.5 rounded-lg text-[10px] shadow-xs">
-                    <div className="w-full h-8 rounded-md bg-[#05080c] border border-white/[0.08] mb-1.5 shadow-inner" />
+                  <div className="bg-[#17212a] border border-[#2b3b48]/60 p-2.5 rounded-lg text-[10px] shadow-xs">
+                    <div className="w-full h-8 rounded-md bg-[#070b0f] border border-[#2b3b48]/60 mb-1.5 shadow-inner" />
                     <div className="font-bold text-foreground">Abyss</div>
-                    <div className="font-mono text-muted-foreground text-[9px]">#05080C</div>
+                    <div className="font-mono text-muted-foreground text-[9px]">#070B0F</div>
                   </div>
-                  <div className="bg-white/[0.02] border border-white/[0.08] p-2.5 rounded-lg text-[10px] shadow-xs">
+                  <div className="bg-[#17212a] border border-[#2b3b48]/60 p-2.5 rounded-lg text-[10px] shadow-xs">
                     <div className="w-full h-8 rounded-md bg-[#c8d400] mb-1.5 shadow-[0_0_12px_rgba(200,212,0,0.25)]" />
                     <div className="font-bold text-foreground">Lime Accent</div>
                     <div className="font-mono text-muted-foreground text-[9px]">#C8D400</div>

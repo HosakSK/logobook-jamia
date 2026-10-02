@@ -22,7 +22,7 @@ export function MarketingNav({ currentLocale }: MarketingNavProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#05080c]/80 backdrop-blur-xl transition-all">
+    <header className="sticky top-0 z-50 w-full border-b border-[#2b3b48]/60 bg-[#0e161d]/90 backdrop-blur-xl transition-all">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
         {/* Brand Logo */}
         <div className="flex items-center gap-3">
@@ -60,7 +60,7 @@ export function MarketingNav({ currentLocale }: MarketingNavProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-muted-foreground hover:text-white hover:bg-white/[0.05] border border-white/[0.08] transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-white hover:bg-white/[0.05] border border-[#2b3b48]/60 transition-colors"
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -70,7 +70,7 @@ export function MarketingNav({ currentLocale }: MarketingNavProps) {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-white/[0.08] bg-[#080d14]/95 backdrop-blur-2xl px-4 py-5 animate-in slide-in-from-top-2 duration-150 space-y-4">
+        <div className="md:hidden border-b border-[#2b3b48]/60 bg-[#121a23]/98 backdrop-blur-2xl px-4 py-5 animate-in slide-in-from-top-2 duration-150 space-y-4">
           <div className="flex flex-col space-y-3">
             {navLinks.map((link) => (
               <a

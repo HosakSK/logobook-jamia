@@ -113,7 +113,7 @@ export function AdminSidebar({
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#080d14] border-r border-white/[0.08] w-64 p-5 space-y-6">
+    <div className="flex flex-col h-full bg-[#121a23] border-r border-[#2b3b48]/60 w-64 p-5 space-y-6">
       {/* Brand Switcher Header */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">

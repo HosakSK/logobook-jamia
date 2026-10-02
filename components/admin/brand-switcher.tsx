@@ -66,7 +66,7 @@ export function BrandSwitcher({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-1.5 w-64 rounded-xl shadow-2xl bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] z-50 p-1.5 animate-in fade-in-50 zoom-in-95">
+        <div className="absolute left-0 mt-1.5 w-64 rounded-xl shadow-2xl bg-[#1f2c36]/98 backdrop-blur-2xl border border-[#2b3b48] z-50 p-1.5 animate-in fade-in-50 zoom-in-95">
           <div className="px-2.5 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
             {dict.admin.brandsListTitle}
           </div>

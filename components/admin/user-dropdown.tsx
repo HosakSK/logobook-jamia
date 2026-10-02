@@ -63,9 +63,9 @@ export function UserDropdown({ user, locale = DEFAULT_LOCALE }: UserDropdownProp
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] z-50 p-1.5 animate-in fade-in-50 zoom-in-95">
+        <div className="absolute right-0 mt-2 w-56 rounded-xl shadow-2xl bg-[#1f2c36]/98 backdrop-blur-2xl border border-[#2b3b48] z-50 p-1.5 animate-in fade-in-50 zoom-in-95">
           {/* User Header */}
-          <div className="px-3.5 py-2.5 border-b border-white/[0.08] space-y-1">
+          <div className="px-3.5 py-2.5 border-b border-[#2b3b48]/60 space-y-1">
             <p className="text-xs font-semibold text-foreground truncate">{displayName}</p>
             <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
             <div className="flex items-center gap-1.5 pt-1">

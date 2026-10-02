@@ -454,7 +454,7 @@ export default function M05DownloadTlacidloModule({
       {isSettingsModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#17212a] border border-border/80 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
@@ -575,7 +575,7 @@ export default function M05DownloadTlacidloModule({
                           value={cfg.url || ""}
                           placeholder="https://drive.google.com/..."
                           onChange={(e) => handleSaveConfig({ ...cfg, url: e.target.value })}
-                          className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
+                          className="w-full bg-[#17212a] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
                         />
                       </div>
                       <label className="flex items-center gap-2 cursor-pointer pt-1">
@@ -583,7 +583,7 @@ export default function M05DownloadTlacidloModule({
                           type="checkbox"
                           checked={cfg.openInNewTab}
                           onChange={(e) => handleSaveConfig({ ...cfg, openInNewTab: e.target.checked })}
-                          className="rounded text-primary focus:ring-primary h-3.5 w-3.5 bg-[#0e161d] border-border/70"
+                          className="rounded text-primary focus:ring-primary h-3.5 w-3.5 bg-[#17212a] border-border/70"
                         />
                         <span className="text-foreground text-[11px]">
                           Otvoriť odkaz v novom okne (_blank)
@@ -617,7 +617,7 @@ export default function M05DownloadTlacidloModule({
                                 openInNewTab: false,
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
+                            className="w-full bg-[#17212a] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
                           >
                             <option value="">-- Vyberte podstránku --</option>
                             {brandPages.map((pg) => {
@@ -671,7 +671,7 @@ export default function M05DownloadTlacidloModule({
                                   className={`w-full flex items-center justify-between p-2 rounded-[3px] border transition-colors text-left ${
                                     isSelected
                                       ? "bg-primary/10 border-primary text-foreground"
-                                      : "bg-[#0e161d] border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                      : "bg-[#17212a] border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
                                   }`}
                                 >
                                   <div className="flex items-center gap-2 truncate">
@@ -781,7 +781,7 @@ export default function M05DownloadTlacidloModule({
                               className={`flex items-center gap-2 p-2 rounded-[3px] border text-left transition-colors ${
                                 isSelected
                                   ? "bg-primary/10 border-primary text-primary font-bold"
-                                  : "bg-[#0e161d] border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
+                                  : "bg-[#17212a] border-border/40 text-muted-foreground hover:text-foreground hover:border-border"
                               }`}
                             >
                               <IconComp className="w-4 h-4 shrink-0" />
@@ -810,7 +810,7 @@ export default function M05DownloadTlacidloModule({
                               icon: { ...cfg.icon, customIconUrl: e.target.value },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
+                          className="w-full bg-[#17212a] border border-border/70 rounded-[3px] px-3 py-2 text-foreground focus:outline-none focus:border-primary text-xs"
                         />
                       </div>
 
@@ -835,7 +835,7 @@ export default function M05DownloadTlacidloModule({
                                   className={`p-2 rounded-[3px] border flex flex-col items-center justify-center gap-1 transition-colors ${
                                     cfg.icon.customIconUrl === m.fileUrl
                                       ? "bg-primary/10 border-primary"
-                                      : "bg-[#0e161d] border-border/40 hover:border-border"
+                                      : "bg-[#17212a] border-border/40 hover:border-border"
                                   }`}
                                 >
                                   <img
@@ -937,7 +937,7 @@ export default function M05DownloadTlacidloModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-2.5 py-1.5 text-foreground font-mono text-xs"
+                          className="w-full bg-[#17212a] border border-border/70 rounded-[3px] px-2.5 py-1.5 text-foreground font-mono text-xs"
                         />
                       </div>
                     </div>
@@ -972,7 +972,7 @@ export default function M05DownloadTlacidloModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-2.5 py-1.5 text-foreground font-mono text-xs"
+                          className="w-full bg-[#17212a] border border-border/70 rounded-[3px] px-2.5 py-1.5 text-foreground font-mono text-xs"
                         />
                       </div>
                     </div>

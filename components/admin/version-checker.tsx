@@ -70,11 +70,11 @@ export function VersionChecker() {
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-lg bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-6 text-foreground animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-lg bg-[#1f2c36]/98 backdrop-blur-2xl border border-[#2b3b48] rounded-2xl shadow-2xl p-6 text-foreground animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-white/[0.08]">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#2b3b48]/60">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0 shadow-[0_0_15px_rgba(200,212,0,0.15)]">
                   <Sparkles className="w-4 h-4" />

@@ -52,7 +52,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
         {/* ==================================================================== */}
         <div id="ako-to-funguje" className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Interactive Widget */}
-          <div className="lg:col-span-7 bg-[#0c121b]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl relative overflow-hidden">
+          <div className="lg:col-span-7 bg-[#17212a]/90 border border-[#2b3b48]/80 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl relative overflow-hidden">
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
@@ -174,7 +174,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
           </div>
 
           {/* Visual Diagram */}
-          <div className="lg:col-span-7 bg-[#0c121b]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl order-1 lg:order-2">
+          <div className="lg:col-span-7 bg-[#17212a]/90 border border-[#2b3b48]/80 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl order-1 lg:order-2">
             <div className="flex items-center gap-2.5 pb-4 border-b border-white/[0.08] mb-6">
               <div className="w-7 h-7 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
                 <GitBranch className="w-4 h-4" />
@@ -183,7 +183,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
             </div>
 
             <div className="space-y-3 font-mono text-xs">
-              <div className="p-3.5 rounded-xl bg-[#060a10] border border-primary/30 flex items-center justify-between shadow-xs">
+              <div className="p-3.5 rounded-xl bg-[#070b0f] border border-primary/30 flex items-center justify-between shadow-xs">
                 <div className="flex items-center gap-2 text-primary font-bold">
                   <span>ROOT: Hlavná značka</span>
                 </div>
@@ -227,7 +227,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
         {/* ==================================================================== */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Code Tabs */}
-          <div className="lg:col-span-7 bg-[#0c121b]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl">
+          <div className="lg:col-span-7 bg-[#17212a]/90 border border-[#2b3b48]/80 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl">
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">
@@ -255,12 +255,12 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
 
             {/* Code container */}
             <div className="relative">
-              <pre className="p-5 rounded-xl bg-[#060a10] border border-white/[0.08] font-mono text-[11px] leading-relaxed text-muted-foreground overflow-x-auto max-h-56 shadow-inner">
+              <pre className="p-5 rounded-xl bg-[#070b0f] border border-white/[0.08] font-mono text-[11px] leading-relaxed text-muted-foreground overflow-x-auto max-h-56 shadow-inner">
                 {tokenTab === "css" && (
 `@theme {
   --color-brand-primary: #c8d400;
   --color-brand-teal: #009f80;
-  --color-brand-abyss: #05080c;
+  --color-brand-abyss: #070b0f;
   --font-display: 'Plus Jakarta Sans', sans-serif;
   --radius-brand: 8px;
 }`
@@ -270,7 +270,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
   "color": {
     "primary": { "value": "#c8d400", "type": "color" },
     "teal": { "value": "#009f80", "type": "color" },
-    "abyss": { "value": "#05080c", "type": "color" }
+    "abyss": { "value": "#070b0f", "type": "color" }
   },
   "typography": {
     "fontFamily": { "value": "Plus Jakarta Sans", "type": "fontFamilies" }
@@ -282,7 +282,7 @@ export function FeatureBlocks({ currentLocale }: FeatureBlocksProps) {
 Brand: Acme Studio
 Primary Accent: #c8d400 (Lime)
 Teal Brand: #009f80
-Abyss Dark: #05080c
+Abyss Dark: #070b0f
 Rules:
 - Never stretch the logo or invert brand colors.
 - Maintain minimum 1.5X clearspace around logo.`
@@ -346,7 +346,7 @@ Rules:
           </div>
 
           {/* Interactive Signature Card */}
-          <div className="lg:col-span-7 bg-[#0c121b]/80 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl order-1 lg:order-2">
+          <div className="lg:col-span-7 bg-[#17212a]/90 border border-[#2b3b48]/80 rounded-2xl p-6 sm:p-8 shadow-[0_16px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl order-1 lg:order-2">
             <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-6">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-md bg-primary/15 border border-primary/30 flex items-center justify-center text-primary">

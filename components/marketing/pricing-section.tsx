@@ -173,13 +173,13 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
                 key={tier.id}
                 className={`relative rounded-2xl p-7 flex flex-col justify-between transition-all duration-200 backdrop-blur-xl ${
                   tier.highlight
-                    ? "bg-[#0f1724]/90 border-2 border-primary shadow-[0_16px_48px_rgba(200,212,0,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] -translate-y-1.5"
-                    : "bg-[#0c121b]/80 border border-white/10 hover:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
+                    ? "bg-[#1f2c36] border-2 border-primary shadow-[0_16px_48px_rgba(200,212,0,0.18),inset_0_1px_0_rgba(255,255,255,0.1)] -translate-y-1.5"
+                    : "bg-[#17212a]/95 border border-[#2b3b48]/80 hover:border-[#3f5566] shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)]"
                 }`}
               >
                 {/* Popular or White-Label Badge */}
                 {tier.badge && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#d8e600] to-[#b6c400] text-[#05080c] text-[10px] font-black uppercase tracking-wider shadow-[0_2px_12px_rgba(200,212,0,0.4)]">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#d8e600] to-[#b6c400] text-[#070b0f] text-[10px] font-black uppercase tracking-wider shadow-[0_2px_12px_rgba(200,212,0,0.4)]">
                     {tier.badge}
                   </div>
                 )}
@@ -236,7 +236,7 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
                     href={tier.href}
                     className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold transition-all active:scale-[0.98] ${
                       tier.highlight
-                        ? "bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#05080c] hover:brightness-105 shadow-[0_4px_18px_rgba(200,212,0,0.35)]"
+                        ? "bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#070b0f] hover:brightness-105 shadow-[0_4px_18px_rgba(200,212,0,0.35)]"
                         : "bg-white/[0.04] border border-white/10 hover:border-white/20 hover:bg-white/[0.08] text-foreground"
                     }`}
                   >

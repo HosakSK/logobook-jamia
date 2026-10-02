@@ -11,12 +11,12 @@
   --radius-3xl: 24px;
   --radius-full: 9999px;
 
-  /* Modern startup palette tokens */
-  --color-abyss: #05080c;
-  --color-deep: #080d14;
-  --color-raised: #0e1520;
-  --color-elevated: #151f2d;
-  --color-surface: #1c283a;
+  /* Modern startup palette tokens from Design Rules (shifted 1 step lighter for clarity) */
+  --color-abyss: #070b0f;
+  --color-deep: #0e161d;
+  --color-raised: #17212a;
+  --color-elevated: #1f2c36;
+  --color-surface: #2b3b48;
 }
 
 @layer base {
@@ -27,61 +27,61 @@
     --radius-card: 14px;
 
     /* Brand Accents */
-    --color-accent-red: #d04f38;
+    --color-accent-red: #bb4934;
     --color-accent-lime: #c8d400;
     --color-accent-teal: #009f80;
 
-    /* Default UI is Dark (Linear / Raycast aesthetic) */
-    --background: #05080c;
-    --foreground: #f4f6f8;
-    --card: #0e1520;
-    --card-foreground: #f4f6f8;
-    --popover: #0e1520;
-    --popover-foreground: #f4f6f8;
+    /* Default UI is shifted 1 step lighter (Deep as base, Raised as cards, Elevated as popovers) */
+    --background: #0e161d;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #1f2c36;
+    --popover-foreground: #fafbfc;
     --primary: #c8d400;
-    --primary-foreground: #05080c;
-    --secondary: #121a26;
-    --secondary-foreground: #e4e9f0;
-    --muted: #0f1622;
-    --muted-foreground: #8295a8;
-    --accent: #172230;
-    --accent-foreground: #f4f6f8;
-    --destructive: #d04f38;
+    --primary-foreground: #070b0f;
+    --secondary: #1f2c36;
+    --secondary-foreground: #fafbfc;
+    --muted: #17212a;
+    --muted-foreground: #96abbe;
+    --accent: #1f2c36;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
     --destructive-foreground: #ffffff;
-    --border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.04);
+    --border: rgba(63, 85, 102, 0.45);
+    --input: #17212a;
     --ring: rgba(200, 212, 0, 0.4);
 
     /* Layered Surfaces */
-    --bg-page-start: #05080c;
-    --bg-page-end: #090e15;
-    --bg-card: rgba(14, 21, 32, 0.7);
-    --bg-card-hover: rgba(21, 31, 45, 0.85);
-    --bg-elevated: #151f2d;
-    --bg-surface: #1c283a;
-    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --bg-page-start: #0e161d;
+    --bg-page-end: #17212a;
+    --bg-card: rgba(23, 33, 42, 0.85);
+    --bg-card-hover: rgba(31, 44, 54, 0.95);
+    --bg-elevated: #1f2c36;
+    --bg-surface: #2b3b48;
+    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   /* Explicit dark mode class */
   .dark, [data-theme="dark"] {
-    --background: #05080c;
-    --foreground: #f4f6f8;
-    --card: #0e1520;
-    --card-foreground: #f4f6f8;
-    --popover: #0e1520;
-    --popover-foreground: #f4f6f8;
+    --background: #0e161d;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #1f2c36;
+    --popover-foreground: #fafbfc;
     --primary: #c8d400;
-    --primary-foreground: #05080c;
-    --secondary: #121a26;
-    --secondary-foreground: #e4e9f0;
-    --muted: #0f1622;
-    --muted-foreground: #8295a8;
-    --accent: #172230;
-    --accent-foreground: #f4f6f8;
-    --destructive: #d04f38;
+    --primary-foreground: #070b0f;
+    --secondary: #1f2c36;
+    --secondary-foreground: #fafbfc;
+    --muted: #17212a;
+    --muted-foreground: #96abbe;
+    --accent: #1f2c36;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
     --destructive-foreground: #ffffff;
-    --border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.04);
+    --border: rgba(63, 85, 102, 0.45);
+    --input: #17212a;
     --ring: rgba(200, 212, 0, 0.4);
   }
 
@@ -94,7 +94,7 @@
     --popover: #ffffff;
     --popover-foreground: #090e15;
     --primary: #c8d400;
-    --primary-foreground: #05080c;
+    --primary-foreground: #070b0f;
     --secondary: #f0f3f6;
     --secondary-foreground: #090e15;
     --muted: #f0f3f6;
@@ -162,42 +162,42 @@ div[class*="rounded-[2px]"] {
 /* MODERN STARTUP SURFACES & GLASSMORPHISM                                        */
 /* ============================================================================== */
 
-/* Canvas background with subtle high-tech ambient glows */
+/* Canvas background with subtle high-tech ambient glows (Deep base) */
 .bg-canvas-dark {
-  background-color: #05080c;
+  background-color: #0e161d;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(200, 212, 0, 0.04) 0%, transparent 60%),
-    radial-gradient(circle at 85% 25%, rgba(0, 159, 128, 0.03) 0%, transparent 50%),
-    linear-gradient(180deg, #05080c 0%, #090e15 100%);
+    radial-gradient(circle at 50% 0%, rgba(200, 212, 0, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 85% 25%, rgba(0, 159, 128, 0.04) 0%, transparent 50%),
+    linear-gradient(180deg, #0e161d 0%, #17212a 100%);
 }
 
 .bg-canvas-light {
-  background: linear-gradient(180deg, #f9fafb 0%, #edf1f5 100%);
+  background: linear-gradient(180deg, #fafbfc 0%, #eef2f6 100%);
 }
 
-/* Glassmorphic cards with crisp top-edge hairline highlight */
+/* Glassmorphic cards (Raised base) with crisp top-edge highlight and slate borders */
 .card-dark,
 [class*="bg-raised/70"],
 [class*="bg-raised"] {
-  background: rgba(14, 21, 32, 0.65) !important;
+  background: rgba(23, 33, 42, 0.85) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(63, 85, 102, 0.45) !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-dark:hover,
 [class*="bg-raised"]:hover {
-  background: rgba(19, 28, 42, 0.8) !important;
-  border-color: rgba(255, 255, 255, 0.16) !important;
-  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  background: rgba(31, 44, 54, 0.95) !important;
+  border-color: rgba(63, 85, 102, 0.75) !important;
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Modern hairline borders on dark mode */
+/* Modern slate borders on dark mode */
 .border-border,
 [class*="border-border"] {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(63, 85, 102, 0.45);
 }
 
 /* Electric lime glow utility */
