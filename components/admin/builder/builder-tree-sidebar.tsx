@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +40,49 @@ interface BuilderTreeSidebarProps {
   tree: PageHierarchyItem[];
 }
 
+// Helper to get localized title
+function getPageTitle(p: PageItem | PageHierarchyItem): string {
+  if (!p || !p.title) return "Bez názvu";
+  return p.title.sk || p.title.en || p.title.cs || "Bez názvu";
+}
+
+// Helper: check if targetId is inside node's descendant tree
+function isDescendantOf(node: PageHierarchyItem, targetId: string): boolean {
+  if (!node.children || node.children.length === 0) return false;
+  for (const child of node.children) {
+    if (child.id === targetId) return true;
+    if (isDescendantOf(child, targetId)) return true;
+  }
+  return false;
+}
+
+// Helper: collect all parent IDs of a specific page
+function collectAncestorIds(tree: PageHierarchyItem[], targetId: string, ancestors: string[] = []): string[] | null {
+  for (const node of tree) {
+    if (node.id === targetId) return ancestors;
+    if (node.children && node.children.length > 0) {
+      const found = collectAncestorIds(node.children, targetId, [...ancestors, node.id]);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// Helper: collect all node IDs with children
+function collectAllParentIds(tree: PageHierarchyItem[]): string[] {
+  const ids: string[] = [];
+  function traverse(nodes: PageHierarchyItem[]) {
+    for (const node of nodes) {
+      if (node.children && node.children.length > 0) {
+        ids.push(node.id);
+        traverse(node.children);
+      }
+    }
+  }
+  traverse(tree);
+  return ids;
+}
+
 export function BuilderTreeSidebar({
   brandId,
   currentPageId,
@@ -53,6 +96,49 @@ export function BuilderTreeSidebar({
   useEffect(() => {
     setLocalTree(tree);
   }, [tree]);
+
+  // Expanded nodes state (Set of node IDs)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
+    // Default: expand all parent nodes + ancestors of currentPageId
+    const initial = new Set<string>(collectAllParentIds(tree));
+    if (currentPageId) {
+      const ancestors = collectAncestorIds(tree, currentPageId);
+      if (ancestors) {
+        ancestors.forEach((id) => initial.add(id));
+      }
+    }
+    return initial;
+  });
+
+  // Ensure active page is expanded whenever currentPageId or tree changes
+  useEffect(() => {
+    if (currentPageId) {
+      const ancestors = collectAncestorIds(localTree, currentPageId);
+      if (ancestors && ancestors.length > 0) {
+        setExpandedIds((prev) => {
+          const next = new Set(prev);
+          ancestors.forEach((id) => next.add(id));
+          return next;
+        });
+      }
+    }
+  }, [currentPageId, localTree]);
+
+  const toggleExpand = (nodeId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
 
   // Drag & drop state
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -98,10 +184,6 @@ export function BuilderTreeSidebar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getTitle = (p: PageItem) => {
-    return p.title?.sk || p.title?.en || "Bez názvu";
-  };
-
   // Auto-generate slug from title
   const handleTitleChange = (val: string) => {
     setNewTitle(val);
@@ -133,6 +215,10 @@ export function BuilderTreeSidebar({
         return;
       }
 
+      if (newParentId) {
+        setExpandedIds((prev) => new Set(prev).add(newParentId));
+      }
+
       setIsCreating(false);
       setNewTitle("");
       setNewSlug("");
@@ -152,13 +238,14 @@ export function BuilderTreeSidebar({
     setNewSlug("");
     setNewMenuStyle("submenu");
     setIsCreating(true);
+    setExpandedIds((prev) => new Set(prev).add(parentId));
   };
 
-  const handleOpenRename = (p: PageItem) => {
+  const handleOpenRename = (p: PageItem | PageHierarchyItem) => {
     setActiveMenuId(null);
     setRenameModal({
       pageId: p.id,
-      title: getTitle(p),
+      title: getPageTitle(p),
       slug: p.slug,
     });
   };
@@ -251,13 +338,19 @@ export function BuilderTreeSidebar({
     }
   };
 
-  // Helper: check if a node has children
-  const nodeHasChildren = (id: string): boolean => {
-    const rootNode = localTree.find((n) => n.id === id);
-    return Boolean(rootNode && rootNode.children && rootNode.children.length > 0);
+  // Helper: find node in tree
+  const findNodeInTree = (nodes: PageHierarchyItem[], id: string): PageHierarchyItem | null => {
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      if (n.children && n.children.length > 0) {
+        const found = findNodeInTree(n.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
   };
 
-  // Drag & Drop Reorder Execution
+  // Drag & Drop Reorder Execution for arbitrary N-level depth
   const handleTreeDrop = async (
     dragId: string,
     targetId: string,
@@ -268,92 +361,86 @@ export function BuilderTreeSidebar({
     // Deep clone local tree
     const newTree: PageHierarchyItem[] = JSON.parse(JSON.stringify(localTree));
 
-    // 1. Locate dragged node and extract it
-    let extractedNode: PageHierarchyItem | null = null;
+    // Find dragged node object
+    const draggedNode = findNodeInTree(newTree, dragId);
+    if (!draggedNode) return;
 
-    // Search root level
-    const rootIdx = newTree.findIndex((n) => n.id === dragId);
-    if (rootIdx !== -1) {
-      extractedNode = newTree.splice(rootIdx, 1)[0];
-    } else {
-      // Search in children
-      for (const parent of newTree) {
-        if (parent.children) {
-          const childIdx = parent.children.findIndex((c) => c.id === dragId);
-          if (childIdx !== -1) {
-            extractedNode = parent.children.splice(childIdx, 1)[0];
-            break;
-          }
+    // Prevent dropping a node inside its own descendants
+    if (isDescendantOf(draggedNode, targetId)) {
+      alert("Nemožno presunúť položku do jej vlastnej podpoložky.");
+      return;
+    }
+
+    // 1. Remove dragged node from its current position
+    let extractedNode: PageHierarchyItem | null = null;
+    function removeNode(nodes: PageHierarchyItem[]): boolean {
+      const idx = nodes.findIndex((n) => n.id === dragId);
+      if (idx !== -1) {
+        extractedNode = nodes.splice(idx, 1)[0];
+        return true;
+      }
+      for (const node of nodes) {
+        if (node.children && removeNode(node.children)) {
+          return true;
         }
       }
+      return false;
     }
+    removeNode(newTree);
 
     if (!extractedNode) return;
 
-    // Enforce 2-level maximum nesting:
-    // If extractedNode has children, it can NEVER be placed inside another node,
-    // and can never be nested under another parent.
-    const hasChildren = extractedNode.children && extractedNode.children.length > 0;
-
-    // 2. Insert into target location
+    // 2. Insert into target position
     if (position === "inside") {
-      if (hasChildren) {
-        alert("Kapitolu s podstránkami nie je možné zanoriť do inej kapitoly (max 2 úrovne).");
-        return;
-      }
-      const targetParent = newTree.find((n) => n.id === targetId);
-      if (targetParent) {
-        targetParent.children = targetParent.children || [];
-        extractedNode.parent = targetParent.id;
-        targetParent.children.push(extractedNode);
-      }
-    } else {
-      // "before" or "after"
-      // Check if target is at root level
-      const targetRootIdx = newTree.findIndex((n) => n.id === targetId);
-      if (targetRootIdx !== -1) {
-        // Target is at root
-        extractedNode.parent = undefined;
-        const insertIdx = position === "before" ? targetRootIdx : targetRootIdx + 1;
-        newTree.splice(insertIdx, 0, extractedNode);
-      } else {
-        // Target is in a child array
-        if (hasChildren) {
-          alert("Kapitolu s podstránkami nie je možné presunúť na úroveň podstránok.");
-          return;
-        }
-
-        for (const parent of newTree) {
-          if (parent.children) {
-            const targetChildIdx = parent.children.findIndex((c) => c.id === targetId);
-            if (targetChildIdx !== -1) {
-              extractedNode.parent = parent.id;
-              const insertIdx =
-                position === "before" ? targetChildIdx : targetChildIdx + 1;
-              parent.children.splice(insertIdx, 0, extractedNode);
-              break;
-            }
+      function insertInside(nodes: PageHierarchyItem[]): boolean {
+        for (const node of nodes) {
+          if (node.id === targetId) {
+            node.children = node.children || [];
+            (extractedNode as PageHierarchyItem).parent = node.id;
+            node.children.push(extractedNode as PageHierarchyItem);
+            return true;
+          }
+          if (node.children && insertInside(node.children)) {
+            return true;
           }
         }
+        return false;
       }
+      insertInside(newTree);
+      setExpandedIds((prev) => new Set(prev).add(targetId));
+    } else {
+      // "before" or "after"
+      function insertAdjacent(nodes: PageHierarchyItem[], parentId: string | null): boolean {
+        const targetIdx = nodes.findIndex((n) => n.id === targetId);
+        if (targetIdx !== -1) {
+          (extractedNode as PageHierarchyItem).parent = parentId || undefined;
+          const insertIdx = position === "before" ? targetIdx : targetIdx + 1;
+          nodes.splice(insertIdx, 0, extractedNode as PageHierarchyItem);
+          return true;
+        }
+        for (const node of nodes) {
+          if (node.children && insertAdjacent(node.children, node.id)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      insertAdjacent(newTree, null);
     }
 
-    // 3. Re-index all orders and collect updates
+    // 3. Re-index all orders and collect updates recursively
     const updates: Array<{ id: string; parentId: string | null; order: number }> = [];
-
-    newTree.forEach((rootItem, rIdx) => {
-      rootItem.order = rIdx;
-      rootItem.parent = undefined;
-      updates.push({ id: rootItem.id, parentId: null, order: rIdx });
-
-      if (rootItem.children) {
-        rootItem.children.forEach((childItem, cIdx) => {
-          childItem.order = cIdx;
-          childItem.parent = rootItem.id;
-          updates.push({ id: childItem.id, parentId: rootItem.id, order: cIdx });
-        });
-      }
-    });
+    function reindex(nodes: PageHierarchyItem[], parentId: string | null) {
+      nodes.forEach((node, idx) => {
+        node.order = idx;
+        node.parent = parentId || undefined;
+        updates.push({ id: node.id, parentId, order: idx });
+        if (node.children && node.children.length > 0) {
+          reindex(node.children, node.id);
+        }
+      });
+    }
+    reindex(newTree, null);
 
     // Optimistic UI update
     setLocalTree(newTree);
@@ -375,6 +462,242 @@ export function BuilderTreeSidebar({
     } finally {
       setIsUpdatingTree(false);
     }
+  };
+
+  // Helper to render hierarchical parent options for select input
+  const renderParentOptions = (nodes: PageHierarchyItem[], depth: number = 0): React.ReactNode[] => {
+    let options: React.ReactNode[] = [];
+    nodes.forEach((node) => {
+      const indent = "\u00A0\u00A0".repeat(depth) + (depth > 0 ? "└ " : "");
+      options.push(
+        <option key={node.id} value={node.id}>
+          {indent + getPageTitle(node)}
+        </option>
+      );
+      if (node.children && node.children.length > 0) {
+        options = options.concat(renderParentOptions(node.children, depth + 1));
+      }
+    });
+    return options;
+  };
+
+  // Recursive TreeNode Renderer
+  const renderTreeNode = (node: PageHierarchyItem, depth: number = 0) => {
+    const hasChildren = Boolean(node.children && node.children.length > 0);
+    const isExpanded = expandedIds.has(node.id);
+    const isDragging = draggedId === node.id;
+    const isTarget = dropTarget?.id === node.id;
+    const isInsideTarget = isTarget && dropTarget?.position === "inside";
+    const isBeforeTarget = isTarget && dropTarget?.position === "before";
+    const isAfterTarget = isTarget && dropTarget?.position === "after";
+    const isDuplicatingThis = duplicatingId === node.id;
+    const isCurrent = currentPageId === node.id;
+
+    return (
+      <div key={node.id} className="relative space-y-0.5">
+        {/* Visual drop indicator before */}
+        {isBeforeTarget && (
+          <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
+        )}
+
+        {/* Node Row */}
+        <div
+          draggable={true}
+          onDragStart={(e) => {
+            e.dataTransfer.setData("text/plain", node.id);
+            e.dataTransfer.effectAllowed = "move";
+            setDraggedId(node.id);
+          }}
+          onDragEnd={() => {
+            setDraggedId(null);
+            setDropTarget(null);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!draggedId || draggedId === node.id) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top;
+            const height = rect.height;
+
+            let pos: "before" | "after" | "inside";
+            if (offsetY < height * 0.25) pos = "before";
+            else if (offsetY > height * 0.75) pos = "after";
+            else pos = "inside";
+
+            setDropTarget({ id: node.id, position: pos });
+          }}
+          onDragLeave={() => {
+            if (dropTarget?.id === node.id) {
+              setDropTarget(null);
+            }
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!draggedId || !dropTarget || draggedId === dropTarget.id) return;
+            handleTreeDrop(draggedId, dropTarget.id, dropTarget.position);
+            setDraggedId(null);
+            setDropTarget(null);
+          }}
+          className={`group relative flex items-center justify-between px-1.5 py-1 rounded-[2px] text-xs transition-all ${
+            isDragging
+              ? "opacity-30 border border-dashed border-primary"
+              : isInsideTarget
+              ? "bg-primary/20 ring-2 ring-primary ring-inset"
+              : isCurrent
+              ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
+              : "text-foreground hover:bg-neutral-800/40"
+          }`}
+          style={{
+            paddingLeft: `${Math.max(6, depth * 12 + 6)}px`,
+          }}
+        >
+          <div className="flex items-center gap-1 flex-1 min-w-0">
+            {/* Drag Handle */}
+            <div
+              title="Uchopiť a presunúť"
+              className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-foreground shrink-0 p-0.5"
+            >
+              <GripVertical className="h-3 w-3" />
+            </div>
+
+            {/* Expand / Collapse Chevron (for any node with children) */}
+            {hasChildren ? (
+              <button
+                type="button"
+                onClick={(e) => toggleExpand(node.id, e)}
+                className="p-0.5 text-muted-foreground hover:text-foreground hover:bg-neutral-800/80 rounded-[2px] transition-transform shrink-0"
+                title={isExpanded ? "Zbaliť vetvu" : "Rozbaliť vetvu"}
+              >
+                <ChevronRight
+                  className={`h-3.5 w-3.5 transition-transform duration-150 ${
+                    isExpanded ? "rotate-90 text-primary" : ""
+                  }`}
+                />
+              </button>
+            ) : (
+              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                <FileText className="h-3 w-3 text-muted-foreground/40 group-hover:text-primary/70 shrink-0" />
+              </div>
+            )}
+
+            {/* Page Link */}
+            <Link
+              href={`/admin/brand/${brandId}/builder/${node.id}`}
+              className="flex items-center gap-1.5 flex-1 truncate py-0.5"
+              title={getPageTitle(node)}
+            >
+              <span className="truncate">{getPageTitle(node)}</span>
+            </Link>
+          </div>
+
+          {/* Node Actions & Dropdown */}
+          <div className="flex items-center gap-1 shrink-0 ml-1">
+            {node.menuStyle === "hidden" && (
+              <span title="Skryté vo verejnom menu">
+                <EyeOff className="h-3 w-3 text-muted-foreground/60 mr-0.5" />
+              </span>
+            )}
+
+            {isDuplicatingThis ? (
+              <Loader2 className="h-3 w-3 animate-spin text-primary" />
+            ) : (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveMenuId(activeMenuId === node.id ? null : node.id);
+                  }}
+                  className="p-1 hover:text-foreground text-muted-foreground/50 hover:bg-neutral-800 rounded-[2px] transition-colors"
+                  title="Možnosti stránky"
+                >
+                  <MoreVertical className="h-3.5 w-3.5" />
+                </button>
+
+                {/* Context Menu Dropdown */}
+                {activeMenuId === node.id && (
+                  <div
+                    ref={menuRef}
+                    className="absolute right-0 top-full mt-1 w-48 bg-neutral-900 border border-border/80 rounded-[3px] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddSubpage(node.id)}
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                    >
+                      <FolderPlus className="h-3.5 w-3.5 text-primary" />
+                      <span>Pridať podstránku</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenRename(node)}
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                    >
+                      <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>Premenovať</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicatePage(node.id)}
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                    >
+                      <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>Duplikovať</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleVisibility(node.id)}
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                    >
+                      {node.menuStyle === "hidden" ? (
+                        <>
+                          <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                          <span>Zobraziť v menu</span>
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span>Skryť v menu</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div className="my-1 border-t border-border/40" />
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePage(node.id, getPageTitle(node))}
+                      className="w-full text-left px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-950/40 flex items-center gap-2"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      <span>Zmazať {hasChildren ? "kapitolu" : "stránku"}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Visual drop indicator after */}
+        {isAfterTarget && (
+          <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
+        )}
+
+        {/* Recursive Children Container */}
+        {hasChildren && isExpanded && (
+          <div className="space-y-0.5 border-l border-border/20 ml-2">
+            {node.children!.map((child) => renderTreeNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -490,14 +813,10 @@ export function BuilderTreeSidebar({
               <select
                 value={newParentId}
                 onChange={(e) => setNewParentId(e.target.value)}
-                className="w-full h-7 rounded-[2px] bg-neutral-900 border border-border/50 text-xs px-2 text-foreground"
+                className="w-full h-7 rounded-[2px] bg-neutral-900 border border-border/50 text-xs px-2 text-foreground font-sans"
               >
                 <option value="">— Hlavná úroveň (Kapitola) —</option>
-                {localTree.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {getTitle(p)}
-                  </option>
-                ))}
+                {renderParentOptions(localTree)}
               </select>
             </div>
           )}
@@ -596,378 +915,14 @@ export function BuilderTreeSidebar({
         </form>
       )}
 
-      {/* Pages Tree Navigation */}
-      <nav className="space-y-1 overflow-y-auto max-h-[calc(100vh-280px)] pr-1 select-none">
+      {/* Pages Tree Navigation (Recursive N-Level) */}
+      <nav className="space-y-0.5 overflow-y-auto max-h-[calc(100vh-280px)] pr-1 select-none">
         {localTree.length === 0 ? (
           <div className="p-4 text-center text-xs text-muted-foreground">
             Žiadne stránky. Kliknite na <strong>+ Pridať</strong> pre vytvorenie prvej podstránky.
           </div>
         ) : (
-          localTree.map((node) => {
-            const isDragging = draggedId === node.id;
-            const isTarget = dropTarget?.id === node.id;
-            const isInsideTarget = isTarget && dropTarget?.position === "inside";
-            const isBeforeTarget = isTarget && dropTarget?.position === "before";
-            const isAfterTarget = isTarget && dropTarget?.position === "after";
-            const isDuplicatingThis = duplicatingId === node.id;
-
-            return (
-              <div key={node.id} className="relative space-y-1">
-                {/* Visual line indicator before */}
-                {isBeforeTarget && (
-                  <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
-                )}
-
-                {/* Level 1 Chapter Item */}
-                <div
-                  draggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", node.id);
-                    e.dataTransfer.effectAllowed = "move";
-                    setDraggedId(node.id);
-                  }}
-                  onDragEnd={() => {
-                    setDraggedId(null);
-                    setDropTarget(null);
-                  }}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!draggedId || draggedId === node.id) return;
-
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const offsetY = e.clientY - rect.top;
-                    const height = rect.height;
-
-                    const draggedHasChildren = nodeHasChildren(draggedId);
-
-                    let pos: "before" | "after" | "inside";
-                    if (!draggedHasChildren) {
-                      if (offsetY < height * 0.25) pos = "before";
-                      else if (offsetY > height * 0.75) pos = "after";
-                      else pos = "inside";
-                    } else {
-                      if (offsetY < height * 0.5) pos = "before";
-                      else pos = "after";
-                    }
-
-                    setDropTarget({ id: node.id, position: pos });
-                  }}
-                  onDragLeave={() => {
-                    if (dropTarget?.id === node.id) {
-                      setDropTarget(null);
-                    }
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if (!draggedId || !dropTarget || draggedId === dropTarget.id) return;
-                    handleTreeDrop(draggedId, dropTarget.id, dropTarget.position);
-                    setDraggedId(null);
-                    setDropTarget(null);
-                  }}
-                  className={`group relative flex items-center justify-between px-2 py-1.5 rounded-[2px] text-xs transition-all ${
-                    isDragging
-                      ? "opacity-30 border border-dashed border-primary"
-                      : isInsideTarget
-                      ? "bg-primary/20 ring-2 ring-primary ring-inset"
-                      : currentPageId === node.id
-                      ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-                      : "text-foreground hover:bg-neutral-800/40"
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                    {/* Drag handle */}
-                    <div
-                      title="Uchopiť a presunúť"
-                      className="cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-foreground shrink-0 p-0.5"
-                    >
-                      <GripVertical className="h-3 w-3" />
-                    </div>
-
-                    <Link
-                      href={`/admin/brand/${brandId}/builder/${node.id}`}
-                      className="flex items-center gap-1.5 flex-1 truncate"
-                    >
-                      <FileText className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0" />
-                      <span className="truncate">{getTitle(node)}</span>
-                    </Link>
-                  </div>
-
-                  {/* Actions & Context Menu */}
-                  <div className="flex items-center gap-1">
-                    {node.menuStyle === "hidden" && (
-                      <span title="Skryté vo verejnom menu">
-                        <EyeOff className="h-3 w-3 text-muted-foreground/60 mr-1" />
-                      </span>
-                    )}
-
-                    {isDuplicatingThis ? (
-                      <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                    ) : (
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMenuId(activeMenuId === node.id ? null : node.id);
-                          }}
-                          className="p-1 hover:text-foreground text-muted-foreground/60 hover:bg-neutral-800 rounded-[2px] transition-colors"
-                          title="Možnosti stránky"
-                        >
-                          <MoreVertical className="h-3.5 w-3.5" />
-                        </button>
-
-                        {/* Dropdown Menu */}
-                        {activeMenuId === node.id && (
-                          <div
-                            ref={menuRef}
-                            className="absolute right-0 top-full mt-1 w-44 bg-neutral-900 border border-border/80 rounded-[3px] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
-                          >
-                            <button
-                              type="button"
-                              onClick={() => handleOpenAddSubpage(node.id)}
-                              className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                            >
-                              <FolderPlus className="h-3.5 w-3.5 text-primary" />
-                              <span>Pridať podstránku</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleOpenRename(node)}
-                              className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                            >
-                              <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
-                              <span>Premenovať</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDuplicatePage(node.id)}
-                              className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                            >
-                              <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                              <span>Duplikovať</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleToggleVisibility(node.id)}
-                              className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                            >
-                              {node.menuStyle === "hidden" ? (
-                                <>
-                                  <Eye className="h-3.5 w-3.5 text-emerald-400" />
-                                  <span>Zobraziť v menu</span>
-                                </>
-                              ) : (
-                                <>
-                                  <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                                  <span>Skryť v menu</span>
-                                </>
-                              )}
-                            </button>
-
-                            <div className="my-1 border-t border-border/40" />
-
-                            <button
-                              type="button"
-                              onClick={() => handleDeletePage(node.id, getTitle(node))}
-                              className="w-full text-left px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-950/40 flex items-center gap-2"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              <span>Zmazať kapitolu</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Visual line indicator after */}
-                {isAfterTarget && (
-                  <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
-                )}
-
-                {/* Level 2 Sub-Pages */}
-                {node.children && node.children.length > 0 && (
-                  <div className="pl-3.5 border-l border-border/30 space-y-1 ml-2.5">
-                    {node.children.map((child) => {
-                      const isChildDragging = draggedId === child.id;
-                      const isChildTarget = dropTarget?.id === child.id;
-                      const isChildBeforeTarget =
-                        isChildTarget && dropTarget?.position === "before";
-                      const isChildAfterTarget =
-                        isChildTarget && dropTarget?.position === "after";
-                      const isDuplicatingChild = duplicatingId === child.id;
-
-                      return (
-                        <div key={child.id} className="relative space-y-1">
-                          {isChildBeforeTarget && (
-                            <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
-                          )}
-
-                          <div
-                            draggable={true}
-                            onDragStart={(e) => {
-                              e.dataTransfer.setData("text/plain", child.id);
-                              e.dataTransfer.effectAllowed = "move";
-                              setDraggedId(child.id);
-                            }}
-                            onDragEnd={() => {
-                              setDraggedId(null);
-                              setDropTarget(null);
-                            }}
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (!draggedId || draggedId === child.id) return;
-
-                              const rect = e.currentTarget.getBoundingClientRect();
-                              const offsetY = e.clientY - rect.top;
-                              const height = rect.height;
-
-                              // Children can only have before or after
-                              const pos = offsetY < height * 0.5 ? "before" : "after";
-                              setDropTarget({ id: child.id, position: pos });
-                            }}
-                            onDragLeave={() => {
-                              if (dropTarget?.id === child.id) {
-                                setDropTarget(null);
-                              }
-                            }}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (!draggedId || !dropTarget || draggedId === dropTarget.id) return;
-                              handleTreeDrop(draggedId, dropTarget.id, dropTarget.position);
-                              setDraggedId(null);
-                              setDropTarget(null);
-                            }}
-                            className={`group relative flex items-center justify-between px-2 py-1 rounded-[2px] text-xs transition-all ${
-                              isChildDragging
-                                ? "opacity-30 border border-dashed border-primary"
-                                : currentPageId === child.id
-                                ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-                                : "text-foreground hover:bg-neutral-800/40"
-                            }`}
-                          >
-                            <div className="flex items-center gap-1 flex-1 min-w-0">
-                              <div
-                                title="Uchopiť a presunúť"
-                                className="cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-foreground shrink-0 p-0.5"
-                              >
-                                <GripVertical className="h-3 w-3" />
-                              </div>
-
-                              <Link
-                                href={`/admin/brand/${brandId}/builder/${child.id}`}
-                                className="flex items-center gap-1.5 flex-1 truncate"
-                              >
-                                <ChevronRight className="h-3 w-3 text-muted-foreground shrink-0" />
-                                <span className="truncate">{getTitle(child)}</span>
-                              </Link>
-                            </div>
-
-                            {/* Subpage Actions */}
-                            <div className="flex items-center gap-1">
-                              {child.menuStyle === "hidden" && (
-                                <span title="Skryté vo verejnom menu">
-                                  <EyeOff className="h-3 w-3 text-muted-foreground/60 mr-1" />
-                                </span>
-                              )}
-
-                              {isDuplicatingChild ? (
-                                <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                              ) : (
-                                <div className="relative">
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActiveMenuId(
-                                        activeMenuId === child.id ? null : child.id
-                                      );
-                                    }}
-                                    className="p-1 hover:text-foreground text-muted-foreground/60 hover:bg-neutral-800 rounded-[2px] transition-colors"
-                                    title="Možnosti podstránky"
-                                  >
-                                    <MoreVertical className="h-3.5 w-3.5" />
-                                  </button>
-
-                                  {activeMenuId === child.id && (
-                                    <div
-                                      ref={menuRef}
-                                      className="absolute right-0 top-full mt-1 w-44 bg-neutral-900 border border-border/80 rounded-[3px] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
-                                    >
-                                      <button
-                                        type="button"
-                                        onClick={() => handleOpenRename(child)}
-                                        className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                                      >
-                                        <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
-                                        <span>Premenovať</span>
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => handleDuplicatePage(child.id)}
-                                        className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                                      >
-                                        <Copy className="h-3.5 w-3.5 text-muted-foreground" />
-                                        <span>Duplikovať</span>
-                                      </button>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => handleToggleVisibility(child.id)}
-                                        className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
-                                      >
-                                        {child.menuStyle === "hidden" ? (
-                                          <>
-                                            <Eye className="h-3.5 w-3.5 text-emerald-400" />
-                                            <span>Zobraziť v menu</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
-                                            <span>Skryť v menu</span>
-                                          </>
-                                        )}
-                                      </button>
-
-                                      <div className="my-1 border-t border-border/40" />
-
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleDeletePage(child.id, getTitle(child))
-                                        }
-                                        className="w-full text-left px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-950/40 flex items-center gap-2"
-                                      >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                        <span>Zmazať podstránku</span>
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          {isChildAfterTarget && (
-                            <div className="h-0.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)] my-0.5" />
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })
+          localTree.map((rootNode) => renderTreeNode(rootNode, 0))
         )}
       </nav>
 

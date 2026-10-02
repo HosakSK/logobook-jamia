@@ -112,26 +112,23 @@ export async function getBrandPagesAction(brandId: string): Promise<{
       };
     });
 
-    // Build hierarchical tree
-    const rootNodes: PageHierarchyItem[] = [];
-    const childrenMap = new Map<string, PageHierarchyItem[]>();
-
+    // Build arbitrary N-level hierarchical tree
+    const nodeMap = new Map<string, PageHierarchyItem>();
     pages.forEach((p) => {
-      const node: PageHierarchyItem = { ...p, children: [] };
-      if (!p.parent) {
-        rootNodes.push(node);
-      } else {
-        if (!childrenMap.has(p.parent)) {
-          childrenMap.set(p.parent, []);
-        }
-        childrenMap.get(p.parent)!.push(node);
-      }
+      nodeMap.set(p.id, { ...p, children: [] });
     });
 
-    // Attach children to roots
-    rootNodes.forEach((root) => {
-      if (childrenMap.has(root.id)) {
-        root.children = childrenMap.get(root.id);
+    const rootNodes: PageHierarchyItem[] = [];
+    pages.forEach((p) => {
+      const node = nodeMap.get(p.id)!;
+      if (p.parent && nodeMap.has(p.parent)) {
+        const parentNode = nodeMap.get(p.parent)!;
+        if (!parentNode.children) {
+          parentNode.children = [];
+        }
+        parentNode.children.push(node);
+      } else {
+        rootNodes.push(node);
       }
     });
 
