@@ -46,11 +46,11 @@ export function BrandSwitcher({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-[3px] border border-border bg-card hover:bg-elevated transition-colors text-left shadow-2xs cursor-pointer"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all text-left cursor-pointer"
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2.5 truncate">
-          <div className="h-6 w-6 rounded-[3px] bg-primary text-primary-foreground flex items-center justify-center font-bold text-[10px] shrink-0 shadow-2xs">
+          <div className="h-6 w-6 rounded-md bg-primary text-black flex items-center justify-center font-bold text-[10px] shrink-0 shadow-[0_0_10px_rgba(200,212,0,0.15)]">
             {currentBrand.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="truncate">
@@ -66,26 +66,26 @@ export function BrandSwitcher({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-1.5 w-64 rounded-[3px] shadow-lg bg-surface border border-border z-50 py-1.5 animate-in fade-in-50 zoom-in-95">
-          <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="absolute left-0 mt-1.5 w-64 rounded-xl shadow-2xl bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] z-50 p-1.5 animate-in fade-in-50 zoom-in-95">
+          <div className="px-2.5 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
             {dict.admin.brandsListTitle}
           </div>
 
-          <div className="py-1">
+          <div className="py-1 space-y-0.5">
             {availableBrands.map((brand) => {
               const isSelected = activeBrand?.id === brand.id;
               return (
                 <button
                   key={brand.id}
                   onClick={() => handleSelect(brand)}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-lg transition-colors cursor-pointer ${
                     isSelected
-                      ? "bg-elevated text-primary font-semibold"
-                      : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
+                      ? "bg-primary/10 text-primary font-semibold border border-primary/20"
+                      : "text-muted-foreground hover:bg-white/[0.05] hover:text-white"
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <div className="h-5 w-5 rounded-[3px] bg-secondary border border-border flex items-center justify-center font-bold text-[9px]">
+                    <div className="h-5 w-5 rounded-md bg-white/[0.06] border border-white/[0.08] flex items-center justify-center font-bold text-[9px] text-foreground">
                       {brand.name.slice(0, 2).toUpperCase()}
                     </div>
                     <span className="truncate">{brand.name}</span>
@@ -96,12 +96,12 @@ export function BrandSwitcher({
             })}
           </div>
 
-          <div className="border-t border-border pt-1.5 mt-1 px-1">
+          <div className="border-t border-white/[0.08] pt-1.5 mt-1">
             <Link
               href={`/m/${currentBrand.slug}`}
               target="_blank"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-elevated rounded-[3px] transition-colors"
+              className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>{dict.admin.viewLiveManual}</span>

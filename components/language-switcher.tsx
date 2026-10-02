@@ -59,37 +59,39 @@ export function LanguageSwitcher({ currentLocale = DEFAULT_LOCALE, className = "
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors shadow-xs"
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] text-muted-foreground hover:text-white transition-all cursor-pointer"
         aria-expanded={isOpen}
       >
         <span className="text-sm">{currentMeta.flag}</span>
-        <span className="uppercase font-semibold tracking-wider">{currentLocale}</span>
-        <Globe className="w-3.5 h-3.5 text-neutral-400" />
+        <span className="uppercase font-semibold tracking-wider font-mono text-[11px]">{currentLocale}</span>
+        <Globe className="w-3.5 h-3.5 text-muted-foreground/70" />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1.5 w-36 rounded-md shadow-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 z-50 py-1">
-          {SUPPORTED_LOCALES.map((locale) => {
-            const meta = LOCALE_METADATA[locale];
-            const isSelected = locale === currentLocale;
-            return (
-              <button
-                key={locale}
-                onClick={() => handleSelectLocale(locale)}
-                className={`w-full text-left px-3 py-1.5 text-xs flex items-center justify-between transition-colors ${
-                  isSelected
-                    ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 font-semibold"
-                    : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span>{meta.flag}</span>
-                  <span>{meta.nativeName}</span>
-                </div>
-                <span className="uppercase text-[10px] text-neutral-400">{locale}</span>
-              </button>
-            );
-          })}
+        <div className="absolute right-0 mt-1.5 w-36 rounded-xl shadow-2xl bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] z-50 p-1 animate-in fade-in-50 zoom-in-95">
+          <div className="space-y-0.5">
+            {SUPPORTED_LOCALES.map((locale) => {
+              const meta = LOCALE_METADATA[locale];
+              const isSelected = locale === currentLocale;
+              return (
+                <button
+                  key={locale}
+                  onClick={() => handleSelectLocale(locale)}
+                  className={`w-full text-left px-2.5 py-1.5 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
+                    isSelected
+                      ? "bg-primary/10 text-primary font-semibold border border-primary/20"
+                      : "text-muted-foreground hover:bg-white/[0.05] hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{meta.flag}</span>
+                    <span className="text-xs">{meta.nativeName}</span>
+                  </div>
+                  <span className="uppercase text-[10px] font-mono text-muted-foreground/60">{locale}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

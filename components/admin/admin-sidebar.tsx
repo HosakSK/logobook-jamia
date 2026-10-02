@@ -113,7 +113,7 @@ export function AdminSidebar({
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-card border-r border-border w-64 p-5 space-y-6">
+    <div className="flex flex-col h-full bg-[#080d14] border-r border-white/[0.08] w-64 p-5 space-y-6">
       {/* Brand Switcher Header */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -121,9 +121,9 @@ export function AdminSidebar({
           {onMobileClose && (
             <button
               onClick={onMobileClose}
-              className="md:hidden p-1 rounded-[3px] text-muted-foreground hover:text-foreground"
+              className="md:hidden p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-white/[0.05] transition-colors"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -138,7 +138,7 @@ export function AdminSidebar({
           <div className="px-2.5 py-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
             <span>{dict.admin.brandSection}</span>
             {activeBrand && (
-              <span className="text-[9px] font-mono text-[#009f80] font-bold bg-[#009f80]/10 border border-[#009f80]/30 px-1.5 py-0.5 rounded-[3px]">
+              <span className="text-[9px] font-mono text-[#009f80] font-bold bg-[#009f80]/15 border border-[#009f80]/30 px-2 py-0.5 rounded-full">
                 ACTIVE
               </span>
             )}
@@ -153,10 +153,10 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[3px] text-xs font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-elevated text-primary font-semibold border border-primary/30"
-                    : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
+                    ? "bg-primary/10 text-primary font-semibold border border-primary/25 shadow-[0_0_15px_rgba(200,212,0,0.08)]"
+                    : "text-muted-foreground hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -181,10 +181,10 @@ export function AdminSidebar({
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-[3px] text-xs font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-elevated text-primary font-semibold border border-primary/30"
-                    : "text-muted-foreground hover:bg-elevated/60 hover:text-foreground"
+                    ? "bg-primary/10 text-primary font-semibold border border-primary/25 shadow-[0_0_15px_rgba(200,212,0,0.08)]"
+                    : "text-muted-foreground hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -196,9 +196,9 @@ export function AdminSidebar({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground">
+      <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-muted-foreground">
         <VersionChecker />
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60">Logobook Studio</span>
+        <span className="text-[10px] uppercase tracking-wider text-muted-foreground/60 font-mono">Logobook Studio</span>
       </div>
     </div>
   );

@@ -111,14 +111,14 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
   ];
 
   return (
-    <section id="cennik" className="py-20 md:py-32 border-t border-border/80 relative">
+    <section id="cennik" className="py-24 md:py-36 border-t border-white/[0.06] relative">
       <div className="container mx-auto px-4 sm:px-8 max-w-7xl">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[3px] bg-secondary border border-border text-xs font-semibold text-primary uppercase tracking-wider">
+        <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary uppercase tracking-wider">
             <span>Cenové balíčky</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground text-gradient-white">
             {dict.marketing.pricingTitle}
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground font-light leading-relaxed">
@@ -126,11 +126,11 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
           </p>
 
           {/* Billing Switcher */}
-          <div className="pt-4 flex items-center justify-center gap-3">
+          <div className="pt-6 flex items-center justify-center gap-4">
             <span
               onClick={() => setIsYearly(false)}
               className={`text-xs font-semibold cursor-pointer transition-colors ${
-                !isYearly ? "text-foreground font-bold" : "text-muted-foreground"
+                !isYearly ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {dict.marketing.billingMonthly}
@@ -139,11 +139,11 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
             <button
               type="button"
               onClick={() => setIsYearly(!isYearly)}
-              className="relative w-12 h-6 rounded-full bg-surface border border-border p-0.5 transition-colors focus:outline-hidden cursor-pointer"
+              className="relative w-13 h-7 rounded-full bg-white/[0.06] border border-white/10 p-0.5 transition-colors focus:outline-hidden cursor-pointer"
               aria-label="Prepnúť fakturačný cyklus"
             >
               <span
-                className={`block w-5 h-5 rounded-full bg-primary transition-transform ${
+                className={`block w-6 h-6 rounded-full bg-gradient-to-b from-[#d8e600] to-[#b6c400] shadow-[0_2px_8px_rgba(200,212,0,0.4)] transition-transform duration-200 ${
                   isYearly ? "translate-x-6" : "translate-x-0"
                 }`}
               />
@@ -151,12 +151,12 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
 
             <span
               onClick={() => setIsYearly(true)}
-              className={`text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors ${
-                isYearly ? "text-foreground font-bold" : "text-muted-foreground"
+              className={`text-xs font-semibold cursor-pointer flex items-center gap-2 transition-colors ${
+                isYearly ? "text-foreground font-bold" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <span>{dict.marketing.billingYearly}</span>
-              <span className="px-1.5 py-0.5 rounded-[3px] bg-primary/20 text-primary font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold text-[10px] border border-primary/30">
                 {dict.marketing.saveDiscount}
               </span>
             </span>
@@ -171,31 +171,31 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-[3px] p-6 flex flex-col justify-between transition-all duration-200 ${
+                className={`relative rounded-2xl p-7 flex flex-col justify-between transition-all duration-200 backdrop-blur-xl ${
                   tier.highlight
-                    ? "bg-raised border-2 border-primary shadow-xl shadow-primary/10 -translate-y-1"
-                    : "bg-raised/70 border border-border hover:border-border/90"
+                    ? "bg-[#0f1724]/90 border-2 border-primary shadow-[0_16px_48px_rgba(200,212,0,0.18),inset_0_1px_0_rgba(255,255,255,0.2)] -translate-y-1.5"
+                    : "bg-[#0c121b]/80 border border-white/10 hover:border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
                 }`}
               >
                 {/* Popular or White-Label Badge */}
                 {tier.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-[3px] bg-primary text-primary-foreground text-[10px] font-extrabold uppercase tracking-wider shadow-sm">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#d8e600] to-[#b6c400] text-[#05080c] text-[10px] font-black uppercase tracking-wider shadow-[0_2px_12px_rgba(200,212,0,0.4)]">
                     {tier.badge}
                   </div>
                 )}
 
                 <div>
                   {/* Title & Description */}
-                  <div className="mb-4">
+                  <div className="mb-5">
                     <h3 className="text-xl font-bold text-foreground">{tier.name}</h3>
-                    <p className="text-xs text-muted-foreground min-h-[32px] mt-1 font-light leading-relaxed">
+                    <p className="text-xs text-muted-foreground min-h-[34px] mt-1 font-light leading-relaxed">
                       {tier.description}
                     </p>
                   </div>
 
                   {/* Price */}
-                  <div className="mb-6 pb-6 border-b border-border/80">
-                    <div className="flex items-baseline gap-1">
+                  <div className="mb-6 pb-6 border-b border-white/[0.08]">
+                    <div className="flex items-baseline gap-1.5">
                       <span className="text-4xl font-extrabold text-foreground tracking-tight">
                         {price} €
                       </span>
@@ -204,25 +204,25 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
                       </span>
                     </div>
                     {tier.priceMonthly > 0 && (
-                      <div className="text-[11px] text-muted-foreground mt-1">
+                      <div className="text-[11px] text-muted-foreground/80 mt-1 font-mono">
                         {isYearly ? dict.marketing.billedAnnually : dict.marketing.billedMonthly}
                       </div>
                     )}
                   </div>
 
                   {/* Feature Checklist */}
-                  <div className="space-y-2.5 mb-8 text-xs">
-                    <div className="text-[11px] uppercase font-bold text-muted-foreground/80 tracking-wider">
+                  <div className="space-y-3 mb-8 text-xs">
+                    <div className="text-[11px] uppercase font-bold text-muted-foreground/70 tracking-wider">
                       V balíku je zahrnuté:
                     </div>
                     {tier.features.map((f, i) => (
-                      <div key={i} className="flex items-start gap-2 text-foreground/90">
+                      <div key={i} className="flex items-start gap-2.5 text-foreground/90">
                         <Check className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                         <span className="leading-snug">{f}</span>
                       </div>
                     ))}
                     {tier.notIncluded.map((f, i) => (
-                      <div key={i} className="flex items-start gap-2 text-muted-foreground/40 line-through">
+                      <div key={i} className="flex items-start gap-2.5 text-muted-foreground/35 line-through">
                         <span className="w-3.5 h-3.5 shrink-0 text-center leading-none">—</span>
                         <span className="leading-snug">{f}</span>
                       </div>
@@ -234,10 +234,10 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
                 <div className="pt-2">
                   <Link
                     href={tier.href}
-                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[3px] text-xs font-bold transition-all ${
+                    className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold transition-all active:scale-[0.98] ${
                       tier.highlight
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
-                        : "bg-surface border border-border hover:bg-surface/80 text-foreground"
+                        ? "bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#05080c] hover:brightness-105 shadow-[0_4px_18px_rgba(200,212,0,0.35)]"
+                        : "bg-white/[0.04] border border-white/10 hover:border-white/20 hover:bg-white/[0.08] text-foreground"
                     }`}
                   >
                     <span>{tier.ctaText}</span>
@@ -250,7 +250,7 @@ export function PricingSection({ currentLocale }: PricingSectionProps) {
         </div>
 
         {/* Security & Lemon Squeezy trust badge */}
-        <div className="mt-12 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+        <div className="mt-14 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
           <ShieldCheck className="w-4 h-4 text-primary" />
           <span>
             Bezpečné platby zabezpečuje Merchant of Record Lemon Squeezy s automatickým vystavením daňových dokladov (DPH).

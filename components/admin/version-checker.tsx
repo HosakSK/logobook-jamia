@@ -6,7 +6,7 @@ import { checkAppVersionAction, type VersionCheckResult } from "@/actions/versio
 import packageJson from "@/package.json";
 
 export function VersionChecker() {
-  const currentAppVersion = packageJson.version || "0.0.1.58";
+  const currentAppVersion = packageJson.version || "0.0.1.61";
   const [data, setData] = useState<VersionCheckResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -54,7 +54,7 @@ export function VersionChecker() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="group flex items-center gap-1.5 font-mono text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/40 px-2 py-0.5 rounded-[3px] transition-all cursor-pointer shadow-xs"
+          className="group flex items-center gap-1.5 font-mono text-[11px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/40 px-2.5 py-0.5 rounded-full transition-all cursor-pointer shadow-[0_0_12px_rgba(200,212,0,0.15)]"
           title={`Dostupná aktualizácia: v${latestVersion}`}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping shrink-0" />
@@ -66,17 +66,17 @@ export function VersionChecker() {
       {/* Modal with update details and instructions */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-lg bg-raised border border-border rounded-[3px] shadow-2xl p-6 text-foreground animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-lg bg-[#0e1520]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-6 text-foreground animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-border">
+            <div className="flex items-start justify-between gap-4 pb-4 border-b border-white/[0.08]">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-[3px] bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0 shadow-[0_0_15px_rgba(200,212,0,0.15)]">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
@@ -91,7 +91,7 @@ export function VersionChecker() {
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded-[3px] hover:bg-surface transition-colors"
+                className="text-muted-foreground hover:text-white p-1.5 rounded-lg hover:bg-white/[0.05] transition-colors"
                 title="Zavrieť"
               >
                 <X className="w-4 h-4" />
@@ -100,7 +100,7 @@ export function VersionChecker() {
 
             {/* Version comparison */}
             <div className="my-5 grid grid-cols-2 gap-3">
-              <div className="bg-surface/60 border border-border/80 p-3 rounded-[3px]">
+              <div className="bg-white/[0.03] border border-white/[0.08] p-3.5 rounded-xl">
                 <div className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-1">
                   Nainštalovaná verzia
                 </div>
@@ -109,7 +109,7 @@ export function VersionChecker() {
                   v{currentVersion}
                 </div>
               </div>
-              <div className="bg-primary/10 border border-primary/40 p-3 rounded-[3px]">
+              <div className="bg-primary/10 border border-primary/30 p-3.5 rounded-xl shadow-[0_0_20px_rgba(200,212,0,0.08)]">
                 <div className="text-[10px] uppercase font-bold text-primary tracking-wider mb-1">
                   Nová dostupná verzia
                 </div>
@@ -124,14 +124,14 @@ export function VersionChecker() {
             {data?.releaseNotes && (
               <div className="mb-5">
                 <div className="text-xs font-semibold text-foreground mb-1.5">Poznámky k vydaniu:</div>
-                <div className="max-h-36 overflow-y-auto bg-abyss border border-border p-3 rounded-[3px] font-mono text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                <div className="max-h-36 overflow-y-auto bg-black/40 border border-white/[0.08] p-3 rounded-xl font-mono text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
                   {data.releaseNotes}
                 </div>
               </div>
             )}
 
             {/* Update instructions */}
-            <div className="mb-6 bg-surface/40 border border-border/60 p-4 rounded-[3px] text-xs space-y-2.5">
+            <div className="mb-6 bg-white/[0.02] border border-white/[0.08] p-4 rounded-xl text-xs space-y-2.5">
               <div className="font-semibold text-foreground flex items-center gap-1.5">
                 <GitFork className="w-3.5 h-3.5 text-primary" />
                 Ako aktualizovať váš self-hosted Logobook:
@@ -147,7 +147,7 @@ export function VersionChecker() {
                 </li>
                 <li>
                   Ak bežíte lokálne cez <strong className="text-foreground">Docker Compose</strong>, spustite v termináli:
-                  <div className="mt-1 bg-abyss px-2.5 py-1 rounded-[3px] font-mono text-[10px] text-primary border border-border/60">
+                  <div className="mt-1 bg-black/60 px-3 py-1.5 rounded-lg font-mono text-[10px] text-primary border border-white/[0.08]">
                     git pull && docker compose up -d --build
                   </div>
                 </li>
@@ -159,7 +159,7 @@ export function VersionChecker() {
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="px-3.5 py-2 rounded-[3px] border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg border border-white/[0.08] text-xs font-medium text-muted-foreground hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
               >
                 Zavrieť
               </button>
@@ -167,7 +167,7 @@ export function VersionChecker() {
                 href={releaseUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[3px] bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-black font-semibold text-xs hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)] cursor-pointer"
               >
                 <span>Pozrieť Release na GitHub</span>
                 <ExternalLink className="w-3.5 h-3.5" />

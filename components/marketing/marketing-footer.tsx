@@ -12,9 +12,9 @@ export function MarketingFooter({ currentLocale }: MarketingFooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-abyss py-12 md:py-16 text-muted-foreground text-xs">
+    <footer className="border-t border-white/[0.08] bg-[#05080c] py-14 md:py-16 text-muted-foreground text-xs">
       <div className="container mx-auto px-4 sm:px-8 max-w-6xl space-y-10">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-border/60">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-white/[0.08]">
           {/* Logo & Slogan */}
           <div className="space-y-2">
             <Logo variant="full" mode="dark" href="/" />
