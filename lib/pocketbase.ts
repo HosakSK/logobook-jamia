@@ -9,13 +9,16 @@ const pbUrl =
  * Returns a new PocketBase instance (suitable for server components / server actions)
  */
 export function getPocketBase() {
-  return new PocketBase(pbUrl);
+  const pb = new PocketBase(pbUrl);
+  pb.autoCancellation(false);
+  return pb;
 }
 
 /**
  * Shared singleton instance for client-side usage
  */
 export const pb = new PocketBase(pbUrl);
+pb.autoCancellation(false);
 
 /**
  * Generates direct URL for files stored in PocketBase collections

@@ -12,6 +12,7 @@ const pbUrl =
  */
 export async function getServerPocketBase() {
   const pb = new PocketBase(pbUrl);
+  pb.autoCancellation(false);
   const cookieStore = await cookies();
   const authCookie = cookieStore.get("pb_auth");
 
@@ -88,6 +89,7 @@ export async function clearPocketBaseCookie() {
  */
 export async function getAdminPocketBase(): Promise<PocketBase> {
   const pb = new PocketBase(pbUrl);
+  pb.autoCancellation(false);
   const email = process.env.POCKETBASE_ADMIN_EMAIL;
   const password = process.env.POCKETBASE_ADMIN_PASSWORD;
 

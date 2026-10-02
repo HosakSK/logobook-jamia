@@ -32,7 +32,7 @@ export default async function BrandBuilderPageDetail({
   const pagesRes = await getBrandPagesAction(resolvedBrandId);
 
   // Load page detail
-  const pageRes = await getPageDetailAction(pageId);
+  const pageRes = await getPageDetailAction(pageId, resolvedBrandId);
   if (!pageRes.success || !pageRes.page) {
     if (pagesRes.pages.length > 0 && pagesRes.pages[0].id !== pageId) {
       redirect(`/admin/brand/${resolvedBrandId}/builder/${pagesRes.pages[0].id}`);

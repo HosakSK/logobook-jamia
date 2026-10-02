@@ -154,7 +154,10 @@ export async function getBrandPagesAction(brandId: string): Promise<{
 /**
  * Fetches full details for a single page including containers, columns, and modules.
  */
-export async function getPageDetailAction(pageId: string): Promise<{
+export async function getPageDetailAction(
+  pageId: string,
+  brandId?: string
+): Promise<{
   success: boolean;
   page?: PageDetail;
   error?: string;
@@ -170,7 +173,10 @@ export async function getPageDetailAction(pageId: string): Promise<{
       pageRecord = await pb.collection("pages").getOne(pageId);
     } catch {
       try {
-        pageRecord = await pb.collection("pages").getFirstListItem(`id = "${pageId}" || slug = "${pageId}"`);
+        const filter = brandId
+          ? `(id = "${pageId}" || slug = "${pageId}") && brand = "${brandId}"`
+          : `id = "${pageId}" || slug = "${pageId}"`;
+        pageRecord = await pb.collection("pages").getFirstListItem(filter);
       } catch {
         return { success: false, error: "Stránka nebola nájdená." };
       }
