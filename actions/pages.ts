@@ -61,8 +61,16 @@ export async function getBrandPagesAction(brandId: string): Promise<{
       return { success: false, pages: [], tree: [], error: "Unauthorized session." };
     }
 
+    let targetBrandId = brandId;
+    try {
+      const b = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+      targetBrandId = b.id;
+    } catch {
+      // fallback
+    }
+
     const records = await pb.collection("pages").getFullList({
-      filter: `brand = "${brandId}"`,
+      filter: `brand = "${targetBrandId}"`,
       sort: "order",
     });
 

@@ -25,6 +25,14 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
   try {
     const pb = await getServerPocketBase();
 
+    let targetBrandId = brandId;
+    try {
+      const b = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+      targetBrandId = b.id;
+    } catch {
+      // fallback
+    }
+
     let shapes: GlobalShapesRecord | null = null;
     let colors: GlobalColorsRecord[] = [];
     let typography: GlobalTypographyRecord[] = [];
@@ -33,7 +41,7 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
     try {
       shapes = await pb
         .collection("globalShapes")
-        .getFirstListItem<GlobalShapesRecord>(`brand = "${brandId}"`);
+        .getFirstListItem<GlobalShapesRecord>(`brand = "${targetBrandId}"`);
     } catch {
       // Shapes record not yet created -> defaults apply
     }
@@ -41,7 +49,7 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
     // 2. Fetch global colors
     try {
       colors = await pb.collection("globalColors").getFullList<GlobalColorsRecord>({
-        filter: `brand = "${brandId}"`,
+        filter: `brand = "${targetBrandId}"`,
         sort: "order",
       });
     } catch {
@@ -53,7 +61,7 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
       typography = await pb
         .collection("globalTypography")
         .getFullList<GlobalTypographyRecord>({
-          filter: `brand = "${brandId}"`,
+          filter: `brand = "${targetBrandId}"`,
           sort: "order",
         });
     } catch {

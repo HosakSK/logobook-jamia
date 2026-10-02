@@ -41,7 +41,14 @@ export function AdminSidebar({
   const dict = getDictionary(locale);
   const { activeBrand } = useBrandStore();
 
-  const brandId = activeBrand?.id || "demo";
+  // Extract brandId directly from URL pathname if in brand context (/admin/brand/[brandId]/...)
+  const pathMatch = pathname.match(/^\/admin\/brand\/([^/]+)/);
+  const pathBrandId = pathMatch ? pathMatch[1] : null;
+  const brandId =
+    pathBrandId ||
+    activeBrand?.id ||
+    (availableBrands && availableBrands.length > 0 ? availableBrands[0].id : "demo");
+
   const isInBrandContext = pathname.startsWith("/admin/brand/") || activeBrand !== null;
 
   const globalNav = [
