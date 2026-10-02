@@ -111,6 +111,8 @@ export function PublishedManualView({
       {/* Recursive Page Tree & Container Grid Renderer */}
       <PageRenderer
         page={activePage}
+        allPages={pages}
+        brandSlug={brandSlug}
         locale={locale}
         brandName={snapshot.brand.name}
         showPageHeader={true}

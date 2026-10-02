@@ -67,6 +67,7 @@ export default async function BrandBuilderPageDetail({
           brandId={resolvedBrandId}
           brandSlug={brandSlug}
           page={pageRes.page}
+          allPages={pagesRes.pages}
         />
       </div>
     </BrandCascadeProvider>

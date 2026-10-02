@@ -28,8 +28,9 @@ import {
   ArrowRight,
   FileArchive,
 } from "lucide-react";
-import { PageDetail, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
+import { PageDetail, PageItem, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
+import { ChevronRight as ChevronRightIcon } from "lucide-react";
 import { InlineEditableText } from "./inline-editable-text";
 import { TemplateBrowserModal } from "./template-browser-modal";
 import { SaveTemplateModal } from "./save-template-modal";
@@ -59,6 +60,7 @@ interface BuilderCanvasProps {
   brandId: string;
   brandSlug: string;
   page: PageDetail;
+  allPages?: PageItem[];
 }
 
 const MODULE_OPTIONS = [
@@ -101,6 +103,7 @@ export function BuilderCanvas({
   brandId,
   brandSlug,
   page,
+  allPages,
 }: BuilderCanvasProps) {
   const router = useRouter();
 
@@ -131,6 +134,39 @@ export function BuilderCanvas({
 
   const [activeLocale, setActiveLocale] = useState<string>("en"); // English is primary by default!
   const pageTitle = page.title?.[activeLocale] || page.title?.en || page.title?.sk || "Untitled";
+
+  // Compute hierarchical ancestors for builder breadcrumbs
+  const breadcrumbs = React.useMemo(() => {
+    const items: Array<{ id: string; slug: string; title: string; href: string }> = [];
+
+    if (allPages && page.parent) {
+      const visited = new Set<string>();
+      let currParentId: string | undefined = page.parent;
+
+      while (currParentId && !visited.has(currParentId)) {
+        visited.add(currParentId);
+        const parentPage = allPages.find((p) => p.id === currParentId);
+        if (parentPage) {
+          const pTitle =
+            (parentPage.title as any)?.[activeLocale] ||
+            (parentPage.title as any)?.sk ||
+            (parentPage.title as any)?.en ||
+            (parentPage.title as any)?.cs ||
+            parentPage.slug;
+          items.unshift({
+            id: parentPage.id,
+            slug: parentPage.slug,
+            title: pTitle,
+            href: `/admin/brand/${brandSlug}/builder/${parentPage.slug || parentPage.id}`,
+          });
+          currParentId = parentPage.parent;
+        } else {
+          break;
+        }
+      }
+    }
+    return items;
+  }, [allPages, page.parent, brandSlug, activeLocale]);
 
   // Template Engine States
   const [isTemplateBrowserOpen, setIsTemplateBrowserOpen] = useState(false);
@@ -370,15 +406,32 @@ export function BuilderCanvas({
       {/* Page Header Bar */}
       <div className="border border-border/50 rounded-[3px] p-5 bg-card/60 shadow-2xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] bg-primary/10 text-primary border border-primary/20">
-                Aktívna Stránka
+          <div className="space-y-1.5">
+            {/* Clickable Ancestor Breadcrumb Trail */}
+            <nav aria-label="Drobková navigácia" className="flex flex-wrap items-center gap-1.5 text-xs font-mono text-muted-foreground">
+              <Link
+                href={`/admin/brand/${brandSlug}/builder`}
+                className="hover:text-foreground hover:underline transition-colors"
+              >
+                PageBuilder
+              </Link>
+              {breadcrumbs.map((crumb) => (
+                <React.Fragment key={crumb.id}>
+                  <ChevronRightIcon className="h-3 w-3 shrink-0 opacity-40" />
+                  <Link
+                    href={crumb.href}
+                    className="hover:text-foreground hover:underline transition-colors max-w-[160px] truncate"
+                    title={crumb.title}
+                  >
+                    {crumb.title}
+                  </Link>
+                </React.Fragment>
+              ))}
+              <ChevronRightIcon className="h-3 w-3 shrink-0 opacity-40" />
+              <span className="text-foreground font-semibold truncate max-w-[240px]">
+                {pageTitle}
               </span>
-              <span className="text-xs font-mono text-muted-foreground">
-                /m/{brandSlug}/{page.slug}
-              </span>
-            </div>
+            </nav>
 
             {/* Direct Inline Editing for H1 Page Title */}
             <InlineEditableText
