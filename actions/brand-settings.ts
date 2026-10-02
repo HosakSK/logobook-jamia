@@ -4,9 +4,19 @@ import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { brandGeneralSettingsSchema, globalShapesSchema } from "@/lib/validations/brand-settings";
 import { revalidatePath } from "next/cache";
 
-// Helper to check user permission on a brand
-async function verifyBrandAccess(pb: any, brandId: string, userId: string, requireOwner = false) {
-  const brand = await pb.collection("brands").getOne(brandId);
+// Helper to check user permission on a brand (accepts either PocketBase record ID or slug)
+async function verifyBrandAccess(pb: any, brandIdOrSlug: string, userId: string, requireOwner = false) {
+  let brand: any = null;
+  try {
+    brand = await pb.collection("brands").getOne(brandIdOrSlug);
+  } catch {
+    try {
+      brand = await pb.collection("brands").getFirstListItem(`slug = "${brandIdOrSlug}"`);
+    } catch {
+      throw new Error("You do not have access to this brand project.");
+    }
+  }
+
   const isOwner = brand.user === userId;
 
   if (requireOwner && !isOwner) {
@@ -17,7 +27,7 @@ async function verifyBrandAccess(pb: any, brandId: string, userId: string, requi
 
   try {
     const tm = await pb.collection("teamMembers").getFirstListItem(
-      `brand = "${brandId}" && user = "${userId}"`
+      `brand = "${brand.id}" && user = "${userId}"`
     );
     if (tm.role === "VIEWER") {
       throw new Error("Viewers do not have editing permissions.");
@@ -60,17 +70,14 @@ export async function updateBrandGeneralAction(
     }
 
     // 1. Tier Enforcement
-    // Custom domain requires COMPANY, FREELANCER, AGENCY, PLATINUM
     if (parsed.data.customDomain && parsed.data.customDomain.length > 0 && userTier === "FREE") {
       return { success: false, error: "Custom domain feature requires Company tier or higher." };
     }
 
-    // Password protection requires COMPANY, FREELANCER, AGENCY, PLATINUM
     if (parsed.data.password && parsed.data.password.length > 0 && userTier === "FREE") {
       return { success: false, error: "Password protection requires Company tier or higher." };
     }
 
-    // Whitelabel / Hide badge requires AGENCY, PLATINUM
     if (parsed.data.hideLogobookBadge && userTier !== "AGENCY" && userTier !== "PLATINUM") {
       return { success: false, error: "Hiding Logobook badge requires Agency or Platinum tier." };
     }
@@ -78,7 +85,7 @@ export async function updateBrandGeneralAction(
     // 2. Check slug uniqueness if changed
     if (parsed.data.slug !== brand.slug) {
       try {
-        const existing = await pb.collection("brands").getFirstListItem(`slug = "${parsed.data.slug}" && id != "${brandId}"`);
+        const existing = await pb.collection("brands").getFirstListItem(`slug = "${parsed.data.slug}" && id != "${brand.id}"`);
         if (existing) {
           return { success: false, error: "This subdomain slug is already in use by another brand." };
         }
@@ -107,14 +114,15 @@ export async function updateBrandGeneralAction(
     if (parsed.data.removePassword) {
       updateData.passwordHash = "";
     } else if (parsed.data.password && parsed.data.password.trim().length > 0) {
-      // Store password (in PB brands collection)
       updateData.passwordHash = parsed.data.password.trim();
     }
 
-    await pb.collection("brands").update(brandId, updateData);
+    await pb.collection("brands").update(brand.id, updateData);
 
-    revalidatePath(`/admin/brand/${brandId}`);
-    revalidatePath(`/admin/brand/${brandId}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}`);
+    revalidatePath(`/admin/brand/${brand.slug}`);
+    revalidatePath(`/admin/brand/${brand.id}/settings`);
+    revalidatePath(`/admin/brand/${brand.slug}/settings`);
     revalidatePath("/admin");
 
     return { success: true };
@@ -138,7 +146,7 @@ export async function uploadBrandFaviconAction(
       return { success: false, error: "Unauthorized session." };
     }
 
-    await verifyBrandAccess(pb, brandId, user.id);
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
 
     const faviconFile = formData.get("favicon") as File | null;
     if (!faviconFile || faviconFile.size === 0) {
@@ -151,7 +159,7 @@ export async function uploadBrandFaviconAction(
 
     // Upload to mediaAssets collection
     const assetPayload = new FormData();
-    assetPayload.set("brand", brandId);
+    assetPayload.set("brand", brand.id);
     assetPayload.set("name", "Favicon");
     assetPayload.set("type", "ICON");
     assetPayload.set("file", faviconFile);
@@ -159,11 +167,12 @@ export async function uploadBrandFaviconAction(
     const mediaAsset = await pb.collection("mediaAssets").create(assetPayload);
 
     // Link in brands collection
-    await pb.collection("brands").update(brandId, {
+    await pb.collection("brands").update(brand.id, {
       favicon: mediaAsset.id,
     });
 
-    revalidatePath(`/admin/brand/${brandId}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}/settings`);
+    revalidatePath(`/admin/brand/${brand.slug}/settings`);
     return {
       success: true,
       faviconUrl: pb.files.getURL(mediaAsset, mediaAsset.file),
@@ -189,7 +198,7 @@ export async function updateGlobalShapesAction(
       return { success: false, error: "Unauthorized session." };
     }
 
-    await verifyBrandAccess(pb, brandId, user.id);
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
 
     const rawData = {
       radiusMode: formData.get("radiusMode")?.toString() || "rounded",
@@ -208,7 +217,7 @@ export async function updateGlobalShapesAction(
     }
 
     const payload = {
-      brand: brandId,
+      brand: brand.id,
       radiusMode: parsed.data.radiusMode,
       customRadiusPx: parsed.data.customRadiusPx,
       borderWidthPx: parsed.data.borderWidthPx,
@@ -219,10 +228,10 @@ export async function updateGlobalShapesAction(
       manualBgColor: parsed.data.manualBgColor || "#0e161d",
     };
 
-    // Check if globalShapes record exists for this brand
+    // Check if globalShapes record exists for this brand (using real brand.id)
     let existingRecordId: string | null = null;
     try {
-      const existing = await pb.collection("globalShapes").getFirstListItem(`brand = "${brandId}"`);
+      const existing = await pb.collection("globalShapes").getFirstListItem(`brand = "${brand.id}"`);
       if (existing) existingRecordId = existing.id;
     } catch {
       // not found -> create
@@ -234,8 +243,12 @@ export async function updateGlobalShapesAction(
       await pb.collection("globalShapes").create(payload);
     }
 
-    revalidatePath(`/admin/brand/${brandId}`);
-    revalidatePath(`/admin/brand/${brandId}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}`);
+    revalidatePath(`/admin/brand/${brand.slug}`);
+    revalidatePath(`/admin/brand/${brand.id}/settings`);
+    revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/manual/${brand.slug}`);
+    revalidatePath(`/m/${brand.slug}`);
 
     return { success: true };
   } catch (err: unknown) {
@@ -265,7 +278,7 @@ export async function deleteBrandAction(
       return { success: false, error: "Confirmation name does not match brand name." };
     }
 
-    await pb.collection("brands").delete(brandId);
+    await pb.collection("brands").delete(brand.id);
 
     revalidatePath("/admin");
     return { success: true };
