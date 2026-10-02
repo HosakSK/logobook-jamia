@@ -70,7 +70,7 @@ export function PublicManualSidebar({
 
   // Build recursive multi-level hierarchy tree
   const tree = useMemo<TreeNodeItem[]>(() => {
-    const visiblePages = pages.filter((p) => p.isInMenu !== false);
+    const visiblePages = pages;
     const itemMap = new Map<string, TreeNodeItem>();
 
     visiblePages.forEach((p) => {

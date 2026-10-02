@@ -128,7 +128,7 @@ export async function generateBrandTreeAction(
         title,
         slug,
         parent: parentId || null,
-        isInMenu: true,
+        isInMenu: !parentId,
         menuStyle,
         order,
       });

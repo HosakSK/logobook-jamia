@@ -67,21 +67,34 @@ export function PublishedManualView({
     return textObj[locale] || textObj.en || textObj.sk || Object.values(textObj)[0] || "";
   };
 
+  // Root navigation chapters (e.g. Logo, Farby, Typografia)
+  const rootChapters = pages.filter((p) => !p.parent && p.isInMenu !== false && p.slug !== "uvod");
+
+  // Helper: check if active page belongs to root chapter
+  const isChapterActive = (rootPage: typeof pages[0]) => {
+    if (activePage.id === rootPage.id || activePage.slug === rootPage.slug) return true;
+    let curr: typeof pages[0] | undefined = activePage;
+    while (curr && curr.parent) {
+      if (curr.parent === rootPage.id) return true;
+      curr = pages.find((p) => p.id === curr!.parent);
+    }
+    return false;
+  };
+
   return (
     <div className="container mx-auto px-4 sm:px-6 py-8 max-w-6xl space-y-8">
-      {/* Chapter Navigation Tabs (Horizontal quick-jump) */}
-      <nav className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60 scrollbar-none">
-        {pages
-          .filter((p) => p.isInMenu !== false)
-          .map((page) => {
-            const isActive = page.id === activePage.id;
-            const title = getLocalized(page.title);
+      {/* Chapter Navigation Tabs (Only shown if multiple top-level sections exist) */}
+      {rootChapters.length > 1 && (
+        <nav className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60 scrollbar-none">
+          {rootChapters.map((page) => {
+            const isActive = isChapterActive(page);
+            const title = getLocalized(page.title) || page.slug;
+            const href = `/m/${brandSlug}/${page.slug}`;
 
             return (
-              <button
+              <Link
                 key={page.id}
-                type="button"
-                onClick={() => setActivePageId(page.id)}
+                href={href}
                 className={`px-3.5 py-1.5 rounded-[2px] text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-xs font-bold"
@@ -89,10 +102,11 @@ export function PublishedManualView({
                 }`}
               >
                 <span>{title}</span>
-              </button>
+              </Link>
             );
           })}
-      </nav>
+        </nav>
+      )}
 
       {/* Recursive Page Tree & Container Grid Renderer */}
       <PageRenderer
