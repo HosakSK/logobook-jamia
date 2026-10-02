@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import Script from "next/script";
 import { PRICING_PLANS, PricingPlan, UsageStats } from "@/lib/constants/billing";
-import { requestUpgradeAction } from "@/actions/billing";
+import { requestUpgradeAction, simulateDevUpgradeAction } from "@/actions/billing";
 import { Button } from "@/components/ui/button";
 import { Dictionary } from "@/lib/i18n";
-import { Check, X, HardDrive, FolderKanban, Sparkles, Loader2, ArrowRight, ExternalLink } from "lucide-react";
+import { Check, X, HardDrive, FolderKanban, Sparkles, Loader2, ArrowRight, ExternalLink, Terminal } from "lucide-react";
 
 interface BillingViewProps {
   stats: UsageStats;
@@ -18,6 +19,26 @@ export function BillingView({ stats, dict }: BillingViewProps) {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const currentTier = stats.tier.toUpperCase();
+
+  // Initialize Lemon.js overlay listeners
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const w = window as any;
+      if (w.createLemonSqueezy) {
+        w.createLemonSqueezy();
+      }
+      if (w.LemonSqueezy?.Setup) {
+        w.LemonSqueezy.Setup({
+          eventHandler: (event: any) => {
+            if (event?.event === "Checkout.Success") {
+              setFeedback("Platba bola úspešne dokončená! Aktualizujem váš profil...");
+              setTimeout(() => window.location.reload(), 2000);
+            }
+          },
+        });
+      }
+    }
+  }, []);
 
   // Storage calculations
   const isStorageUnlimited = stats.storageMaxMb >= 999999;
@@ -41,8 +62,27 @@ export function BillingView({ stats, dict }: BillingViewProps) {
     setFeedback(null);
     startTransition(async () => {
       const res = await requestUpgradeAction(plan.id, billingCycle);
-      if (res.success) {
+      if (res.success && res.checkoutUrl) {
         setFeedback(res.message);
+        const w = window as any;
+        if (typeof window !== "undefined" && w.LemonSqueezy?.Url) {
+          w.LemonSqueezy.Url.Open(res.checkoutUrl);
+        } else {
+          window.open(res.checkoutUrl, "_blank");
+        }
+      } else {
+        setFeedback(res.message);
+      }
+    });
+  };
+
+  const handleSimulateDevUpgrade = (targetTier: string) => {
+    setFeedback(null);
+    startTransition(async () => {
+      const res = await simulateDevUpgradeAction(targetTier);
+      setFeedback(res.message);
+      if (res.success) {
+        setTimeout(() => window.location.reload(), 1500);
       }
     });
   };
@@ -363,6 +403,54 @@ export function BillingView({ stats, dict }: BillingViewProps) {
           );
         })}
       </div>
+
+      {/* 3. Lemon Squeezy Sandbox & Dev Testing Panel */}
+      <div className="border border-dashed border-border/70 rounded-[3px] p-5 bg-card/30 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Terminal className="h-4 w-4 text-[#c8d400]" />
+            <h3 className="text-xs font-bold text-foreground font-mono">
+              Lemon Squeezy Sandbox &amp; Testovací režim
+            </h3>
+          </div>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-neutral-900 border border-border/40 text-muted-foreground">
+            Testovacie odomykanie funkcií
+          </span>
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Pre otestovanie odomykania prémiových funkcií v aplikácii (vlastná doména, ochrana heslom, offline ZIP, neobmedzené tiery)
+          môžete okamžite prepnúť svoj účet do ľubovoľného tieru bez nutnosti zadávať skutočnú platobnú kartu.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          {(["FREE", "COMPANY", "FREELANCER", "AGENCY", "PLATINUM"] as const).map((t) => (
+            <Button
+              key={t}
+              type="button"
+              variant={currentTier === t ? "default" : "outline"}
+              size="sm"
+              disabled={isPending || currentTier === t}
+              onClick={() => handleSimulateDevUpgrade(t)}
+              className="h-7 text-xs font-mono rounded-[2px] cursor-pointer"
+            >
+              {isPending ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+              {t} {currentTier === t ? "✓ (Aktuálny)" : ""}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Embedded Lemon.js Script */}
+      <Script
+        src="https://assets.lemonsqueezy.com/lemon.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          if (typeof window !== "undefined" && (window as any).createLemonSqueezy) {
+            (window as any).createLemonSqueezy();
+          }
+        }}
+      />
     </div>
   );
 }

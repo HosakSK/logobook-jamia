@@ -81,3 +81,30 @@ export async function clearPocketBaseCookie() {
   const cookieStore = await cookies();
   cookieStore.delete("pb_auth");
 }
+
+/**
+ * Returns an authenticated PocketBase instance with Superuser / Admin privileges.
+ * Used for server-side background operations, webhooks, and migrations.
+ */
+export async function getAdminPocketBase(): Promise<PocketBase> {
+  const pb = new PocketBase(pbUrl);
+  const email = process.env.POCKETBASE_ADMIN_EMAIL;
+  const password = process.env.POCKETBASE_ADMIN_PASSWORD;
+
+  if (email && password) {
+    try {
+      await pb.collection("_superusers").authWithPassword(email, password);
+    } catch {
+      try {
+        await pb.admins.authWithPassword(email, password);
+      } catch (e) {
+        console.error("Failed to authenticate PocketBase superuser:", e);
+      }
+    }
+  } else {
+    console.warn("[PocketBase] POCKETBASE_ADMIN_EMAIL or POCKETBASE_ADMIN_PASSWORD is not set.");
+  }
+
+  return pb;
+}
+
