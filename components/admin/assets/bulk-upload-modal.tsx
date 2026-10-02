@@ -3,6 +3,7 @@
 import { useState, useRef, useTransition } from "react";
 import { uploadBrandAssetAction } from "@/actions/assets";
 import { normalizeAndScopeSvg } from "@/lib/utils/svg";
+import { suggestLogoName } from "@/lib/utils/asset-naming";
 import {
   ASSET_MEDIUMS,
   ASSET_ORIENTATIONS,
@@ -30,6 +31,7 @@ import {
   FileCode,
   FolderArchive,
   Image as ImageIcon,
+  RotateCcw,
 } from "lucide-react";
 
 interface QueuedAttachedFile {
@@ -42,6 +44,8 @@ interface QueuedLogoItem {
   id: string;
   baseKey: string;
   name: string;
+  note: string;
+  nameCustomized?: boolean;
   medium: AssetMedium;
   orientation: AssetOrientation;
   hasClaim: boolean;
@@ -53,6 +57,7 @@ interface QueuedLogoItem {
 
 interface BulkUploadModalProps {
   brandId: string;
+  brandName?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -82,6 +87,7 @@ function getBaseKey(fileName: string): string {
 
 export function BulkUploadModal({
   brandId,
+  brandName = "logobook",
   isOpen,
   onClose,
   onSuccess,
@@ -131,7 +137,6 @@ export function BulkUploadModal({
 
         // Find primary SVG file if present
         const svgFile = groupFiles.find((f) => f.name.toLowerCase().endsWith(".svg")) || null;
-        const pngFile = groupFiles.find((f) => /\.(png|jpg|jpeg|webp)$/i.test(f.name)) || null;
 
         const newAttached: QueuedAttachedFile[] = groupFiles.map((f) => ({
           file: f,
@@ -158,10 +163,6 @@ export function BulkUploadModal({
         } else {
           // Auto heuristic tags from filename
           const firstFile = groupFiles[0];
-          const baseName = firstFile.name
-            .replace(/\.[a-zA-Z0-9]+$/i, "")
-            .replace(/[-_]/g, " ")
-            .trim();
           const lowerName = firstFile.name.toLowerCase();
 
           let medium: AssetMedium = "UNIVERSAL";
@@ -174,28 +175,45 @@ export function BulkUploadModal({
           let orientation: AssetOrientation = "HORIZONTAL";
           if (lowerName.includes("symbol") || lowerName.includes("mark") || lowerName.includes("icon")) {
             orientation = "SYMBOL";
-          } else if (lowerName.includes("vert") || lowerName.includes("stack")) {
+          } else if (lowerName.includes("vert") || lowerName.includes("stack") || lowerName.includes("height")) {
             orientation = "VERTICAL";
           }
 
           let background: AssetBackground = "LIGHT";
-          if (lowerName.includes("dark") || lowerName.includes("black")) {
+          if (lowerName.includes("dark") || lowerName.includes("_d.") || lowerName.includes("-d.") || lowerName.includes("black")) {
             background = "DARK";
-          } else if (lowerName.includes("inverse") || lowerName.includes("inv") || lowerName.includes("white")) {
+          } else if (lowerName.includes("inverse") || lowerName.includes("inv") || lowerName.includes("white") || lowerName.includes("_w.") || lowerName.includes("-w.")) {
             background = "INVERSE";
           } else if (lowerName.includes("trans")) {
             background = "TRANSPARENT";
+          } else if (lowerName.includes("mono")) {
+            background = "MONOCHROME";
           }
+
+          const hasClaim = orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan");
+          const note = "";
+
+          // Suggest structured name based on parameters
+          const suggestedName = suggestLogoName({
+            brandName,
+            medium,
+            orientation,
+            hasClaim,
+            background,
+            note,
+          });
 
           const itemId = Math.random().toString(36).substring(2, 9);
 
           updatedQueue.push({
             id: itemId,
             baseKey,
-            name: baseName,
+            name: suggestedName,
+            note: "",
+            nameCustomized: false,
             medium,
             orientation,
-            hasClaim: orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan"),
+            hasClaim,
             background,
             svgContent: "", // Will be parsed asynchronously
             svgFile,
@@ -258,11 +276,67 @@ export function BulkUploadModal({
     setQueue((prev) =>
       prev.map((item) => {
         if (item.id === id) {
-          const updated = { ...item, ...updates };
-          if (updated.orientation === "SYMBOL") {
-            updated.hasClaim = false;
+          const newMedium = updates.medium ?? item.medium;
+          const newOrientation = updates.orientation ?? item.orientation;
+          const newHasClaim =
+            newOrientation === "SYMBOL"
+              ? false
+              : updates.hasClaim !== undefined
+              ? updates.hasClaim
+              : item.hasClaim;
+          const newBackground = updates.background ?? item.background;
+          const newNote = updates.note !== undefined ? updates.note : item.note;
+
+          let newName = updates.name !== undefined ? updates.name : item.name;
+          let isCustomized = item.nameCustomized ?? false;
+
+          if (updates.name !== undefined) {
+            isCustomized = true;
+          } else if (!isCustomized) {
+            newName = suggestLogoName({
+              brandName,
+              medium: newMedium,
+              orientation: newOrientation,
+              hasClaim: newHasClaim,
+              background: newBackground,
+              note: newNote,
+            });
           }
-          return updated;
+
+          return {
+            ...item,
+            ...updates,
+            medium: newMedium,
+            orientation: newOrientation,
+            hasClaim: newHasClaim,
+            background: newBackground,
+            note: newNote,
+            name: newName,
+            nameCustomized: isCustomized,
+          };
+        }
+        return item;
+      })
+    );
+  };
+
+  const regenerateItemName = (id: string) => {
+    setQueue((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const generated = suggestLogoName({
+            brandName,
+            medium: item.medium,
+            orientation: item.orientation,
+            hasClaim: item.orientation === "SYMBOL" ? false : item.hasClaim,
+            background: item.background,
+            note: item.note,
+          });
+          return {
+            ...item,
+            name: generated,
+            nameCustomized: false,
+          };
         }
         return item;
       })
@@ -402,7 +476,7 @@ export function BulkUploadModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in-0">
-      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-[3px] bg-card border border-border/60 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] bg-card border border-border/60 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="p-5 border-b border-border/30 flex items-center justify-between shrink-0">
           <div>
@@ -411,7 +485,7 @@ export function BulkUploadModal({
               <span>Hromadné nahrávanie lôg & exportov (Bulk Upload)</span>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Presuňte sem ľubovoľné súbory značky (SVG, PNG, PDF, EPS, AI, ZIP). Súbory s rovnakým názvom sa automaticky zlúčia do jedného loga.
+              Názvy lôg sa automaticky navrhujú podľa zvolených parametrov (napr. <code className="text-[#c8d400] font-mono">logobook_print_cmyk_width_darkbg_poznamka</code>).
             </p>
           </div>
           <button
@@ -468,7 +542,7 @@ export function BulkUploadModal({
                 Kliknite alebo pretiahnite súbory sem (.SVG, .PNG, .PDF, .EPS, .AI, .ZIP)
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Môžete nahrať všetky varianty a formáty naraz. Systém ich automaticky spáruje a vygeneruje kompletný balík pre Cloudflare R2.
+                Môžete nahrať všetky varianty a formáty naraz. Súbory sa zlúčia podľa rovnakého názvu a názov loga sa automaticky navrhne z parametrov.
               </p>
             </div>
           </div>
@@ -519,20 +593,42 @@ export function BulkUploadModal({
                         )}
                       </div>
 
-                      {/* Form fields */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 w-full">
-                        {/* Name */}
-                        <div className="sm:col-span-2 lg:col-span-1">
-                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
+                      {/* Form fields Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 flex-1 w-full">
+                        {/* Name (Navrhnutý názov) */}
+                        <div className="sm:col-span-2 lg:col-span-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
+                            <button
+                              type="button"
+                              onClick={() => regenerateItemName(item.id)}
+                              className="text-[10px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
+                              title="Vygenerovať názov automaticky z parametrov"
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              <span>Prepočítať</span>
+                            </button>
+                          </div>
                           <Input
                             value={item.name}
-                            onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                            onChange={(e) => updateItem(item.id, { name: e.target.value, nameCustomized: true })}
+                            className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-[#c8d400]"
+                          />
+                        </div>
+
+                        {/* Note (Poznámka) */}
+                        <div className="sm:col-span-1 lg:col-span-1">
+                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Poznámka</Label>
+                          <Input
+                            value={item.note}
+                            placeholder="napr. poznamka"
+                            onChange={(e) => updateItem(item.id, { note: e.target.value })}
                             className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60"
                           />
                         </div>
 
                         {/* Medium */}
-                        <div>
+                        <div className="sm:col-span-1 lg:col-span-1">
                           <Label className="text-[10px] text-muted-foreground uppercase font-mono">Médium</Label>
                           <select
                             value={item.medium}
@@ -546,30 +642,30 @@ export function BulkUploadModal({
                         </div>
 
                         {/* Orientation */}
-                        <div>
+                        <div className="sm:col-span-1 lg:col-span-1">
                           <Label className="text-[10px] text-muted-foreground uppercase font-mono">Orientácia</Label>
                           <select
                             value={item.orientation}
                             onChange={(e) => updateItem(item.id, { orientation: e.target.value as AssetOrientation })}
                             className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                           >
-                            <option value="HORIZONTAL">Horizontálne</option>
-                            <option value="VERTICAL">Vertikálne</option>
+                            <option value="HORIZONTAL">Horizontálne (width)</option>
+                            <option value="VERTICAL">Vertikálne (height)</option>
                             <option value="SYMBOL">Symbol / Značka</option>
                           </select>
                         </div>
 
                         {/* Background & Claim */}
-                        <div className="flex items-center gap-3">
+                        <div className="sm:col-span-1 lg:col-span-1 flex items-center gap-2">
                           <div className="flex-1">
                             <Label className="text-[10px] text-muted-foreground uppercase font-mono">Podklad</Label>
                             <select
                               value={item.background}
                               onChange={(e) => updateItem(item.id, { background: e.target.value as AssetBackground })}
-                              className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+                              className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-1.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                             >
-                              <option value="LIGHT">Svetlý</option>
-                              <option value="DARK">Tmavý</option>
+                              <option value="LIGHT">Svetlý (lightbg)</option>
+                              <option value="DARK">Tmavý (darkbg)</option>
                               <option value="TRANSPARENT">Priehľadný</option>
                               <option value="MONOCHROME">Monochróm</option>
                               <option value="INVERSE">Inverzný</option>
@@ -578,7 +674,7 @@ export function BulkUploadModal({
 
                           <div className="pt-4 shrink-0">
                             <label
-                              className={`flex items-center gap-1.5 cursor-pointer text-[11px] ${
+                              className={`flex items-center gap-1 cursor-pointer text-[11px] ${
                                 item.orientation === "SYMBOL"
                                   ? "opacity-40 cursor-not-allowed text-muted-foreground"
                                   : "text-foreground"
@@ -606,7 +702,7 @@ export function BulkUploadModal({
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="p-1.5 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors self-end md:self-center"
+                        className="p-1.5 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors self-end md:self-center cursor-pointer"
                         title="Odstrániť toto logo zo zoznamu"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -620,7 +716,7 @@ export function BulkUploadModal({
                           <FolderArchive className="h-3.5 w-3.5 text-[#c8d400]" />
                           {item.attachedFiles.length > 1 ? (
                             <span>
-                              Zlúčených <strong className="text-[#c8d400]">{item.attachedFiles.length} formátov</strong> podľa rovnakého názvu súborov:
+                              Zlúčených <strong className="text-[#c8d400]">{item.attachedFiles.length} formátov</strong> podľa rovnakého názvu:
                             </span>
                           ) : (
                             <span>Priradený formát súboru:</span>
@@ -640,7 +736,7 @@ export function BulkUploadModal({
                                 <button
                                   type="button"
                                   onClick={() => removeAttachedFile(item.id, att.file.name)}
-                                  className="text-muted-foreground hover:text-red-400 ml-0.5"
+                                  className="text-muted-foreground hover:text-red-400 ml-0.5 cursor-pointer"
                                   title={`Odstrániť formát ${att.format}`}
                                 >
                                   <X className="h-2.5 w-2.5" />
@@ -707,7 +803,7 @@ export function BulkUploadModal({
               size="sm"
               disabled={isPending || queue.length === 0}
               onClick={handleUploadAll}
-              className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors"
+              className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors cursor-pointer"
             >
               {isPending ? (
                 <>

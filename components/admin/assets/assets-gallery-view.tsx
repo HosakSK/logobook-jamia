@@ -233,6 +233,7 @@ export function AssetsGalleryView({
       {/* 4. Modals */}
       <BulkUploadModal
         brandId={brandId}
+        brandName={brandName}
         isOpen={bulkModalOpen}
         onClose={() => setBulkModalOpen(false)}
         onSuccess={handleRefresh}
@@ -249,6 +250,7 @@ export function AssetsGalleryView({
       <EditAssetModal
         asset={activeEditAsset}
         brandId={brandId}
+        brandName={brandName}
         isOpen={Boolean(activeEditAsset)}
         onClose={() => setActiveEditAsset(null)}
         onSuccess={handleRefresh}

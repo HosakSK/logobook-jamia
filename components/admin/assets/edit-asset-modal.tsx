@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { BrandAsset } from "@/lib/types/asset";
 import { updateBrandAssetAction } from "@/actions/assets";
+import { suggestLogoName } from "@/lib/utils/asset-naming";
 import {
   ASSET_MEDIUMS,
   ASSET_ORIENTATIONS,
@@ -14,11 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Pencil, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { X, Pencil, Loader2, AlertCircle, Sparkles } from "lucide-react";
 
 interface EditAssetModalProps {
   asset: BrandAsset | null;
   brandId: string;
+  brandName?: string;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -27,12 +29,14 @@ interface EditAssetModalProps {
 export function EditAssetModal({
   asset,
   brandId,
+  brandName = "logobook",
   isOpen,
   onClose,
   onSuccess,
 }: EditAssetModalProps) {
   const [name, setName] = useState(asset?.name.en || asset?.name.sk || "");
   const [nameSk, setNameSk] = useState(asset?.name.sk || "");
+  const [note, setNote] = useState("");
   const [medium, setMedium] = useState<AssetMedium>(asset?.medium || "UNIVERSAL");
   const [orientation, setOrientation] = useState<AssetOrientation>(asset?.orientation || "HORIZONTAL");
   const [background, setBackground] = useState<AssetBackground>(asset?.background || "LIGHT");
@@ -49,11 +53,25 @@ export function EditAssetModal({
       setOrientation(asset.orientation || "HORIZONTAL");
       setBackground(asset.background || "LIGHT");
       setHasClaim(Boolean(asset.hasClaim));
+      setNote("");
       setError(null);
     }
   }, [asset]);
 
   if (!isOpen || !asset) return null;
+
+  const handleGenerateName = () => {
+    const suggested = suggestLogoName({
+      brandName,
+      medium,
+      orientation,
+      hasClaim: orientation === "SYMBOL" ? false : hasClaim,
+      background,
+      note,
+    });
+    setName(suggested);
+    setNameSk(suggested);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +79,7 @@ export function EditAssetModal({
 
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("nameSk", nameSk);
+    formData.append("nameSk", nameSk || name);
     formData.append("medium", medium);
     formData.append("orientation", orientation);
     formData.append("hasClaim", orientation === "SYMBOL" ? "false" : String(hasClaim));
@@ -116,6 +134,29 @@ export function EditAssetModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Note and Auto-generation */}
+          <div className="p-3 rounded-[3px] bg-neutral-900 border border-border/40 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-[10px] text-muted-foreground uppercase font-mono">
+                Poznámka pre generovanie názvu
+              </Label>
+              <button
+                type="button"
+                onClick={handleGenerateName}
+                className="text-[11px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
+              >
+                <Sparkles className="h-3 w-3" />
+                <span>Prepočítať názov z parametrov</span>
+              </button>
+            </div>
+            <Input
+              value={note}
+              placeholder="napr. poznamka, v2, hlavne"
+              onChange={(e) => setNote(e.target.value)}
+              className="h-8 text-xs rounded-[3px] bg-neutral-950 border-border/60"
+            />
+          </div>
+
           {/* Names */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -124,7 +165,7 @@ export function EditAssetModal({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="mt-1.5 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs"
+                className="mt-1.5 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs font-mono text-[#c8d400]"
               />
             </div>
             <div>
@@ -132,7 +173,7 @@ export function EditAssetModal({
               <Input
                 value={nameSk}
                 onChange={(e) => setNameSk(e.target.value)}
-                className="mt-1.5 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs"
+                className="mt-1.5 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs font-mono"
               />
             </div>
           </div>
@@ -158,8 +199,8 @@ export function EditAssetModal({
                 onChange={(e) => handleOrientationChange(e.target.value as AssetOrientation)}
                 className="w-full mt-1.5 h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
               >
-                <option value="HORIZONTAL">Horizontálne</option>
-                <option value="VERTICAL">Vertikálne</option>
+                <option value="HORIZONTAL">Horizontálne (width)</option>
+                <option value="VERTICAL">Vertikálne (height)</option>
                 <option value="SYMBOL">Symbol / Značka</option>
               </select>
             </div>
@@ -174,8 +215,8 @@ export function EditAssetModal({
                 onChange={(e) => setBackground(e.target.value as AssetBackground)}
                 className="w-full mt-1.5 h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
               >
-                <option value="LIGHT">Svetlý</option>
-                <option value="DARK">Tmavý</option>
+                <option value="LIGHT">Svetlý (lightbg)</option>
+                <option value="DARK">Tmavý (darkbg)</option>
                 <option value="TRANSPARENT">Priehľadný</option>
                 <option value="MONOCHROME">Monochróm</option>
                 <option value="INVERSE">Inverzný</option>
@@ -217,7 +258,7 @@ export function EditAssetModal({
               type="submit"
               size="sm"
               disabled={isPending}
-              className="h-8 px-4 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors"
+              className="h-8 px-4 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors cursor-pointer"
             >
               {isPending ? (
                 <>
