@@ -220,9 +220,22 @@ export async function uploadBrandAssetAction(
     };
   } catch (err: any) {
     console.error("Failed to upload brand asset:", err);
+
+    let detailedMessage = err?.message || "Nepodarilo sa nahrať logo.";
+    if (err?.data?.data && typeof err.data.data === "object") {
+      const fieldErrors = Object.entries(err.data.data)
+        .map(([field, errObj]: [string, any]) => `${field}: ${errObj?.message || JSON.stringify(errObj)}`)
+        .join(", ");
+      if (fieldErrors) {
+        detailedMessage = `${detailedMessage} (${fieldErrors})`;
+      }
+    } else if (err?.data?.message) {
+      detailedMessage = `${detailedMessage} - ${err.data.message}`;
+    }
+
     return {
       success: false,
-      message: err.message || "Nepodarilo sa nahrať logo.",
+      message: detailedMessage,
     };
   }
 }

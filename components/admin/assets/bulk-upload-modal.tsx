@@ -435,55 +435,76 @@ export function BulkUploadModal({
     );
   };
 
-  // Convert SVG to small PNG thumbnail blob via browser canvas
+  // Convert SVG to small PNG thumbnail blob via browser canvas with timeout
   const generatePngThumbnail = async (svgText: string): Promise<File | null> => {
     if (!svgText) return null;
     return new Promise((resolve) => {
+      let isSettled = false;
+      const safeResolve = (file: File | null, urlToRevoke?: string) => {
+        if (isSettled) return;
+        isSettled = true;
+        if (urlToRevoke) {
+          try {
+            URL.revokeObjectURL(urlToRevoke);
+          } catch {}
+        }
+        resolve(file);
+      };
+
+      // 3 second safety timeout to avoid hanging the upload
+      const timer = setTimeout(() => {
+        safeResolve(null);
+      }, 3000);
+
       try {
         const img = new Image();
         const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
         const url = URL.createObjectURL(svgBlob);
 
         img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = 300;
-          canvas.height = 300;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            URL.revokeObjectURL(url);
-            resolve(null);
-            return;
+          clearTimeout(timer);
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = 300;
+            canvas.height = 300;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              safeResolve(null, url);
+              return;
+            }
+
+            const scale = Math.min(260 / (img.width || 300), 260 / (img.height || 300));
+            const w = (img.width || 300) * scale;
+            const h = (img.height || 300) * scale;
+            const x = (300 - w) / 2;
+            const y = (300 - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  safeResolve(new File([blob], "thumbnail.png", { type: "image/png" }), url);
+                } else {
+                  safeResolve(null, url);
+                }
+              },
+              "image/png",
+              0.85
+            );
+          } catch {
+            safeResolve(null, url);
           }
-
-          const scale = Math.min(260 / (img.width || 300), 260 / (img.height || 300));
-          const w = (img.width || 300) * scale;
-          const h = (img.height || 300) * scale;
-          const x = (300 - w) / 2;
-          const y = (300 - h) / 2;
-          ctx.drawImage(img, x, y, w, h);
-
-          canvas.toBlob(
-            (blob) => {
-              URL.revokeObjectURL(url);
-              if (blob) {
-                resolve(new File([blob], "thumbnail.png", { type: "image/png" }));
-              } else {
-                resolve(null);
-              }
-            },
-            "image/png",
-            0.85
-          );
         };
 
         img.onerror = () => {
-          URL.revokeObjectURL(url);
-          resolve(null);
+          clearTimeout(timer);
+          safeResolve(null, url);
         };
 
         img.src = url;
       } catch {
-        resolve(null);
+        clearTimeout(timer);
+        safeResolve(null);
       }
     });
   };
@@ -494,52 +515,62 @@ export function BulkUploadModal({
     setError(null);
 
     startTransition(async () => {
-      const total = queue.length;
-      for (let i = 0; i < total; i++) {
-        const item = queue[i];
-        setUploadProgress({
-          current: i + 1,
-          total,
-          currentName: item.name,
-        });
+      try {
+        const total = queue.length;
+        for (let i = 0; i < total; i++) {
+          const item = queue[i];
+          setUploadProgress({
+            current: i + 1,
+            total,
+            currentName: item.name,
+          });
 
-        const formData = new FormData();
-        formData.append("name", item.name);
-        formData.append("medium", item.medium);
-        formData.append("orientation", item.orientation);
-        formData.append("hasClaim", String(item.hasClaim));
-        formData.append("background", item.background);
-        formData.append("svgContent", item.svgContent || "<svg viewBox='0 0 100 100'></svg>");
+          const formData = new FormData();
+          formData.append("name", item.name);
+          formData.append("medium", item.medium);
+          formData.append("orientation", item.orientation);
+          formData.append("hasClaim", String(item.hasClaim));
+          formData.append("background", item.background);
+          formData.append("svgContent", item.svgContent || "<svg viewBox='0 0 100 100'></svg>");
 
-        // Append all attached format files (file_SVG, file_PNG, file_PDF, file_EPS, file_AI, file_ZIP)
-        for (const att of item.attachedFiles) {
-          formData.append(`file_${att.format}`, att.file);
-        }
+          // Append all attached format files (file_SVG, file_PNG, file_PDF, file_EPS, file_AI, file_ZIP)
+          for (const att of item.attachedFiles) {
+            formData.append(`file_${att.format}`, att.file);
+          }
 
-        if (item.svgFile) {
-          formData.append("svgFile", item.svgFile);
-        }
+          if (item.svgFile) {
+            formData.append("svgFile", item.svgFile);
+          }
 
-        // Try to generate thumbnail
-        if (item.svgContent) {
-          const thumbnail = await generatePngThumbnail(item.svgContent);
-          if (thumbnail) {
-            formData.append("previewFile", thumbnail);
+          // Try to generate thumbnail safely
+          if (item.svgContent) {
+            try {
+              const thumbnail = await generatePngThumbnail(item.svgContent);
+              if (thumbnail) {
+                formData.append("previewFile", thumbnail);
+              }
+            } catch (thumbErr) {
+              console.warn("Thumbnail generation skipped due to error:", thumbErr);
+            }
+          }
+
+          const res = await uploadBrandAssetAction(brandId, formData);
+          if (!res.success) {
+            setError(`Chyba pri nahrávaní loga „${item.name}“: ${res.message}`);
+            setUploadProgress(null);
+            return;
           }
         }
 
-        const res = await uploadBrandAssetAction(brandId, formData);
-        if (!res.success) {
-          setError(`Chyba pri nahrávaní loga „${item.name}“: ${res.message}`);
-          setUploadProgress(null);
-          return;
-        }
+        setUploadProgress(null);
+        setQueue([]);
+        onSuccess();
+        onClose();
+      } catch (err: any) {
+        console.error("Unhanded error in bulk upload:", err);
+        setError(`Nastala chyba pri spracovaní nahrávania: ${err?.message || "Nešpecifikovaná chyba spojenia"}`);
+        setUploadProgress(null);
       }
-
-      setUploadProgress(null);
-      setQueue([]);
-      onSuccess();
-      onClose();
     });
   };
 
