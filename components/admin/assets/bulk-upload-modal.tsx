@@ -10,6 +10,7 @@ import {
   AssetMedium,
   AssetOrientation,
   AssetBackground,
+  AssetFileFormat,
 } from "@/lib/validations/asset";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,17 +26,29 @@ import {
   AlertCircle,
   Layers,
   ArrowRight,
+  FileText,
+  FileCode,
+  FolderArchive,
+  Image as ImageIcon,
 } from "lucide-react";
 
-interface QueuedSvgItem {
-  id: string;
+interface QueuedAttachedFile {
   file: File;
+  format: AssetFileFormat;
+  sizeFormatted: string;
+}
+
+interface QueuedLogoItem {
+  id: string;
+  baseKey: string;
   name: string;
   medium: AssetMedium;
   orientation: AssetOrientation;
   hasClaim: boolean;
   background: AssetBackground;
   svgContent: string;
+  svgFile: File | null;
+  attachedFiles: QueuedAttachedFile[];
 }
 
 interface BulkUploadModalProps {
@@ -45,13 +58,35 @@ interface BulkUploadModalProps {
   onSuccess: () => void;
 }
 
+function detectFileFormat(fileName: string): AssetFileFormat | null {
+  const ext = fileName.split(".").pop()?.toLowerCase() || "";
+  if (ext === "svg") return "SVG";
+  if (ext === "pdf") return "PDF";
+  if (ext === "eps") return "EPS";
+  if (ext === "ai") return "AI";
+  if (["png", "jpg", "jpeg", "webp"].includes(ext)) return "PNG";
+  if (["zip", "rar", "7z", "tar", "gz"].includes(ext)) return "ZIP";
+  return null;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getBaseKey(fileName: string): string {
+  const withoutExt = fileName.replace(/\.[a-zA-Z0-9]+$/i, "");
+  return withoutExt.trim().toLowerCase();
+}
+
 export function BulkUploadModal({
   brandId,
   isOpen,
   onClose,
   onSuccess,
 }: BulkUploadModalProps) {
-  const [queue, setQueue] = useState<QueuedSvgItem[]>([]);
+  const [queue, setQueue] = useState<QueuedLogoItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{
     current: number;
@@ -64,71 +99,151 @@ export function BulkUploadModal({
 
   if (!isOpen) return null;
 
-  // Process dropped or selected files
+  // Process dropped or selected files (supports SVG, PNG, PDF, EPS, AI, ZIP)
   const processFiles = async (files: FileList | File[]) => {
     setError(null);
-    const newItems: QueuedSvgItem[] = [];
+    const incomingFiles = Array.from(files);
+    if (incomingFiles.length === 0) return;
 
-    for (const file of Array.from(files)) {
-      if (!file.name.toLowerCase().endsWith(".svg")) {
-        continue;
+    // Group incoming files by their base name (e.g. "Logo_width_RGB" matches .svg, .png, .pdf, .eps, .ai)
+    const groups = new Map<string, File[]>();
+    for (const file of incomingFiles) {
+      const fmt = detectFileFormat(file.name);
+      if (!fmt) continue; // Skip unsupported files
+      const baseKey = getBaseKey(file.name);
+      if (!groups.has(baseKey)) {
+        groups.set(baseKey, []);
       }
-
-      try {
-        const svgText = await file.text();
-        const itemId = Math.random().toString(36).substring(2, 9);
-        const scopedSvg = normalizeAndScopeSvg(svgText, `bulk_${itemId}`);
-        const baseName = file.name
-          .replace(/\.svg$/i, "")
-          .replace(/[-_]/g, " ")
-          .trim();
-
-        // Auto heuristic tags from filename
-        const lowerName = file.name.toLowerCase();
-        let medium: AssetMedium = "UNIVERSAL";
-        if (lowerName.includes("cmyk") || lowerName.includes("print")) {
-          medium = "PRINT_CMYK";
-        } else if (lowerName.includes("rgb") || lowerName.includes("web") || lowerName.includes("screen")) {
-          medium = "DIGITAL_RGB";
-        }
-
-        let orientation: AssetOrientation = "HORIZONTAL";
-        if (lowerName.includes("symbol") || lowerName.includes("mark") || lowerName.includes("icon")) {
-          orientation = "SYMBOL";
-        } else if (lowerName.includes("vert") || lowerName.includes("stack")) {
-          orientation = "VERTICAL";
-        }
-
-        let background: AssetBackground = "LIGHT";
-        if (lowerName.includes("dark") || lowerName.includes("black")) {
-          background = "DARK";
-        } else if (lowerName.includes("inverse") || lowerName.includes("inv") || lowerName.includes("white")) {
-          background = "INVERSE";
-        } else if (lowerName.includes("trans")) {
-          background = "TRANSPARENT";
-        }
-
-        newItems.push({
-          id: itemId,
-          file,
-          name: baseName,
-          medium,
-          orientation,
-          hasClaim: orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan"),
-          background,
-          svgContent: scopedSvg,
-        });
-      } catch (err) {
-        console.error("Failed to read SVG file:", err);
-      }
+      groups.get(baseKey)!.push(file);
     }
 
-    if (newItems.length === 0) {
-      setError("Nevybrali ste žiadne platné .SVG súbory.");
+    if (groups.size === 0) {
+      setError("Nevybrali ste žiadne podporované súbory lôg (.SVG, .PNG, .PDF, .EPS, .AI, .ZIP).");
       return;
     }
 
-    setQueue((prev) => [...prev, ...newItems]);
+    setQueue((prevQueue) => {
+      const updatedQueue = [...prevQueue];
+
+      for (const [baseKey, groupFiles] of groups.entries()) {
+        // Check if an item with this baseKey already exists in the queue
+        let existingIndex = updatedQueue.findIndex((item) => item.baseKey === baseKey);
+
+        // Find primary SVG file if present
+        const svgFile = groupFiles.find((f) => f.name.toLowerCase().endsWith(".svg")) || null;
+        const pngFile = groupFiles.find((f) => /\.(png|jpg|jpeg|webp)$/i.test(f.name)) || null;
+
+        const newAttached: QueuedAttachedFile[] = groupFiles.map((f) => ({
+          file: f,
+          format: detectFileFormat(f.name) || "ZIP",
+          sizeFormatted: formatFileSize(f.size),
+        }));
+
+        if (existingIndex >= 0) {
+          // Merge into existing item
+          const existingItem = updatedQueue[existingIndex];
+          const mergedFiles = [...existingItem.attachedFiles];
+
+          for (const att of newAttached) {
+            if (!mergedFiles.some((m) => m.file.name === att.file.name)) {
+              mergedFiles.push(att);
+            }
+          }
+
+          updatedQueue[existingIndex] = {
+            ...existingItem,
+            attachedFiles: mergedFiles,
+            svgFile: existingItem.svgFile || svgFile,
+          };
+        } else {
+          // Auto heuristic tags from filename
+          const firstFile = groupFiles[0];
+          const baseName = firstFile.name
+            .replace(/\.[a-zA-Z0-9]+$/i, "")
+            .replace(/[-_]/g, " ")
+            .trim();
+          const lowerName = firstFile.name.toLowerCase();
+
+          let medium: AssetMedium = "UNIVERSAL";
+          if (lowerName.includes("cmyk") || lowerName.includes("print")) {
+            medium = "PRINT_CMYK";
+          } else if (lowerName.includes("rgb") || lowerName.includes("web") || lowerName.includes("screen")) {
+            medium = "DIGITAL_RGB";
+          }
+
+          let orientation: AssetOrientation = "HORIZONTAL";
+          if (lowerName.includes("symbol") || lowerName.includes("mark") || lowerName.includes("icon")) {
+            orientation = "SYMBOL";
+          } else if (lowerName.includes("vert") || lowerName.includes("stack")) {
+            orientation = "VERTICAL";
+          }
+
+          let background: AssetBackground = "LIGHT";
+          if (lowerName.includes("dark") || lowerName.includes("black")) {
+            background = "DARK";
+          } else if (lowerName.includes("inverse") || lowerName.includes("inv") || lowerName.includes("white")) {
+            background = "INVERSE";
+          } else if (lowerName.includes("trans")) {
+            background = "TRANSPARENT";
+          }
+
+          const itemId = Math.random().toString(36).substring(2, 9);
+
+          updatedQueue.push({
+            id: itemId,
+            baseKey,
+            name: baseName,
+            medium,
+            orientation,
+            hasClaim: orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan"),
+            background,
+            svgContent: "", // Will be parsed asynchronously
+            svgFile,
+            attachedFiles: newAttached,
+          });
+        }
+      }
+
+      return updatedQueue;
+    });
+
+    // Asynchronously parse SVGs / images for preview in queue
+    for (const [baseKey, groupFiles] of groups.entries()) {
+      const svgFile = groupFiles.find((f) => f.name.toLowerCase().endsWith(".svg"));
+      const pngFile = groupFiles.find((f) => /\.(png|jpg|jpeg|webp)$/i.test(f.name));
+
+      if (svgFile) {
+        try {
+          const text = await svgFile.text();
+          const scoped = normalizeAndScopeSvg(text, `bulk_${baseKey.replace(/[^a-z0-9]/g, "")}`);
+          setQueue((curr) =>
+            curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: scoped } : it))
+          );
+        } catch (err) {
+          console.error("Failed to read SVG:", err);
+        }
+      } else if (pngFile) {
+        try {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const dataUrl = e.target?.result as string;
+            const rasterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><image href="${dataUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
+            setQueue((curr) =>
+              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: rasterSvg } : it))
+            );
+          };
+          reader.readAsDataURL(pngFile);
+        } catch (err) {
+          console.error("Failed to read PNG preview:", err);
+        }
+      } else {
+        // Fallback document SVG
+        const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
+        setQueue((curr) =>
+          curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
+        );
+      }
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -139,12 +254,11 @@ export function BulkUploadModal({
     }
   };
 
-  const updateItem = (id: string, updates: Partial<QueuedSvgItem>) => {
+  const updateItem = (id: string, updates: Partial<QueuedLogoItem>) => {
     setQueue((prev) =>
       prev.map((item) => {
         if (item.id === id) {
           const updated = { ...item, ...updates };
-          // If orientation was changed to SYMBOL, enforce rule: symbol never has claim
           if (updated.orientation === "SYMBOL") {
             updated.hasClaim = false;
           }
@@ -159,8 +273,28 @@ export function BulkUploadModal({
     setQueue((prev) => prev.filter((item) => item.id !== id));
   };
 
+  const removeAttachedFile = (itemId: string, fileName: string) => {
+    setQueue((prev) =>
+      prev
+        .map((item) => {
+          if (item.id === itemId) {
+            const remaining = item.attachedFiles.filter((f) => f.file.name !== fileName);
+            if (remaining.length === 0) return null;
+            return {
+              ...item,
+              attachedFiles: remaining,
+              svgFile: item.svgFile?.name === fileName ? null : item.svgFile,
+            };
+          }
+          return item;
+        })
+        .filter((item): item is QueuedLogoItem => item !== null)
+    );
+  };
+
   // Convert SVG to small PNG thumbnail blob via browser canvas
   const generatePngThumbnail = async (svgText: string): Promise<File | null> => {
+    if (!svgText) return null;
     return new Promise((resolve) => {
       try {
         const img = new Image();
@@ -178,10 +312,9 @@ export function BulkUploadModal({
             return;
           }
 
-          // Draw image centered and scaled
-          const scale = Math.min(260 / img.width, 260 / img.height);
-          const w = img.width * scale;
-          const h = img.height * scale;
+          const scale = Math.min(260 / (img.width || 300), 260 / (img.height || 300));
+          const w = (img.width || 300) * scale;
+          const h = (img.height || 300) * scale;
           const x = (300 - w) / 2;
           const y = (300 - h) / 2;
           ctx.drawImage(img, x, y, w, h);
@@ -212,7 +345,7 @@ export function BulkUploadModal({
     });
   };
 
-  // Upload all items in queue sequentially
+  // Upload all items in queue sequentially with all their attached formats
   const handleUploadAll = () => {
     if (queue.length === 0) return;
     setError(null);
@@ -233,13 +366,23 @@ export function BulkUploadModal({
         formData.append("orientation", item.orientation);
         formData.append("hasClaim", String(item.hasClaim));
         formData.append("background", item.background);
-        formData.append("svgContent", item.svgContent);
-        formData.append("svgFile", item.file);
+        formData.append("svgContent", item.svgContent || "<svg viewBox='0 0 100 100'></svg>");
+
+        // Append all attached format files (file_SVG, file_PNG, file_PDF, file_EPS, file_AI, file_ZIP)
+        for (const att of item.attachedFiles) {
+          formData.append(`file_${att.format}`, att.file);
+        }
+
+        if (item.svgFile) {
+          formData.append("svgFile", item.svgFile);
+        }
 
         // Try to generate thumbnail
-        const thumbnail = await generatePngThumbnail(item.svgContent);
-        if (thumbnail) {
-          formData.append("previewFile", thumbnail);
+        if (item.svgContent) {
+          const thumbnail = await generatePngThumbnail(item.svgContent);
+          if (thumbnail) {
+            formData.append("previewFile", thumbnail);
+          }
         }
 
         const res = await uploadBrandAssetAction(brandId, formData);
@@ -265,10 +408,10 @@ export function BulkUploadModal({
           <div>
             <h2 className="text-base font-bold text-foreground flex items-center gap-2">
               <Upload className="h-4 w-4 text-[#c8d400]" />
-              <span>Hromadné nahrávanie vektorových lôg (Bulk Upload)</span>
+              <span>Hromadné nahrávanie lôg & exportov (Bulk Upload)</span>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Presuňte sem viacero SVG súborov naraz a priraďte im vlastnosti pre maticu logotypov.
+              Presuňte sem ľubovoľné súbory značky (SVG, PNG, PDF, EPS, AI, ZIP). Súbory s rovnakým názvom sa automaticky zlúčia do jedného loga.
             </p>
           </div>
           <button
@@ -309,7 +452,7 @@ export function BulkUploadModal({
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".svg"
+              accept=".svg,.png,.jpg,.jpeg,.webp,.pdf,.eps,.ai,.zip"
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
@@ -322,10 +465,10 @@ export function BulkUploadModal({
                 <Upload className="h-5 w-5" />
               </div>
               <div className="text-xs text-foreground font-semibold">
-                Kliknite alebo pretiahnite .SVG súbory sem
+                Kliknite alebo pretiahnite súbory sem (.SVG, .PNG, .PDF, .EPS, .AI, .ZIP)
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Môžete nahrať všetky varianty loga naraz (RGB, CMYK, horizontálne, vertikálne, symboly).
+                Môžete nahrať všetky varianty a formáty naraz. Systém ich automaticky spáruje a vygeneruje kompletný balík pre Cloudflare R2.
               </p>
             </div>
           </div>
@@ -346,120 +489,172 @@ export function BulkUploadModal({
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {queue.map((item, idx) => (
+              <div className="space-y-4">
+                {queue.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-[3px] bg-neutral-900 border border-border/40 flex flex-col md:flex-row items-start md:items-center gap-4 text-xs"
+                    className="p-4 rounded-[3px] bg-neutral-900 border border-border/40 flex flex-col gap-3 text-xs shadow-xs"
                   >
-                    {/* Thumbnail preview */}
-                    <div
-                      className={`h-20 w-24 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden ${
-                        item.background === "LIGHT"
-                          ? "bg-white text-black"
-                          : item.background === "DARK" || item.background === "INVERSE"
-                          ? "bg-[#070b0f] text-white"
-                          : "bg-neutral-800 text-white"
-                      }`}
-                    >
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                      {/* Thumbnail preview */}
                       <div
-                        className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain"
-                        dangerouslySetInnerHTML={{ __html: item.svgContent }}
-                      />
-                    </div>
-
-                    {/* Form fields */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 w-full">
-                      {/* Name */}
-                      <div className="sm:col-span-2 lg:col-span-1">
-                        <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
-                        <Input
-                          value={item.name}
-                          onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                          className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60"
-                        />
+                        className={`h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden ${
+                          item.background === "LIGHT"
+                            ? "bg-white text-black"
+                            : item.background === "DARK" || item.background === "INVERSE"
+                            ? "bg-[#070b0f] text-white"
+                            : "bg-neutral-800 text-white"
+                        }`}
+                      >
+                        {item.svgContent ? (
+                          <div
+                            className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain"
+                            dangerouslySetInnerHTML={{ __html: item.svgContent }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                            <ImageIcon className="h-5 w-5" />
+                            <span className="text-[9px] font-mono">Nahrávam...</span>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Medium */}
-                      <div>
-                        <Label className="text-[10px] text-muted-foreground uppercase font-mono">Médium</Label>
-                        <select
-                          value={item.medium}
-                          onChange={(e) => updateItem(item.id, { medium: e.target.value as AssetMedium })}
-                          className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
-                        >
-                          <option value="UNIVERSAL">Univerzálne</option>
-                          <option value="DIGITAL_RGB">Digitál (RGB)</option>
-                          <option value="PRINT_CMYK">Tlač (CMYK)</option>
-                        </select>
-                      </div>
+                      {/* Form fields */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1 w-full">
+                        {/* Name */}
+                        <div className="sm:col-span-2 lg:col-span-1">
+                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
+                          <Input
+                            value={item.name}
+                            onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                            className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60"
+                          />
+                        </div>
 
-                      {/* Orientation */}
-                      <div>
-                        <Label className="text-[10px] text-muted-foreground uppercase font-mono">Orientácia</Label>
-                        <select
-                          value={item.orientation}
-                          onChange={(e) => updateItem(item.id, { orientation: e.target.value as AssetOrientation })}
-                          className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
-                        >
-                          <option value="HORIZONTAL">Horizontálne</option>
-                          <option value="VERTICAL">Vertikálne</option>
-                          <option value="SYMBOL">Symbol / Značka</option>
-                        </select>
-                      </div>
-
-                      {/* Background & Claim */}
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1">
-                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Podklad</Label>
+                        {/* Medium */}
+                        <div>
+                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Médium</Label>
                           <select
-                            value={item.background}
-                            onChange={(e) => updateItem(item.id, { background: e.target.value as AssetBackground })}
+                            value={item.medium}
+                            onChange={(e) => updateItem(item.id, { medium: e.target.value as AssetMedium })}
                             className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                           >
-                            <option value="LIGHT">Svetlý</option>
-                            <option value="DARK">Tmavý</option>
-                            <option value="TRANSPARENT">Priehľadný</option>
-                            <option value="MONOCHROME">Monochróm</option>
-                            <option value="INVERSE">Inverzný</option>
+                            <option value="UNIVERSAL">Univerzálne</option>
+                            <option value="DIGITAL_RGB">Digitál (RGB)</option>
+                            <option value="PRINT_CMYK">Tlač (CMYK)</option>
                           </select>
                         </div>
 
-                        <div className="pt-4 shrink-0">
-                          <label
-                            className={`flex items-center gap-1.5 cursor-pointer text-[11px] ${
-                              item.orientation === "SYMBOL"
-                                ? "opacity-40 cursor-not-allowed text-muted-foreground"
-                                : "text-foreground"
-                            }`}
-                            title={
-                              item.orientation === "SYMBOL"
-                                ? "Pravidlo: Symbol nemôže obsahovať slogan/claim"
-                                : "Označte, ak logo obsahuje slogan"
-                            }
+                        {/* Orientation */}
+                        <div>
+                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Orientácia</Label>
+                          <select
+                            value={item.orientation}
+                            onChange={(e) => updateItem(item.id, { orientation: e.target.value as AssetOrientation })}
+                            className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                           >
-                            <input
-                              type="checkbox"
-                              checked={item.hasClaim}
-                              disabled={item.orientation === "SYMBOL"}
-                              onChange={(e) => updateItem(item.id, { hasClaim: e.target.checked })}
-                              className="rounded-[2px] accent-[#c8d400]"
-                            />
-                            <span>Claim</span>
-                          </label>
+                            <option value="HORIZONTAL">Horizontálne</option>
+                            <option value="VERTICAL">Vertikálne</option>
+                            <option value="SYMBOL">Symbol / Značka</option>
+                          </select>
+                        </div>
+
+                        {/* Background & Claim */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <Label className="text-[10px] text-muted-foreground uppercase font-mono">Podklad</Label>
+                            <select
+                              value={item.background}
+                              onChange={(e) => updateItem(item.id, { background: e.target.value as AssetBackground })}
+                              className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+                            >
+                              <option value="LIGHT">Svetlý</option>
+                              <option value="DARK">Tmavý</option>
+                              <option value="TRANSPARENT">Priehľadný</option>
+                              <option value="MONOCHROME">Monochróm</option>
+                              <option value="INVERSE">Inverzný</option>
+                            </select>
+                          </div>
+
+                          <div className="pt-4 shrink-0">
+                            <label
+                              className={`flex items-center gap-1.5 cursor-pointer text-[11px] ${
+                                item.orientation === "SYMBOL"
+                                  ? "opacity-40 cursor-not-allowed text-muted-foreground"
+                                  : "text-foreground"
+                              }`}
+                              title={
+                                item.orientation === "SYMBOL"
+                                  ? "Pravidlo: Symbol nemôže obsahovať slogan/claim"
+                                  : "Označte, ak logo obsahuje slogan"
+                              }
+                            >
+                              <input
+                                type="checkbox"
+                                checked={item.hasClaim}
+                                disabled={item.orientation === "SYMBOL"}
+                                onChange={(e) => updateItem(item.id, { hasClaim: e.target.checked })}
+                                className="rounded-[2px] accent-[#c8d400]"
+                              />
+                              <span>Claim</span>
+                            </label>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Remove item button */}
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.id)}
+                        className="p-1.5 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors self-end md:self-center"
+                        title="Odstrániť toto logo zo zoznamu"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
 
-                    {/* Remove button */}
-                    <button
-                      type="button"
-                      onClick={() => removeItem(item.id)}
-                      className="p-1.5 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors self-end md:self-center"
-                      title="Odstrániť zo zoznamu"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                    {/* Merged formats note & chips */}
+                    <div className="pt-2 border-t border-border/30 flex flex-wrap items-center justify-between gap-2 bg-neutral-950/40 p-2 rounded-[2px]">
+                      <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                          <FolderArchive className="h-3.5 w-3.5 text-[#c8d400]" />
+                          {item.attachedFiles.length > 1 ? (
+                            <span>
+                              Zlúčených <strong className="text-[#c8d400]">{item.attachedFiles.length} formátov</strong> podľa rovnakého názvu súborov:
+                            </span>
+                          ) : (
+                            <span>Priradený formát súboru:</span>
+                          )}
+                        </span>
+
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {item.attachedFiles.map((att) => (
+                            <span
+                              key={att.file.name}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-neutral-800 border border-border/60 text-[10px] font-mono text-foreground"
+                              title={att.file.name}
+                            >
+                              <span className="font-bold text-[#c8d400]">{att.format}</span>
+                              <span className="text-muted-foreground text-[9px]">({att.sizeFormatted})</span>
+                              {item.attachedFiles.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => removeAttachedFile(item.id, att.file.name)}
+                                  className="text-muted-foreground hover:text-red-400 ml-0.5"
+                                  title={`Odstrániť formát ${att.format}`}
+                                >
+                                  <X className="h-2.5 w-2.5" />
+                                </button>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <span className="text-[10px] text-muted-foreground italic shrink-0">
+                        Všetky formáty sa nahrajú do R2
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -492,7 +687,7 @@ export function BulkUploadModal({
         <div className="p-5 border-t border-border/30 bg-card/60 flex items-center justify-between shrink-0">
           <div className="text-xs text-muted-foreground">
             {queue.length > 0
-              ? `${queue.length} ${queue.length === 1 ? "logo pripravené" : "lôg pripravených"} na nahratie.`
+              ? `${queue.length} ${queue.length === 1 ? "logo pripravené" : "lôg pripravených"} na nahratie (spolu ${queue.reduce((acc, it) => acc + it.attachedFiles.length, 0)} súborov).`
               : "Pretiahnite súbory na začatie."}
           </div>
 

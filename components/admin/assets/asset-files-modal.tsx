@@ -220,7 +220,18 @@ export function AssetFilesModal({
               <input
                 ref={fileInputRef}
                 type="file"
-                onChange={(e) => setFileToUpload(e.target.files?.[0] || null)}
+                onChange={(e) => {
+                  const picked = e.target.files?.[0] || null;
+                  setFileToUpload(picked);
+                  if (picked) {
+                    const ext = picked.name.split(".").pop()?.toUpperCase();
+                    if (ext === "SVG" || ext === "PDF" || ext === "EPS" || ext === "AI" || ext === "PNG" || ext === "ZIP") {
+                      setSelectedFormat(ext as AssetFileFormat);
+                    } else if (ext === "JPG" || ext === "JPEG" || ext === "WEBP") {
+                      setSelectedFormat("PNG");
+                    }
+                  }
+                }}
                 className="w-full mt-1.5 h-9 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-[2px] file:border-0 file:bg-neutral-800 file:text-foreground file:font-semibold text-muted-foreground cursor-pointer"
               />
             </div>

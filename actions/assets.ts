@@ -173,22 +173,30 @@ export async function uploadBrandAssetAction(
 
     const createdAsset = await pb.collection("assets").create(assetData);
 
-    // Save initial SVG file to assetFiles (stored directly on Cloudflare R2)
-    const svgFile = formData.get("svgFile");
-    if (svgFile instanceof File && svgFile.size > 0) {
-      try {
-        const fileData = new FormData();
-        fileData.append("asset", createdAsset.id);
-        fileData.append("fileFormat", "SVG");
-        fileData.append("file", svgFile);
-        await pb.collection("assetFiles").create(fileData);
-      } catch (fileErr) {
-        console.error("Failed to store SVG in assetFiles:", fileErr);
+    // Save all provided file formats to assetFiles (stored directly on Cloudflare R2)
+    const possibleFormats: AssetFileFormat[] = ["SVG", "PDF", "EPS", "AI", "PNG", "ZIP"];
+    let savedSvg = false;
+
+    for (const fmt of possibleFormats) {
+      const file = formData.get(`file_${fmt}`) || (fmt === "SVG" ? formData.get("svgFile") : null);
+      if (file instanceof File && file.size > 0) {
+        try {
+          const fileData = new FormData();
+          fileData.append("asset", createdAsset.id);
+          fileData.append("fileFormat", fmt);
+          fileData.append("file", file);
+          await pb.collection("assetFiles").create(fileData);
+          if (fmt === "SVG") savedSvg = true;
+        } catch (fileErr) {
+          console.error(`Failed to store ${fmt} in assetFiles:`, fileErr);
+        }
       }
-    } else if (svgContent) {
-      // Create SVG blob from text content if physical file wasn't provided
+    }
+
+    // If SVG file wasn't provided physically, create SVG file record from text content
+    if (!savedSvg && svgContent) {
       try {
-        const blob = new Blob([svgContent], { type: "image/svg+xml" });
+        const blob = new Blob([scopedSvg], { type: "image/svg+xml" });
         const generatedFile = new File(
           [blob],
           `${name.toLowerCase().replace(/[^a-z0-9]/g, "-") || "logo"}.svg`,
