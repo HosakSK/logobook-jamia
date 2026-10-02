@@ -8,6 +8,8 @@ import { PublicManualSidebar } from "./public-manual-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Locale } from "@/lib/i18n";
+import { useBrandCascade } from "@/components/modules/cascade";
+import { getWcagContrast } from "@/lib/utils/color-calc";
 
 interface PublicManualShellProps {
   children: React.ReactNode;
@@ -34,6 +36,11 @@ export function PublicManualShell({
 }: PublicManualShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pages = snapshot?.pages || [];
+  const { tokens } = useBrandCascade();
+  const manualBg = tokens?.manualBgColor || "#0e161d";
+  const contrast = getWcagContrast(manualBg);
+  const isDarkBg = contrast.preferredText === "white";
+  const logobookSymbolSrc = isDarkBg ? "/logo/logo-symbol-dark.svg" : "/logo/logo-symbol-light.svg";
 
   return (
     <div
@@ -157,23 +164,18 @@ export function PublicManualShell({
         <div className="container mx-auto px-4 space-y-1.5">
           <p>© {new Date().getFullYear()} {brand.name}. Všetky práva vyhradené.</p>
           {!brand.hideLogobookBadge && (
-            <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/80">
+            <div className="pt-1.5 flex items-center justify-center gap-1.5 text-xs text-muted-foreground/80">
               <span>Vytvorené na</span>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 font-semibold text-foreground/85 hover:text-foreground transition-all duration-150 group"
+                className="inline-flex items-center gap-1.5 font-semibold text-foreground hover:text-foreground transition-all duration-150 group"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <img
-                  src="/logo/logo-symbol-dark.svg"
+                  src={logobookSymbolSrc}
                   alt="Logobook.sk"
-                  className="h-3.5 w-3.5 object-contain opacity-85 group-hover:opacity-100 transition-opacity dark:block hidden"
-                />
-                <img
-                  src="/logo/logo-symbol-light.svg"
-                  alt="Logobook.sk"
-                  className="h-3.5 w-3.5 object-contain opacity-85 group-hover:opacity-100 transition-opacity dark:hidden block"
+                  className="h-5 w-5 object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                 />
                 <span className="hover:underline">Logobook.sk</span>
               </Link>
