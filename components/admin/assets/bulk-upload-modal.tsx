@@ -102,9 +102,9 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     const page = await pdfDoc.getPage(1);
     const unscaledViewport = page.getViewport({ scale: 1 });
     
-    // Scale up for high DPI crispness (max 1000px dimension)
+    // Scale to max 500px dimension to ensure preview is fast, crisp and stays safely under 60-80 KB DataURL
     const maxDim = Math.max(unscaledViewport.width, unscaledViewport.height) || 500;
-    const targetScale = Math.min(2.5, 1200 / maxDim);
+    const targetScale = Math.min(1.5, 500 / maxDim);
     const viewport = page.getViewport({ scale: targetScale });
 
     const canvas = document.createElement("canvas");
@@ -113,7 +113,6 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Render transparent / clean
     const renderContext = {
       canvasContext: ctx,
       viewport: viewport,
@@ -121,7 +120,13 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     };
     await page.render(renderContext).promise;
 
-    const dataUrl = canvas.toDataURL("image/png");
+    // Use JPEG with quality 0.85 for small footprint (<50k chars)
+    let dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    // If somehow still > 350k chars, re-encode with lower quality
+    if (dataUrl.length > 350000) {
+      dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+    }
+
     return {
       dataUrl,
       width: Math.floor(viewport.width),
@@ -295,11 +300,27 @@ export function BulkUploadModal({
         try {
           const reader = new FileReader();
           reader.onload = (e) => {
-            const dataUrl = e.target?.result as string;
-            const rasterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><image href="${dataUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
-            setQueue((curr) =>
-              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: rasterSvg } : it))
-            );
+            const rawUrl = e.target?.result as string;
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = Math.max(img.width, img.height) || 400;
+              const scale = Math.min(1, 500 / maxDim);
+              const w = Math.floor(img.width * scale);
+              const h = Math.floor(img.height * scale);
+              const c = document.createElement("canvas");
+              c.width = w;
+              c.height = h;
+              const ctx = c.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(img, 0, 0, w, h);
+                const compactUrl = c.toDataURL("image/png");
+                const rasterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><image href="${compactUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
+                setQueue((curr) =>
+                  curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: rasterSvg } : it))
+                );
+              }
+            };
+            img.src = rawUrl;
           };
           reader.readAsDataURL(pngFile);
         } catch (err) {
@@ -530,8 +551,11 @@ export function BulkUploadModal({
           formData.append("medium", item.medium);
           formData.append("orientation", item.orientation);
           formData.append("hasClaim", String(item.hasClaim));
-          formData.append("background", item.background);
-          formData.append("svgContent", item.svgContent || "<svg viewBox='0 0 100 100'></svg>");
+          let contentToSend = item.svgContent || "<svg viewBox='0 0 100 100'></svg>";
+          if (contentToSend.length > 400000) {
+            contentToSend = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${item.medium}</text></svg>`;
+          }
+          formData.append("svgContent", contentToSend);
 
           // Append all attached format files (file_SVG, file_PNG, file_PDF, file_EPS, file_AI, file_ZIP)
           for (const att of item.attachedFiles) {
