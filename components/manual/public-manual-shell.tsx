@@ -41,14 +41,14 @@ export function PublicManualShell({
       className="min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors"
     >
       {/* Sticky Top Header */}
-      <header className="sticky top-0 z-40 h-16 border-b border-border bg-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
+      <header className="sticky top-0 z-40 h-18 border-b border-border/50 bg-card/90 backdrop-blur-md px-5 sm:px-8 flex items-center justify-between">
         {/* Left: Mobile hamburger + Brand Title / Logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           {pages.length > 0 && (
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
+              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
               aria-label="Open manual navigation"
             >
               <Menu className="h-5 w-5" />
@@ -57,20 +57,19 @@ export function PublicManualShell({
 
           <Link
             href={`/manual/${domain}/${locale}`}
-            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-3.5 hover:opacity-90 transition-opacity"
           >
             {brand.headerLogoUrl ? (
               <img
                 src={brand.headerLogoUrl}
                 alt={brand.name}
-                className="h-8 w-auto max-w-[140px] sm:max-w-[180px] object-contain"
+                className="h-9 w-auto max-w-[150px] sm:max-w-[200px] object-contain"
               />
             ) : (
               <div
-                className="h-8 w-8 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs"
+                className="h-9 w-9 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs rounded-xl"
                 style={{
                   backgroundColor: "var(--brand-color-primary, #c8d400)",
-                  borderRadius: "var(--brand-radius, 3px)",
                 }}
               >
                 {brand.name.slice(0, 2).toUpperCase()}
@@ -81,7 +80,7 @@ export function PublicManualShell({
               <span className="font-bold tracking-tight text-sm sm:text-base uppercase">
                 {brand.name}
               </span>
-              <span className="text-[11px] text-muted-foreground ml-2 border-l border-border/60 pl-2">
+              <span className="text-xs text-muted-foreground ml-2.5 border-l border-border/60 pl-2.5 font-medium">
                 Brand Manual
               </span>
             </div>
@@ -89,7 +88,7 @@ export function PublicManualShell({
         </div>
 
         {/* Right: Language switcher & Theme toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-3">
           <LanguageSwitcher currentLocale={locale as Locale} />
           <ThemeToggle />
         </div>
@@ -99,7 +98,7 @@ export function PublicManualShell({
       <div className="flex-1 flex w-full">
         {/* Desktop Fixed Sidebar */}
         {pages.length > 0 && (
-          <div className="hidden md:block w-64 shrink-0 border-r border-border bg-card/40 sticky top-16 h-[calc(100vh-4rem)]">
+          <div className="hidden md:block w-72 shrink-0 border-r border-border/50 bg-card/20 sticky top-18 h-[calc(100vh-4.5rem)]">
             <PublicManualSidebar
               pages={pages}
               currentPageSlug={currentPageSlug}
@@ -110,7 +109,7 @@ export function PublicManualShell({
         )}
 
         {/* Center Main Content Area */}
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 p-6 sm:p-10 md:p-14 max-w-6xl mx-auto w-full">
           {children}
         </main>
       </div>

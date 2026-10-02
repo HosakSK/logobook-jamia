@@ -76,55 +76,55 @@ export default async function BrandSettingsPage({
     : null;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8 py-2">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 pb-2">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-2">
             <Link
               href={`/admin/brand/${brandId}`}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
             >
-              <ArrowLeft className="h-3 w-3" />
+              <ArrowLeft className="h-3.5 w-3.5" />
               <span>{dict.admin.brandOverview}</span>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             {dict.admin.brandSettings}: <span className="text-primary">{brand.name}</span>
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground mt-1">
             Spravujte nastavenia projektu, domény, SEO a globálny vizuálny štýl manuálu.
           </p>
         </div>
 
-        <Button asChild variant="outline" size="sm" className="gap-2 self-start sm:self-auto text-xs rounded-[3px]">
+        <Button asChild variant="outline" size="default" className="self-start sm:self-auto shrink-0 shadow-xs">
           <Link href={`/m/${brand.slug || brandId}`} target="_blank">
             <span>{dict.admin.viewLiveManual}</span>
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-4 w-4" />
           </Link>
         </Button>
       </div>
 
       {/* Team Collaborators Link Card */}
-      <div className="border border-border/40 rounded-[3px] p-5 bg-card shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-[3px] bg-neutral-900 border border-border/60 flex items-center justify-center text-[#c8d400]">
-            <Users className="h-5 w-5" />
+      <div className="border border-border/50 rounded-2xl p-6 sm:p-7 bg-card shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-xl bg-neutral-900/80 border border-border/70 flex items-center justify-center text-[#c8d400] shrink-0">
+            <Users className="h-6 w-6" />
           </div>
-          <div>
-            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+          <div className="space-y-1">
+            <h3 className="font-bold text-base text-foreground flex items-center gap-2">
               <span>{dict.admin.teamTitle}</span>
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               {dict.admin.teamSubtitle}
             </p>
           </div>
         </div>
 
-        <Button asChild variant="outline" size="sm" className="h-9 px-4 text-xs font-semibold rounded-[3px] border-border/60 self-start sm:self-auto gap-1.5">
+        <Button asChild variant="outline" size="default" className="self-start sm:self-auto shrink-0 shadow-xs">
           <Link href={`/admin/brand/${brandId}/settings/team`}>
             <span>{dict.admin.manageTeam}</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </div>
@@ -135,7 +135,7 @@ export default async function BrandSettingsPage({
       {/* 2. Favicon Upload */}
       <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />
 
-      {/* 3. Global Shapes (Corner radius, border width, semantic colors) */}
+      {/* 3. Global Shapes (Corner radius, border width, semantic colors, manual background) */}
       <BrandShapesForm brandId={brand.id} initialShapes={serializedShapes} dict={dict} />
 
       {/* 4. Danger Zone (Delete Brand) - Only for Owner */}

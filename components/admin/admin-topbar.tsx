@@ -23,7 +23,7 @@ export function AdminTopbar({
   onMenuToggle,
 }: AdminTopbarProps) {
   return (
-    <header className="h-16 border-b border-[#2b3b48]/60 bg-[#0e161d]/90 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30">
+    <header className="h-17 border-b border-[#2b3b48]/60 bg-[#0e161d]/90 backdrop-blur-xl flex items-center justify-between px-5 sm:px-8 sticky top-0 z-30">
       {/* Left: Mobile hamburger + Dynamic Breadcrumbs */}
       <div className="flex items-center gap-3">
         <button

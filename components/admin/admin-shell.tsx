@@ -42,7 +42,7 @@ export function AdminShell({
           locale={locale}
           onMenuToggle={() => setMobileOpen(!mobileOpen)}
         />
-        <main className="flex-1 p-4 sm:p-6 md:p-10">{children}</main>
+        <main className="flex-1 p-5 sm:p-8 md:p-12 w-full max-w-7xl mx-auto">{children}</main>
       </div>
     </div>
   );

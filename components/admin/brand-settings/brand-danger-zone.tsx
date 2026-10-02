@@ -40,14 +40,14 @@ export function BrandDangerZone({ brandId, brandName, dict }: BrandDangerZonePro
 
   return (
     <>
-      <div className="border border-red-500/30 rounded-[3px] bg-red-950/20 p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="space-y-1">
-            <h2 className="text-base font-bold text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
+      <div className="border border-red-500/30 rounded-2xl bg-red-950/20 p-6 sm:p-8 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="space-y-1.5">
+            <h2 className="text-lg font-bold text-red-400 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
               {dict.admin.dangerZone}
             </h2>
-            <p className="text-xs text-red-300/70 max-w-xl">
+            <p className="text-xs text-red-300/70 max-w-xl leading-relaxed">
               {dict.admin.dangerZoneDesc}
             </p>
           </div>
@@ -55,51 +55,51 @@ export function BrandDangerZone({ brandId, brandName, dict }: BrandDangerZonePro
           <Button
             type="button"
             variant="destructive"
-            size="sm"
+            size="default"
             onClick={() => {
               setConfirmInput("");
               setError(null);
               setIsOpen(true);
             }}
-            className="h-9 px-4 text-xs font-semibold rounded-[3px] shrink-0 gap-1.5"
+            className="shrink-0"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            {dict.admin.deleteBrand}
+            <Trash2 className="h-4 w-4" />
+            <span>{dict.admin.deleteBrand}</span>
           </Button>
         </div>
       </div>
 
       {/* Confirmation Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-          <div className="bg-[#1f2c36] border border-red-500/40 rounded-[3px] max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in-0 zoom-in-95">
-            <div className="flex items-center justify-between border-b border-border/40 pb-3">
-              <div className="flex items-center gap-2 text-red-400 font-bold text-base">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
+          <div className="bg-[#141e27] border border-red-500/40 rounded-2xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in-0 zoom-in-95">
+            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+              <div className="flex items-center gap-2.5 text-red-400 font-bold text-lg">
                 <AlertTriangle className="h-5 w-5" />
                 <h3>{dict.admin.deleteBrandModalTitle}</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-1 rounded-lg transition-colors cursor-pointer"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
             {error && (
-              <div className="p-3 text-xs bg-red-950/60 border border-red-500/50 text-red-300 rounded-[3px]">
+              <div className="p-4 text-xs bg-red-950/60 border border-red-500/50 text-red-300 rounded-xl">
                 {error}
               </div>
             )}
 
-            <div className="space-y-3 text-xs text-muted-foreground">
+            <div className="space-y-3.5 text-xs text-muted-foreground leading-relaxed">
               <p>
                 Tento krok je <strong>nezvratný</strong>. Zmaže sa celá štruktúra stránok, farby, typografia a priradené assety.
               </p>
               <p>
                 {dict.admin.deleteBrandConfirmPrompt}{" "}
-                <span className="font-bold text-foreground font-mono bg-neutral-800/80 px-1.5 py-0.5 rounded-[3px]">
+                <span className="font-bold text-foreground font-mono bg-neutral-800 px-2 py-0.5 rounded-md">
                   {brandName}
                 </span>
               </p>
@@ -107,37 +107,35 @@ export function BrandDangerZone({ brandId, brandName, dict }: BrandDangerZonePro
                 value={confirmInput}
                 onChange={(e) => setConfirmInput(e.target.value)}
                 placeholder={brandName}
-                className="h-9 text-xs rounded-[3px] bg-background border-border/60 font-mono"
+                className="h-10 text-xs rounded-xl bg-background border-border/60 font-mono"
                 autoFocus
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3.5 pt-2">
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={() => setIsOpen(false)}
-                className="h-9 text-xs rounded-[3px] border-border/60"
               >
                 Zrušiť
               </Button>
               <Button
                 type="button"
                 variant="destructive"
-                size="sm"
+                size="default"
                 disabled={!isConfirmed || isPending}
                 onClick={handleDelete}
-                className="h-9 text-xs font-semibold rounded-[3px] gap-1.5"
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     <span>{dict.admin.deleting}</span>
                   </>
                 ) : (
                   <>
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-4 w-4 mr-2" />
                     <span>{dict.admin.deleteConfirmButton}</span>
                   </>
                 )}

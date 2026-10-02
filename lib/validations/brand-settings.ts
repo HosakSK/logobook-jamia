@@ -21,7 +21,17 @@ export const brandGeneralSettingsSchema = z.object({
 export type BrandGeneralSettingsInput = z.infer<typeof brandGeneralSettingsSchema>;
 
 export const globalShapesSchema = z.object({
-  radiusMode: z.enum(["sharp", "rounded", "pill"]).default("rounded"),
+  radiusMode: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const lower = (val || "rounded").toLowerCase().trim();
+      if (lower === "sharp" || lower === "pill" || lower === "rounded") {
+        return lower as "sharp" | "rounded" | "pill";
+      }
+      return "rounded";
+    })
+    .default("rounded"),
   customRadiusPx: z.coerce.number().min(0).max(64).default(3),
   borderWidthPx: z.coerce.number().min(0).max(8).default(1),
   semanticSuccess: z.string().optional(),

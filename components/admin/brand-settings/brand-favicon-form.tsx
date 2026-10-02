@@ -50,41 +50,41 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
   };
 
   return (
-    <div className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-4">
-      <div className="border-b border-border/30 pb-4">
-        <h2 className="text-base font-bold text-foreground">{dict.admin.faviconLabel}</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+    <div className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="border-b border-border/30 pb-5">
+        <h2 className="text-lg font-bold text-foreground">{dict.admin.faviconLabel}</h2>
+        <p className="text-xs text-muted-foreground mt-1">
           {dict.admin.faviconHint}
         </p>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 text-xs bg-red-950/40 border border-red-500/40 text-red-400 rounded-[3px]">
+        <div className="flex items-center gap-2.5 p-4 text-xs bg-red-950/40 border border-red-500/40 text-red-400 rounded-xl">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="flex items-center gap-2 p-3 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-[3px]">
+        <div className="flex items-center gap-2.5 p-4 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-xl">
           <Check className="h-4 w-4 shrink-0" />
           <span>Favicon bol úspešne nahraný!</span>
         </div>
       )}
 
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-6">
         {/* Favicon Preview Box */}
-        <div className="h-16 w-16 rounded-[3px] border border-border/60 bg-background/50 flex items-center justify-center overflow-hidden p-2 shadow-xs">
+        <div className="h-20 w-20 rounded-xl border border-border/60 bg-background/50 flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
           {previewUrl ? (
-            <img src={previewUrl} alt="Favicon preview" className="h-8 w-8 object-contain" />
+            <img src={previewUrl} alt="Favicon preview" className="h-10 w-10 object-contain" />
           ) : (
-            <Sparkles className="h-6 w-6 text-muted-foreground/40" />
+            <Sparkles className="h-8 w-8 text-muted-foreground/40" />
           )}
         </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Nahrať novú ikonu</Label>
-          <p className="text-[11px] text-muted-foreground">
+        <div className="space-y-2.5">
+          <Label className="text-xs font-semibold text-muted-foreground">Nahrať novú ikonu</Label>
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Podporované formáty: .ico, .png, .svg (odporúčaný rozmer: 32x32 alebo 64x64 px).
           </p>
           <input
@@ -98,19 +98,19 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
           <Button
             type="button"
             variant="outline"
-            size="sm"
+            size="default"
             disabled={isPending}
             onClick={() => fileInputRef.current?.click()}
-            className="h-8 text-xs rounded-[3px] border-border/60 mt-1 gap-1.5"
+            className="mt-1 shadow-xs"
           >
             {isPending ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 <span>Nahrávam...</span>
               </>
             ) : (
               <>
-                <Upload className="h-3.5 w-3.5" />
+                <Upload className="h-4 w-4 mr-2" />
                 <span>Vybrať favicon</span>
               </>
             )}
