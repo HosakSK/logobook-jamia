@@ -86,6 +86,8 @@ export function computeBrandCssVariables(
     }
   }
 
+  const manualBg = (shapes as any)?.manualBgColor || "#0e161d";
+
   return {
     "--brand-radius": radiusValue,
     "--brand-radius-mode": radiusMode,
@@ -100,6 +102,7 @@ export function computeBrandCssVariables(
     "--brand-color-info": info,
     "--brand-font-heading": headingFont,
     "--brand-font-body": bodyFont,
+    "--brand-manual-bg": manualBg,
   };
 }
 
@@ -114,6 +117,7 @@ export function buildBrandCascadeTokens(
   const radiusMode = (shapes?.radiusMode as "sharp" | "rounded" | "pill") || "rounded";
   const customRadiusPx = shapes?.customRadiusPx ?? 3;
   const borderWidthPx = shapes?.borderWidthPx ?? 1;
+  const manualBgColor = (shapes as any)?.manualBgColor || "#0e161d";
 
   let primary = "#c8d400";
   let secondary = "#17212a";
@@ -146,6 +150,7 @@ export function buildBrandCascadeTokens(
     customRadiusPx,
     borderWidth: `${Math.max(0, borderWidthPx)}px`,
     borderWidthPx,
+    manualBgColor,
     colors: {
       primary,
       secondary,

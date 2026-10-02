@@ -54,6 +54,7 @@ export interface BrandCascadeTokens {
     [key: string]: string | undefined;
   };
   palette: Array<{ hex: string; role: string; name: string }>;
+  manualBgColor?: string;
   typography?: {
     headingFontFamily?: string;
     bodyFontFamily?: string;

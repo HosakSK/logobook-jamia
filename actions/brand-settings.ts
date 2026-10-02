@@ -199,6 +199,7 @@ export async function updateGlobalShapesAction(
       semanticWarning: formData.get("semanticWarning")?.toString().trim() || undefined,
       semanticDanger: formData.get("semanticDanger")?.toString().trim() || undefined,
       semanticInfo: formData.get("semanticInfo")?.toString().trim() || undefined,
+      manualBgColor: formData.get("manualBgColor")?.toString().trim() || undefined,
     };
 
     const parsed = globalShapesSchema.safeParse(rawData);
@@ -215,6 +216,7 @@ export async function updateGlobalShapesAction(
       semanticWarning: parsed.data.semanticWarning || "",
       semanticDanger: parsed.data.semanticDanger || "",
       semanticInfo: parsed.data.semanticInfo || "",
+      manualBgColor: parsed.data.manualBgColor || "#0e161d",
     };
 
     // Check if globalShapes record exists for this brand

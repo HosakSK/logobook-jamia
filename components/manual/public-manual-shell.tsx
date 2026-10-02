@@ -36,7 +36,10 @@ export function PublicManualShell({
   const pages = snapshot?.pages || [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900">
+    <div
+      style={{ backgroundColor: "var(--brand-manual-bg, var(--background))" }}
+      className="min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors"
+    >
       {/* Sticky Top Header */}
       <header className="sticky top-0 z-40 h-16 border-b border-border bg-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between">
         {/* Left: Mobile hamburger + Brand Title / Logo */}

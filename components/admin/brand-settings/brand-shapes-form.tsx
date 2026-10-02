@@ -18,6 +18,7 @@ interface BrandShapesFormProps {
     semanticWarning?: string;
     semanticDanger?: string;
     semanticInfo?: string;
+    manualBgColor?: string;
   } | null;
   dict: Dictionary;
 }
@@ -35,6 +36,7 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
   const [warningColor, setWarningColor] = useState<string>(initialShapes?.semanticWarning || "#c8d400");
   const [dangerColor, setDangerColor] = useState<string>(initialShapes?.semanticDanger || "#bb4934");
   const [infoColor, setInfoColor] = useState<string>(initialShapes?.semanticInfo || "#2b3b48");
+  const [manualBgColor, setManualBgColor] = useState<string>(initialShapes?.manualBgColor || "#0e161d");
 
   // Effective preview radius
   const previewRadiusPx =
@@ -47,6 +49,7 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
 
     const formData = new FormData(e.currentTarget);
     formData.set("radiusMode", radiusMode);
+    formData.set("manualBgColor", manualBgColor);
 
     startTransition(async () => {
       const res = await updateGlobalShapesAction(brandId, null, formData);
@@ -84,58 +87,73 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
 
       {/* Live Preview Box */}
       <div className="p-5 rounded-[3px] border border-border/60 bg-background/50 space-y-3">
-        <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
-          Živý náhľad tvarov a štýlu
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+            Živý náhľad tvarov a pozadia manuálu
+          </span>
+          <span className="text-[10px] font-mono text-muted-foreground">
+            Pozadie manuálu: {manualBgColor}
+          </span>
+        </div>
         <div
           style={{
-            borderRadius: `${previewRadiusPx}px`,
-            borderWidth: `${borderWidth}px`,
+            backgroundColor: manualBgColor,
+            color: manualBgColor === "#ffffff" || manualBgColor === "#f8fafc" ? "#070b0f" : "#fafbfc",
           }}
-          className="border-border p-4 bg-card transition-all flex flex-col sm:flex-row items-center justify-between gap-4"
+          className="p-5 rounded-[3px] border border-border/40 transition-colors"
         >
-          <div className="space-y-1 text-center sm:text-left">
-            <h4 className="text-xs font-bold">Ukážkový kontajner modulu</h4>
-            <p className="text-[11px] text-muted-foreground">
-              Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px
-            </p>
-          </div>
+          <div
+            style={{
+              borderRadius: `${previewRadiusPx}px`,
+              borderWidth: `${borderWidth}px`,
+              borderColor: manualBgColor === "#ffffff" || manualBgColor === "#f8fafc" ? "rgba(0,0,0,0.15)" : "rgba(63,85,102,0.45)",
+              backgroundColor: manualBgColor === "#ffffff" ? "#f1f5f9" : manualBgColor === "#f8fafc" ? "#ffffff" : "rgba(23, 33, 42, 0.85)",
+            }}
+            className="p-4 transition-all flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm"
+          >
+            <div className="space-y-1 text-center sm:text-left">
+              <h4 className="text-xs font-bold">Ukážkový kontajner modulu</h4>
+              <p className="text-[11px] opacity-75">
+                Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px
+              </p>
+            </div>
 
-          {/* Sample Badges */}
-          <div className="flex flex-wrap gap-2">
-            <span
-              style={{
-                borderRadius: `${previewRadiusPx}px`,
-                backgroundColor: `${successColor}25`,
-                borderColor: successColor,
-                color: successColor,
-              }}
-              className="px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1"
-            >
-              <CircleCheck className="h-3 w-3" /> Do&apos;s
-            </span>
-            <span
-              style={{
-                borderRadius: `${previewRadiusPx}px`,
-                backgroundColor: `${warningColor}25`,
-                borderColor: warningColor,
-                color: warningColor,
-              }}
-              className="px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1"
-            >
-              <AlertTriangle className="h-3 w-3" /> Notice
-            </span>
-            <span
-              style={{
-                borderRadius: `${previewRadiusPx}px`,
-                backgroundColor: `${dangerColor}25`,
-                borderColor: dangerColor,
-                color: dangerColor,
-              }}
-              className="px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1"
-            >
-              <XCircle className="h-3 w-3" /> Don&apos;ts
-            </span>
+            {/* Sample Badges */}
+            <div className="flex flex-wrap gap-2">
+              <span
+                style={{
+                  borderRadius: `${previewRadiusPx}px`,
+                  backgroundColor: `${successColor}25`,
+                  borderColor: successColor,
+                  color: successColor,
+                }}
+                className="px-2.5 py-1 text-[10px] font-bold border flex items-center gap-1"
+              >
+                <CircleCheck className="h-3 w-3" /> Do&apos;s
+              </span>
+              <span
+                style={{
+                  borderRadius: `${previewRadiusPx}px`,
+                  backgroundColor: `${warningColor}25`,
+                  borderColor: warningColor,
+                  color: warningColor,
+                }}
+                className="px-2.5 py-1 text-[10px] font-bold border flex items-center gap-1"
+              >
+                <AlertTriangle className="h-3 w-3" /> Notice
+              </span>
+              <span
+                style={{
+                  borderRadius: `${previewRadiusPx}px`,
+                  backgroundColor: `${dangerColor}25`,
+                  borderColor: dangerColor,
+                  color: dangerColor,
+                }}
+                className="px-2.5 py-1 text-[10px] font-bold border flex items-center gap-1"
+              >
+                <XCircle className="h-3 w-3" /> Don&apos;ts
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -341,6 +359,103 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
               />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Brand Manual Background Color Setting */}
+      <div className="pt-4 border-t border-border/30 space-y-4">
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Farba pozadia verejného manuálu
+          </h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            Zvoľte celkovú farbu plátna / pozadia pre verejný brand manuál. Administrátorské rozhranie ostáva v systémovom tmavom režime.
+          </p>
+        </div>
+
+        {/* Quick Presets */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <button
+            type="button"
+            onClick={() => setManualBgColor("#0e161d")}
+            className={`p-3 rounded-[3px] border text-left flex items-center gap-3 transition-colors ${
+              manualBgColor.toLowerCase() === "#0e161d"
+                ? "border-[#c8d400] bg-[#c8d400]/10"
+                : "border-border/60 hover:border-border"
+            }`}
+          >
+            <div className="h-6 w-6 rounded-[2px] bg-[#0e161d] border border-white/20 shrink-0" />
+            <div>
+              <div className="text-xs font-semibold">Tmavá (Default)</div>
+              <div className="text-[10px] text-muted-foreground font-mono">#0e161d</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setManualBgColor("#ffffff")}
+            className={`p-3 rounded-[3px] border text-left flex items-center gap-3 transition-colors ${
+              manualBgColor.toLowerCase() === "#ffffff"
+                ? "border-[#c8d400] bg-[#c8d400]/10"
+                : "border-border/60 hover:border-border"
+            }`}
+          >
+            <div className="h-6 w-6 rounded-[2px] bg-[#ffffff] border border-black/20 shrink-0" />
+            <div>
+              <div className="text-xs font-semibold">Čistá biela</div>
+              <div className="text-[10px] text-muted-foreground font-mono">#ffffff</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setManualBgColor("#f8fafc")}
+            className={`p-3 rounded-[3px] border text-left flex items-center gap-3 transition-colors ${
+              manualBgColor.toLowerCase() === "#f8fafc"
+                ? "border-[#c8d400] bg-[#c8d400]/10"
+                : "border-border/60 hover:border-border"
+            }`}
+          >
+            <div className="h-6 w-6 rounded-[2px] bg-[#f8fafc] border border-black/20 shrink-0" />
+            <div>
+              <div className="text-xs font-semibold">Mäkký papier</div>
+              <div className="text-[10px] text-muted-foreground font-mono">#f8fafc</div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setManualBgColor("#070b0f")}
+            className={`p-3 rounded-[3px] border text-left flex items-center gap-3 transition-colors ${
+              manualBgColor.toLowerCase() === "#070b0f"
+                ? "border-[#c8d400] bg-[#c8d400]/10"
+                : "border-border/60 hover:border-border"
+            }`}
+          >
+            <div className="h-6 w-6 rounded-[2px] bg-[#070b0f] border border-white/20 shrink-0" />
+            <div>
+              <div className="text-xs font-semibold">Hlboká čierna</div>
+              <div className="text-[10px] text-muted-foreground font-mono">#070b0f</div>
+            </div>
+          </button>
+        </div>
+
+        {/* Custom hex selector */}
+        <div className="flex items-center gap-3 max-w-xs">
+          <input
+            type="color"
+            value={manualBgColor.startsWith("#") && manualBgColor.length === 7 ? manualBgColor : "#0e161d"}
+            onChange={(e) => setManualBgColor(e.target.value)}
+            className="h-9 w-9 rounded-[3px] border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+          />
+          <Input
+            id="manualBgColor"
+            name="manualBgColor"
+            value={manualBgColor}
+            onChange={(e) => setManualBgColor(e.target.value)}
+            placeholder="#0e161d"
+            className="h-9 text-xs rounded-[3px] bg-background/50 border-border/60 font-mono"
+          />
         </div>
       </div>
 

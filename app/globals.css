@@ -20,8 +20,13 @@
 }
 
 @layer base {
+  html {
+    /* Slightly increased root font size (~3-4%) for better readability and airier proportions */
+    font-size: 16.5px;
+  }
+
   :root {
-    /* Ergonomic modern radius (replaces rigid 3px) */
+    /* Ergonomic modern radius */
     --radius: 8px;
     --radius-element: 8px;
     --radius-card: 14px;
@@ -121,6 +126,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   letter-spacing: -0.01em;
+  line-height: 1.6;
 }
 
 /* ============================================================================== */
@@ -159,6 +165,56 @@ div[class*="rounded-[2px]"] {
 }
 
 /* ============================================================================== */
+/* 100% SOLID OPAQUE MODALS & DIALOGS (Zero transparency, no bleed-through)      */
+/* ============================================================================== */
+
+/* All modal dialog contents, popup sheets, and drawers */
+.fixed.inset-0.z-50 > div:not([class*="bg-black"]):not([class*="bg-opacity"]),
+.fixed.inset-0.z-50 > div.relative,
+[role="dialog"],
+.modal-content,
+div[class*="fixed"][class*="z-50"] > div[class*="max-w-"],
+div[class*="fixed"][class*="z-50"] > div[class*="w-full"][class*="bg-"] {
+  background-color: #141e27 !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: 1 !important;
+  border: 1px solid rgba(63, 85, 102, 0.65) !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Modal overlays */
+div[class*="fixed"][class*="inset-0"][class*="bg-black"],
+div[class*="fixed"][class*="inset-0"][class*="bg-[#070b0f]"] {
+  background-color: rgba(7, 11, 15, 0.82) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ============================================================================== */
+/* AIRY SPACING & BREATHING ROOM                                                  */
+/* ============================================================================== */
+
+/* Form inputs comfort padding */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0.85rem;
+  padding-right: 0.85rem;
+}
+
+/* Clean heading spacing */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================================== */
 /* MODERN STARTUP SURFACES & GLASSMORPHISM                                        */
 /* ============================================================================== */
 
@@ -179,19 +235,19 @@ div[class*="rounded-[2px]"] {
 .card-dark,
 [class*="bg-raised/70"],
 [class*="bg-raised"] {
-  background: rgba(23, 33, 42, 0.85) !important;
+  background: rgba(23, 33, 42, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(63, 85, 102, 0.45) !important;
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(63, 85, 102, 0.45);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-dark:hover,
 [class*="bg-raised"]:hover {
-  background: rgba(31, 44, 54, 0.95) !important;
-  border-color: rgba(63, 85, 102, 0.75) !important;
-  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  background: rgba(31, 44, 54, 0.95);
+  border-color: rgba(63, 85, 102, 0.75);
+  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* Modern slate borders on dark mode */

@@ -71,6 +71,7 @@ export default async function BrandSettingsPage({
         semanticWarning: globalShapes.semanticWarning || "#c8d400",
         semanticDanger: globalShapes.semanticDanger || "#bb4934",
         semanticInfo: globalShapes.semanticInfo || "#2b3b48",
+        manualBgColor: globalShapes.manualBgColor || "#0e161d",
       }
     : null;
 
