@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   LayoutGrid,
   ExternalLink,
@@ -69,11 +69,12 @@ export default function M04RazcestnikModule({
   onConfigChange,
 }: ModuleRenderProps<BaseModuleConfig>) {
   const params = useParams();
+  const router = useRouter();
   const brandId = (params?.brandId as string) || "";
 
-  const typedConfig = config as unknown as Partial<M04RazcestnikConfig> | undefined;
+  const typedConfig = config as unknown as (Partial<M04RazcestnikConfig> & { gridColumns?: number }) | undefined;
 
-  const columns = typedConfig?.columns || 2;
+  const columns = typedConfig?.columns || typedConfig?.gridColumns || 2;
   const clickableEntireCard =
     typedConfig?.clickableEntireCard !== undefined ? typedConfig.clickableEntireCard : true;
   const items: M04CardItem[] =
@@ -83,16 +84,16 @@ export default function M04RazcestnikModule({
   const [brandPages, setBrandPages] = useState<PageItem[]>([]);
   const [editingCardIndex, setEditingCardIndex] = useState<number>(0);
 
-  // Load brand pages when card manager is opened
+  // Load brand pages for linking
   useEffect(() => {
-    if (isManageModalOpen && brandId) {
+    if (brandId) {
       getBrandPagesAction(brandId).then((res) => {
         if (res.success && res.pages) {
           setBrandPages(res.pages);
         }
       });
     }
-  }, [isManageModalOpen, brandId]);
+  }, [brandId, isManageModalOpen]);
 
   // Helper to commit config updates to server
   const handleUpdateConfig = async (patch: Partial<M04RazcestnikConfig>) => {
@@ -124,9 +125,10 @@ export default function M04RazcestnikModule({
   // Direct Inline Edit of a Card Description
   const handleSaveCardDesc = async (cardIndex: number, newDesc: string) => {
     const newItems = [...items];
+    const prevDesc = newItems[cardIndex].description || (newItems[cardIndex] as any).subtitle;
     newItems[cardIndex] = {
       ...newItems[cardIndex],
-      description: setI18nText(newItems[cardIndex].description, locale, newDesc),
+      description: setI18nText(prevDesc, locale, newDesc),
     };
     await handleUpdateConfig({ items: newItems });
   };
@@ -135,7 +137,7 @@ export default function M04RazcestnikModule({
   const handleSaveCardButtonLabel = async (cardIndex: number, newLabel: string) => {
     const newItems = [...items];
     const prevButton = newItems[cardIndex].button || {
-      label: { en: "Explore", sk: "Prejsť" },
+      label: { en: "Explore section", sk: "Prejsť do sekcie" },
       style: "primary",
     };
     newItems[cardIndex] = {
@@ -225,9 +227,48 @@ export default function M04RazcestnikModule({
     }
   };
 
+  // Link resolver for card
+  const getCardHref = (card: M04CardItem & { url?: string; subtitle?: any }) => {
+    if (isEditor) {
+      if (card.targetPageId) {
+        return `/admin/brand/${brandId}/builder/${card.targetPageId}`;
+      }
+      if (card.targetUrl && card.targetUrl !== "#") {
+        return card.targetUrl;
+      }
+      if (card.url && card.url !== "#") {
+        return card.url;
+      }
+      return "#";
+    } else {
+      // Public manual mode
+      if (card.targetPageId) {
+        const matched = brandPages.find((p) => p.id === card.targetPageId);
+        if (matched?.slug) return `/${matched.slug}`;
+      }
+      if (card.targetUrl && card.targetUrl !== "#") {
+        if (card.targetUrl.includes("/builder/")) {
+          const parts = card.targetUrl.split("/builder/");
+          const matched = brandPages.find((p) => p.id === parts[1]);
+          return matched?.slug ? `/${matched.slug}` : `/${parts[1]}`;
+        }
+        return card.targetUrl;
+      }
+      if (card.url && card.url !== "#") {
+        if (card.url.includes("/builder/")) {
+          const parts = card.url.split("/builder/");
+          const matched = brandPages.find((p) => p.id === parts[1]);
+          return matched?.slug ? `/${matched.slug}` : `/${parts[1]}`;
+        }
+        return card.url;
+      }
+      return "#";
+    }
+  };
+
   return (
     <div className="group/m04 relative w-full py-1">
-      {/* Editor Hover Toolbar (Prevents Pencil Hell) */}
+      {/* Editor Hover Toolbar */}
       {isEditor && (
         <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m04:opacity-100 transition-opacity bg-neutral-950/95 border border-border/80 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
           {/* Columns Selector */}
@@ -288,23 +329,29 @@ export default function M04RazcestnikModule({
 
       {/* Grid of Navigation Cards */}
       <div className={`grid gap-4 sm:gap-6 ${gridColsClass}`}>
-        {items.map((card, idx) => {
+        {items.map((rawCard, idx) => {
+          const card = rawCard as M04CardItem & { url?: string; subtitle?: any };
           const cardTitle =
             resolveI18nText(card.title, locale, "en") ||
             (locale === "sk" ? "Názov sekcie" : "Section Title");
-          const cardDesc = resolveI18nText(card.description, locale, "en");
+          const cardDesc =
+            resolveI18nText(card.description || card.subtitle, locale, "en") || "";
           const buttonLabel =
             resolveI18nText(card.button?.label, locale, "en") ||
-            (locale === "sk" ? "Zobraziť viac" : "Explore section");
+            resolveI18nText(card.subtitle, locale, "en") ||
+            (locale === "sk" ? "Prejsť do sekcie" : "Explore section");
           const buttonStyle = card.button?.style || "primary";
 
           // Resolved link
-          const resolvedHref = card.targetUrl || "#";
+          const resolvedHref = getCardHref(card);
+          const hasValidHref = resolvedHref && resolvedHref !== "#";
 
           // Card inner content
           const CardContent = (
             <div
-              className="group/card flex flex-col justify-between overflow-hidden bg-neutral-900/60 hover:bg-neutral-900/90 border border-border/50 hover:border-primary/60 transition-all duration-200 shadow-2xs hover:shadow-lg hover:-translate-y-1 h-full"
+              className={`group/card relative flex flex-col justify-between overflow-hidden bg-neutral-900/60 hover:bg-neutral-900/90 border border-border/50 hover:border-primary/60 transition-all duration-200 shadow-2xs hover:shadow-lg hover:-translate-y-1 h-full ${
+                hasValidHref ? "cursor-pointer" : ""
+              }`}
               style={{
                 borderRadius: "var(--brand-radius, 3px)",
                 borderWidth: "var(--brand-border-width, 1px)",
@@ -331,13 +378,15 @@ export default function M04RazcestnikModule({
               <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-1.5">
                   {isEditor ? (
-                    <InlineEditableText
-                      as="h4"
-                      value={cardTitle}
-                      onSave={(val) => handleSaveCardTitle(idx, val)}
-                      className="text-base sm:text-lg font-bold tracking-tight text-foreground block"
-                      placeholder="Card Title..."
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <InlineEditableText
+                        as="h4"
+                        value={cardTitle}
+                        onSave={(val) => handleSaveCardTitle(idx, val)}
+                        className="text-base sm:text-lg font-bold tracking-tight text-foreground block"
+                        placeholder="Card Title..."
+                      />
+                    </div>
                   ) : (
                     <h4 className="text-base sm:text-lg font-bold tracking-tight text-foreground group-hover/card:text-primary transition-colors">
                       {cardTitle}
@@ -345,14 +394,16 @@ export default function M04RazcestnikModule({
                   )}
 
                   {isEditor ? (
-                    <InlineEditableText
-                      as="p"
-                      multiline={true}
-                      value={cardDesc}
-                      onSave={(val) => handleSaveCardDesc(idx, val)}
-                      className="text-xs sm:text-sm text-muted-foreground leading-relaxed block"
-                      placeholder="Card description..."
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <InlineEditableText
+                        as="p"
+                        multiline={true}
+                        value={cardDesc}
+                        onSave={(val) => handleSaveCardDesc(idx, val)}
+                        className="text-xs sm:text-sm text-muted-foreground leading-relaxed block"
+                        placeholder="Card description..."
+                      />
+                    </div>
                   ) : (
                     cardDesc && (
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
@@ -364,33 +415,54 @@ export default function M04RazcestnikModule({
 
                 {/* Call to action button */}
                 <div className="pt-2 flex items-center justify-between">
-                  {clickableEntireCard ? (
-                    // Decorative button pill when entire card is an anchor link (A11y compliant)
+                  {hasValidHref ? (
+                    <Link
+                      href={resolvedHref}
+                      onClick={(e) => e.stopPropagation()}
+                      className={`px-3 py-1.5 rounded-[2px] text-xs font-semibold flex items-center gap-1.5 transition-colors ${getButtonStyle(
+                        buttonStyle
+                      )}`}
+                    >
+                      {isEditor ? (
+                        <span onClick={(e) => e.stopPropagation()}>
+                          <InlineEditableText
+                            value={buttonLabel}
+                            onSave={(val) => handleSaveCardButtonLabel(idx, val)}
+                          />
+                        </span>
+                      ) : (
+                        <span>{buttonLabel}</span>
+                      )}
+                      <ChevronRight className="h-3 w-3 transition-transform group-hover/card:translate-x-0.5" />
+                    </Link>
+                  ) : (
                     <div
                       className={`px-3 py-1.5 rounded-[2px] text-xs font-semibold flex items-center gap-1.5 transition-colors ${getButtonStyle(
                         buttonStyle
                       )}`}
                     >
                       {isEditor ? (
-                        <InlineEditableText
-                          value={buttonLabel}
-                          onSave={(val) => handleSaveCardButtonLabel(idx, val)}
-                        />
+                        <span onClick={(e) => e.stopPropagation()}>
+                          <InlineEditableText
+                            value={buttonLabel}
+                            onSave={(val) => handleSaveCardButtonLabel(idx, val)}
+                          />
+                        </span>
                       ) : (
                         <span>{buttonLabel}</span>
                       )}
-                      <ChevronRight className="h-3 w-3 transition-transform group-hover/card:translate-x-0.5" />
+                      <ChevronRight className="h-3 w-3" />
                     </div>
-                  ) : (
-                    // Interactive button when card is static
+                  )}
+
+                  {isEditor && hasValidHref && (
                     <Link
                       href={resolvedHref}
-                      className={`px-3 py-1.5 rounded-[2px] text-xs font-semibold flex items-center gap-1.5 transition-colors ${getButtonStyle(
-                        buttonStyle
-                      )}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-1.5 text-muted-foreground hover:text-primary hover:bg-neutral-800 rounded-[2px] transition-colors"
+                      title="Otvoriť cieľovú podstránku v PageBuilderi"
                     >
-                      <span>{buttonLabel}</span>
-                      <ChevronRight className="h-3 w-3" />
+                      <ExternalLink className="h-3.5 w-3.5" />
                     </Link>
                   )}
                 </div>
@@ -398,10 +470,14 @@ export default function M04RazcestnikModule({
             </div>
           );
 
-          // Return wrapped or direct card
-          if (clickableEntireCard && !isEditor) {
+          // Return wrapped card when clickable entire card is active
+          if (clickableEntireCard && hasValidHref) {
             return (
-              <Link key={card.id || idx} href={resolvedHref} className="block h-full outline-hidden">
+              <Link
+                key={card.id || idx}
+                href={resolvedHref}
+                className="block h-full outline-hidden"
+              >
                 {CardContent}
               </Link>
             );
@@ -451,7 +527,8 @@ export default function M04RazcestnikModule({
                 </div>
 
                 <div className="space-y-1.5">
-                  {items.map((c, i) => {
+                  {items.map((rawC, i) => {
+                    const c = rawC as M04CardItem & { url?: string; subtitle?: any };
                     const cTitle = resolveI18nText(c.title, locale, "en") || `Karta ${i + 1}`;
                     const isSelected = editingCardIndex === i;
 
@@ -550,11 +627,17 @@ export default function M04RazcestnikModule({
                     </label>
                     <textarea
                       rows={2}
-                      value={resolveI18nText(items[editingCardIndex].description, locale, "en")}
+                      value={resolveI18nText(
+                        items[editingCardIndex].description ||
+                          (items[editingCardIndex] as any).subtitle,
+                        locale,
+                        "en"
+                      )}
                       onChange={(e) =>
                         handleUpdateActiveCard({
                           description: setI18nText(
-                            items[editingCardIndex].description,
+                            items[editingCardIndex].description ||
+                              (items[editingCardIndex] as any).subtitle,
                             locale,
                             e.target.value
                           ),
@@ -585,20 +668,30 @@ export default function M04RazcestnikModule({
                         Prepojiť s internou stránkou manuálu
                       </label>
                       <select
-                        value={items[editingCardIndex].targetPageId || ""}
+                        value={
+                          items[editingCardIndex].targetPageId ||
+                          (items[editingCardIndex].targetUrl?.startsWith("/admin/brand/")
+                            ? items[editingCardIndex].targetUrl?.split("/builder/")[1]
+                            : "") ||
+                          ((items[editingCardIndex] as any).url?.startsWith("/admin/brand/")
+                            ? (items[editingCardIndex] as any).url?.split("/builder/")[1]
+                            : "") ||
+                          ""
+                        }
                         onChange={(e) => {
-                          const selectedPage = brandPages.find((p) => p.id === e.target.value);
+                          const pageId = e.target.value;
+                          const selectedPage = brandPages.find((p) => p.id === pageId);
                           handleUpdateActiveCard({
-                            targetPageId: e.target.value || undefined,
-                            targetUrl: selectedPage ? `/m/${selectedPage.slug}` : undefined,
+                            targetPageId: pageId || undefined,
+                            targetUrl: pageId ? `/admin/brand/${brandId}/builder/${pageId}` : undefined,
                           });
                         }}
                         className="w-full h-8 px-2 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
                       >
-                        <option value="">— Vyberte stránku (alebo použite vlastnú URL nižšie) —</option>
+                        <option value="">— Vyberte stránku (alebo zadajte URL nižšie) —</option>
                         {brandPages.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {p.title?.en || p.title?.sk || p.slug} (/{p.slug})
+                            {p.title?.sk || p.title?.en || p.slug} (/{p.slug})
                           </option>
                         ))}
                       </select>
@@ -612,9 +705,17 @@ export default function M04RazcestnikModule({
                     </label>
                     <input
                       type="text"
-                      value={items[editingCardIndex].targetUrl || ""}
-                      onChange={(e) => handleUpdateActiveCard({ targetUrl: e.target.value })}
-                      placeholder="/logo/tlac alebo https://..."
+                      value={
+                        items[editingCardIndex].targetUrl ||
+                        (items[editingCardIndex] as any).url ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        handleUpdateActiveCard({
+                          targetUrl: e.target.value,
+                        })
+                      }
+                      placeholder="/admin/brand/.../builder/... alebo /logo/tlac"
                       className="w-full h-8 px-2.5 rounded-[2px] bg-neutral-900 border border-border/50 text-xs font-mono text-foreground"
                     />
                   </div>
@@ -627,13 +728,19 @@ export default function M04RazcestnikModule({
                       </label>
                       <input
                         type="text"
-                        value={resolveI18nText(items[editingCardIndex].button?.label, locale, "en")}
+                        value={resolveI18nText(
+                          items[editingCardIndex].button?.label ||
+                            (items[editingCardIndex] as any).subtitle,
+                          locale,
+                          "en"
+                        )}
                         onChange={(e) =>
                           handleUpdateActiveCard({
                             button: {
                               style: items[editingCardIndex].button?.style || "primary",
                               label: setI18nText(
-                                items[editingCardIndex].button?.label,
+                                items[editingCardIndex].button?.label ||
+                                  (items[editingCardIndex] as any).subtitle,
                                 locale,
                                 e.target.value
                               ),
@@ -654,8 +761,8 @@ export default function M04RazcestnikModule({
                           handleUpdateActiveCard({
                             button: {
                               label: items[editingCardIndex].button?.label || {
-                                en: "Explore",
-                                sk: "Prejsť",
+                                en: "Explore section",
+                                sk: "Prejsť do sekcie",
                               },
                               style: e.target.value as "primary" | "secondary" | "outline" | "ghost",
                             },

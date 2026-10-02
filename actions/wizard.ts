@@ -241,10 +241,13 @@ export async function generateBrandTreeAction(
       const m04Items = children.map((child, idx) => ({
         id: `link-item-${child.id}-${idx}`,
         title: child.title,
-        subtitle: { en: "Explore chapter", sk: "Zobraziť kapitolu", cs: "Zobrazit kapitolu" },
-        url: `/admin/brand/${brandId}/builder/${child.id}`,
-        iconName: "ArrowRight",
-        badge: null,
+        description: { en: "Explore chapter", sk: "Zobraziť kapitolu", cs: "Zobrazit kapitolu" },
+        targetPageId: child.id,
+        targetUrl: `/admin/brand/${brandId}/builder/${child.id}`,
+        button: {
+          label: { en: "Explore section", sk: "Prejsť do sekcie", cs: "Přejít do sekce" },
+          style: "primary" as const,
+        },
       }));
 
       await pb.collection("modules").create({
@@ -254,7 +257,8 @@ export async function generateBrandTreeAction(
         showH3: true,
         h3Title: { en: "Select Variant", sk: "Vyberte variant", cs: "Vyberte variant" },
         config: {
-          gridColumns: children.length > 2 ? 3 : 2,
+          columns: children.length > 2 ? 3 : 2,
+          clickableEntireCard: true,
           items: m04Items,
         },
       });
