@@ -40,7 +40,8 @@ export async function updateUserProfileAction(
       updatePayload.set("avatar", avatarFile);
     }
 
-    await pb.collection("users").update(user.id, updatePayload);
+    const updatedUser = await pb.collection("users").update(user.id, updatePayload);
+    pb.authStore.save(pb.authStore.token, updatedUser);
     await savePocketBaseCookie(pb);
 
     // Update NEXT_LOCALE cookie to reflect chosen UI language
@@ -54,11 +55,20 @@ export async function updateUserProfileAction(
     revalidatePath("/admin");
 
     return { success: true };
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error("Failed to update profile:", err);
+    let errorMsg = err instanceof Error ? err.message : "Failed to update profile";
+    if (err?.response?.data) {
+      const fieldErrors = Object.entries(err.response.data)
+        .map(([field, errObj]: [string, any]) => `${field}: ${errObj.message || errObj.code}`)
+        .join(", ");
+      if (fieldErrors) {
+        errorMsg = fieldErrors;
+      }
+    }
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to update profile",
+      error: errorMsg,
     };
   }
 }

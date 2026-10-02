@@ -60,7 +60,7 @@ export function ProfileInfoForm({ user, dict }: ProfileInfoFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-6">
+    <form onSubmit={handleSubmit} encType="multipart/form-data" className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-6">
       <div className="border-b border-border/30 pb-4">
         <h2 className="text-base font-bold text-foreground">{dict.admin.personalInfo}</h2>
         <p className="text-xs text-muted-foreground mt-0.5">{dict.admin.personalInfoDesc}</p>

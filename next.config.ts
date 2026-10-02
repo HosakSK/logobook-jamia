@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
     serverActions: {
+      bodySizeLimit: "50mb",
       allowedOrigins: [
         "89.168.121.252.sslip.io",
         "*.89.168.121.252.sslip.io",
