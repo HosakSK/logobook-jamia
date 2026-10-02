@@ -27,6 +27,8 @@ interface AssetCardProps {
   brandId: string;
   locale: string;
   dict: Dictionary;
+  isSelected?: boolean;
+  onToggleSelect?: (assetId: string) => void;
   onOpenFiles: (asset: BrandAsset) => void;
   onEdit: (asset: BrandAsset) => void;
   onDelete?: (assetId: string) => void;
@@ -37,6 +39,8 @@ export function AssetCard({
   brandId,
   locale,
   dict,
+  isSelected = false,
+  onToggleSelect,
   onOpenFiles,
   onEdit,
   onDelete,
@@ -73,9 +77,13 @@ export function AssetCard({
       "bg-neutral-900 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
   }
 
+  // Check if asset has a real SVG file or pure SVG code
+  const hasSvgFile = asset.files.some((f) => f.fileFormat === "SVG");
+  const hasRealSvg = hasSvgFile || (Boolean(asset.svgContent) && !asset.svgContent.includes("<image href=") && !asset.svgContent.includes("VECTOR"));
+
   // Copy SVG content to clipboard
   const handleCopySvg = async () => {
-    if (!asset.svgContent) return;
+    if (!asset.svgContent || !hasRealSvg) return;
     try {
       await navigator.clipboard.writeText(asset.svgContent);
       setCopied(true);
@@ -94,7 +102,7 @@ export function AssetCard({
       return;
     }
 
-    if (!asset.svgContent) return;
+    if (!asset.svgContent || !hasRealSvg) return;
     const blob = new Blob([asset.svgContent], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -128,7 +136,11 @@ export function AssetCard({
   };
 
   return (
-    <div className="border border-border/40 rounded-[3px] bg-card overflow-hidden flex flex-col justify-between transition-all hover:border-border/80 shadow-xs relative group">
+    <div
+      className={`border rounded-[3px] bg-card overflow-hidden flex flex-col justify-between transition-all shadow-xs relative group ${
+        isSelected ? "border-[#c8d400] ring-1 ring-[#c8d400]/40" : "border-border/40 hover:border-border/80"
+      }`}
+    >
       {/* Deleting overlay */}
       {isDeleting && (
         <div className="absolute inset-0 z-40 bg-black/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2">
@@ -137,11 +149,21 @@ export function AssetCard({
         </div>
       )}
       {/* 1. Header with title & badges */}
-      <div className="p-4 border-b border-border/30 flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="font-bold text-sm text-foreground truncate font-mono" title={displayName}>
-            {displayName}
-          </h3>
+      <div className="p-4 border-b border-border/30 flex items-start justify-between gap-3">
+        <div className="flex items-start gap-2.5 min-w-0">
+          {onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => onToggleSelect(asset.id)}
+              className="mt-1 h-3.5 w-3.5 rounded-[2px] accent-[#c8d400] cursor-pointer shrink-0"
+              title="Označiť pre hromadnú akciu"
+            />
+          )}
+          <div className="min-w-0">
+            <h3 className="font-bold text-sm text-foreground truncate font-mono" title={displayName}>
+              {displayName}
+            </h3>
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
             {/* Medium Badge */}
             <span
@@ -187,6 +209,7 @@ export function AssetCard({
                 + Slogan
               </span>
             )}
+          </div>
           </div>
         </div>
 
@@ -283,7 +306,13 @@ export function AssetCard({
       <div
         className={`h-48 w-full flex items-center justify-center p-6 relative transition-colors ${canvasBgClass}`}
       >
-        {scopedSvg ? (
+        {asset.previewUrl ? (
+          <img
+            src={asset.previewUrl}
+            alt={displayName}
+            className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs"
+          />
+        ) : scopedSvg ? (
           <div
             className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain drop-shadow-xs"
             dangerouslySetInnerHTML={{ __html: scopedSvg }}
@@ -295,31 +324,33 @@ export function AssetCard({
         )}
 
         {/* Floating Quick Action Overlay */}
-        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            type="button"
-            onClick={handleCopySvg}
-            title="Kopírovať SVG kód do schránky"
-            className="p-1.5 rounded-[3px] bg-black/60 hover:bg-black text-white text-xs backdrop-blur-xs transition-colors flex items-center gap-1 shadow-xs"
-          >
-            {copied ? (
-              <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-[10px] text-emerald-400 pr-0.5">Skopírované</span>
-              </>
-            ) : (
-              <Copy className="h-3.5 w-3.5" />
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={handleDownloadSvg}
-            title="Stiahnuť SVG súbor"
-            className="p-1.5 rounded-[3px] bg-black/60 hover:bg-black text-white text-xs backdrop-blur-xs transition-colors shadow-xs"
-          >
-            <Download className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        {hasRealSvg && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={handleCopySvg}
+              title="Kopírovať SVG kód do schránky"
+              className="p-1.5 rounded-[3px] bg-black/60 hover:bg-black text-white text-xs backdrop-blur-xs transition-colors flex items-center gap-1 shadow-xs"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <span className="text-[10px] text-emerald-400 pr-0.5">Skopírované</span>
+                </>
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadSvg}
+              title="Stiahnuť SVG súbor"
+              className="p-1.5 rounded-[3px] bg-black/60 hover:bg-black text-white text-xs backdrop-blur-xs transition-colors shadow-xs"
+            >
+              <Download className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 3. Footer: Attached formats & files manager button */}

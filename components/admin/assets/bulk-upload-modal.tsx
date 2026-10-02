@@ -120,12 +120,8 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     };
     await page.render(renderContext).promise;
 
-    // Use JPEG with quality 0.85 for small footprint (<50k chars)
-    let dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-    // If somehow still > 350k chars, re-encode with lower quality
-    if (dataUrl.length > 350000) {
-      dataUrl = canvas.toDataURL("image/jpeg", 0.6);
-    }
+    // Use PNG with transparent background
+    const dataUrl = canvas.toDataURL("image/png");
 
     return {
       dataUrl,
@@ -565,6 +561,9 @@ export function BulkUploadModal({
 
           if (item.svgFile) {
             formData.append("svgFile", item.svgFile);
+            formData.append("hasRealSvg", "true");
+          } else {
+            formData.append("hasRealSvg", "false");
           }
 
           // Try to generate thumbnail safely

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { BrandAsset, BrandAssetFile } from "@/lib/types/asset";
 import { AssetCard } from "@/components/admin/assets/asset-card";
 import { BulkUploadModal } from "@/components/admin/assets/bulk-upload-modal";
 import { AssetFilesModal } from "@/components/admin/assets/asset-files-modal";
 import { EditAssetModal } from "@/components/admin/assets/edit-asset-modal";
+import { bulkDeleteBrandAssetsAction } from "@/actions/assets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dictionary } from "@/lib/i18n";
@@ -17,6 +18,10 @@ import {
   FolderArchive,
   Layers,
   Sparkles,
+  Trash2,
+  CheckSquare,
+  Square,
+  Loader2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -37,6 +42,9 @@ export function AssetsGalleryView({
 }: AssetsGalleryViewProps) {
   const router = useRouter();
   const [assets, setAssets] = useState<BrandAsset[]>(initialAssets);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkDeleting, startBulkDelete] = useTransition();
+
   const [search, setSearch] = useState("");
   const [mediumFilter, setMediumFilter] = useState<string>("ALL");
   const [orientationFilter, setOrientationFilter] = useState<string>("ALL");
@@ -55,7 +63,45 @@ export function AssetsGalleryView({
   // Handle asset deletion immediately in client state + server sync
   const handleDeleteAsset = (assetId: string) => {
     setAssets((prev) => prev.filter((a) => a.id !== assetId));
+    setSelectedIds((prev) => prev.filter((id) => id !== assetId));
     router.refresh();
+  };
+
+  // Toggle selection
+  const handleToggleSelect = (assetId: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(assetId) ? prev.filter((id) => id !== assetId) : [...prev, assetId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filteredAssets.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredAssets.map((a) => a.id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    if (
+      !confirm(
+        `Naozaj chcete hromadne vymazať ${selectedIds.length} označených lôg a všetky ich súbory z Cloudflare R2?`
+      )
+    ) {
+      return;
+    }
+
+    startBulkDelete(async () => {
+      const res = await bulkDeleteBrandAssetsAction(selectedIds, brandId);
+      if (res.success) {
+        setAssets((prev) => prev.filter((a) => !selectedIds.includes(a.id)));
+        setSelectedIds([]);
+        router.refresh();
+      } else {
+        alert(res.message);
+      }
+    });
   };
 
   // Filter assets
@@ -92,6 +138,8 @@ export function AssetsGalleryView({
     router.refresh();
   };
 
+  const isAllSelected = filteredAssets.length > 0 && selectedIds.length === filteredAssets.length;
+
   return (
     <div className="space-y-6">
       {/* 1. Header Toolbar */}
@@ -109,7 +157,7 @@ export function AssetsGalleryView({
         <Button
           type="button"
           onClick={() => setBulkModalOpen(true)}
-          className="h-9 px-4 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors shadow-xs self-start sm:self-auto"
+          className="h-9 px-4 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors shadow-xs self-start sm:self-auto cursor-pointer"
         >
           <Upload className="h-4 w-4" />
           <span>Hromadné nahrávanie (Bulk Upload)</span>
@@ -171,6 +219,59 @@ export function AssetsGalleryView({
         </div>
       </div>
 
+      {/* 2.5 Bulk Action Bar when items selected or to select all */}
+      {filteredAssets.length > 0 && (
+        <div className="p-3 rounded-[3px] bg-neutral-950 border border-border/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSelectAll}
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground font-mono transition-colors cursor-pointer"
+            >
+              {isAllSelected ? (
+                <CheckSquare className="h-4 w-4 text-[#c8d400]" />
+              ) : (
+                <Square className="h-4 w-4" />
+              )}
+              <span>
+                {isAllSelected ? "Odznačiť všetky" : "Označiť všetky"} ({filteredAssets.length})
+              </span>
+            </button>
+
+            {selectedIds.length > 0 && (
+              <span className="px-2 py-0.5 rounded-[2px] bg-[#c8d400]/15 text-[#c8d400] font-mono font-semibold">
+                Označených: {selectedIds.length}
+              </span>
+            )}
+          </div>
+
+          {selectedIds.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                disabled={isBulkDeleting}
+                onClick={handleBulkDelete}
+                className="h-7 px-3 text-xs font-semibold rounded-[3px] gap-1.5 cursor-pointer"
+              >
+                {isBulkDeleting ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Mažem označené...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Hromadne vymazať ({selectedIds.length})</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 3. Assets Gallery Grid or Empty State */}
       {assets.length === 0 ? (
         <div className="border border-dashed border-border/50 rounded-[3px] p-12 text-center bg-card/40 space-y-4">
@@ -188,7 +289,7 @@ export function AssetsGalleryView({
           <Button
             type="button"
             onClick={() => setBulkModalOpen(true)}
-            className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors"
+            className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors cursor-pointer"
           >
             <Upload className="h-4 w-4" />
             <span>Nahrať prvé logá (Bulk Upload)</span>
@@ -208,7 +309,7 @@ export function AssetsGalleryView({
               setOrientationFilter("ALL");
               setBackgroundFilter("ALL");
             }}
-            className="h-8 text-xs rounded-[3px] mt-2"
+            className="h-8 text-xs rounded-[3px] mt-2 cursor-pointer"
           >
             Resetovať filtre
           </Button>
@@ -222,6 +323,8 @@ export function AssetsGalleryView({
               brandId={brandId}
               locale={locale}
               dict={dict}
+              isSelected={selectedIds.includes(asset.id)}
+              onToggleSelect={handleToggleSelect}
               onOpenFiles={(a) => setActiveFilesAsset(a)}
               onEdit={(a) => setActiveEditAsset(a)}
               onDelete={handleDeleteAsset}
@@ -249,6 +352,7 @@ export function AssetsGalleryView({
 
       <EditAssetModal
         asset={activeEditAsset}
+        allAssets={assets}
         brandId={brandId}
         brandName={brandName}
         isOpen={Boolean(activeEditAsset)}

@@ -199,8 +199,9 @@ export async function uploadBrandAssetAction(
       }
     }
 
-    // If SVG file wasn't provided physically, create SVG file record from text content
-    if (!savedSvg && svgContent) {
+    // Only create SVG in assetFiles if an actual physical SVG file was uploaded or flagged as a real SVG
+    const hasRealSvg = formData.get("hasRealSvg") === "true";
+    if (!savedSvg && hasRealSvg && svgContent) {
       try {
         const blob = new Blob([scopedSvg], { type: "image/svg+xml" });
         const generatedFile = new File(
@@ -297,6 +298,18 @@ export async function updateBrandAssetAction(
       background,
     };
 
+    // Optional updated svgContent (e.g. copied from another SVG asset)
+    const newSvgContent = formData.get("svgContent");
+    if (typeof newSvgContent === "string" && newSvgContent.trim().length > 0) {
+      updatePayload.svgContent = normalizeAndScopeSvg(newSvgContent.trim());
+    }
+
+    // Optional uploaded preview image
+    const previewFile = formData.get("previewFile");
+    if (previewFile instanceof File && previewFile.size > 0) {
+      updatePayload.preview = previewFile;
+    }
+
     await pb.collection("assets").update(assetId, updatePayload);
 
     revalidatePath(`/admin/brand/${brandId}/logos`);
@@ -346,6 +359,56 @@ export async function deleteBrandAssetAction(
     return {
       success: false,
       message: err.message || "Nepodarilo sa vymazať logo.",
+    };
+  }
+}
+
+/**
+ * Bulk deletes multiple assets and cascades to all their attached files.
+ */
+export async function bulkDeleteBrandAssetsAction(
+  assetIds: string[],
+  brandId: string
+): Promise<{ success: boolean; message: string; deletedCount: number }> {
+  try {
+    const pb = await getServerPocketBase();
+    if (!pb.authStore.isValid) {
+      return { success: false, message: "Unauthorized", deletedCount: 0 };
+    }
+
+    let deletedCount = 0;
+    for (const id of assetIds) {
+      try {
+        const attachedFiles = await pb.collection("assetFiles").getFullList({
+          filter: `asset = "${id}"`,
+          fields: "id",
+        });
+
+        for (const f of attachedFiles) {
+          try {
+            await pb.collection("assetFiles").delete(f.id);
+          } catch {}
+        }
+
+        await pb.collection("assets").delete(id);
+        deletedCount++;
+      } catch (err) {
+        console.warn(`Failed to delete asset ${id}:`, err);
+      }
+    }
+
+    revalidatePath(`/admin/brand/${brandId}/logos`);
+    return {
+      success: true,
+      message: `Úspešne bolo vymazaných ${deletedCount} lôg.`,
+      deletedCount,
+    };
+  } catch (err: any) {
+    console.error("Bulk delete error:", err);
+    return {
+      success: false,
+      message: err?.message || "Chyba pri hromadnom mazaní lôg.",
+      deletedCount: 0,
     };
   }
 }
