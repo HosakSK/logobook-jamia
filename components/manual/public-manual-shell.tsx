@@ -157,16 +157,27 @@ export function PublicManualShell({
         <div className="container mx-auto px-4 space-y-1.5">
           <p>© {new Date().getFullYear()} {brand.name}. Všetky práva vyhradené.</p>
           {!brand.hideLogobookBadge && (
-            <p className="text-[11px] text-muted-foreground/80">
-              Vytvorené na{" "}
+            <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/80">
+              <span>Vytvorené na</span>
               <Link
                 href="/"
-                className="font-medium underline hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1.5 font-semibold text-foreground/85 hover:text-foreground transition-all duration-150 group"
                 target="_blank"
+                rel="noopener noreferrer"
               >
-                Logobook.sk
+                <img
+                  src="/logo/logo-symbol-dark.svg"
+                  alt="Logobook.sk"
+                  className="h-3.5 w-3.5 object-contain opacity-85 group-hover:opacity-100 transition-opacity dark:block hidden"
+                />
+                <img
+                  src="/logo/logo-symbol-light.svg"
+                  alt="Logobook.sk"
+                  className="h-3.5 w-3.5 object-contain opacity-85 group-hover:opacity-100 transition-opacity dark:hidden block"
+                />
+                <span className="hover:underline">Logobook.sk</span>
               </Link>
-            </p>
+            </div>
           )}
         </div>
       </footer>
