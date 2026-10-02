@@ -24,7 +24,13 @@ export default async function BrandOverviewPage({
     if (brand?.name) brandName = brand.name;
     if (brand?.slug) brandSlug = brand.slug;
   } catch {
-    // fallback to brandId
+    try {
+      const brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`);
+      if (brand?.name) brandName = brand.name;
+      if (brand?.slug) brandSlug = brand.slug;
+    } catch {
+      // fallback to brandId
+    }
   }
 
   const sections = [

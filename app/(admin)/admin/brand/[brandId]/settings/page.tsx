@@ -30,7 +30,11 @@ export default async function BrandSettingsPage({
   try {
     brand = await pb.collection("brands").getOne(brandId, { expand: "favicon" });
   } catch {
-    notFound();
+    try {
+      brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`, { expand: "favicon" });
+    } catch {
+      notFound();
+    }
   }
 
   // Check if current user is owner
@@ -46,7 +50,7 @@ export default async function BrandSettingsPage({
   // Fetch Global Shapes record
   let globalShapes: any = null;
   try {
-    globalShapes = await pb.collection("globalShapes").getFirstListItem(`brand = "${brandId}"`);
+    globalShapes = await pb.collection("globalShapes").getFirstListItem(`brand = "${brand.id}"`);
   } catch {
     // defaults will be used
   }

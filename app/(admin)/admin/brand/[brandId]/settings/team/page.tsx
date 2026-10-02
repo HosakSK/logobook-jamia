@@ -26,7 +26,11 @@ export default async function BrandTeamPage({
   try {
     brand = await pb.collection("brands").getOne(brandId, { expand: "user" });
   } catch {
-    notFound();
+    try {
+      brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`, { expand: "user" });
+    } catch {
+      notFound();
+    }
   }
 
   // Get Owner User record
@@ -46,7 +50,7 @@ export default async function BrandTeamPage({
   let rawTeamMembers: any[] = [];
   try {
     rawTeamMembers = await pb.collection("teamMembers").getFullList({
-      filter: `brand = "${brandId}"`,
+      filter: `brand = "${brand.id}"`,
       expand: "user",
     });
   } catch {
