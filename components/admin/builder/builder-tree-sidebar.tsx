@@ -36,6 +36,7 @@ import { Label } from "@/components/ui/label";
 interface BuilderTreeSidebarProps {
   brandId: string;
   currentPageId?: string;
+  currentPageSlug?: string;
   pages: PageItem[];
   tree: PageHierarchyItem[];
 }
@@ -86,6 +87,7 @@ function collectAllParentIds(tree: PageHierarchyItem[]): string[] {
 export function BuilderTreeSidebar({
   brandId,
   currentPageId,
+  currentPageSlug,
   pages,
   tree,
 }: BuilderTreeSidebarProps) {
@@ -491,7 +493,9 @@ export function BuilderTreeSidebar({
     const isBeforeTarget = isTarget && dropTarget?.position === "before";
     const isAfterTarget = isTarget && dropTarget?.position === "after";
     const isDuplicatingThis = duplicatingId === node.id;
-    const isCurrent = currentPageId === node.id;
+    const isCurrent =
+      (currentPageId && (currentPageId === node.id || currentPageId === node.slug)) ||
+      (currentPageSlug && currentPageSlug === node.slug);
 
     return (
       <div key={node.id} className="relative space-y-0.5">
@@ -583,9 +587,9 @@ export function BuilderTreeSidebar({
               </div>
             )}
 
-            {/* Page Link */}
+            {/* Page Link with clean slug */}
             <Link
-              href={`/admin/brand/${brandId}/builder/${node.id}`}
+              href={`/admin/brand/${brandId}/builder/${node.slug || node.id}`}
               className="flex items-center gap-1.5 flex-1 truncate py-0.5"
               title={getPageTitle(node)}
             >

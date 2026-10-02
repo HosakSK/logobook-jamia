@@ -25,9 +25,13 @@ export default async function BrandBuilderIndexPage({
   // Check if pages already exist for this brand
   const pagesRes = await getBrandPagesAction(brand.id);
 
+  const brandSlugOrId = brand.slug || brand.id;
+
   if (pagesRes.success && pagesRes.pages.length > 0) {
-    // Redirect directly to the first active page
-    redirect(`/admin/brand/${brand.id}/builder/${pagesRes.pages[0].id}`);
+    // Redirect directly to the first active page using clean slug
+    const firstPage = pagesRes.pages[0];
+    const pageSlugOrId = firstPage.slug || firstPage.id;
+    redirect(`/admin/brand/${brandSlugOrId}/builder/${pageSlugOrId}`);
   }
 
   // If no pages exist yet, display the onboarding empty state

@@ -85,15 +85,26 @@ export default function M04RazcestnikModule({
   const [editingCardIndex, setEditingCardIndex] = useState<number>(0);
 
   // Load brand pages for linking
+  const brandIdentifier =
+    brandId ||
+    (params?.domain as string) ||
+    (typeof window !== "undefined"
+      ? window.location.pathname.match(/\/admin\/brand\/([^/]+)/)?.[1] ||
+        (window.location.pathname.startsWith("/m/")
+          ? window.location.pathname.split("/")[2]
+          : "")
+      : "") ||
+    "logobook";
+
   useEffect(() => {
-    if (brandId) {
-      getBrandPagesAction(brandId).then((res) => {
+    if (brandIdentifier) {
+      getBrandPagesAction(brandIdentifier).then((res) => {
         if (res.success && res.pages) {
           setBrandPages(res.pages);
         }
       });
     }
-  }, [brandId, isManageModalOpen]);
+  }, [brandIdentifier, isManageModalOpen]);
 
   // Helper to commit config updates to server
   const handleUpdateConfig = async (patch: Partial<M04RazcestnikConfig>) => {
@@ -229,37 +240,40 @@ export default function M04RazcestnikModule({
 
   const currentBrand =
     brandId ||
-    (typeof window !== "undefined"
-      ? window.location.pathname.match(/\/admin\/brand\/([^/]+)/)?.[1] ||
-        (window.location.pathname.startsWith("/m/")
-          ? window.location.pathname.split("/")[2]
-          : "")
-      : "") ||
+    brandIdentifier ||
     "logobook";
 
   // Link resolver for card
-  const getCardHref = (card: M04CardItem & { url?: string; subtitle?: any }) => {
+  const getCardHref = (card: M04CardItem & { url?: string; subtitle?: any; targetSlug?: string; slug?: string }) => {
+    // 1. Direct explicit targetSlug or slug on card
+    let rawTarget = card.targetSlug || card.slug || "";
+
+    // 2. Extract from targetUrl or url if not found
+    if (!rawTarget) {
+      const urlStr = card.targetUrl || card.url || "";
+      if (urlStr && urlStr !== "#") {
+        if (urlStr.includes("/builder/")) {
+          rawTarget = urlStr.split("/builder/")[1] || "";
+        } else {
+          rawTarget = urlStr.replace(/^\/+/, "");
+        }
+      }
+    }
+
+    // 3. Fallback to targetPageId
+    if (!rawTarget && card.targetPageId) {
+      rawTarget = card.targetPageId;
+    }
+
+    if (!rawTarget || rawTarget === "#") return "#";
+
+    // Match against brandPages list if available
+    const matched = brandPages.find((p) => p.id === rawTarget || p.slug === rawTarget);
+    const finalSlug = matched?.slug || rawTarget;
+
     if (isEditor) {
-      if (card.targetPageId) {
-        return `/admin/brand/${currentBrand}/builder/${card.targetPageId}`;
-      }
-      if (card.targetUrl && card.targetUrl !== "#") {
-        if (card.targetUrl.includes("/builder/")) {
-          const targetId = card.targetUrl.split("/builder/")[1];
-          return `/admin/brand/${currentBrand}/builder/${targetId}`;
-        }
-        return card.targetUrl;
-      }
-      if (card.url && card.url !== "#") {
-        if (card.url.includes("/builder/")) {
-          const targetId = card.url.split("/builder/")[1];
-          return `/admin/brand/${currentBrand}/builder/${targetId}`;
-        }
-        return card.url;
-      }
-      return "#";
+      return `/admin/brand/${currentBrand}/builder/${finalSlug}`;
     } else {
-      // Public manual mode
       let prefix = "";
       if (typeof window !== "undefined") {
         const path = window.location.pathname;
@@ -269,31 +283,10 @@ export default function M04RazcestnikModule({
           prefix = `/m/${domainPart}`;
         }
       }
-
-      let slug = "";
-      if (card.targetPageId) {
-        const matched = brandPages.find((p) => p.id === card.targetPageId);
-        slug = matched?.slug || card.targetPageId;
-      } else if (card.targetUrl && card.targetUrl !== "#") {
-        if (card.targetUrl.includes("/builder/")) {
-          const targetId = card.targetUrl.split("/builder/")[1];
-          const matched = brandPages.find((p) => p.id === targetId);
-          slug = matched?.slug || targetId;
-        } else {
-          slug = card.targetUrl.replace(/^\/+/, "");
-        }
-      } else if (card.url && card.url !== "#") {
-        if (card.url.includes("/builder/")) {
-          const targetId = card.url.split("/builder/")[1];
-          const matched = brandPages.find((p) => p.id === targetId);
-          slug = matched?.slug || targetId;
-        } else {
-          slug = card.url.replace(/^\/+/, "");
-        }
+      if (!prefix) {
+        prefix = `/m/${currentBrand}`;
       }
-
-      if (!slug) return "#";
-      return prefix ? `${prefix}/${slug}` : `/${slug}`;
+      return `${prefix}/${finalSlug}`;
     }
   };
 

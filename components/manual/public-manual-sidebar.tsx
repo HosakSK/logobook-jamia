@@ -1,10 +1,14 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ChevronRight, ChevronDown, FileText, Search, Folder, FolderOpen, BookOpen } from "lucide-react";
+import { ChevronRight, FileText, Search, Folder, FolderOpen } from "lucide-react";
 import { PublishedPageItem } from "@/actions/publish";
+
+interface TreeNodeItem extends PublishedPageItem {
+  children: TreeNodeItem[];
+}
 
 interface PublicManualSidebarProps {
   pages: PublishedPageItem[];
@@ -13,6 +17,35 @@ interface PublicManualSidebarProps {
   locale: string;
   onPageSelect?: () => void;
   className?: string;
+}
+
+// Helper: collect all parent IDs of a specific page
+function collectAncestorIds(tree: TreeNodeItem[], targetSlugOrId: string, ancestors: string[] = []): string[] | null {
+  for (const node of tree) {
+    if (node.id === targetSlugOrId || node.slug === targetSlugOrId) {
+      return ancestors;
+    }
+    if (node.children && node.children.length > 0) {
+      const found = collectAncestorIds(node.children, targetSlugOrId, [...ancestors, node.id]);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// Helper: collect all node IDs with children
+function collectAllParentIds(tree: TreeNodeItem[]): string[] {
+  const ids: string[] = [];
+  function traverse(nodes: TreeNodeItem[]) {
+    for (const node of nodes) {
+      if (node.children && node.children.length > 0) {
+        ids.push(node.id);
+        traverse(node.children);
+      }
+    }
+  }
+  traverse(tree);
+  return ids;
 }
 
 export function PublicManualSidebar({
@@ -28,39 +61,87 @@ export function PublicManualSidebar({
   const activeSlug = currentPageSlug || routePageSlug || (pages[0]?.slug);
 
   const [search, setSearch] = useState("");
-  const [collapsedParents, setCollapsedParents] = useState<Record<string, boolean>>({});
 
   // Localized helper
   const getLocalized = (textObj?: Record<string, string>): string => {
     if (!textObj) return "";
-    return textObj[locale] || textObj.en || textObj.sk || Object.values(textObj)[0] || "";
+    return textObj[locale] || textObj.sk || textObj.en || textObj.cs || Object.values(textObj)[0] || "";
   };
 
-  // Build tree from published pages
-  const { rootNodes, childrenMap } = useMemo(() => {
+  // Build recursive multi-level hierarchy tree
+  const tree = useMemo<TreeNodeItem[]>(() => {
     const visiblePages = pages.filter((p) => p.isInMenu !== false);
-    const roots: PublishedPageItem[] = [];
-    const children = new Map<string, PublishedPageItem[]>();
+    const itemMap = new Map<string, TreeNodeItem>();
 
     visiblePages.forEach((p) => {
-      if (!p.parent) {
-        roots.push(p);
+      itemMap.set(p.id, { ...p, children: [] });
+    });
+
+    const roots: TreeNodeItem[] = [];
+
+    visiblePages.forEach((p) => {
+      const node = itemMap.get(p.id)!;
+      if (p.parent && itemMap.has(p.parent)) {
+        itemMap.get(p.parent)!.children.push(node);
       } else {
-        if (!children.has(p.parent)) {
-          children.set(p.parent, []);
-        }
-        children.get(p.parent)!.push(p);
+        roots.push(node);
       }
     });
 
-    return { rootNodes: roots, childrenMap: children };
+    return roots;
   }, [pages]);
 
-  const toggleCollapse = (pageId: string) => {
-    setCollapsedParents((prev) => ({
-      ...prev,
-      [pageId]: !prev[pageId],
-    }));
+  // Expanded nodes state (Set of node IDs)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
+    const initial = new Set<string>(collectAllParentIds(tree));
+    if (activeSlug) {
+      const ancestors = collectAncestorIds(tree, activeSlug);
+      if (ancestors) {
+        ancestors.forEach((id) => initial.add(id));
+      }
+    }
+    return initial;
+  });
+
+  // Auto-expand ancestors when activeSlug or tree changes
+  useEffect(() => {
+    if (activeSlug && tree.length > 0) {
+      const ancestors = collectAncestorIds(tree, activeSlug);
+      if (ancestors && ancestors.length > 0) {
+        setExpandedIds((prev) => {
+          const next = new Set(prev);
+          ancestors.forEach((id) => next.add(id));
+          return next;
+        });
+      }
+    }
+  }, [activeSlug, tree]);
+
+  const toggleExpand = (nodeId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
+
+  // Resolve target link URL
+  const getPageHref = (slug: string) => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      if (path.startsWith("/manual/")) {
+        return `/manual/${domain}/${locale}/${slug}`;
+      }
+    }
+    return `/m/${domain}/${slug}`;
   };
 
   // Search filtering
@@ -74,6 +155,76 @@ export function PublicManualSidebar({
     });
   }, [pages, search, locale]);
 
+  // Recursive tree node renderer
+  const renderTreeNode = (node: TreeNodeItem, depth: number = 0) => {
+    const hasChildren = node.children && node.children.length > 0;
+    const isExpanded = expandedIds.has(node.id);
+    const isCurrent = node.slug === activeSlug || node.id === activeSlug;
+    const title = getLocalized(node.title) || node.slug;
+    const href = getPageHref(node.slug || node.id);
+
+    return (
+      <div key={node.id} className="relative space-y-0.5">
+        <div
+          className={`group flex items-center justify-between py-1 px-1.5 rounded-[2px] text-xs transition-colors ${
+            isCurrent
+              ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+          }`}
+          style={{
+            paddingLeft: `${Math.max(6, depth * 12 + 6)}px`,
+          }}
+        >
+          <div className="flex items-center gap-1 flex-1 min-w-0">
+            {/* Expand / Collapse Chevron */}
+            {hasChildren ? (
+              <button
+                type="button"
+                onClick={(e) => toggleExpand(node.id, e)}
+                className="p-0.5 text-muted-foreground hover:text-foreground hover:bg-neutral-800/60 rounded-[2px] transition-colors shrink-0 cursor-pointer"
+                title={isExpanded ? "Zbaliť" : "Rozbaliť"}
+              >
+                <ChevronRight
+                  className={`h-3.5 w-3.5 transition-transform duration-150 ${
+                    isExpanded ? "rotate-90 text-primary" : ""
+                  }`}
+                />
+              </button>
+            ) : (
+              <div className="w-4 h-4 flex items-center justify-center shrink-0">
+                <FileText className="h-3 w-3 opacity-60 shrink-0" />
+              </div>
+            )}
+
+            {/* Title Link */}
+            <Link
+              href={href}
+              onClick={onPageSelect}
+              className="flex items-center gap-1.5 flex-1 truncate py-0.5 cursor-pointer"
+              title={title}
+            >
+              {hasChildren && (
+                isExpanded ? (
+                  <FolderOpen className="h-3.5 w-3.5 shrink-0 opacity-70 text-primary/80" />
+                ) : (
+                  <Folder className="h-3.5 w-3.5 shrink-0 opacity-70 text-muted-foreground" />
+                )
+              )}
+              <span className="truncate">{title}</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Recursive Child Nodes */}
+        {hasChildren && isExpanded && (
+          <div className="border-l border-border/30 ml-3 space-y-0.5">
+            {node.children.map((child) => renderTreeNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <aside className={`w-full flex flex-col h-full bg-card/60 select-none ${className}`}>
       {/* Search Input */}
@@ -82,7 +233,7 @@ export function PublicManualSidebar({
           <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder={locale === "en" ? "Search guidelines..." : "Hľadať v manuáli..."}
+            placeholder={locale === "sk" ? "Hľadať v manuáli..." : locale === "cs" ? "Hledat v manuálu..." : "Search guidelines..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 text-xs bg-muted/30 border border-border/60 rounded-[3px] focus:outline-none focus:border-primary/80 placeholder:text-muted-foreground transition-colors"
@@ -91,29 +242,30 @@ export function PublicManualSidebar({
       </div>
 
       {/* Navigation Tree */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto p-2 space-y-0.5 scrollbar-thin">
         {filteredPages ? (
           // Flat search results
           <div className="space-y-1">
             <div className="px-2 py-1 text-[10px] font-mono uppercase text-muted-foreground">
-              {locale === "en" ? `Results (${filteredPages.length})` : `Výsledky (${filteredPages.length})`}
+              {locale === "sk" ? `Výsledky (${filteredPages.length})` : locale === "cs" ? `Výsledky (${filteredPages.length})` : `Results (${filteredPages.length})`}
             </div>
             {filteredPages.length === 0 ? (
               <div className="px-2 py-4 text-center text-xs text-muted-foreground italic">
-                {locale === "en" ? "No pages found." : "Nenašli sa žiadne stránky."}
+                {locale === "sk" ? "Nenašli sa žiadne stránky." : locale === "cs" ? "Nebyly nalezeny žádné stránky." : "No pages found."}
               </div>
             ) : (
               filteredPages.map((page) => {
-                const isActive = page.slug === activeSlug;
+                const isCurrent = page.slug === activeSlug || page.id === activeSlug;
                 const title = getLocalized(page.title) || page.slug;
+                const href = getPageHref(page.slug || page.id);
 
                 return (
                   <Link
                     key={page.id}
-                    href={`/manual/${domain}/${locale}/${page.slug}`}
+                    href={href}
                     onClick={onPageSelect}
                     className={`flex items-center gap-2 px-2.5 py-1.5 rounded-[2px] text-xs transition-colors ${
-                      isActive
+                      isCurrent
                         ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                     }`}
@@ -126,82 +278,11 @@ export function PublicManualSidebar({
             )}
           </div>
         ) : (
-          // Hierarchical tree view
-          rootNodes.map((rootPage) => {
-            const children = childrenMap.get(rootPage.id) || [];
-            const hasChildren = children.length > 0;
-            const isCollapsed = collapsedParents[rootPage.id] || false;
-            const isActive = rootPage.slug === activeSlug;
-            const rootTitle = getLocalized(rootPage.title) || rootPage.slug;
-
-            return (
-              <div key={rootPage.id} className="space-y-0.5">
-                <div
-                  className={`group flex items-center justify-between rounded-[2px] text-xs transition-colors ${
-                    isActive
-                      ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                  }`}
-                >
-                  <Link
-                    href={`/manual/${domain}/${locale}/${rootPage.slug}`}
-                    onClick={onPageSelect}
-                    className="flex-1 flex items-center gap-2 px-2.5 py-1.5 truncate"
-                  >
-                    {hasChildren ? (
-                      <Folder className="h-3.5 w-3.5 shrink-0 opacity-70 text-muted-foreground" />
-                    ) : (
-                      <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                    )}
-                    <span className="truncate">{rootTitle}</span>
-                  </Link>
-
-                  {hasChildren && (
-                    <button
-                      type="button"
-                      onClick={() => toggleCollapse(rootPage.id)}
-                      className="p-1.5 mr-1 text-muted-foreground hover:text-foreground cursor-pointer rounded-[2px]"
-                      aria-label="Toggle chapter"
-                    >
-                      {isCollapsed ? (
-                        <ChevronRight className="h-3 w-3" />
-                      ) : (
-                        <ChevronDown className="h-3 w-3" />
-                      )}
-                    </button>
-                  )}
-                </div>
-
-                {/* Sub-pages */}
-                {hasChildren && !isCollapsed && (
-                  <div className="pl-4 ml-2 border-l border-border/40 space-y-0.5">
-                    {children.map((child) => {
-                      const isChildActive = child.slug === activeSlug;
-                      const childTitle = getLocalized(child.title) || child.slug;
-
-                      return (
-                        <Link
-                          key={child.id}
-                          href={`/manual/${domain}/${locale}/${child.slug}`}
-                          onClick={onPageSelect}
-                          className={`flex items-center gap-2 px-2 py-1 rounded-[2px] text-xs transition-colors ${
-                            isChildActive
-                              ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-                              : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                          }`}
-                        >
-                          <FileText className="h-3 w-3 shrink-0 opacity-60" />
-                          <span className="truncate">{childTitle}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })
+          // Recursive hierarchical tree
+          tree.map((rootNode) => renderTreeNode(rootNode, 0))
         )}
       </div>
     </aside>
   );
 }
+

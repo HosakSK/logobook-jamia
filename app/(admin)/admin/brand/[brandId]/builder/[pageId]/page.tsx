@@ -34,11 +34,13 @@ export default async function BrandBuilderPageDetail({
   // Load page detail
   const pageRes = await getPageDetailAction(pageId, resolvedBrandId);
   if (!pageRes.success || !pageRes.page) {
-    if (pagesRes.pages.length > 0 && pagesRes.pages[0].id !== pageId) {
-      redirect(`/admin/brand/${resolvedBrandId}/builder/${pagesRes.pages[0].id}`);
-    } else {
-      return <BuilderEmptyState brandId={resolvedBrandId} brandName={brandName} />;
+    if (pagesRes.pages.length > 0) {
+      const firstPage = pagesRes.pages[0];
+      if (firstPage.id !== pageId && firstPage.slug !== pageId) {
+        redirect(`/admin/brand/${brandSlug}/builder/${firstPage.slug || firstPage.id}`);
+      }
     }
+    return <BuilderEmptyState brandId={resolvedBrandId} brandName={brandName} />;
   }
 
   // Load brand cascade tokens
@@ -53,8 +55,9 @@ export default async function BrandBuilderPageDetail({
       <div className="flex flex-col md:flex-row gap-6 items-start">
         {/* Left Hierarchical Tree Sidebar */}
         <BuilderTreeSidebar
-          brandId={resolvedBrandId}
-          currentPageId={pageId}
+          brandId={brandSlug}
+          currentPageId={pageRes.page.id}
+          currentPageSlug={pageRes.page.slug}
           pages={pagesRes.pages}
           tree={pagesRes.tree}
         />

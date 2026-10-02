@@ -203,10 +203,11 @@ export async function generateBrandTreeAction(
     };
 
     // Helper: Inject M04 Button Box into a category page pointing to its child pages
+    const brandSlugOrId = brand.slug || brandId;
     const injectCategoryM04 = async (
       pageId: string,
       titleRecord: Record<string, string>,
-      children: Array<{ id: string; title: Record<string, string> }>
+      children: Array<{ id: string; slug?: string; title: Record<string, string> }>
     ) => {
       // Check if page already has containers
       const existingConts = await pb.collection("containers").getList(1, 1, { filter: `page = "${pageId}"` });
@@ -238,17 +239,20 @@ export async function generateBrandTreeAction(
       createdModulesCount++;
 
       // Module 2: M04 Razcestnik pointing to children
-      const m04Items = children.map((child, idx) => ({
-        id: `link-item-${child.id}-${idx}`,
-        title: child.title,
-        description: { en: "Explore chapter", sk: "Zobraziť kapitolu", cs: "Zobrazit kapitolu" },
-        targetPageId: child.id,
-        targetUrl: `/admin/brand/${brandId}/builder/${child.id}`,
-        button: {
-          label: { en: "Explore section", sk: "Prejsť do sekcie", cs: "Přejít do sekce" },
-          style: "primary" as const,
-        },
-      }));
+      const m04Items = children.map((child, idx) => {
+        const childSlugOrId = child.slug || child.id;
+        return {
+          id: `link-item-${child.id}-${idx}`,
+          title: child.title,
+          description: { en: "Explore chapter", sk: "Zobraziť kapitolu", cs: "Zobrazit kapitolu" },
+          targetPageId: child.id,
+          targetUrl: `/admin/brand/${brandSlugOrId}/builder/${childSlugOrId}`,
+          button: {
+            label: { en: "Explore section", sk: "Prejsť do sekcie", cs: "Přejít do sekce" },
+            style: "primary" as const,
+          },
+        };
+      });
 
       await pb.collection("modules").create({
         column: createdColumn.id,
@@ -333,7 +337,7 @@ export async function generateBrandTreeAction(
       globalOrder++
     );
 
-    const mediaNodesForRootM04: Array<{ id: string; title: Record<string, string> }> = [];
+    const mediaNodesForRootM04: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
 
     // -------------------------------------------------------------------------
     // STEP C: Combinatorial Loop (Media -> Orientations -> Claims -> Backgrounds)
@@ -362,9 +366,9 @@ export async function generateBrandTreeAction(
         "submenu",
         mIdx
       );
-      mediaNodesForRootM04.push({ id: medPage.id, title: { en: medMeta.en, sk: medMeta.sk, cs: medMeta.cs } });
+      mediaNodesForRootM04.push({ id: medPage.id, slug: medMeta.slug, title: { en: medMeta.en, sk: medMeta.sk, cs: medMeta.cs } });
 
-      const orientationNodesForMedM04: Array<{ id: string; title: Record<string, string> }> = [];
+      const orientationNodesForMedM04: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
 
       for (let oIdx = 0; oIdx < config.orientations.length; oIdx++) {
         const oriKey = config.orientations[oIdx];
@@ -379,7 +383,7 @@ export async function generateBrandTreeAction(
           "submenu",
           oIdx
         );
-        orientationNodesForMedM04.push({ id: oriPage.id, title: { en: oriMeta.en, sk: oriMeta.sk, cs: oriMeta.cs } });
+        orientationNodesForMedM04.push({ id: oriPage.id, slug: oriSlug, title: { en: oriMeta.en, sk: oriMeta.sk, cs: oriMeta.cs } });
 
         // Linked Sync ID for this orientation & media
         const syncGroupId = `linkGroup-m08-${oriKey}-${medKey}`;
@@ -414,13 +418,13 @@ export async function generateBrandTreeAction(
             oriPage.id,
             { en: `${brandName} - ${oriMeta.en}`, sk: `${brandName} - ${oriMeta.sk}`, cs: `${brandName} - ${oriMeta.cs}` },
             [
-              { id: baseBranchPage.id, title: { en: "Standard (No Claim)", sk: "Základná verzia", cs: "Základní verze" } },
-              { id: claimBranchPage.id, title: { en: "With Claim / Slogan", sk: "S claimom / sloganom", cs: "S claimem" } },
+              { id: baseBranchPage.id, slug: baseBranchSlug, title: { en: "Standard (No Claim)", sk: "Základná verzia", cs: "Základní verze" } },
+              { id: claimBranchPage.id, slug: claimBranchSlug, title: { en: "With Claim / Slogan", sk: "S claimom / sloganom", cs: "S claimem" } },
             ]
           );
 
           // Leaves for Branch 1 (Standard)
-          const leavesBranch1: Array<{ id: string; title: Record<string, string> }> = [];
+          const leavesBranch1: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
           for (const bg of ["light", "dark"] as const) {
             const isLight = bg === "light";
             const bgSlug = `${baseBranchSlug}-${isLight ? "svetle" : "tmave"}`;
@@ -430,7 +434,7 @@ export async function generateBrandTreeAction(
               cs: `${oriMeta.cs} - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
             };
             const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, baseBranchPage.id, "submenu", isLight ? 0 : 1);
-            leavesBranch1.push({ id: leafPage.id, title: bgTitle });
+            leavesBranch1.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
             if (isNew) {
               await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
             }
@@ -438,7 +442,7 @@ export async function generateBrandTreeAction(
           await injectCategoryM04(baseBranchPage.id, { en: "Background Canvas", sk: "Výber podkladu", cs: "Výběr podkladu" }, leavesBranch1);
 
           // Leaves for Branch 2 (With Claim)
-          const leavesBranch2: Array<{ id: string; title: Record<string, string> }> = [];
+          const leavesBranch2: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
           for (const bg of ["light", "dark"] as const) {
             const isLight = bg === "light";
             const bgSlug = `${claimBranchSlug}-${isLight ? "svetle" : "tmave"}`;
@@ -448,7 +452,7 @@ export async function generateBrandTreeAction(
               cs: `${oriMeta.cs} (S claimem) - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
             };
             const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, claimBranchPage.id, "submenu", isLight ? 0 : 1);
-            leavesBranch2.push({ id: leafPage.id, title: bgTitle });
+            leavesBranch2.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
             if (isNew) {
               await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
             }
@@ -457,7 +461,7 @@ export async function generateBrandTreeAction(
 
         } else {
           // Direct 2 background leaves under orientation (Symbol or No Claim Mode)
-          const leavesDirect: Array<{ id: string; title: Record<string, string> }> = [];
+          const leavesDirect: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
           for (const bg of ["light", "dark"] as const) {
             const isLight = bg === "light";
             const bgSlug = `${oriSlug}-${isLight ? "svetle" : "tmave"}`;
@@ -467,7 +471,7 @@ export async function generateBrandTreeAction(
               cs: `${oriMeta.cs} - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
             };
             const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, oriPage.id, "submenu", isLight ? 0 : 1);
-            leavesDirect.push({ id: leafPage.id, title: bgTitle });
+            leavesDirect.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
             if (isNew) {
               await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
             }

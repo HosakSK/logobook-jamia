@@ -165,14 +165,35 @@ export async function getPageDetailAction(
       return { success: false, error: "Unauthorized session." };
     }
 
-    let pageRecord: any = null;
-    try {
-      pageRecord = await pb.collection("pages").getOne(pageId);
-    } catch {
+    let targetBrandId: string | null = null;
+    if (brandId) {
       try {
-        const filter = brandId
-          ? `(id = "${pageId}" || slug = "${pageId}") && brand = "${brandId}"`
-          : `id = "${pageId}" || slug = "${pageId}"`;
+        const b = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+        targetBrandId = b.id;
+      } catch {
+        targetBrandId = brandId;
+      }
+    }
+
+    let pageRecord: any = null;
+    // 1. If pageId looks like a 15-character PocketBase record ID, try getOne first
+    if (/^[a-z0-9]{15}$/.test(pageId)) {
+      try {
+        const p = await pb.collection("pages").getOne(pageId);
+        if (!targetBrandId || p.brand === targetBrandId) {
+          pageRecord = p;
+        }
+      } catch {
+        // Not found by ID, proceed to slug search
+      }
+    }
+
+    // 2. Search by slug or ID within the target brand
+    if (!pageRecord) {
+      try {
+        const filter = targetBrandId
+          ? `(slug = "${pageId}" || id = "${pageId}") && brand = "${targetBrandId}"`
+          : `slug = "${pageId}" || id = "${pageId}"`;
         pageRecord = await pb.collection("pages").getFirstListItem(filter);
       } catch {
         return { success: false, error: "Stránka nebola nájdená." };
