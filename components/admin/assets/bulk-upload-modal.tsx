@@ -551,6 +551,7 @@ export function BulkUploadModal({
           formData.append("medium", item.medium);
           formData.append("orientation", item.orientation);
           formData.append("hasClaim", String(item.hasClaim));
+          formData.append("background", item.background || "LIGHT");
           let contentToSend = item.svgContent || "<svg viewBox='0 0 100 100'></svg>";
           if (contentToSend.length > 400000) {
             contentToSend = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${item.medium}</text></svg>`;

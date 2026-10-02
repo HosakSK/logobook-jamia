@@ -128,7 +128,8 @@ export async function uploadBrandAssetAction(
     const medium = formData.get("medium") as AssetMedium;
     const orientation = formData.get("orientation") as AssetOrientation;
     const hasClaim = formData.get("hasClaim") === "true";
-    const background = formData.get("background") as AssetBackground;
+    const rawBg = formData.get("background");
+    const background = rawBg === "DARK" ? "DARK" : "LIGHT";
     const svgContent = (formData.get("svgContent") as string) || "";
 
     const parsed = createAssetSchema.safeParse({
