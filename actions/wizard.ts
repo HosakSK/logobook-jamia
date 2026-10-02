@@ -7,10 +7,8 @@ import {
   DimensionMatrixResult,
 } from "@/lib/types/wizard";
 import { dimensionMatrixSchema } from "@/lib/validations/wizard";
-import {
-  DEFAULT_SYSTEM_TEMPLATES,
-  seedSystemTemplatesAction,
-} from "@/actions/templates";
+import { seedSystemTemplatesAction } from "@/actions/templates";
+import { DEFAULT_SYSTEM_TEMPLATES } from "@/lib/constants/default-templates";
 import { PageTemplateStructure } from "@/lib/types/template";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
 

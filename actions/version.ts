@@ -31,7 +31,7 @@ function isNewerVersion(latest: string, current: string): boolean {
  * Cached on server for 1 hour to respect rate limits.
  */
 export async function checkAppVersionAction(): Promise<VersionCheckResult> {
-  const currentVersion = packageJson.version || "0.0.1.61";
+  const currentVersion = packageJson.version || "0.0.1.62";
   const repo = process.env.NEXT_PUBLIC_GITHUB_REPO || "HosakSK/logobook-jamia";
 
   try {

@@ -6,7 +6,7 @@ import { checkAppVersionAction, type VersionCheckResult } from "@/actions/versio
 import packageJson from "@/package.json";
 
 export function VersionChecker() {
-  const currentAppVersion = packageJson.version || "0.0.1.61";
+  const currentAppVersion = packageJson.version || "0.0.1.62";
   const [data, setData] = useState<VersionCheckResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
