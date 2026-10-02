@@ -150,6 +150,12 @@ export function AssetCard({
                   ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30"
                   : asset.medium === "PRINT_CMYK"
                   ? "bg-fuchsia-500/15 text-fuchsia-400 border border-fuchsia-500/30"
+                  : asset.medium === "PRINT_PANTONE"
+                  ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                  : asset.medium === "PRINT_MONOCHROME"
+                  ? "bg-purple-500/15 text-purple-400 border border-purple-500/30"
+                  : asset.medium === "PRINT_WB"
+                  ? "bg-neutral-500/15 text-neutral-300 border border-neutral-500/30"
                   : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
               }`}
             >
@@ -157,6 +163,12 @@ export function AssetCard({
                 ? "RGB"
                 : asset.medium === "PRINT_CMYK"
                 ? "CMYK"
+                : asset.medium === "PRINT_PANTONE"
+                ? "PANTONE"
+                : asset.medium === "PRINT_MONOCHROME"
+                ? "MONO"
+                : asset.medium === "PRINT_WB"
+                ? "WB"
                 : "UNI"}
             </span>
 

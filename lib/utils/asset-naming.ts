@@ -6,12 +6,11 @@ export interface SuggestLogoNameParams {
   orientation: AssetOrientation;
   hasClaim?: boolean;
   background: AssetBackground;
-  note?: string;
 }
 
 /**
- * Generates a structured logo name based on assigned parameters and optional note.
- * Format example: "logobook_print_cmyk_width_darkbg_poznamka"
+ * Generates a structured logo name based on assigned parameters.
+ * Format example: "logobook_print_cmyk_width_darkbg"
  */
 export function suggestLogoName({
   brandName,
@@ -19,7 +18,6 @@ export function suggestLogoName({
   orientation,
   hasClaim,
   background,
-  note,
 }: SuggestLogoNameParams): string {
   const parts: string[] = [];
 
@@ -36,9 +34,15 @@ export function suggestLogoName({
     parts.push(cleanBrand);
   }
 
-  // 2. Medium (print_cmyk, digital_rgb, universal)
+  // 2. Medium (print_cmyk, print_pantone, print_monochrome, print_wb, digital_rgb, universal)
   if (medium === "PRINT_CMYK") {
     parts.push("print_cmyk");
+  } else if (medium === "PRINT_PANTONE") {
+    parts.push("print_pantone");
+  } else if (medium === "PRINT_MONOCHROME") {
+    parts.push("print_monochrome");
+  } else if (medium === "PRINT_WB") {
+    parts.push("print_wb");
   } else if (medium === "DIGITAL_RGB") {
     parts.push("digital_rgb");
   } else {
@@ -55,32 +59,11 @@ export function suggestLogoName({
     parts.push(hasClaim ? "width_claim" : "width");
   }
 
-  // 4. Background (darkbg, lightbg, transparentbg, inversebg, monochrome)
+  // 4. Background (darkbg, lightbg)
   if (background === "DARK") {
     parts.push("darkbg");
-  } else if (background === "LIGHT") {
+  } else {
     parts.push("lightbg");
-  } else if (background === "TRANSPARENT") {
-    parts.push("transparentbg");
-  } else if (background === "INVERSE") {
-    parts.push("inversebg");
-  } else if (background === "MONOCHROME") {
-    parts.push("monochrome");
-  }
-
-  // 5. Note / Poznámka (optional, e.g. poznamka, v2, white, etc.)
-  if (note && note.trim()) {
-    const cleanNote = note
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
-
-    if (cleanNote) {
-      parts.push(cleanNote);
-    }
   }
 
   return parts.join("_");

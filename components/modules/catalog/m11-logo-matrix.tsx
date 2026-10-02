@@ -35,7 +35,7 @@ interface MatrixLogoItem {
   svgUrl: string;
   mockupImageUrl?: string;
   backgroundColor: string;
-  medium: "cmyk" | "rgb" | "universal";
+  medium: "cmyk" | "pantone" | "mono" | "wb" | "rgb" | "universal";
   orientation: "horizontal" | "vertical" | "symbol";
   hasClaim: boolean;
   backgroundType: "light" | "dark" | "brand" | "monochrome";
@@ -236,9 +236,12 @@ export default function M11MaticaLogotypovModule({
   const allLogos = useMemo<MatrixLogoItem[]>(() => {
     if (brandAssets.length === 0) return DEMO_LOGOS;
 
-    const medMap: Record<string, "cmyk" | "rgb" | "universal"> = {
+    const medMap: Record<string, string> = {
       DIGITAL_RGB: "rgb",
       PRINT_CMYK: "cmyk",
+      PRINT_PANTONE: "pantone",
+      PRINT_MONOCHROME: "mono",
+      PRINT_WB: "wb",
       UNIVERSAL: "universal",
     };
     const oriMap: Record<string, "horizontal" | "vertical" | "symbol"> = {
@@ -246,11 +249,11 @@ export default function M11MaticaLogotypovModule({
       VERTICAL: "vertical",
       SYMBOL: "symbol",
     };
-    const bgMap: Record<string, "light" | "dark" | "brand" | "monochrome"> = {
+    const bgMap: Record<string, "light" | "dark"> = {
       LIGHT: "light",
       DARK: "dark",
-      BRAND: "brand",
-      MONOCHROME: "monochrome",
+      BRAND: "dark",
+      MONOCHROME: "dark",
       INVERSE: "dark",
       TRANSPARENT: "light",
     };
@@ -276,8 +279,8 @@ export default function M11MaticaLogotypovModule({
         id: asset.id,
         name,
         svgUrl,
-        backgroundColor: bg === "dark" ? "#0e161d" : bg === "brand" ? tokens?.colors?.primary || "#c8d400" : "#fafbfc",
-        medium: medMap[asset.medium] || "universal",
+        backgroundColor: bg === "dark" ? "#0e161d" : "#fafbfc",
+        medium: (medMap[asset.medium] as any) || "universal",
         orientation: oriMap[asset.orientation] || "horizontal",
         hasClaim: asset.hasClaim ?? false,
         backgroundType: bg,
@@ -450,8 +453,11 @@ export default function M11MaticaLogotypovModule({
               <div className="flex flex-wrap gap-1">
                 {[
                   { id: "all", label: "Všetky" },
-                  { id: "rgb", label: "Digitál (RGB)" },
-                  { id: "cmyk", label: "Tlač (CMYK)" },
+                  { id: "cmyk", label: "CMYK (Tlač)" },
+                  { id: "pantone", label: "Pantone (Tlač)" },
+                  { id: "mono", label: "Monochróm (Tlač)" },
+                  { id: "wb", label: "Čiernobiela / WB (Tlač)" },
+                  { id: "rgb", label: "RGB (Digitál)" },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -479,8 +485,8 @@ export default function M11MaticaLogotypovModule({
               <div className="flex flex-wrap gap-1">
                 {[
                   { id: "all", label: "Všetky" },
-                  { id: "horizontal", label: "Na šírku" },
-                  { id: "vertical", label: "Na výšku" },
+                  { id: "horizontal", label: "Na šírku (width)" },
+                  { id: "vertical", label: "Na výšku (height)" },
                   { id: "symbol", label: "Symbol" },
                 ].map((item) => (
                   <button
@@ -538,9 +544,8 @@ export default function M11MaticaLogotypovModule({
               <div className="flex flex-wrap gap-1">
                 {[
                   { id: "all", label: "Všetky" },
-                  { id: "light", label: "Svetlý" },
-                  { id: "dark", label: "Tmavý" },
-                  { id: "brand", label: "Brand" },
+                  { id: "light", label: "Svetlý podklad" },
+                  { id: "dark", label: "Tmavý podklad" },
                 ].map((item) => (
                   <button
                     key={item.id}

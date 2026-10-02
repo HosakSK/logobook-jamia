@@ -36,7 +36,6 @@ export function EditAssetModal({
 }: EditAssetModalProps) {
   const [name, setName] = useState(asset?.name.en || asset?.name.sk || "");
   const [nameSk, setNameSk] = useState(asset?.name.sk || "");
-  const [note, setNote] = useState("");
   const [medium, setMedium] = useState<AssetMedium>(asset?.medium || "UNIVERSAL");
   const [orientation, setOrientation] = useState<AssetOrientation>(asset?.orientation || "HORIZONTAL");
   const [background, setBackground] = useState<AssetBackground>(asset?.background || "LIGHT");
@@ -51,9 +50,8 @@ export function EditAssetModal({
       setNameSk(asset.name.sk || "");
       setMedium(asset.medium || "UNIVERSAL");
       setOrientation(asset.orientation || "HORIZONTAL");
-      setBackground(asset.background || "LIGHT");
+      setBackground(asset.background === "DARK" ? "DARK" : "LIGHT");
       setHasClaim(Boolean(asset.hasClaim));
-      setNote("");
       setError(null);
     }
   }, [asset]);
@@ -67,7 +65,6 @@ export function EditAssetModal({
       orientation,
       hasClaim: orientation === "SYMBOL" ? false : hasClaim,
       background,
-      note,
     });
     setName(suggested);
     setNameSk(suggested);
@@ -120,7 +117,7 @@ export function EditAssetModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-neutral-800 transition-colors"
+            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -134,27 +131,19 @@ export function EditAssetModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Note and Auto-generation */}
-          <div className="p-3 rounded-[3px] bg-neutral-900 border border-border/40 space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-[10px] text-muted-foreground uppercase font-mono">
-                Poznámka pre generovanie názvu
-              </Label>
-              <button
-                type="button"
-                onClick={handleGenerateName}
-                className="text-[11px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span>Prepočítať názov z parametrov</span>
-              </button>
-            </div>
-            <Input
-              value={note}
-              placeholder="napr. poznamka, v2, hlavne"
-              onChange={(e) => setNote(e.target.value)}
-              className="h-8 text-xs rounded-[3px] bg-neutral-950 border-border/60"
-            />
+          {/* Quick Auto-generate Bar */}
+          <div className="p-2.5 rounded-[3px] bg-neutral-900 border border-border/40 flex items-center justify-between">
+            <span className="text-[11px] text-muted-foreground">
+              Formát: <code className="text-[#c8d400] font-mono">[brand]_[medium]_[orient]_[bg]</code>
+            </span>
+            <button
+              type="button"
+              onClick={handleGenerateName}
+              className="text-[11px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
+            >
+              <Sparkles className="h-3 w-3" />
+              <span>Prepočítať názov z parametrov</span>
+            </button>
           </div>
 
           {/* Names */}
@@ -187,9 +176,12 @@ export function EditAssetModal({
                 onChange={(e) => setMedium(e.target.value as AssetMedium)}
                 className="w-full mt-1.5 h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
               >
-                <option value="UNIVERSAL">Univerzálne</option>
-                <option value="DIGITAL_RGB">Digitál (RGB)</option>
                 <option value="PRINT_CMYK">Tlač (CMYK)</option>
+                <option value="PRINT_PANTONE">Tlač (Pantone)</option>
+                <option value="PRINT_MONOCHROME">Tlač (Monochróm)</option>
+                <option value="PRINT_WB">Tlač (Čiernobiela / WB)</option>
+                <option value="DIGITAL_RGB">Digitál (RGB)</option>
+                <option value="UNIVERSAL">Univerzálne</option>
               </select>
             </div>
             <div>
@@ -217,9 +209,6 @@ export function EditAssetModal({
               >
                 <option value="LIGHT">Svetlý (lightbg)</option>
                 <option value="DARK">Tmavý (darkbg)</option>
-                <option value="TRANSPARENT">Priehľadný</option>
-                <option value="MONOCHROME">Monochróm</option>
-                <option value="INVERSE">Inverzný</option>
               </select>
             </div>
 

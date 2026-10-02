@@ -1,14 +1,21 @@
 import { z } from "zod";
 
-export const ASSET_MEDIUMS = ["DIGITAL_RGB", "PRINT_CMYK", "UNIVERSAL"] as const;
+export const ASSET_MEDIUMS = [
+  "DIGITAL_RGB",
+  "PRINT_CMYK",
+  "PRINT_PANTONE",
+  "PRINT_MONOCHROME",
+  "PRINT_WB",
+  "UNIVERSAL",
+] as const;
+
 export const ASSET_ORIENTATIONS = ["HORIZONTAL", "VERTICAL", "SYMBOL"] as const;
+
 export const ASSET_BACKGROUNDS = [
   "LIGHT",
   "DARK",
-  "MONOCHROME",
-  "INVERSE",
-  "TRANSPARENT",
 ] as const;
+
 export const ASSET_FILE_FORMATS = ["SVG", "PDF", "EPS", "AI", "PNG", "ZIP"] as const;
 
 export type AssetMedium = (typeof ASSET_MEDIUMS)[number];

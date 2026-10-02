@@ -138,8 +138,11 @@ export function AssetsGalleryView({
             className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky médiá</option>
-            <option value="DIGITAL_RGB">RGB (Digitál)</option>
             <option value="PRINT_CMYK">CMYK (Tlač)</option>
+            <option value="PRINT_PANTONE">Pantone (Tlač)</option>
+            <option value="PRINT_MONOCHROME">Monochróm (Tlač)</option>
+            <option value="PRINT_WB">Čiernobiela / WB (Tlač)</option>
+            <option value="DIGITAL_RGB">RGB (Digitál)</option>
             <option value="UNIVERSAL">Univerzálne</option>
           </select>
 
@@ -162,11 +165,8 @@ export function AssetsGalleryView({
             className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky podklady</option>
-            <option value="LIGHT">Svetlý</option>
-            <option value="DARK">Tmavý</option>
-            <option value="TRANSPARENT">Priehľadný</option>
-            <option value="MONOCHROME">Monochróm</option>
-            <option value="INVERSE">Inverzný</option>
+            <option value="LIGHT">Svetlý podklad</option>
+            <option value="DARK">Tmavý podklad</option>
           </select>
         </div>
       </div>

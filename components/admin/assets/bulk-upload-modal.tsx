@@ -31,7 +31,6 @@ import {
   FileCode,
   FolderArchive,
   Image as ImageIcon,
-  RotateCcw,
 } from "lucide-react";
 
 interface QueuedAttachedFile {
@@ -44,7 +43,6 @@ interface QueuedLogoItem {
   id: string;
   baseKey: string;
   name: string;
-  note: string;
   nameCustomized?: boolean;
   medium: AssetMedium;
   orientation: AssetOrientation;
@@ -166,7 +164,15 @@ export function BulkUploadModal({
           const lowerName = firstFile.name.toLowerCase();
 
           let medium: AssetMedium = "UNIVERSAL";
-          if (lowerName.includes("cmyk") || lowerName.includes("print")) {
+          if (lowerName.includes("pantone")) {
+            medium = "PRINT_PANTONE";
+          } else if (lowerName.includes("cmyk")) {
+            medium = "PRINT_CMYK";
+          } else if (lowerName.includes("wb") || lowerName.includes("black_white") || lowerName.includes("blackwhite") || lowerName.includes("bw")) {
+            medium = "PRINT_WB";
+          } else if (lowerName.includes("mono")) {
+            medium = "PRINT_MONOCHROME";
+          } else if (lowerName.includes("print")) {
             medium = "PRINT_CMYK";
           } else if (lowerName.includes("rgb") || lowerName.includes("web") || lowerName.includes("screen")) {
             medium = "DIGITAL_RGB";
@@ -180,18 +186,13 @@ export function BulkUploadModal({
           }
 
           let background: AssetBackground = "LIGHT";
-          if (lowerName.includes("dark") || lowerName.includes("_d.") || lowerName.includes("-d.") || lowerName.includes("black")) {
+          if (lowerName.includes("dark") || lowerName.includes("_d.") || lowerName.includes("-d.") || lowerName.includes("_d_") || lowerName.includes("black")) {
             background = "DARK";
-          } else if (lowerName.includes("inverse") || lowerName.includes("inv") || lowerName.includes("white") || lowerName.includes("_w.") || lowerName.includes("-w.")) {
-            background = "INVERSE";
-          } else if (lowerName.includes("trans")) {
-            background = "TRANSPARENT";
-          } else if (lowerName.includes("mono")) {
-            background = "MONOCHROME";
+          } else {
+            background = "LIGHT";
           }
 
           const hasClaim = orientation === "SYMBOL" ? false : lowerName.includes("claim") || lowerName.includes("slogan");
-          const note = "";
 
           // Suggest structured name based on parameters
           const suggestedName = suggestLogoName({
@@ -200,7 +201,6 @@ export function BulkUploadModal({
             orientation,
             hasClaim,
             background,
-            note,
           });
 
           const itemId = Math.random().toString(36).substring(2, 9);
@@ -209,7 +209,6 @@ export function BulkUploadModal({
             id: itemId,
             baseKey,
             name: suggestedName,
-            note: "",
             nameCustomized: false,
             medium,
             orientation,
@@ -285,7 +284,6 @@ export function BulkUploadModal({
               ? updates.hasClaim
               : item.hasClaim;
           const newBackground = updates.background ?? item.background;
-          const newNote = updates.note !== undefined ? updates.note : item.note;
 
           let newName = updates.name !== undefined ? updates.name : item.name;
           let isCustomized = item.nameCustomized ?? false;
@@ -299,7 +297,6 @@ export function BulkUploadModal({
               orientation: newOrientation,
               hasClaim: newHasClaim,
               background: newBackground,
-              note: newNote,
             });
           }
 
@@ -310,7 +307,6 @@ export function BulkUploadModal({
             orientation: newOrientation,
             hasClaim: newHasClaim,
             background: newBackground,
-            note: newNote,
             name: newName,
             nameCustomized: isCustomized,
           };
@@ -330,7 +326,6 @@ export function BulkUploadModal({
             orientation: item.orientation,
             hasClaim: item.orientation === "SYMBOL" ? false : item.hasClaim,
             background: item.background,
-            note: item.note,
           });
           return {
             ...item,
@@ -485,14 +480,14 @@ export function BulkUploadModal({
               <span>Hromadné nahrávanie lôg & exportov (Bulk Upload)</span>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Názvy lôg sa automaticky navrhujú podľa zvolených parametrov (napr. <code className="text-[#c8d400] font-mono">logobook_print_cmyk_width_darkbg_poznamka</code>).
+              Názvy lôg sa automaticky navrhujú podľa zvolených parametrov (napr. <code className="text-[#c8d400] font-mono">logobook_print_cmyk_width_darkbg</code>).
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-neutral-800 transition-colors"
+            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -557,7 +552,7 @@ export function BulkUploadModal({
                 <button
                   type="button"
                   onClick={() => setQueue([])}
-                  className="text-red-400 hover:underline text-[11px]"
+                  className="text-red-400 hover:underline text-[11px] cursor-pointer"
                 >
                   Vyčistiť zoznam
                 </button>
@@ -575,9 +570,7 @@ export function BulkUploadModal({
                         className={`h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden ${
                           item.background === "LIGHT"
                             ? "bg-white text-black"
-                            : item.background === "DARK" || item.background === "INVERSE"
-                            ? "bg-[#070b0f] text-white"
-                            : "bg-neutral-800 text-white"
+                            : "bg-[#070b0f] text-white"
                         }`}
                       >
                         {item.svgContent ? (
@@ -594,8 +587,8 @@ export function BulkUploadModal({
                       </div>
 
                       {/* Form fields Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 flex-1 w-full">
-                        {/* Name (Navrhnutý názov) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1 w-full">
+                        {/* Name (Navrhnutý názov) - span 2 */}
                         <div className="sm:col-span-2 lg:col-span-2">
                           <div className="flex items-center justify-between">
                             <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
@@ -616,17 +609,6 @@ export function BulkUploadModal({
                           />
                         </div>
 
-                        {/* Note (Poznámka) */}
-                        <div className="sm:col-span-1 lg:col-span-1">
-                          <Label className="text-[10px] text-muted-foreground uppercase font-mono">Poznámka</Label>
-                          <Input
-                            value={item.note}
-                            placeholder="napr. poznamka"
-                            onChange={(e) => updateItem(item.id, { note: e.target.value })}
-                            className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60"
-                          />
-                        </div>
-
                         {/* Medium */}
                         <div className="sm:col-span-1 lg:col-span-1">
                           <Label className="text-[10px] text-muted-foreground uppercase font-mono">Médium</Label>
@@ -635,9 +617,12 @@ export function BulkUploadModal({
                             onChange={(e) => updateItem(item.id, { medium: e.target.value as AssetMedium })}
                             className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                           >
-                            <option value="UNIVERSAL">Univerzálne</option>
-                            <option value="DIGITAL_RGB">Digitál (RGB)</option>
                             <option value="PRINT_CMYK">Tlač (CMYK)</option>
+                            <option value="PRINT_PANTONE">Tlač (Pantone)</option>
+                            <option value="PRINT_MONOCHROME">Tlač (Monochróm)</option>
+                            <option value="PRINT_WB">Tlač (Čiernobiela / WB)</option>
+                            <option value="DIGITAL_RGB">Digitál (RGB)</option>
+                            <option value="UNIVERSAL">Univerzálne</option>
                           </select>
                         </div>
 
@@ -662,13 +647,10 @@ export function BulkUploadModal({
                             <select
                               value={item.background}
                               onChange={(e) => updateItem(item.id, { background: e.target.value as AssetBackground })}
-                              className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-1.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+                              className="w-full mt-1 h-8 rounded-[3px] bg-neutral-950 border border-border/60 text-xs px-2 text-foreground focus:outline-hidden focus:border-[#c8d400]"
                             >
                               <option value="LIGHT">Svetlý (lightbg)</option>
                               <option value="DARK">Tmavý (darkbg)</option>
-                              <option value="TRANSPARENT">Priehľadný</option>
-                              <option value="MONOCHROME">Monochróm</option>
-                              <option value="INVERSE">Inverzný</option>
                             </select>
                           </div>
 

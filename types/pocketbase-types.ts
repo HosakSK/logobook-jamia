@@ -43,11 +43,17 @@ export type GlobalTypographyRole = "HEADING" | "BODY" | "DISPLAY" | "MONOSPACE" 
 
 export type GlobalFontSource = "GOOGLE_FONTS" | "CUSTOM_UPLOAD" | "ADOBE_FONTS";
 
-export type AssetMedium = "DIGITAL_RGB" | "PRINT_CMYK" | "UNIVERSAL";
+export type AssetMedium =
+  | "DIGITAL_RGB"
+  | "PRINT_CMYK"
+  | "PRINT_PANTONE"
+  | "PRINT_MONOCHROME"
+  | "PRINT_WB"
+  | "UNIVERSAL";
 
 export type AssetOrientation = "HORIZONTAL" | "VERTICAL" | "SYMBOL";
 
-export type AssetBackground = "LIGHT" | "DARK" | "MONOCHROME" | "INVERSE" | "TRANSPARENT";
+export type AssetBackground = "LIGHT" | "DARK";
 
 export type AssetFileFormat = "SVG" | "PDF" | "EPS" | "AI" | "PNG" | "ZIP";
 
