@@ -638,7 +638,30 @@ export function BulkUploadModal({
                     key={item.id}
                     className="p-4 rounded-[3px] bg-neutral-900 border border-border/40 flex flex-col gap-3 text-xs shadow-xs"
                   >
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                    {/* Top banner: Original Source File Name without truncation */}
+                    <div className="flex items-center justify-between gap-3 pb-2 border-b border-border/30 bg-neutral-950/50 -mx-4 -mt-4 px-4 py-2 rounded-t-[3px]">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#c8d400] font-mono shrink-0 flex items-center gap-1.5">
+                          <FileCode className="h-3.5 w-3.5" />
+                          Pôvodný súbor:
+                        </span>
+                        <span className="font-mono text-xs text-neutral-100 font-semibold break-all select-all">
+                          {item.originalFileName || item.attachedFiles[0]?.file.name}
+                        </span>
+                      </div>
+
+                      {/* Remove item button */}
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.id)}
+                        className="p-1 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors shrink-0 cursor-pointer"
+                        title="Odstrániť toto logo zo zoznamu"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 pt-1">
                       {/* Thumbnail preview */}
                       <div
                         className={`h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden ${
@@ -663,32 +686,24 @@ export function BulkUploadModal({
                       {/* Form fields Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1 w-full">
                         {/* Name (Navrhnutý názov) - span 2 */}
-                        <div className="sm:col-span-2 lg:col-span-2 flex flex-col justify-between">
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
-                              <button
-                                type="button"
-                                onClick={() => regenerateItemName(item.id)}
-                                className="text-[10px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
-                                title="Vygenerovať názov automaticky z parametrov"
-                              >
-                                <Sparkles className="h-3 w-3" />
-                                <span>Prepočítať</span>
-                              </button>
-                            </div>
-                            <Input
-                              value={item.name}
-                              onChange={(e) => updateItem(item.id, { name: e.target.value, nameCustomized: true })}
-                              className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-[#c8d400]"
-                            />
+                        <div className="sm:col-span-2 lg:col-span-2">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-[10px] text-muted-foreground uppercase font-mono">Navrhnutý názov loga</Label>
+                            <button
+                              type="button"
+                              onClick={() => regenerateItemName(item.id)}
+                              className="text-[10px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
+                              title="Vygenerovať názov automaticky z parametrov"
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              <span>Prepočítať</span>
+                            </button>
                           </div>
-
-                          {/* Pôvodný súbor */}
-                          <div className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground truncate" title={item.originalFileName || item.attachedFiles[0]?.file.name}>
-                            <span className="text-[10px] uppercase font-mono text-neutral-400 shrink-0">Pôvodný súbor:</span>
-                            <span className="font-mono text-neutral-200 truncate select-all">{item.originalFileName || item.attachedFiles[0]?.file.name}</span>
-                          </div>
+                          <Input
+                            value={item.name}
+                            onChange={(e) => updateItem(item.id, { name: e.target.value, nameCustomized: true })}
+                            className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-[#c8d400]"
+                          />
                         </div>
 
                         {/* Medium */}
@@ -761,29 +776,19 @@ export function BulkUploadModal({
                           </div>
                         </div>
                       </div>
-
-                      {/* Remove item button */}
-                      <button
-                        type="button"
-                        onClick={() => removeItem(item.id)}
-                        className="p-1.5 rounded-[3px] text-muted-foreground hover:text-red-400 hover:bg-neutral-800 transition-colors self-end md:self-center cursor-pointer"
-                        title="Odstrániť toto logo zo zoznamu"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
                     </div>
 
-                    {/* Merged formats note & chips */}
+                    {/* Merged formats note & chips with full unshortened filenames */}
                     <div className="pt-2 border-t border-border/30 flex flex-wrap items-center justify-between gap-2 bg-neutral-950/40 p-2 rounded-[2px]">
                       <div className="flex flex-wrap items-center gap-2 min-w-0">
-                        <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                        <span className="text-[11px] font-semibold text-foreground flex items-center gap-1.5 shrink-0">
                           <FolderArchive className="h-3.5 w-3.5 text-[#c8d400]" />
                           {item.attachedFiles.length > 1 ? (
                             <span>
-                              Zlúčených <strong className="text-[#c8d400]">{item.attachedFiles.length} formátov</strong> podľa rovnakého názvu:
+                              Zlúčených <strong className="text-[#c8d400]">{item.attachedFiles.length} súborov</strong>:
                             </span>
                           ) : (
-                            <span>Priradený formát súboru:</span>
+                            <span>Priradený súbor:</span>
                           )}
                         </span>
 
@@ -791,16 +796,17 @@ export function BulkUploadModal({
                           {item.attachedFiles.map((att) => (
                             <span
                               key={att.file.name}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[2px] bg-neutral-800 border border-border/60 text-[10px] font-mono text-foreground"
+                              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[2px] bg-neutral-800 border border-border/60 text-[10px] font-mono text-foreground"
                               title={att.file.name}
                             >
                               <span className="font-bold text-[#c8d400]">{att.format}</span>
-                              <span className="text-muted-foreground text-[9px]">({att.sizeFormatted})</span>
+                              <span className="text-neutral-200 select-all break-all">{att.file.name}</span>
+                              <span className="text-muted-foreground text-[9px] shrink-0">({att.sizeFormatted})</span>
                               {item.attachedFiles.length > 1 && (
                                 <button
                                   type="button"
                                   onClick={() => removeAttachedFile(item.id, att.file.name)}
-                                  className="text-muted-foreground hover:text-red-400 ml-0.5 cursor-pointer"
+                                  className="text-muted-foreground hover:text-red-400 ml-0.5 cursor-pointer shrink-0"
                                   title={`Odstrániť formát ${att.format}`}
                                 >
                                   <X className="h-2.5 w-2.5" />
