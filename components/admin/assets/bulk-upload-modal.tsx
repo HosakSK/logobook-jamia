@@ -42,6 +42,7 @@ interface QueuedAttachedFile {
 interface QueuedLogoItem {
   id: string;
   baseKey: string;
+  originalFileName: string;
   name: string;
   nameCustomized?: boolean;
   medium: AssetMedium;
@@ -257,6 +258,7 @@ export function BulkUploadModal({
           updatedQueue.push({
             id: itemId,
             baseKey,
+            originalFileName: firstFile.name,
             name: suggestedName,
             nameCustomized: false,
             medium,
@@ -661,24 +663,32 @@ export function BulkUploadModal({
                       {/* Form fields Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 flex-1 w-full">
                         {/* Name (Navrhnutý názov) - span 2 */}
-                        <div className="sm:col-span-2 lg:col-span-2">
-                          <div className="flex items-center justify-between">
-                            <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
-                            <button
-                              type="button"
-                              onClick={() => regenerateItemName(item.id)}
-                              className="text-[10px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
-                              title="Vygenerovať názov automaticky z parametrov"
-                            >
-                              <Sparkles className="h-3 w-3" />
-                              <span>Prepočítať</span>
-                            </button>
+                        <div className="sm:col-span-2 lg:col-span-2 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between">
+                              <Label className="text-[10px] text-muted-foreground uppercase font-mono">Názov loga</Label>
+                              <button
+                                type="button"
+                                onClick={() => regenerateItemName(item.id)}
+                                className="text-[10px] text-[#c8d400] hover:underline flex items-center gap-1 font-mono cursor-pointer"
+                                title="Vygenerovať názov automaticky z parametrov"
+                              >
+                                <Sparkles className="h-3 w-3" />
+                                <span>Prepočítať</span>
+                              </button>
+                            </div>
+                            <Input
+                              value={item.name}
+                              onChange={(e) => updateItem(item.id, { name: e.target.value, nameCustomized: true })}
+                              className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-[#c8d400]"
+                            />
                           </div>
-                          <Input
-                            value={item.name}
-                            onChange={(e) => updateItem(item.id, { name: e.target.value, nameCustomized: true })}
-                            className="h-8 text-xs mt-1 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-[#c8d400]"
-                          />
+
+                          {/* Pôvodný súbor */}
+                          <div className="mt-1.5 flex items-center gap-1 text-[11px] text-muted-foreground truncate" title={item.originalFileName || item.attachedFiles[0]?.file.name}>
+                            <span className="text-[10px] uppercase font-mono text-neutral-400 shrink-0">Pôvodný súbor:</span>
+                            <span className="font-mono text-neutral-200 truncate select-all">{item.originalFileName || item.attachedFiles[0]?.file.name}</span>
+                          </div>
                         </div>
 
                         {/* Medium */}
