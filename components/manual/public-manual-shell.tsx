@@ -158,7 +158,9 @@ export function PublicManualShell({
             className="relative flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-1 sm:mx-4"
           >
             <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center w-4 h-4">
+                <Search className="h-4 w-4" style={{ color: "var(--muted-foreground)" }} />
+              </div>
               <input
                 type="text"
                 placeholder={
@@ -174,7 +176,14 @@ export function PublicManualShell({
                   setSearchOpen(true);
                 }}
                 onFocus={() => setSearchOpen(true)}
-                className="w-full pl-9 pr-8 py-2 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-background border border-border/60 rounded-[3px] focus:outline-none focus:border-primary/80 placeholder:text-muted-foreground transition-all"
+                style={{
+                  paddingLeft: "2.75rem",
+                  paddingRight: "2.25rem",
+                  backgroundColor: "var(--card, #17212a)",
+                  color: "var(--foreground, #fafbfc)",
+                  borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+                }}
+                className="w-full py-2 text-xs border rounded-[3px] focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground transition-all shadow-xs"
               />
               {searchQuery && (
                 <button
@@ -190,10 +199,20 @@ export function PublicManualShell({
               )}
             </div>
 
-            {/* Instant Search Dropdown Results */}
+            {/* Instant Search Dropdown Results with Solid Background */}
             {searchOpen && searchQuery.trim() && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50 max-h-80 overflow-y-auto p-1.5 space-y-1">
-                <div className="px-2.5 py-1 text-[10px] font-mono uppercase text-muted-foreground">
+              <div
+                style={{
+                  backgroundColor: "var(--card, #17212a)",
+                  color: "var(--foreground, #fafbfc)",
+                  borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+                }}
+                className="absolute top-full left-0 right-0 mt-1.5 border rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto p-1.5 space-y-1"
+              >
+                <div
+                  className="px-2.5 py-1 text-[10px] font-mono uppercase"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
                   {locale === "sk"
                     ? `Výsledky hľadania (${searchResults.length})`
                     : locale === "cs"
@@ -201,7 +220,10 @@ export function PublicManualShell({
                     : `Search Results (${searchResults.length})`}
                 </div>
                 {searchResults.length === 0 ? (
-                  <div className="px-3 py-4 text-center text-xs text-muted-foreground italic">
+                  <div
+                    className="px-3 py-4 text-center text-xs italic"
+                    style={{ color: "var(--muted-foreground)" }}
+                  >
                     {locale === "sk"
                       ? "Nenašli sa žiadne stránky."
                       : locale === "cs"
@@ -217,14 +239,18 @@ export function PublicManualShell({
                         setSearchOpen(false);
                         setSearchQuery("");
                       }}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs hover:bg-muted/50 transition-colors group cursor-pointer"
+                      style={{ color: "var(--foreground)" }}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs hover:bg-black/5 dark:hover:bg-white/10 transition-colors group cursor-pointer"
                     >
                       <FileText className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                       <div className="min-w-0 flex-1">
                         <div className="font-semibold truncate text-foreground group-hover:text-primary transition-colors">
                           {getLocalized(page.title) || page.slug}
                         </div>
-                        <div className="text-[10px] text-muted-foreground font-mono truncate">
+                        <div
+                          className="text-[10px] font-mono truncate"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
                           /{page.slug}
                         </div>
                       </div>
@@ -264,7 +290,7 @@ export function PublicManualShell({
         </main>
       </div>
 
-      {/* Slide-out Navigation Drawer from the RIGHT */}
+      {/* Slide-out Navigation Drawer from the RIGHT with Solid Opaque Background */}
       {navDrawerOpen && (
         <div className="fixed inset-0 z-50">
           {/* Backdrop */}
@@ -274,18 +300,36 @@ export function PublicManualShell({
           />
 
           {/* Drawer content sliding from the RIGHT */}
-          <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-card border-l border-border p-0 shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-200">
-            <div className="p-4 border-b border-border flex items-center justify-between">
+          <div
+            style={{
+              backgroundColor: "var(--card, #17212a)",
+              color: "var(--foreground, #fafbfc)",
+              borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+            }}
+            className="fixed inset-y-0 right-0 w-80 max-w-[85vw] border-l p-0 shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-200"
+          >
+            <div
+              style={{
+                backgroundColor: "var(--card, #17212a)",
+                borderBottomColor: "var(--border, rgba(63, 85, 102, 0.45))",
+                color: "var(--foreground, #fafbfc)",
+              }}
+              className="p-4 border-b flex items-center justify-between"
+            >
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <BookOpen className="h-4 w-4" style={{ color: "var(--brand-color-primary, #c8d400)" }} />
+                <span
+                  className="text-xs font-bold uppercase tracking-wider"
+                  style={{ color: "var(--foreground, #fafbfc)" }}
+                >
                   {locale === "sk" ? "Navigácia manuálu" : locale === "cs" ? "Navigace manuálu" : "Manual Navigation"}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setNavDrawerOpen(false)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"
+                className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
+                style={{ color: "var(--foreground, #fafbfc)" }}
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />
