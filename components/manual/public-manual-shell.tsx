@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Menu, X, BookOpen, ExternalLink, Globe, Moon, Sun } from "lucide-react";
+import { Menu, X, BookOpen, Search, FileText } from "lucide-react";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { PublicManualSidebar } from "./public-manual-sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Locale } from "@/lib/i18n";
 import { useBrandCascade } from "@/components/modules/cascade";
@@ -34,7 +33,11 @@ export function PublicManualShell({
   locale,
   currentPageSlug,
 }: PublicManualShellProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
   const pages = snapshot?.pages || [];
   const { tokens } = useBrandCascade();
   const manualBg = tokens?.manualBgColor || "#0e161d";
@@ -42,6 +45,66 @@ export function PublicManualShell({
     ? tokens.theme.isDark
     : getWcagContrast(manualBg).preferredText === "white";
   const logobookSymbolSrc = isDarkBg ? "/logo/logo-symbol-dark.svg" : "/logo/logo-symbol-light.svg";
+
+  // Helper for localized title
+  const getLocalized = (textObj?: Record<string, string>): string => {
+    if (!textObj) return "";
+    return (
+      textObj[locale] ||
+      textObj.sk ||
+      textObj.en ||
+      textObj.cs ||
+      Object.values(textObj)[0] ||
+      ""
+    );
+  };
+
+  // Resolve target link URL
+  const getPageHref = (slug: string) => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      if (path.startsWith("/manual/")) {
+        return `/manual/${domain}/${locale}/${slug}`;
+      }
+    }
+    return `/m/${domain}/${slug}`;
+  };
+
+  // Search filtering for the top header
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return pages.filter((p) => {
+      const title = getLocalized(p.title).toLowerCase();
+      const slug = p.slug.toLowerCase();
+      return title.includes(q) || slug.includes(q);
+    });
+  }, [pages, searchQuery, locale]);
+
+  // Click outside listener for search dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Close search dropdown on ESC
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setSearchOpen(false);
+        setNavDrawerOpen(false);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div
@@ -53,29 +116,18 @@ export function PublicManualShell({
       className="min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors"
     >
       {/* Sticky Top Header */}
-      <header className="sticky top-0 z-40 h-18 border-b border-border/50 bg-card/90 backdrop-blur-md px-5 sm:px-8 flex items-center justify-between">
-        {/* Left: Mobile hamburger + Brand Title / Logo */}
-        <div className="flex items-center gap-3.5">
-          {pages.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer"
-              aria-label="Open manual navigation"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-          )}
-
+      <header className="sticky top-0 z-40 h-18 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6">
+        {/* Left: Brand Title / Logo */}
+        <div className="flex items-center gap-3 shrink-0">
           <Link
             href={`/manual/${domain}/${locale}`}
-            className="flex items-center gap-3.5 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
           >
             {brand.headerLogoUrl ? (
               <img
                 src={brand.headerLogoUrl}
                 alt={brand.name}
-                className="h-9 w-auto max-w-[150px] sm:max-w-[200px] object-contain"
+                className="h-9 w-auto max-w-[140px] sm:max-w-[200px] object-contain"
               />
             ) : (
               <div
@@ -99,52 +151,141 @@ export function PublicManualShell({
           </Link>
         </div>
 
-        {/* Right: Language switcher & Theme toggle */}
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher currentLocale={locale as Locale} />
-          <ThemeToggle />
-        </div>
-      </header>
-
-      {/* Main Body Layout */}
-      <div className="flex-1 flex w-full">
-        {/* Desktop Fixed Sidebar */}
+        {/* Center: Search Input in Top Bar */}
         {pages.length > 0 && (
-          <div className="hidden md:block w-72 shrink-0 border-r border-border/50 bg-card/20 sticky top-18 h-[calc(100vh-4.5rem)]">
-            <PublicManualSidebar
-              pages={pages}
-              currentPageSlug={currentPageSlug}
-              domain={domain}
-              locale={locale}
-            />
+          <div
+            ref={searchRef}
+            className="relative flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-1 sm:mx-4"
+          >
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                placeholder={
+                  locale === "sk"
+                    ? "Hľadať v manuáli..."
+                    : locale === "cs"
+                    ? "Hledat v manuálu..."
+                    : "Search manual..."
+                }
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                className="w-full pl-9 pr-8 py-2 text-xs bg-muted/40 hover:bg-muted/60 focus:bg-background border border-border/60 rounded-[3px] focus:outline-none focus:border-primary/80 placeholder:text-muted-foreground transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSearchOpen(false);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Instant Search Dropdown Results */}
+            {searchOpen && searchQuery.trim() && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl overflow-hidden z-50 max-h-80 overflow-y-auto p-1.5 space-y-1">
+                <div className="px-2.5 py-1 text-[10px] font-mono uppercase text-muted-foreground">
+                  {locale === "sk"
+                    ? `Výsledky hľadania (${searchResults.length})`
+                    : locale === "cs"
+                    ? `Výsledky hledání (${searchResults.length})`
+                    : `Search Results (${searchResults.length})`}
+                </div>
+                {searchResults.length === 0 ? (
+                  <div className="px-3 py-4 text-center text-xs text-muted-foreground italic">
+                    {locale === "sk"
+                      ? "Nenašli sa žiadne stránky."
+                      : locale === "cs"
+                      ? "Nebyly nalezeny žádné stránky."
+                      : "No pages found."}
+                  </div>
+                ) : (
+                  searchResults.map((page) => (
+                    <Link
+                      key={page.id}
+                      href={getPageHref(page.slug || page.id)}
+                      onClick={() => {
+                        setSearchOpen(false);
+                        setSearchQuery("");
+                      }}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs hover:bg-muted/50 transition-colors group cursor-pointer"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold truncate text-foreground group-hover:text-primary transition-colors">
+                          {getLocalized(page.title) || page.slug}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground font-mono truncate">
+                          /{page.slug}
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Center Main Content Area */}
+        {/* Right: Language switcher & Slide-out Navigation Hamburger */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <LanguageSwitcher currentLocale={locale as Locale} />
+
+          {pages.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setNavDrawerOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl border border-border/60 hover:border-border hover:bg-muted/50 text-foreground flex items-center gap-2 text-xs font-semibold cursor-pointer shadow-xs transition-colors"
+              aria-label="Open manual navigation"
+              title="Otvoriť navigáciu manuálu"
+            >
+              <Menu className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {locale === "sk" ? "Kapitoly" : locale === "cs" ? "Kapitoly" : "Pages"}
+              </span>
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/* Main Body Layout (Left static column removed for full-width content) */}
+      <div className="flex-1 flex w-full">
         <main className="flex-1 min-w-0 p-6 sm:p-10 md:p-14 max-w-6xl mx-auto w-full">
           {children}
         </main>
       </div>
 
-      {/* Mobile Sidebar Drawer / Sheet */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+      {/* Slide-out Navigation Drawer from the RIGHT */}
+      {navDrawerOpen && (
+        <div className="fixed inset-0 z-50">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
+            onClick={() => setNavDrawerOpen(false)}
           />
 
-          {/* Drawer content */}
-          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-card border-r border-border p-0 shadow-2xl flex flex-col animate-in slide-in-from-left duration-200">
+          {/* Drawer content sliding from the RIGHT */}
+          <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-card border-l border-border p-0 shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-200">
             <div className="p-4 border-b border-border flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Navigácia manuálu
-              </span>
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  {locale === "sk" ? "Navigácia manuálu" : locale === "cs" ? "Navigace manuálu" : "Manual Navigation"}
+                </span>
+              </div>
               <button
                 type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-1 rounded-[2px] text-muted-foreground hover:text-foreground cursor-pointer"
+                onClick={() => setNavDrawerOpen(false)}
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 cursor-pointer transition-colors"
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />
@@ -157,7 +298,7 @@ export function PublicManualShell({
                 currentPageSlug={currentPageSlug}
                 domain={domain}
                 locale={locale}
-                onPageSelect={() => setMobileMenuOpen(false)}
+                onPageSelect={() => setNavDrawerOpen(false)}
               />
             </div>
           </div>
