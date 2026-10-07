@@ -196,6 +196,8 @@ export interface GlobalShapesRecord {
   semanticWarning?: string;
   semanticDanger?: string;
   semanticInfo?: string;
+  manualBgColor?: string;
+  themeConfig?: any;
 }
 
 export interface GlobalTypographyRecord<

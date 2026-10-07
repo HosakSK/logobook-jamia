@@ -31,6 +31,8 @@ export function computeBrandRadiusValue(
   }
 }
 
+import { resolveManualTheme } from "@/lib/constants/themes";
+
 /**
  * Computes standard CSS custom properties for Level 1 Brand Tokens.
  * These are injected into the root manual layout and container DOM elements.
@@ -46,23 +48,6 @@ export function computeBrandCssVariables(
 
   const radiusValue = computeBrandRadiusValue(radiusMode, customRadiusPx);
   const borderWidthValue = `${Math.max(0, borderWidthPx)}px`;
-
-  // Color mapping by role
-  let primary = "#c8d400";
-  let secondary = "#17212a";
-  let accent = "#009f80";
-  let neutral = "#fafbfc";
-
-  if (colors && colors.length > 0) {
-    for (const c of colors) {
-      if (!c.hex) continue;
-      const role = c.role?.toUpperCase();
-      if (role === "PRIMARY") primary = c.hex;
-      else if (role === "SECONDARY") secondary = c.hex;
-      else if (role === "ACCENT") accent = c.hex;
-      else if (role === "NEUTRAL") neutral = c.hex;
-    }
-  }
 
   // Semantic colors
   const success = shapes?.semanticSuccess || "#10b981";
@@ -88,15 +73,32 @@ export function computeBrandCssVariables(
     }
   }
 
-  const manualBg = (shapes as any)?.manualBgColor || "#0e161d";
+  // Resolve theme using 4 default presets or custom configuration
+  const theme = resolveManualTheme(
+    (shapes as any)?.themeConfig,
+    (shapes as any)?.manualBgColor,
+    colors as any
+  );
+
+  let secondary = "#17212a";
+  let neutral = theme.isDark ? "#fafbfc" : "#0e161d";
+
+  if (colors && colors.length > 0) {
+    for (const c of colors) {
+      if (!c.hex) continue;
+      const role = c.role?.toUpperCase();
+      if (role === "SECONDARY") secondary = c.hex;
+      else if (role === "NEUTRAL") neutral = c.hex;
+    }
+  }
 
   return {
     "--brand-radius": radiusValue,
     "--brand-radius-mode": radiusMode,
     "--brand-border-width": borderWidthValue,
-    "--brand-color-primary": primary,
+    "--brand-color-primary": theme.primaryColor,
     "--brand-color-secondary": secondary,
-    "--brand-color-accent": accent,
+    "--brand-color-accent": theme.accentColor,
     "--brand-color-neutral": neutral,
     "--brand-color-success": success,
     "--brand-color-warning": warning,
@@ -104,7 +106,26 @@ export function computeBrandCssVariables(
     "--brand-color-info": info,
     "--brand-font-heading": headingFont,
     "--brand-font-body": bodyFont,
-    "--brand-manual-bg": manualBg,
+    "--brand-manual-bg": theme.bgColor,
+
+    // Adaptive Theme Variables (Fixes white text on white bg & sets card/border styles)
+    "--background": theme.bgColor,
+    "--foreground": theme.textColor,
+    "--card": theme.surfaceColor,
+    "--card-foreground": theme.textColor,
+    "--popover": theme.surfaceColor,
+    "--popover-foreground": theme.textColor,
+    "--muted": theme.surfaceColor,
+    "--muted-foreground": theme.mutedColor,
+    "--border": theme.borderColor,
+    "--primary": theme.primaryColor,
+    "--primary-foreground": theme.isDark ? "#070b0f" : "#ffffff",
+
+    // Brand theme aliases
+    "--brand-card-bg": theme.surfaceColor,
+    "--brand-text-main": theme.textColor,
+    "--brand-text-muted": theme.mutedColor,
+    "--brand-border-color": theme.borderColor,
   };
 }
 
@@ -121,12 +142,16 @@ export function buildBrandCascadeTokens(
     rawMode === "square" || rawMode === "sharp" ? "sharp" : rawMode === "pill" ? "pill" : "rounded";
   const customRadiusPx = shapes?.customRadiusPx ?? 3;
   const borderWidthPx = shapes?.borderWidthPx ?? 1;
-  const manualBgColor = (shapes as any)?.manualBgColor || "#0e161d";
 
-  let primary = "#c8d400";
+  // Resolve theme
+  const theme = resolveManualTheme(
+    (shapes as any)?.themeConfig,
+    (shapes as any)?.manualBgColor,
+    colors as any
+  );
+
   let secondary = "#17212a";
-  let accent = "#009f80";
-  let neutral = "#fafbfc";
+  let neutral = theme.isDark ? "#fafbfc" : "#0e161d";
 
   const palette: Array<{ hex: string; role: string; name: string }> = [];
 
@@ -141,9 +166,7 @@ export function buildBrandCascadeTokens(
 
       palette.push({ hex: c.hex, role, name });
 
-      if (role === "PRIMARY") primary = c.hex;
-      else if (role === "SECONDARY") secondary = c.hex;
-      else if (role === "ACCENT") accent = c.hex;
+      if (role === "SECONDARY") secondary = c.hex;
       else if (role === "NEUTRAL") neutral = c.hex;
     }
   }
@@ -154,11 +177,13 @@ export function buildBrandCascadeTokens(
     customRadiusPx,
     borderWidth: `${Math.max(0, borderWidthPx)}px`,
     borderWidthPx,
-    manualBgColor,
+    manualBgColor: theme.bgColor,
+    themeConfig: (shapes as any)?.themeConfig || { themeId: theme.themeId },
+    theme,
     colors: {
-      primary,
+      primary: theme.primaryColor,
       secondary,
-      accent,
+      accent: theme.accentColor,
       neutral,
       success: shapes?.semanticSuccess || "#10b981",
       warning: shapes?.semanticWarning || "#f59e0b",

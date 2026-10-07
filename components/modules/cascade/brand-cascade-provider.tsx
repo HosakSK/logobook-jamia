@@ -118,7 +118,11 @@ export function BrandCascadeProvider({
 
   return (
     <BrandCascadeContext.Provider value={contextValue}>
-      <Component className={className} style={combinedStyle}>
+      <Component
+        className={className}
+        style={combinedStyle}
+        data-theme={tokens.theme?.isDark ? "dark" : "light"}
+      >
         {children}
       </Component>
     </BrandCascadeContext.Provider>

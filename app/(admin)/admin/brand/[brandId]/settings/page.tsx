@@ -55,6 +55,22 @@ export default async function BrandSettingsPage({
     // defaults will be used
   }
 
+  // Fetch Global Colors for pre-populating custom themes
+  let brandColors: Array<{ hex: string; role?: string; name?: string }> = [];
+  try {
+    const colList = await pb.collection("globalColors").getFullList({
+      filter: `brand = "${brand.id}"`,
+      sort: "order",
+    });
+    brandColors = colList.map((c: any) => ({
+      hex: c.hex,
+      role: c.role,
+      name: typeof c.name === "object" ? c.name?.sk || c.name?.en : c.name,
+    }));
+  } catch {
+    // defaults
+  }
+
   const serializedBrand = {
     id: brand.id,
     name: brand.name,
@@ -76,6 +92,7 @@ export default async function BrandSettingsPage({
         semanticDanger: globalShapes.semanticDanger || "#bb4934",
         semanticInfo: globalShapes.semanticInfo || "#2b3b48",
         manualBgColor: globalShapes.manualBgColor || "#0e161d",
+        themeConfig: globalShapes.themeConfig || null,
       }
     : null;
 
@@ -139,8 +156,13 @@ export default async function BrandSettingsPage({
       {/* 2. Favicon Upload */}
       <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />
 
-      {/* 3. Global Shapes (Corner radius, border width, semantic colors, manual background) */}
-      <BrandShapesForm brandId={brand.id} initialShapes={serializedShapes} dict={dict} />
+      {/* 3. Global Shapes & Theme (Corner radius, border width, theme & background) */}
+      <BrandShapesForm
+        brandId={brand.id}
+        initialShapes={serializedShapes}
+        brandColors={brandColors}
+        dict={dict}
+      />
 
       {/* 4. Danger Zone (Delete Brand) - Only for Owner */}
       {isOwner && (

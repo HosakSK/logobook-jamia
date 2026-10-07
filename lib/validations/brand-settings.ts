@@ -38,6 +38,7 @@ export const globalShapesSchema = z.object({
   semanticDanger: z.string().optional(),
   semanticInfo: z.string().optional(),
   manualBgColor: z.string().optional(),
+  themeConfig: z.string().optional(),
 });
 
 export type GlobalShapesInput = z.infer<typeof globalShapesSchema>;

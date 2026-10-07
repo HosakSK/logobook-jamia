@@ -36,6 +36,8 @@ export interface BaseModuleConfig {
 /**
  * Fully resolved brand tokens injected into the CSS variables cascade and React Context
  */
+import { ManualThemeConfig, ResolvedTheme } from "@/lib/constants/themes";
+
 export interface BrandCascadeTokens {
   radius: string; // e.g. "3px", "0px", "9999px"
   radiusMode: "sharp" | "rounded" | "pill";
@@ -55,6 +57,8 @@ export interface BrandCascadeTokens {
   };
   palette: Array<{ hex: string; role: string; name: string }>;
   manualBgColor?: string;
+  themeConfig?: ManualThemeConfig;
+  theme?: ResolvedTheme;
   typography?: {
     headingFontFamily?: string;
     bodyFontFamily?: string;

@@ -209,6 +209,7 @@ export async function updateGlobalShapesAction(
       semanticDanger: formData.get("semanticDanger")?.toString().trim() || undefined,
       semanticInfo: formData.get("semanticInfo")?.toString().trim() || undefined,
       manualBgColor: formData.get("manualBgColor")?.toString().trim() || undefined,
+      themeConfig: formData.get("themeConfig")?.toString().trim() || undefined,
     };
 
     const parsed = globalShapesSchema.safeParse(rawData);
@@ -223,7 +224,16 @@ export async function updateGlobalShapesAction(
         ? "PILL"
         : "ROUNDED";
 
-    const payload = {
+    let parsedThemeConfig: any = null;
+    if (parsed.data.themeConfig) {
+      try {
+        parsedThemeConfig = JSON.parse(parsed.data.themeConfig);
+      } catch {
+        parsedThemeConfig = null;
+      }
+    }
+
+    const payload: Record<string, any> = {
       brand: brand.id,
       radiusMode: pbRadiusMode,
       customRadiusPx: parsed.data.customRadiusPx,
@@ -234,6 +244,10 @@ export async function updateGlobalShapesAction(
       semanticInfo: parsed.data.semanticInfo || "",
       manualBgColor: parsed.data.manualBgColor || "#0e161d",
     };
+
+    if (parsedThemeConfig) {
+      payload.themeConfig = parsedThemeConfig;
+    }
 
     // Check if globalShapes record exists for this brand (using real brand.id)
     let existingRecordId: string | null = null;

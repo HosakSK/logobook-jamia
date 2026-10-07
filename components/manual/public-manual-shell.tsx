@@ -38,13 +38,18 @@ export function PublicManualShell({
   const pages = snapshot?.pages || [];
   const { tokens } = useBrandCascade();
   const manualBg = tokens?.manualBgColor || "#0e161d";
-  const contrast = getWcagContrast(manualBg);
-  const isDarkBg = contrast.preferredText === "white";
+  const isDarkBg = tokens?.theme
+    ? tokens.theme.isDark
+    : getWcagContrast(manualBg).preferredText === "white";
   const logobookSymbolSrc = isDarkBg ? "/logo/logo-symbol-dark.svg" : "/logo/logo-symbol-light.svg";
 
   return (
     <div
-      style={{ backgroundColor: "var(--brand-manual-bg, var(--background))" }}
+      data-theme={isDarkBg ? "dark" : "light"}
+      style={{
+        backgroundColor: "var(--brand-manual-bg, var(--background))",
+        color: "var(--foreground)",
+      }}
       className="min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors"
     >
       {/* Sticky Top Header */}

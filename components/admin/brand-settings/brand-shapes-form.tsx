@@ -1,12 +1,31 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { updateGlobalShapesAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dictionary } from "@/lib/i18n";
-import { Check, AlertCircle, Loader2, Square, CircleCheck, AlertTriangle, XCircle } from "lucide-react";
+import {
+  Check,
+  AlertCircle,
+  Loader2,
+  Square,
+  CircleCheck,
+  AlertTriangle,
+  XCircle,
+  Palette,
+  Sparkles,
+  Sun,
+  Moon,
+} from "lucide-react";
+import {
+  ManualThemeId,
+  ManualThemeConfig,
+  PRESET_THEMES,
+  resolveManualTheme,
+} from "@/lib/constants/themes";
+import { getWcagContrast } from "@/lib/utils/color-calc";
 
 interface BrandShapesFormProps {
   brandId: string;
@@ -19,18 +38,28 @@ interface BrandShapesFormProps {
     semanticDanger?: string;
     semanticInfo?: string;
     manualBgColor?: string;
+    themeConfig?: ManualThemeConfig | null;
   } | null;
+  brandColors?: Array<{ hex: string; role?: string; name?: string }>;
   dict: Dictionary;
 }
 
-export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFormProps) {
+export function BrandShapesForm({
+  brandId,
+  initialShapes,
+  brandColors = [],
+  dict,
+}: BrandShapesFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
-  // Form states for live preview
+  // Form states for corner radius & borders
   const rawRadius = (initialShapes?.radiusMode || "rounded").toLowerCase().trim();
-  const validRadius = rawRadius === "sharp" || rawRadius === "pill" || rawRadius === "rounded" ? rawRadius : "rounded";
+  const validRadius =
+    rawRadius === "sharp" || rawRadius === "pill" || rawRadius === "rounded"
+      ? rawRadius
+      : "rounded";
 
   const [radiusMode, setRadiusMode] = useState<string>(validRadius);
   const [customRadius, setCustomRadius] = useState<number>(initialShapes?.customRadiusPx ?? 3);
@@ -39,20 +68,142 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
   const [warningColor, setWarningColor] = useState<string>(initialShapes?.semanticWarning || "#c8d400");
   const [dangerColor, setDangerColor] = useState<string>(initialShapes?.semanticDanger || "#bb4934");
   const [infoColor, setInfoColor] = useState<string>(initialShapes?.semanticInfo || "#2b3b48");
-  const [manualBgColor, setManualBgColor] = useState<string>(initialShapes?.manualBgColor || "#0e161d");
+
+  // Initial Theme Detection
+  const initialThemeId: ManualThemeId = useMemo(() => {
+    if (initialShapes?.themeConfig?.themeId) {
+      return initialShapes.themeConfig.themeId;
+    }
+    const bg = (initialShapes?.manualBgColor || "").toLowerCase().trim();
+    if (bg === "#070b0f") return "abyss";
+    if (bg === "#0e161d") return "deep";
+    if (bg === "#fafbfc") return "paper";
+    if (bg === "#eef2f6") return "mist";
+    if (bg && bg !== "#0e161d" && bg !== "#ffffff") return "custom";
+    return "paper"; // default for public manual according to design rules
+  }, [initialShapes]);
+
+  const [themeId, setThemeId] = useState<ManualThemeId>(initialThemeId);
+
+  // Custom theme colors state (7 fields)
+  const initialCustom = initialShapes?.themeConfig?.custom || {};
+  const [customBg, setCustomBg] = useState<string>(
+    initialCustom.bgColor || initialShapes?.manualBgColor || "#fafbfc"
+  );
+  const [customSurface, setCustomSurface] = useState<string>(
+    initialCustom.surfaceColor || "#f1f4f7"
+  );
+  const [customText, setCustomText] = useState<string>(
+    initialCustom.textColor || "#0e161d"
+  );
+  const [customMuted, setCustomMuted] = useState<string>(
+    initialCustom.mutedColor || "#587489"
+  );
+  const [customBorder, setCustomBorder] = useState<string>(
+    initialCustom.borderColor || "#bac8d6"
+  );
+  const [customPrimary, setCustomPrimary] = useState<string>(
+    initialCustom.primaryColor || "#c8d400"
+  );
+  const [customAccent, setCustomAccent] = useState<string>(
+    initialCustom.accentColor || "#009f80"
+  );
 
   // Effective preview radius
   const previewRadiusPx =
     radiusMode === "sharp" ? 0 : radiusMode === "pill" ? 9999 : customRadius;
+
+  // Resolved current active theme for live preview & submit
+  const currentTheme = useMemo(() => {
+    const config: ManualThemeConfig = {
+      themeId,
+      custom:
+        themeId === "custom"
+          ? {
+              bgColor: customBg,
+              surfaceColor: customSurface,
+              textColor: customText,
+              mutedColor: customMuted,
+              borderColor: customBorder,
+              primaryColor: customPrimary,
+              accentColor: customAccent,
+            }
+          : undefined,
+    };
+    return resolveManualTheme(config, customBg, brandColors);
+  }, [
+    themeId,
+    customBg,
+    customSurface,
+    customText,
+    customMuted,
+    customBorder,
+    customPrimary,
+    customAccent,
+    brandColors,
+  ]);
+
+  // Pre-populate custom theme from brand colors
+  const handlePrepopulateFromBrand = () => {
+    if (!brandColors || brandColors.length === 0) return;
+
+    let p = customPrimary;
+    let a = customAccent;
+    let s = customSurface;
+    let bg = customBg;
+
+    for (const c of brandColors) {
+      if (!c.hex) continue;
+      const role = c.role?.toUpperCase();
+      if (role === "PRIMARY") p = c.hex;
+      else if (role === "ACCENT") a = c.hex;
+      else if (role === "SECONDARY") s = c.hex;
+      else if (role === "BACKGROUND" || role === "NEUTRAL") bg = c.hex;
+    }
+
+    setCustomPrimary(p);
+    setCustomAccent(a);
+    if (bg) setCustomBg(bg);
+    if (s) setCustomSurface(s);
+
+    try {
+      const contrast = getWcagContrast(bg);
+      const isDark = contrast.preferredText === "white";
+      setCustomText(isDark ? "#fafbfc" : "#0e161d");
+      setCustomMuted(isDark ? "#96abbe" : "#587489");
+      setCustomBorder(isDark ? "rgba(63, 85, 102, 0.45)" : "#bac8d6");
+    } catch {
+      // fallback
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
+    const themeConfigPayload: ManualThemeConfig = {
+      themeId,
+      custom:
+        themeId === "custom"
+          ? {
+              bgColor: customBg,
+              surfaceColor: customSurface,
+              textColor: customText,
+              mutedColor: customMuted,
+              borderColor: customBorder,
+              primaryColor: customPrimary,
+              accentColor: customAccent,
+            }
+          : undefined,
+    };
+
     const formData = new FormData(e.currentTarget);
     formData.set("radiusMode", radiusMode);
-    formData.set("manualBgColor", manualBgColor);
+    formData.set("customRadiusPx", String(customRadius));
+    formData.set("borderWidthPx", String(borderWidth));
+    formData.set("manualBgColor", currentTheme.bgColor);
+    formData.set("themeConfig", JSON.stringify(themeConfigPayload));
 
     startTransition(async () => {
       const res = await updateGlobalShapesAction(brandId, null, formData);
@@ -60,15 +211,20 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
         setSuccess(true);
         setTimeout(() => setSuccess(false), 4000);
       } else {
-        setError(res.error || "Failed to update visual shapes");
+        setError(res.error || "Failed to update visual shapes and theme");
       }
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-8">
+    <form
+      onSubmit={handleSubmit}
+      className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-8"
+    >
       <div className="border-b border-border/30 pb-5">
-        <h2 className="text-lg font-bold text-foreground">{dict.admin.globalShapesTitle}</h2>
+        <h2 className="text-lg font-bold text-foreground">
+          {dict.admin.globalShapesTitle}
+        </h2>
         <p className="text-xs text-muted-foreground mt-1">
           {dict.admin.globalShapesDesc}
         </p>
@@ -88,81 +244,480 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
         </div>
       )}
 
-      {/* Live Preview Box */}
+      {/* ------------------------------------------------------------- */}
+      {/* LIVE PREVIEW BOX                                              */}
+      {/* ------------------------------------------------------------- */}
       <div className="p-6 rounded-2xl border border-border/60 bg-background/50 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">
-            Živý náhľad tvarov a pozadia manuálu
+            Živý náhľad témy manuálu a tvarov
           </span>
-          <span className="text-xs font-mono text-muted-foreground">
-            Pozadie: {manualBgColor}
-          </span>
+          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+            <span>Téma: {themeId.toUpperCase()}</span>
+            <span>•</span>
+            <span>Pozadie: {currentTheme.bgColor}</span>
+          </div>
         </div>
+
+        {/* Outer Manual Canvas Preview */}
         <div
           style={{
-            backgroundColor: manualBgColor,
-            color: manualBgColor === "#ffffff" || manualBgColor === "#f8fafc" ? "#070b0f" : "#fafbfc",
+            backgroundColor: currentTheme.bgColor,
+            color: currentTheme.textColor,
           }}
-          className="p-6 sm:p-8 rounded-xl border border-border/40 transition-colors shadow-inner"
+          className="p-6 sm:p-8 rounded-xl border border-border/40 transition-colors shadow-inner space-y-4"
         >
+          {/* Sample Card Surface */}
           <div
             style={{
               borderRadius: `${previewRadiusPx}px`,
               borderWidth: `${borderWidth}px`,
-              borderColor: manualBgColor === "#ffffff" || manualBgColor === "#f8fafc" ? "rgba(0,0,0,0.12)" : "rgba(63,85,102,0.45)",
-              backgroundColor: manualBgColor === "#ffffff" ? "#f8fafc" : manualBgColor === "#f8fafc" ? "#ffffff" : "rgba(23, 33, 42, 0.9)",
+              borderColor: currentTheme.borderColor,
+              backgroundColor: currentTheme.surfaceColor,
+              color: currentTheme.textColor,
             }}
-            className="p-6 transition-all flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md"
+            className="p-6 transition-all flex flex-col md:flex-row items-center justify-between gap-6 shadow-md"
           >
-            <div className="space-y-1.5 text-center sm:text-left">
-              <h4 className="text-sm font-bold">Ukážkový kontajner modulu</h4>
-              <p className="text-xs opacity-75">
-                Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px
+            <div className="space-y-1.5 text-center md:text-left">
+              <h4 className="text-base font-bold tracking-tight">
+                Ukážkový kontajner logomanuálu
+              </h4>
+              <p
+                style={{ color: currentTheme.mutedColor }}
+                className="text-xs max-w-md leading-relaxed"
+              >
+                Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px |
+                Hierarchia textu a komponentov prispôsobená téme.
               </p>
             </div>
 
-            {/* Sample Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {/* Buttons & Accents */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {/* Primary CTA */}
+              <button
+                type="button"
+                style={{
+                  borderRadius: `${previewRadiusPx}px`,
+                  backgroundColor: currentTheme.primaryColor,
+                  color: currentTheme.isDark ? "#070b0f" : "#0e161d",
+                }}
+                className="px-4 py-2 text-xs font-bold shadow-sm transition-transform active:scale-95"
+              >
+                Stiahnuť balíček (CTA)
+              </button>
+
+              {/* Accent Badge */}
               <span
                 style={{
                   borderRadius: `${previewRadiusPx}px`,
-                  backgroundColor: `${successColor}25`,
-                  borderColor: successColor,
-                  color: successColor,
+                  backgroundColor: `${currentTheme.accentColor}20`,
+                  color: currentTheme.accentColor,
+                  borderColor: currentTheme.accentColor,
                 }}
-                className="px-3.5 py-1.5 text-xs font-bold border flex items-center gap-1.5 shadow-xs"
+                className="px-3 py-1.5 text-xs font-semibold border flex items-center gap-1.5"
               >
-                <CircleCheck className="h-3.5 w-3.5" /> Do&apos;s
-              </span>
-              <span
-                style={{
-                  borderRadius: `${previewRadiusPx}px`,
-                  backgroundColor: `${warningColor}25`,
-                  borderColor: warningColor,
-                  color: warningColor,
-                }}
-                className="px-3.5 py-1.5 text-xs font-bold border flex items-center gap-1.5 shadow-xs"
-              >
-                <AlertTriangle className="h-3.5 w-3.5" /> Notice
-              </span>
-              <span
-                style={{
-                  borderRadius: `${previewRadiusPx}px`,
-                  backgroundColor: `${dangerColor}25`,
-                  borderColor: dangerColor,
-                  color: dangerColor,
-                }}
-                className="px-3.5 py-1.5 text-xs font-bold border flex items-center gap-1.5 shadow-xs"
-              >
-                <XCircle className="h-3.5 w-3.5" /> Don&apos;ts
+                <Sparkles className="h-3 w-3" /> Akcent značky
               </span>
             </div>
+          </div>
+
+          {/* Semantic Badges Preview */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 pt-1">
+            <span
+              style={{
+                borderRadius: `${previewRadiusPx}px`,
+                backgroundColor: `${successColor}20`,
+                borderColor: successColor,
+                color: successColor,
+              }}
+              className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
+            >
+              <CircleCheck className="h-3.5 w-3.5" /> Do&apos;s
+            </span>
+            <span
+              style={{
+                borderRadius: `${previewRadiusPx}px`,
+                backgroundColor: `${warningColor}20`,
+                borderColor: warningColor,
+                color: warningColor,
+              }}
+              className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
+            >
+              <AlertTriangle className="h-3.5 w-3.5" /> Notice
+            </span>
+            <span
+              style={{
+                borderRadius: `${previewRadiusPx}px`,
+                backgroundColor: `${dangerColor}20`,
+                borderColor: dangerColor,
+                color: dangerColor,
+              }}
+              className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
+            >
+              <XCircle className="h-3.5 w-3.5" /> Don&apos;ts
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Radius Mode Selector */}
-      <div className="space-y-3">
+      {/* ------------------------------------------------------------- */}
+      {/* THEME SELECTION: 4 PRESETS + 1 CUSTOM                        */}
+      {/* ------------------------------------------------------------- */}
+      <div className="space-y-4 pt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Téma verejného brand manuálu
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Vyberte si z 4 overených predvolených tém bez sterilnej bielej a
+              čiernej, alebo si namiešajte vlastnú tému.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          {/* Preset 1: Abyss (Dark 1) */}
+          <button
+            type="button"
+            onClick={() => setThemeId("abyss")}
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              themeId === "abyss"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <Moon className="h-3 w-3 text-sky-400" /> Abyss
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                Tmavá 1
+              </span>
+            </div>
+            {/* Visual mini-swatch */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-white/10 bg-[#070b0f]">
+              <div className="h-7 w-12 rounded bg-[#17212a] border border-white/10 flex items-center justify-center">
+                <div className="h-2 w-4 rounded-full bg-[#c8d400]" />
+              </div>
+              <div className="text-[10px] font-mono text-[#fafbfc] pr-1">#070b0f</div>
+            </div>
+            <div className="text-[11px] text-muted-foreground leading-snug">
+              Hlboký polnočný podklad so zdvihnutým povrchom.
+            </div>
+          </button>
+
+          {/* Preset 2: Deep Slate (Dark 2) */}
+          <button
+            type="button"
+            onClick={() => setThemeId("deep")}
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              themeId === "deep"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <Moon className="h-3 w-3 text-indigo-400" /> Deep Slate
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                Tmavá 2
+              </span>
+            </div>
+            {/* Visual mini-swatch */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-white/10 bg-[#0e161d]">
+              <div className="h-7 w-12 rounded bg-[#1f2c36] border border-white/10 flex items-center justify-center">
+                <div className="h-2 w-4 rounded-full bg-[#009f80]" />
+              </div>
+              <div className="text-[10px] font-mono text-[#fafbfc] pr-1">#0e161d</div>
+            </div>
+            <div className="text-[11px] text-muted-foreground leading-snug">
+              Grafitová bridlica s vyvýšenými panelmi.
+            </div>
+          </button>
+
+          {/* Preset 3: Light Canvas (Light 1) */}
+          <button
+            type="button"
+            onClick={() => setThemeId("paper")}
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              themeId === "paper"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <Sun className="h-3 w-3 text-amber-400" /> Light Canvas
+              </span>
+              <span className="text-[10px] text-[#009f80] font-semibold uppercase">
+                Default
+              </span>
+            </div>
+            {/* Visual mini-swatch */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-black/10 bg-[#fafbfc]">
+              <div className="h-7 w-12 rounded bg-[#f1f4f7] border border-black/10 flex items-center justify-center">
+                <div className="h-2 w-4 rounded-full bg-[#c8d400]" />
+              </div>
+              <div className="text-[10px] font-mono text-[#0e161d] pr-1">#fafbfc</div>
+            </div>
+            <div className="text-[11px] text-muted-foreground leading-snug">
+              Jemný matný papier, elegantná svetlá prezentácia.
+            </div>
+          </button>
+
+          {/* Preset 4: Cool Mist (Light 2) */}
+          <button
+            type="button"
+            onClick={() => setThemeId("mist")}
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              themeId === "mist"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <Sun className="h-3 w-3 text-sky-400" /> Cool Mist
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                Svetlá 2
+              </span>
+            </div>
+            {/* Visual mini-swatch */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-black/10 bg-[#eef2f6]">
+              <div className="h-7 w-12 rounded bg-[#fafbfc] border border-black/10 flex items-center justify-center">
+                <div className="h-2 w-4 rounded-full bg-[#009f80]" />
+              </div>
+              <div className="text-[10px] font-mono text-[#0e161d] pr-1">#eef2f6</div>
+            </div>
+            <div className="text-[11px] text-muted-foreground leading-snug">
+              Chladná sivastá hmla so svetlými kartami.
+            </div>
+          </button>
+
+          {/* Preset 5: Custom Theme */}
+          <button
+            type="button"
+            onClick={() => setThemeId("custom")}
+            className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+              themeId === "custom"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <Palette className="h-3 w-3 text-[#c8d400]" /> Vlastná téma
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">
+                Custom
+              </span>
+            </div>
+            {/* Visual mini-swatch */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-border/40 bg-neutral-900/50">
+              <div className="flex items-center gap-1">
+                <div
+                  style={{ backgroundColor: customBg }}
+                  className="h-6 w-4 rounded-xs border border-white/20"
+                />
+                <div
+                  style={{ backgroundColor: customSurface }}
+                  className="h-6 w-4 rounded-xs border border-white/20"
+                />
+                <div
+                  style={{ backgroundColor: customPrimary }}
+                  className="h-6 w-4 rounded-xs border border-white/20"
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground">7 farieb</span>
+            </div>
+            <div className="text-[11px] text-muted-foreground leading-snug">
+              Úplná kontrola nad pozadím, kartami a textom.
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* CUSTOM THEME DETAILED CONTROLS (EXPANDABLE)                  */}
+      {/* ------------------------------------------------------------- */}
+      {themeId === "custom" && (
+        <div className="p-5 sm:p-6 rounded-2xl border border-[#c8d400]/30 bg-[#c8d400]/5 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-border/30 pb-4">
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <Palette className="h-3.5 w-3.5 text-[#c8d400]" />
+                Vlastné nastavenie farieb témy
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Prispôsobte si jednotlivé farebné vrstvy manuálu pre dokonalý súlad so značkou.
+              </p>
+            </div>
+
+            {brandColors && brandColors.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handlePrepopulateFromBrand}
+                className="self-start sm:self-auto text-xs gap-1.5 border-border/60 hover:border-[#c8d400] hover:text-[#c8d400]"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-[#c8d400]" />
+                Predvyplniť z farieb značky
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* 1. Page Background */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                1. Pozadie manuálu (Plátno)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customBg.startsWith("#") && customBg.length === 7 ? customBg : "#fafbfc"}
+                  onChange={(e) => setCustomBg(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customBg}
+                  onChange={(e) => setCustomBg(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 2. Card Surface */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                2. Karty a panely (Surface)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customSurface.startsWith("#") && customSurface.length === 7 ? customSurface : "#f1f4f7"}
+                  onChange={(e) => setCustomSurface(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customSurface}
+                  onChange={(e) => setCustomSurface(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 3. Primary Text */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                3. Hlavný text (Nadpisy)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customText.startsWith("#") && customText.length === 7 ? customText : "#0e161d"}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 4. Muted Text */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                4. Tlmený text (Popisy)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customMuted.startsWith("#") && customMuted.length === 7 ? customMuted : "#587489"}
+                  onChange={(e) => setCustomMuted(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customMuted}
+                  onChange={(e) => setCustomMuted(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 5. Border Color */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                5. Orámovanie (Linky)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customBorder.startsWith("#") && customBorder.length === 7 ? customBorder : "#bac8d6"}
+                  onChange={(e) => setCustomBorder(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customBorder}
+                  onChange={(e) => setCustomBorder(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 6. Primary CTA Color */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                6. Primárna farba (CTA Tlačidlá)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customPrimary.startsWith("#") && customPrimary.length === 7 ? customPrimary : "#c8d400"}
+                  onChange={(e) => setCustomPrimary(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customPrimary}
+                  onChange={(e) => setCustomPrimary(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+
+            {/* 7. Accent Color */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">
+                7. Akcentová farba (Badge / Tagy)
+              </Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={customAccent.startsWith("#") && customAccent.length === 7 ? customAccent : "#009f80"}
+                  onChange={(e) => setCustomAccent(e.target.value)}
+                  className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+                />
+                <Input
+                  value={customAccent}
+                  onChange={(e) => setCustomAccent(e.target.value)}
+                  className="h-9 text-xs font-mono bg-background/50 border-border/60"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* RADIUS MODE SELECTOR                                          */}
+      {/* ------------------------------------------------------------- */}
+      <div className="space-y-3 pt-4 border-t border-border/30">
         <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {dict.admin.cornerRounding}
         </Label>
@@ -212,7 +767,10 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
       <div className="grid sm:grid-cols-2 gap-6">
         {radiusMode === "rounded" && (
           <div className="space-y-2.5">
-            <Label htmlFor="customRadiusPx" className="text-xs font-semibold text-muted-foreground">
+            <Label
+              htmlFor="customRadiusPx"
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {dict.admin.customRadiusLabel}
             </Label>
             <div className="flex items-center gap-4">
@@ -239,7 +797,10 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
         )}
 
         <div className="space-y-2.5">
-          <Label htmlFor="borderWidthPx" className="text-xs font-semibold text-muted-foreground">
+          <Label
+            htmlFor="borderWidthPx"
+            className="text-xs font-semibold text-muted-foreground"
+          >
             {dict.admin.borderWidthLabel} (px)
           </Label>
           <div className="flex items-center gap-4">
@@ -265,21 +826,27 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
         </div>
       </div>
 
-      {/* Semantic Color Pickers */}
+      {/* ------------------------------------------------------------- */}
+      {/* SEMANTIC COLORS (Do's & Don'ts)                               */}
+      {/* ------------------------------------------------------------- */}
       <div className="pt-4 border-t border-border/30 space-y-4">
         <div>
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             {dict.admin.semanticColorsLabel}
           </h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Tieto farby sa používajú na systémové označenia a vizuálne akcenty v moduloch Do&apos;s &amp; Don&apos;ts.
+            Tieto farby sa používajú na systémové označenia a vizuálne akcenty v
+            moduloch Do&apos;s &amp; Don&apos;ts.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Success */}
           <div className="space-y-2">
-            <Label htmlFor="semanticSuccess" className="text-xs font-semibold text-muted-foreground">
+            <Label
+              htmlFor="semanticSuccess"
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {dict.admin.semanticSuccess}
             </Label>
             <div className="flex items-center gap-2.5">
@@ -301,7 +868,10 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
 
           {/* Warning */}
           <div className="space-y-2">
-            <Label htmlFor="semanticWarning" className="text-xs font-semibold text-muted-foreground">
+            <Label
+              htmlFor="semanticWarning"
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {dict.admin.semanticWarning}
             </Label>
             <div className="flex items-center gap-2.5">
@@ -323,7 +893,10 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
 
           {/* Danger */}
           <div className="space-y-2">
-            <Label htmlFor="semanticDanger" className="text-xs font-semibold text-muted-foreground">
+            <Label
+              htmlFor="semanticDanger"
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {dict.admin.semanticDanger}
             </Label>
             <div className="flex items-center gap-2.5">
@@ -345,7 +918,10 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
 
           {/* Info */}
           <div className="space-y-2">
-            <Label htmlFor="semanticInfo" className="text-xs font-semibold text-muted-foreground">
+            <Label
+              htmlFor="semanticInfo"
+              className="text-xs font-semibold text-muted-foreground"
+            >
               {dict.admin.semanticInfo}
             </Label>
             <div className="flex items-center gap-2.5">
@@ -367,109 +943,12 @@ export function BrandShapesForm({ brandId, initialShapes, dict }: BrandShapesFor
         </div>
       </div>
 
-      {/* Brand Manual Background Color Setting */}
-      <div className="pt-4 border-t border-border/30 space-y-4">
-        <div>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Farba pozadia verejného manuálu
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1">
-            Zvoľte celkovú farbu plátna / pozadia pre verejný brand manuál. Administrátorské rozhranie ostáva v systémovom tmavom režime.
-          </p>
-        </div>
-
-        {/* Quick Presets */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <button
-            type="button"
-            onClick={() => setManualBgColor("#0e161d")}
-            className={`p-4 rounded-xl border text-left flex items-center gap-3.5 transition-all cursor-pointer ${
-              manualBgColor.toLowerCase() === "#0e161d"
-                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_15px_rgba(200,212,0,0.1)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
-            }`}
-          >
-            <div className="h-7 w-7 rounded-lg bg-[#0e161d] border border-white/20 shrink-0 shadow-xs" />
-            <div>
-              <div className="text-xs font-semibold">Tmavá (Default)</div>
-              <div className="text-[11px] text-muted-foreground font-mono">#0e161d</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setManualBgColor("#ffffff")}
-            className={`p-4 rounded-xl border text-left flex items-center gap-3.5 transition-all cursor-pointer ${
-              manualBgColor.toLowerCase() === "#ffffff"
-                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_15px_rgba(200,212,0,0.1)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
-            }`}
-          >
-            <div className="h-7 w-7 rounded-lg bg-[#ffffff] border border-black/20 shrink-0 shadow-xs" />
-            <div>
-              <div className="text-xs font-semibold">Čistá biela</div>
-              <div className="text-[11px] text-muted-foreground font-mono">#ffffff</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setManualBgColor("#f8fafc")}
-            className={`p-4 rounded-xl border text-left flex items-center gap-3.5 transition-all cursor-pointer ${
-              manualBgColor.toLowerCase() === "#f8fafc"
-                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_15px_rgba(200,212,0,0.1)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
-            }`}
-          >
-            <div className="h-7 w-7 rounded-lg bg-[#f8fafc] border border-black/20 shrink-0 shadow-xs" />
-            <div>
-              <div className="text-xs font-semibold">Mäkký papier</div>
-              <div className="text-[11px] text-muted-foreground font-mono">#f8fafc</div>
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setManualBgColor("#070b0f")}
-            className={`p-4 rounded-xl border text-left flex items-center gap-3.5 transition-all cursor-pointer ${
-              manualBgColor.toLowerCase() === "#070b0f"
-                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_15px_rgba(200,212,0,0.1)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
-            }`}
-          >
-            <div className="h-7 w-7 rounded-lg bg-[#070b0f] border border-white/20 shrink-0 shadow-xs" />
-            <div>
-              <div className="text-xs font-semibold">Hlboká čierna</div>
-              <div className="text-[11px] text-muted-foreground font-mono">#070b0f</div>
-            </div>
-          </button>
-        </div>
-
-        {/* Custom hex selector */}
-        <div className="flex items-center gap-3.5 max-w-xs pt-1">
-          <input
-            type="color"
-            value={manualBgColor.startsWith("#") && manualBgColor.length === 7 ? manualBgColor : "#0e161d"}
-            onChange={(e) => setManualBgColor(e.target.value)}
-            className="h-10 w-10 rounded-xl border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
-          />
-          <Input
-            id="manualBgColor"
-            name="manualBgColor"
-            value={manualBgColor}
-            onChange={(e) => setManualBgColor(e.target.value)}
-            placeholder="#0e161d"
-            className="h-10 text-xs rounded-xl bg-background/50 border-border/60 font-mono"
-          />
-        </div>
-      </div>
-
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
           disabled={isPending}
           size="lg"
-          className="shadow-md"
+          className="shadow-md cursor-pointer"
         >
           {isPending ? (
             <>
