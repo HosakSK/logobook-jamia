@@ -50,10 +50,10 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
   };
 
   return (
-    <div className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-6">
-      <div className="border-b border-border/30 pb-5">
-        <h2 className="text-lg font-bold text-foreground">{dict.admin.faviconLabel}</h2>
-        <p className="text-xs text-muted-foreground mt-1">
+    <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-5">
+        <h2 className="text-lg font-bold text-[#fafbfc]">{dict.admin.faviconLabel}</h2>
+        <p className="text-xs text-[#96abbe] mt-1">
           {dict.admin.faviconHint}
         </p>
       </div>
@@ -74,7 +74,7 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
 
       <div className="flex flex-col sm:flex-row sm:items-center gap-6">
         {/* Favicon Preview Box */}
-        <div className="h-20 w-20 rounded-xl border border-border/60 bg-background/50 flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
+        <div className="h-20 w-20 rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
           {previewUrl ? (
             <img src={previewUrl} alt="Favicon preview" className="h-10 w-10 object-contain" />
           ) : (

@@ -132,8 +132,8 @@ export function AssetCard({
 
   return (
     <div
-      className={`border rounded-[3px] bg-card overflow-hidden flex flex-col justify-between transition-all shadow-xs relative group ${
-        isSelected ? "border-[#c8d400] ring-1 ring-[#c8d400]/40" : "border-border/40 hover:border-border/80"
+      className={`border rounded-[3px] bg-[#17212a] text-[#fafbfc] overflow-hidden flex flex-col justify-between transition-all shadow-xs relative group ${
+        isSelected ? "border-[#c8d400] ring-1 ring-[#c8d400]/40" : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.8)]"
       }`}
     >
       {/* Deleting overlay */}
@@ -144,7 +144,7 @@ export function AssetCard({
         </div>
       )}
       {/* 1. Header with title & badges */}
-      <div className="p-4 border-b border-border/30 flex items-start justify-between gap-3">
+      <div className="p-4 border-b border-[rgba(63,85,102,0.35)] flex items-start justify-between gap-3 bg-[#17212a]">
         <div className="flex items-start gap-2.5 min-w-0">
           {onToggleSelect && (
             <input
@@ -156,7 +156,7 @@ export function AssetCard({
             />
           )}
           <div className="min-w-0">
-            <h3 className="font-bold text-sm text-foreground truncate font-mono" title={displayName}>
+            <h3 className="font-bold text-sm text-[#fafbfc] truncate font-mono" title={displayName}>
               {displayName}
             </h3>
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -337,11 +337,11 @@ export function AssetCard({
       </div>
 
       {/* 3. Footer: Attached formats & files manager button */}
-      <div className="p-3 border-t border-border/30 bg-card/60 flex items-center justify-between gap-2">
+      <div className="p-3 border-t border-[rgba(63,85,102,0.35)] bg-[#17212a] flex items-center justify-between gap-2">
         {/* Formats list chips */}
         <div className="flex flex-wrap items-center gap-1 min-w-0">
           {asset.files.length === 0 ? (
-            <span className="text-[10px] text-muted-foreground italic">Iba inline SVG</span>
+            <span className="text-[10px] text-[#96abbe] italic">Iba inline SVG</span>
           ) : (
             asset.files.map((file) => (
               <a
@@ -351,7 +351,7 @@ export function AssetCard({
                 rel="noreferrer"
                 download
                 title={`Stiahnuť ${file.fileFormat} z Cloudflare R2`}
-                className="px-1.5 py-0.5 rounded-[2px] bg-neutral-800 hover:bg-neutral-700 text-foreground font-mono text-[9px] font-bold tracking-wider transition-colors flex items-center gap-0.5 border border-border/40"
+                className="px-1.5 py-0.5 rounded-[2px] bg-[#070b0f] hover:bg-[#1f2c36] text-[#fafbfc] font-mono text-[9px] font-bold tracking-wider transition-colors flex items-center gap-0.5 border border-[rgba(63,85,102,0.5)]"
               >
                 <span>{file.fileFormat}</span>
                 <Download className="h-2 w-2 opacity-60" />

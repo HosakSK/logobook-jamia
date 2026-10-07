@@ -219,13 +219,13 @@ export function BrandShapesForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-8"
+      className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-8"
     >
-      <div className="border-b border-border/30 pb-5">
-        <h2 className="text-lg font-bold text-foreground">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-5">
+        <h2 className="text-lg font-bold text-[#fafbfc]">
           {dict.admin.globalShapesTitle}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs text-[#96abbe] mt-1">
           {dict.admin.globalShapesDesc}
         </p>
       </div>
@@ -247,7 +247,7 @@ export function BrandShapesForm({
       {/* ------------------------------------------------------------- */}
       {/* LIVE PREVIEW BOX                                              */}
       {/* ------------------------------------------------------------- */}
-      <div className="p-6 rounded-2xl border border-border/60 bg-background/50 space-y-4">
+      <div className="p-6 rounded-2xl border border-[rgba(63,85,102,0.5)] bg-[#070b0f] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <span className="text-[11px] uppercase font-bold tracking-wider text-muted-foreground">
             Živý náhľad témy manuálu a tvarov

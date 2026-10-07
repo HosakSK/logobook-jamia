@@ -95,12 +95,12 @@ export function AssetFilesModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in-0">
-      <div className="relative w-full max-w-lg rounded-[3px] bg-card border border-border/60 shadow-2xl p-6 space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in-0">
+      <div className="relative w-full max-w-lg rounded-[3px] bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] shadow-2xl p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-border/30 pb-4">
+        <div className="flex items-start justify-between gap-4 border-b border-[rgba(63,85,102,0.4)] pb-4">
           <div>
-            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#fafbfc] flex items-center gap-2">
               <FolderArchive className="h-4 w-4 text-[#c8d400]" />
               <span>Súbory a exporty loga</span>
             </h2>

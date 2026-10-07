@@ -40,7 +40,7 @@ export function CascadeControlWrapper({
   inheritedPreview: React.ReactNode;
 }) {
   return (
-    <div className="border border-border/50 rounded-[3px] p-4 bg-card/60 space-y-3">
+    <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-4 bg-[#17212a] text-[#fafbfc] space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="space-y-0.5">
           <Label className="text-xs font-semibold uppercase tracking-wider text-foreground">

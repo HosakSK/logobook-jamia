@@ -51,16 +51,16 @@ export function AgencyDefaultsForm({ initialDefaults, dict }: AgencyDefaultsForm
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-6">
-      <div className="border-b border-border/30 pb-4 flex items-center justify-between">
+    <form onSubmit={handleSubmit} className="border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#17212a] text-[#fafbfc] p-6 shadow-xs space-y-6">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-4 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-foreground">{dict.admin.agencyDefaultsTitle}</h2>
+            <h2 className="text-base font-bold text-[#fafbfc]">{dict.admin.agencyDefaultsTitle}</h2>
             <span className="px-2 py-0.5 rounded-[3px] bg-[#c8d400]/10 text-[#c8d400] text-[10px] font-bold tracking-wider uppercase border border-[#c8d400]/20 flex items-center gap-1">
               <Sparkles className="h-3 w-3" /> Agency
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-0.5">{dict.admin.agencyDefaultsDesc}</p>
+          <p className="text-xs text-[#96abbe] mt-0.5">{dict.admin.agencyDefaultsDesc}</p>
         </div>
       </div>
 

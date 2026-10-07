@@ -140,7 +140,7 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
   };
 
   return (
-    <div className="bg-card border border-border/80 rounded-[3px] p-5 shadow-xs space-y-4">
+    <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-5 shadow-xs space-y-4">
       {/* Mode Switcher Tabs */}
       <div className="flex items-center justify-between border-b border-border/60 pb-3">
         <div className="flex items-center gap-2">
@@ -246,11 +246,11 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
                 {queue.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between gap-3 text-xs p-2 rounded-[2px] bg-card border border-border/40"
+                    className="flex items-center justify-between gap-3 text-xs p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#fafbfc]"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
-                      <span className="truncate font-medium text-foreground">{item.name}</span>
+                      <FileText className="w-3.5 h-3.5 shrink-0 text-[#96abbe]" />
+                      <span className="truncate font-medium text-[#fafbfc]">{item.name}</span>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">

@@ -65,10 +65,10 @@ export function BrandGeneralForm({ brand, userTier, dict }: BrandGeneralFormProp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border/40 rounded-2xl bg-card p-6 sm:p-8 shadow-sm space-y-8">
-      <div className="border-b border-border/30 pb-5">
-        <h2 className="text-lg font-bold text-foreground">{dict.admin.generalSettings}</h2>
-        <p className="text-xs text-muted-foreground mt-1">
+    <form onSubmit={handleSubmit} className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-8">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-5">
+        <h2 className="text-lg font-bold text-[#fafbfc]">{dict.admin.generalSettings}</h2>
+        <p className="text-xs text-[#96abbe] mt-1">
           Nastavte základné parametre manuálu, URL adresu a SEO optimalizáciu.
         </p>
       </div>

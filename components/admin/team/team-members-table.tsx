@@ -57,8 +57,8 @@ export function TeamMembersTable({
   };
 
   return (
-    <div className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-4">
-      <div className="border-b border-border/30 pb-3 flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+    <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#17212a] text-[#fafbfc] p-6 shadow-xs space-y-4">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-3 flex items-center justify-between text-xs font-semibold text-[#96abbe] uppercase tracking-wider">
         <div className="w-1/2">{dict.admin.memberCol}</div>
         <div className="w-1/4">{dict.admin.roleCol}</div>
         <div className="w-1/4 text-right">{dict.admin.actionsCol}</div>
@@ -71,7 +71,7 @@ export function TeamMembersTable({
         </div>
       )}
 
-      <div className="divide-y divide-border/20">
+      <div className="divide-y divide-[rgba(63,85,102,0.3)]">
         {members.map((member) => {
           const isSelf = member.userId === currentUserId;
           const avatarUrl = member.avatar
@@ -81,11 +81,11 @@ export function TeamMembersTable({
           return (
             <div
               key={member.id}
-              className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs"
+              className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-[#fafbfc]"
             >
               {/* Member details */}
               <div className="flex items-center gap-3 w-full sm:w-1/2">
-                <div className="h-9 w-9 rounded-[3px] bg-neutral-900 border border-border/60 overflow-hidden flex items-center justify-center font-bold text-xs shrink-0">
+                <div className="h-9 w-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-[#fafbfc] overflow-hidden flex items-center justify-center font-bold text-xs shrink-0">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}

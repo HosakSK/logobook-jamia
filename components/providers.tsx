@@ -1,17 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
-      disableTransitionOnChange
-    >
-      {children}
-    </NextThemesProvider>
-  );
+  React.useEffect(() => {
+    // Purge any stale legacy theme keys from localStorage to prevent rogue light mode
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("theme");
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
+      }
+    } catch {}
+  }, []);
+
+  return <>{children}</>;
 }
+

@@ -38,10 +38,10 @@ export function ChangePasswordForm({ dict }: ChangePasswordFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border border-border/40 rounded-[3px] bg-card p-6 shadow-xs space-y-6">
-      <div className="border-b border-border/30 pb-4">
-        <h2 className="text-base font-bold text-foreground">{dict.admin.securityPassword}</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{dict.admin.securityPasswordDesc}</p>
+    <form onSubmit={handleSubmit} className="border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#17212a] text-[#fafbfc] p-6 shadow-xs space-y-6">
+      <div className="border-b border-[rgba(63,85,102,0.4)] pb-4">
+        <h2 className="text-base font-bold text-[#fafbfc]">{dict.admin.securityPassword}</h2>
+        <p className="text-xs text-[#96abbe] mt-0.5">{dict.admin.securityPasswordDesc}</p>
       </div>
 
       {error && (

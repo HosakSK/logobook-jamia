@@ -104,12 +104,12 @@ export function ColorsGalleryView({
       {/* 1. Header Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">
+          <h1 className="text-2xl font-bold tracking-tight text-[#fafbfc] font-mono">
             {dict.admin.brandColors}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-[#96abbe] mt-1">
             Globálna knižnica brandových farieb pre manuál{" "}
-            <span className="font-mono font-semibold text-foreground">{brandName}</span>.
+            <span className="font-mono font-semibold text-[#fafbfc]">{brandName}</span>.
           </p>
         </div>
 
@@ -118,7 +118,7 @@ export function ColorsGalleryView({
             type="button"
             variant="outline"
             onClick={() => setBulkOpen(true)}
-            className="h-9 px-3.5 text-xs font-semibold rounded-[3px] border-border/60 hover:bg-neutral-800 gap-1.5 transition-colors"
+            className="h-9 px-3.5 text-xs font-semibold rounded-[3px] bg-[#17212a] text-[#fafbfc] border-[rgba(63,85,102,0.6)] hover:bg-[#1f2c36] gap-1.5 transition-colors"
           >
             <Layers className="h-4 w-4 text-[#c8d400]" />
             <span>Hromadný import HEX</span>
@@ -136,15 +136,15 @@ export function ColorsGalleryView({
       </div>
 
       {/* 2. Filters & Search Bar */}
-      <div className="p-4 rounded-[3px] bg-card border border-border/40 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
+      <div className="p-4 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#96abbe]" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Hľadať farbu podľa názvu, #HEX alebo RAL..."
-            className="pl-8 h-9 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+            className="pl-8 h-9 text-xs rounded-[3px] bg-[#070b0f] text-[#fafbfc] border-[rgba(63,85,102,0.6)] placeholder:text-[#96abbe]/60 focus:border-[#c8d400]"
           />
         </div>
 
@@ -153,7 +153,7 @@ export function ColorsGalleryView({
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+            className="h-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs px-2.5 text-[#fafbfc] focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky roly ({colors.length})</option>
             <option value="PRIMARY">Primárne farby</option>
@@ -167,15 +167,15 @@ export function ColorsGalleryView({
 
       {/* 3. Colors Grid or Empty State */}
       {colors.length === 0 ? (
-        <div className="border border-dashed border-border/50 rounded-[3px] p-12 text-center bg-card/40 space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-neutral-900 flex items-center justify-center text-[#c8d400] border border-border/40">
+        <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-[3px] p-12 text-center bg-[#17212a] text-[#fafbfc] space-y-4">
+          <div className="mx-auto w-12 h-12 rounded-full bg-[#070b0f] flex items-center justify-center text-[#c8d400] border border-[rgba(63,85,102,0.5)]">
             <Palette className="h-6 w-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-bold text-base text-foreground font-mono">
+            <h3 className="font-bold text-base text-[#fafbfc] font-mono">
               Paleta farieb je zatiaľ prázdna
             </h3>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+            <p className="text-xs text-[#96abbe] max-w-md mx-auto">
               Pridajte primárne a sekundárne farby vašej značky s presnými HEX, RGB a CMYK kódmi pre tlačové a digitálne manuály.
             </p>
           </div>
@@ -184,7 +184,7 @@ export function ColorsGalleryView({
               type="button"
               variant="outline"
               onClick={() => setBulkOpen(true)}
-              className="h-9 px-4 text-xs font-semibold rounded-[3px] border-border/60"
+              className="h-9 px-4 text-xs font-semibold rounded-[3px] border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc]"
             >
               Hromadný import HEX
             </Button>
@@ -199,9 +199,9 @@ export function ColorsGalleryView({
           </div>
         </div>
       ) : filteredColors.length === 0 ? (
-        <div className="border border-border/40 rounded-[3px] p-10 text-center bg-card space-y-2">
-          <p className="text-sm font-medium text-foreground">Žiadne farby nezodpovedajú zvoleným filtrom.</p>
-          <p className="text-xs text-muted-foreground">Skúste upraviť vyhľadávací výraz alebo zrušte filter role.</p>
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-10 text-center bg-[#17212a] text-[#fafbfc] space-y-2">
+          <p className="text-sm font-medium text-[#fafbfc]">Žiadne farby nezodpovedajú zvoleným filtrom.</p>
+          <p className="text-xs text-[#96abbe]">Skúste upraviť vyhľadávací výraz alebo zrušte filter role.</p>
           <Button
             type="button"
             variant="outline"

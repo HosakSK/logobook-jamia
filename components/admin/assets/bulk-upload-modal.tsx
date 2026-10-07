@@ -564,12 +564,12 @@ export function BulkUploadModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in-0">
-      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] bg-card border border-border/60 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in-0">
+      <div className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-[3px] bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-border/30 flex items-center justify-between shrink-0">
+        <div className="p-5 border-b border-[rgba(63,85,102,0.4)] flex items-center justify-between shrink-0">
           <div>
-            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#fafbfc] flex items-center gap-2">
               <Upload className="h-4 w-4 text-[#c8d400]" />
               <span>Hromadné nahrávanie lôg & exportov (Bulk Upload)</span>
             </h2>
@@ -896,7 +896,7 @@ export function BulkUploadModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 border-t border-border/30 bg-card/60 flex items-center justify-between shrink-0">
+        <div className="p-5 border-t border-[rgba(63,85,102,0.4)] bg-[#17212a] text-[#fafbfc] flex items-center justify-between shrink-0">
           <div className="text-xs text-muted-foreground">
             {queue.length > 0
               ? `${queue.length} ${queue.length === 1 ? "logo pripravené" : "lôg pripravených"} na nahratie (spolu ${queue.reduce((acc, it) => acc + it.attachedFiles.length, 0)} súborov).`

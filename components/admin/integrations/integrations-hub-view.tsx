@@ -112,7 +112,7 @@ module.exports = {
   return (
     <div className="space-y-8 max-w-5xl">
       {/* Header Banner */}
-      <div className="border border-border/60 rounded-[3px] p-6 bg-card/60 shadow-2xs space-y-4">
+      <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-6 bg-[#17212a] text-[#fafbfc] shadow-2xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ module.exports = {
                 </span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#fafbfc]">
               Integrácie & Design Tokens API
             </h1>
           </div>
@@ -140,14 +140,14 @@ module.exports = {
           <div className="flex items-center gap-2">
             <Link
               href={`/admin/brand/${brand.id}/builder`}
-              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-4"
+              className="text-xs text-[#96abbe] hover:text-[#fafbfc] underline underline-offset-4"
             >
               Prejsť do Page Buildera &rarr;
             </Link>
           </div>
         </div>
 
-        <p className="text-xs sm:text-sm text-muted-foreground max-w-3xl leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#96abbe] max-w-3xl leading-relaxed">
           Premeňte dizajn manuál na živý zdroj pravdy (<strong>Single Source of Truth</strong>). Tieto
           strojovo-čitateľné endpointy umožňujú vývojárom a softvérom (ako Figma alebo Tailwind)
           automaticky sťahovať firemné farby a typografiu priamo do kódu a grafických šablón.
@@ -167,7 +167,7 @@ module.exports = {
       {/* Grid of Integration Endpoints */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Endpoint 1: CSS Theme */}
-        <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 flex flex-col justify-between space-y-4">
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -295,7 +295,7 @@ module.exports = {
         </div>
 
         {/* Endpoint 2: W3C DTCG Tokens JSON */}
-        <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 flex flex-col justify-between space-y-4">
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ module.exports = {
       </div>
 
       {/* Section: AI Context Generator & LLM Prompt (llms.txt / ai.md) */}
-      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-4">
+      <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-[2px] bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -543,7 +543,7 @@ module.exports = {
       </div>
 
       {/* Section 3: Tailwind Integration Code Snippet */}
-      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-3">
+      <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Terminal className="h-4 w-4 text-primary" />
@@ -580,7 +580,7 @@ module.exports = {
       </div>
 
       {/* Section 4: Offline HTML & ZIP Export Engine */}
-      <div className="border border-border/60 rounded-[3px] p-5 bg-card/40 space-y-4">
+      <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="p-2 rounded-[2px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">

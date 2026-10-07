@@ -260,7 +260,7 @@ export function TemplateBrowserModal({
 
         {/* Body Content */}
         <div
-          className="flex-1 overflow-y-auto p-6 space-y-4 bg-card"
+          className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#17212a] text-[#fafbfc]"
         >
           {error && (
             <div className="p-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 text-xs flex items-center gap-2">
@@ -312,7 +312,7 @@ export function TemplateBrowserModal({
                 return (
                   <div
                     key={tpl.id}
-                    className="border border-border rounded-lg p-5 bg-card hover:bg-muted/30 hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-sm group"
+                    className="border border-[rgba(63,85,102,0.45)] rounded-lg p-5 bg-[#0e161d] text-[#fafbfc] hover:bg-[#1f2c36] hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-sm group"
                   >
                     <div className="space-y-2.5">
                       {/* Top Badges */}

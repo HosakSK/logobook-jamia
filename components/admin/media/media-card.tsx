@@ -68,10 +68,10 @@ export function MediaCard({
   return (
     <div
       onClick={() => onToggleSelect(asset.id)}
-      className={`group relative bg-card border rounded-[3px] overflow-hidden flex flex-col justify-between transition-all cursor-pointer ${
+      className={`group relative bg-[#17212a] border rounded-[3px] overflow-hidden flex flex-col justify-between transition-all cursor-pointer ${
         isSelected
           ? "border-primary ring-1 ring-primary shadow-md bg-primary/5"
-          : "border-border/80 hover:border-border hover:shadow-xs"
+          : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] hover:shadow-xs"
       }`}
     >
       {/* Top Overlay Bar: Selection Checkbox & Type Badge */}
@@ -99,7 +99,7 @@ export function MediaCard({
       </div>
 
       {/* Media Preview Box */}
-      <div className="relative w-full aspect-4/3 bg-background/60 flex items-center justify-center overflow-hidden border-b border-border/40">
+      <div className="relative w-full aspect-4/3 bg-[#070b0f] flex items-center justify-center overflow-hidden border-b border-[rgba(63,85,102,0.4)]">
         {isImageOrVisual ? (
           <div className="relative w-full h-full p-2 flex items-center justify-center">
             {/* Checkerboard subtle pattern for transparency */}
@@ -112,23 +112,23 @@ export function MediaCard({
             />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground p-4 text-center">
-            <TypeIcon className="w-10 h-10 text-muted-foreground/60 group-hover:text-primary transition-colors" />
-            <span className="text-[11px] font-mono text-muted-foreground/80 max-w-[140px] truncate">
+          <div className="flex flex-col items-center justify-center gap-2 text-[#96abbe] p-4 text-center">
+            <TypeIcon className="w-10 h-10 text-[#96abbe]/60 group-hover:text-primary transition-colors" />
+            <span className="text-[11px] font-mono text-[#96abbe]/80 max-w-[140px] truncate">
               {asset.fileName.split(".").pop()?.toUpperCase() || asset.fileType}
             </span>
           </div>
         )}
 
         {/* Hover Quick Actions Bar */}
-        <div className="absolute inset-0 bg-background/70 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-2">
+        <div className="absolute inset-0 bg-[#070b0f]/80 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 p-2">
           {asset.fileUrl && (
             <a
               href={asset.fileUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="p-1.5 rounded-[3px] bg-background border border-border/80 text-foreground hover:bg-muted transition-colors shadow-xs"
+              className="p-1.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] text-[#fafbfc] hover:bg-[#1f2c36] transition-colors shadow-xs"
               title="Otvoriť originál v novom okne"
             >
               <Eye className="w-4 h-4" />
@@ -137,7 +137,7 @@ export function MediaCard({
 
           <button
             onClick={handleCopyLink}
-            className="p-1.5 rounded-[3px] bg-background border border-border/80 text-foreground hover:bg-muted transition-colors shadow-xs"
+            className="p-1.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] text-[#fafbfc] hover:bg-[#1f2c36] transition-colors shadow-xs"
             title="Kopírovať odkaz na súbor"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -148,7 +148,7 @@ export function MediaCard({
               e.stopPropagation();
               onEdit(asset);
             }}
-            className="p-1.5 rounded-[3px] bg-background border border-border/80 text-foreground hover:bg-muted transition-colors shadow-xs"
+            className="p-1.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] text-[#fafbfc] hover:bg-[#1f2c36] transition-colors shadow-xs"
             title="Upraviť metadáta (názov, alt text)"
           >
             <Pencil className="w-4 h-4" />
@@ -159,7 +159,7 @@ export function MediaCard({
               e.stopPropagation();
               onDelete(asset.id, asset.fileName);
             }}
-            className="p-1.5 rounded-[3px] bg-background border border-border/80 text-destructive hover:bg-destructive/10 transition-colors shadow-xs"
+            className="p-1.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] text-destructive hover:bg-destructive/10 transition-colors shadow-xs"
             title="Zmazať súbor"
           >
             <Trash2 className="w-4 h-4" />
@@ -168,10 +168,10 @@ export function MediaCard({
       </div>
 
       {/* Meta Footer */}
-      <div className="p-3 space-y-1.5 bg-card">
+      <div className="p-3 space-y-1.5 bg-[#17212a]">
         <div className="flex items-start justify-between gap-2">
           <p
-            className="text-xs font-medium text-foreground truncate select-text"
+            className="text-xs font-medium text-[#fafbfc] truncate select-text"
             title={asset.fileName}
           >
             {asset.fileName}

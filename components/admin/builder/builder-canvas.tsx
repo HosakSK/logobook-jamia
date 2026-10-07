@@ -699,12 +699,12 @@ export function BuilderCanvas({
       {/* Containers (Rows) Stack */}
       <div className="space-y-6">
         {page.containers.length === 0 ? (
-          <div className="border border-dashed border-border/60 rounded-xl p-10 text-center space-y-6 bg-card/20 shadow-2xs">
+          <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-xl p-10 text-center space-y-6 bg-[#17212a] text-[#fafbfc] shadow-2xs">
             <div className="space-y-2 max-w-md mx-auto">
               <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mx-auto">
                 <LayoutTemplate className="h-6 w-6" />
               </div>
-              <h3 className="text-base font-bold text-foreground">
+              <h3 className="text-base font-bold text-[#fafbfc]">
                 Táto stránka zatiaľ nemá žiadny obsah
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -1052,7 +1052,7 @@ export function BuilderCanvas({
         )}
 
         {/* Add Container Layout Toolbar */}
-        <div className="border border-dashed border-border/60 rounded-[3px] p-4 bg-card/30 flex flex-wrap items-center justify-between gap-3">
+        <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-[3px] p-4 bg-[#17212a] text-[#fafbfc] flex flex-wrap items-center justify-between gap-3">
           <span className="text-xs font-semibold text-foreground flex items-center gap-2">
             <Plus className="h-4 w-4 text-primary" />
             <span>Pridať nový riadok na stránku:</span>
@@ -1735,7 +1735,7 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                    : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                 }`}
                               >
                                 <span
@@ -1772,7 +1772,7 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                    : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                 }`}
                               >
                                 <span
@@ -1873,7 +1873,7 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                    : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                 }`}
                               >
                                 <span
@@ -1910,7 +1910,7 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                    : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                 }`}
                               >
                                 <span
@@ -1950,7 +1950,7 @@ export function BuilderCanvas({
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             editingModule.borderWidthPx === item.val
                               ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                              : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                           }`}
                         >
                           {item.label}
@@ -2035,7 +2035,7 @@ export function BuilderCanvas({
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                       isSelected
                                         ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                        : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                     }`}
                                   >
                                     <span
@@ -2072,7 +2072,7 @@ export function BuilderCanvas({
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                       isSelected
                                         ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                                        : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                                     }`}
                                   >
                                     <span
@@ -2114,7 +2114,7 @@ export function BuilderCanvas({
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             (editingModule.paddingY || "normal") === pad.id
                               ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
+                              : "border-[rgba(63,85,102,0.45)] hover:border-[rgba(63,85,102,0.7)] text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                           }`}
                         >
                           {pad.label}

@@ -105,25 +105,25 @@ export function BillingView({ stats, dict }: BillingViewProps) {
       {/* 1. Usage Quotas Grid */}
       <div className="grid sm:grid-cols-2 gap-4">
         {/* Storage Quota */}
-        <div className="border border-border/40 rounded-[3px] p-6 bg-card shadow-xs space-y-4">
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-6 bg-[#17212a] text-[#fafbfc] shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#96abbe] flex items-center gap-1.5">
               <HardDrive className="h-4 w-4 text-[#c8d400]" />
               {dict.admin.storageUsage}
             </span>
-            <span className="px-2 py-0.5 rounded-[3px] bg-neutral-800 text-[10px] font-mono font-bold">
+            <span className="px-2 py-0.5 rounded-[3px] bg-[#070b0f] text-[10px] font-mono font-bold text-[#fafbfc] border border-[rgba(63,85,102,0.5)]">
               {currentTier}
             </span>
           </div>
 
           <div>
-            <div className="text-2xl font-extrabold text-foreground font-mono">
+            <div className="text-2xl font-extrabold text-[#fafbfc] font-mono">
               {stats.storageUsedMb} MB{" "}
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-xs font-normal text-[#96abbe]">
                 / {isStorageUnlimited ? "Neobmedzene" : `${stats.storageMaxMb} MB`}
               </span>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+            <p className="text-[11px] text-[#96abbe] mt-0.5">
               {isStorageUnlimited
                 ? "Máte k dispozícii neobmedzený priestor pre súbory a assety."
                 : `Zostáva ${storageRemainingMb} MB voľného úložiska pre logá a exporty.`}
@@ -131,7 +131,7 @@ export function BillingView({ stats, dict }: BillingViewProps) {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-neutral-900 border border-border/40 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.5)] rounded-full h-2 overflow-hidden">
             <div
               className={`h-full transition-all ${
                 storagePercent >= 90 ? "bg-amber-400" : "bg-[#c8d400]"
@@ -142,21 +142,21 @@ export function BillingView({ stats, dict }: BillingViewProps) {
         </div>
 
         {/* Brands Project Quota */}
-        <div className="border border-border/40 rounded-[3px] p-6 bg-card shadow-xs space-y-4">
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-6 bg-[#17212a] text-[#fafbfc] shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#96abbe] flex items-center gap-1.5">
               <FolderKanban className="h-4 w-4 text-[#c8d400]" />
               {dict.admin.brandCount}
             </span>
-            <span className="px-2 py-0.5 rounded-[3px] bg-neutral-800 text-[10px] font-mono font-bold">
+            <span className="px-2 py-0.5 rounded-[3px] bg-[#070b0f] text-[10px] font-mono font-bold text-[#fafbfc] border border-[rgba(63,85,102,0.5)]">
               {currentTier}
             </span>
           </div>
 
           <div>
-            <div className="text-2xl font-extrabold text-foreground font-mono">
+            <div className="text-2xl font-extrabold text-[#fafbfc] font-mono">
               {stats.brandsUsed}{" "}
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-xs font-normal text-[#96abbe]">
                 / {isBrandsUnlimited ? "Neobmedzene" : stats.brandsMax}
               </span>
             </div>
@@ -189,7 +189,7 @@ export function BillingView({ stats, dict }: BillingViewProps) {
         </div>
 
         {/* Toggle Switch */}
-        <div className="inline-flex items-center p-1 rounded-[3px] bg-card border border-border/60">
+        <div className="inline-flex items-center p-1 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)]">
           <button
             type="button"
             onClick={() => setBillingCycle("monthly")}
@@ -230,10 +230,10 @@ export function BillingView({ stats, dict }: BillingViewProps) {
               key={plan.id}
               className={`border rounded-[3px] p-5 flex flex-col justify-between transition-all relative ${
                 isCurrent
-                  ? "border-[#c8d400] bg-card shadow-md ring-1 ring-[#c8d400]/40"
+                  ? "border-[#c8d400] bg-[#17212a] text-[#fafbfc] shadow-md ring-1 ring-[#c8d400]/40"
                   : plan.popular
-                  ? "border-primary/60 bg-card shadow-xs"
-                  : "border-border/40 bg-card/60 hover:border-border/80"
+                  ? "border-[#009f80] bg-[#17212a] text-[#fafbfc] shadow-xs"
+                  : "border-[rgba(63,85,102,0.45)] bg-[#17212a] text-[#fafbfc] hover:border-[rgba(63,85,102,0.7)]"
               }`}
             >
               {/* Badges */}
@@ -405,7 +405,7 @@ export function BillingView({ stats, dict }: BillingViewProps) {
       </div>
 
       {/* 3. Lemon Squeezy Sandbox & Dev Testing Panel */}
-      <div className="border border-dashed border-border/70 rounded-[3px] p-5 bg-card/30 space-y-3">
+      <div className="border border-dashed border-[rgba(63,85,102,0.5)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Terminal className="h-4 w-4 text-[#c8d400]" />

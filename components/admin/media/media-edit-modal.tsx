@@ -101,25 +101,25 @@ export function MediaEditModal({
     Boolean(asset.thumbnailUrl || asset.fileUrl);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs overflow-y-auto">
       <div
-        className="relative w-full max-w-lg bg-card border border-border rounded-[3px] shadow-2xl p-6 my-8 animate-in fade-in-50 zoom-in-95 duration-150"
+        className="relative w-full max-w-lg bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] rounded-[3px] shadow-2xl p-6 my-8 animate-in fade-in-50 zoom-in-95 duration-150"
         role="dialog"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border/60">
+        <div className="flex items-center justify-between pb-4 border-b border-[rgba(63,85,102,0.4)]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center text-primary">
               <Pencil className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-foreground">Upraviť metadáta média</h2>
-              <p className="text-xs text-muted-foreground truncate max-w-xs">{asset.fileName}</p>
+              <h2 className="text-base font-semibold text-[#fafbfc]">Upraviť metadáta média</h2>
+              <p className="text-xs text-[#96abbe] truncate max-w-xs">{asset.fileName}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="p-1 rounded-[3px] text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#070b0f] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,8 +135,8 @@ export function MediaEditModal({
           )}
 
           {/* Thumbnail / File Info Snippet */}
-          <div className="flex items-center gap-3.5 p-3 rounded-[3px] bg-background/60 border border-border/50">
-            <div className="w-16 h-16 rounded-[2px] bg-card border border-border/60 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="flex items-center gap-3.5 p-3 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.45)]">
+            <div className="w-16 h-16 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] flex items-center justify-center shrink-0 overflow-hidden">
               {isImageOrVisual ? (
                 <img
                   src={asset.thumbnailUrl || asset.fileUrl}

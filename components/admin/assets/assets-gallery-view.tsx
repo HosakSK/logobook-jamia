@@ -145,12 +145,12 @@ export function AssetsGalleryView({
       {/* 1. Header Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">
+          <h1 className="text-2xl font-bold tracking-tight text-[#fafbfc] font-mono">
             {dict.admin.brandLogos}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-[#96abbe] mt-1">
             Centrálny repozitár vektorových a bitmapových lôg pre manuál{" "}
-            <span className="font-mono font-semibold text-foreground">{brandName}</span>.
+            <span className="font-mono font-semibold text-[#fafbfc]">{brandName}</span>.
           </p>
         </div>
 
@@ -165,15 +165,15 @@ export function AssetsGalleryView({
       </div>
 
       {/* 2. Filters & Search Bar */}
-      <div className="p-4 rounded-[3px] bg-card border border-border/40 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
+      <div className="p-4 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#96abbe]" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Hľadať logo podľa názvu..."
-            className="pl-8 h-9 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+            className="pl-8 h-9 text-xs rounded-[3px] bg-[#070b0f] text-[#fafbfc] border-[rgba(63,85,102,0.6)] placeholder:text-[#96abbe]/60 focus:border-[#c8d400]"
           />
         </div>
 
@@ -183,7 +183,7 @@ export function AssetsGalleryView({
           <select
             value={mediumFilter}
             onChange={(e) => setMediumFilter(e.target.value)}
-            className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+            className="h-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs px-2.5 text-[#fafbfc] focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky médiá</option>
             <option value="PRINT_CMYK">CMYK (Tlač)</option>
@@ -198,7 +198,7 @@ export function AssetsGalleryView({
           <select
             value={orientationFilter}
             onChange={(e) => setOrientationFilter(e.target.value)}
-            className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+            className="h-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs px-2.5 text-[#fafbfc] focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky orientácie</option>
             <option value="HORIZONTAL">Horizontálne</option>
@@ -210,7 +210,7 @@ export function AssetsGalleryView({
           <select
             value={backgroundFilter}
             onChange={(e) => setBackgroundFilter(e.target.value)}
-            className="h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
+            className="h-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs px-2.5 text-[#fafbfc] focus:outline-hidden focus:border-[#c8d400]"
           >
             <option value="ALL">Všetky podklady</option>
             <option value="LIGHT">Svetlý podklad</option>
@@ -221,7 +221,7 @@ export function AssetsGalleryView({
 
       {/* 2.5 Bulk Action Bar when items selected or to select all */}
       {filteredAssets.length > 0 && (
-        <div className="p-3 rounded-[3px] bg-neutral-950 border border-border/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="p-3 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)] flex flex-wrap items-center justify-between gap-3 text-xs text-[#fafbfc]">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -274,15 +274,15 @@ export function AssetsGalleryView({
 
       {/* 3. Assets Gallery Grid or Empty State */}
       {assets.length === 0 ? (
-        <div className="border border-dashed border-border/50 rounded-[3px] p-12 text-center bg-card/40 space-y-4">
-          <div className="mx-auto w-12 h-12 rounded-full bg-neutral-900 flex items-center justify-center text-[#c8d400] border border-border/40">
+        <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-[3px] p-12 text-center bg-[#17212a] text-[#fafbfc] space-y-4">
+          <div className="mx-auto w-12 h-12 rounded-full bg-[#070b0f] flex items-center justify-center text-[#c8d400] border border-[rgba(63,85,102,0.5)]">
             <ImageIcon className="h-6 w-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-bold text-base text-foreground font-mono">
+            <h3 className="font-bold text-base text-[#fafbfc] font-mono">
               Knižnica lôg je zatiaľ prázdna
             </h3>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
+            <p className="text-xs text-[#96abbe] max-w-md mx-auto">
               Nahrajte vektorové logá (.SVG) značky. Systém z nich automaticky vygeneruje maticu logotypov, náhľady a uloží ich do Cloudflare R2.
             </p>
           </div>
@@ -296,9 +296,9 @@ export function AssetsGalleryView({
           </Button>
         </div>
       ) : filteredAssets.length === 0 ? (
-        <div className="border border-border/40 rounded-[3px] p-10 text-center bg-card space-y-2">
-          <p className="text-sm font-medium text-foreground">Žiadne logá nezodpovedajú zvoleným filtrom.</p>
-          <p className="text-xs text-muted-foreground">Skúste resetovať vyhľadávanie alebo zvoľte iné parametre.</p>
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-10 text-center bg-[#17212a] text-[#fafbfc] space-y-2">
+          <p className="text-sm font-medium text-[#fafbfc]">Žiadne logá nezodpovedajú zvoleným filtrom.</p>
+          <p className="text-xs text-[#96abbe]">Skúste resetovať vyhľadávanie alebo zvoľte iné parametre.</p>
           <Button
             type="button"
             variant="outline"

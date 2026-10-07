@@ -57,7 +57,7 @@ export function BuilderCascadeSandbox({
       className="space-y-6"
     >
       {/* Introduction Card */}
-      <div className="border border-border/60 rounded-[3px] p-5 bg-card/80 shadow-2xs space-y-3">
+      <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] text-[#fafbfc] shadow-2xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-[3px] bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
@@ -142,7 +142,7 @@ export function BuilderCascadeSandbox({
           </div>
 
           {/* Module Selector */}
-          <div className="p-3 border border-border/40 rounded-[3px] bg-card/40 space-y-2">
+          <div className="p-3 border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#0e161d] text-[#fafbfc] space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-foreground">
                 Vybrať modul na otestovanie:

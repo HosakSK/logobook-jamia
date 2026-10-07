@@ -209,19 +209,19 @@ export function TypographyEditorModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs overflow-y-auto">
       <div
-        className="relative w-full max-w-2xl bg-card border border-border rounded-[3px] shadow-2xl p-6 my-8 animate-in fade-in-50 zoom-in-95 duration-150"
+        className="relative w-full max-w-2xl bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] rounded-[3px] shadow-2xl p-6 my-8 animate-in fade-in-50 zoom-in-95 duration-150"
         role="dialog"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-border/60">
+        <div className="flex items-center justify-between pb-4 border-b border-[rgba(63,85,102,0.4)]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center text-primary">
               <Type className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-foreground">
+              <h2 className="text-base font-semibold text-[#fafbfc]">
                 {isEditing ? `Upraviť písmo: ${typography?.name}` : "Pridať nové písmo do knižnice"}
               </h2>
               <p className="text-xs text-muted-foreground">

@@ -85,12 +85,12 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header bar with CreateBrand button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-border/40">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-[rgba(63,85,102,0.45)]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#fafbfc]">
             {dict.admin.title}
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 font-light">
+          <p className="text-xs sm:text-sm text-[#96abbe] mt-1 font-light">
             {dict.admin.subtitle}
           </p>
         </div>
@@ -106,37 +106,37 @@ export default async function AdminDashboardPage() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Metric 1: Brands count */}
-        <div className="card-dark p-5 rounded-[3px] space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] p-5 rounded-[3px] space-y-1 shadow-2xs">
+          <div className="flex items-center justify-between text-[#96abbe]">
             <span className="text-xs font-semibold">{dict.admin.activeBrands}</span>
-            <FolderKanban className="h-4 w-4 text-primary" />
+            <FolderKanban className="h-4 w-4 text-[#c8d400]" />
           </div>
-          <div className="text-2xl font-extrabold text-foreground">{brands.length}</div>
+          <div className="text-2xl font-extrabold text-[#fafbfc]">{brands.length}</div>
           <span className="text-[11px] text-[#009f80] font-medium block">
             {liveBrandsCount} {dict.admin.statusLive}
           </span>
         </div>
 
         {/* Metric 2: Subscription Plan & Limit */}
-        <div className="card-dark p-5 rounded-[3px] space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] p-5 rounded-[3px] space-y-1 shadow-2xs">
+          <div className="flex items-center justify-between text-[#96abbe]">
             <span className="text-xs font-semibold">{dict.admin.currentPlan}</span>
-            <Zap className="h-4 w-4 text-primary" />
+            <Zap className="h-4 w-4 text-[#c8d400]" />
           </div>
-          <div className="text-2xl font-extrabold text-foreground">{userTier}</div>
-          <span className="text-[11px] text-muted-foreground font-light block">
+          <div className="text-2xl font-extrabold text-[#fafbfc]">{userTier}</div>
+          <span className="text-[11px] text-[#96abbe] font-light block">
             {ownedBrandsCount} / {maxBrands} {dict.admin.allBrands.toLowerCase()}
           </span>
         </div>
 
         {/* Metric 3: Storage Quota */}
-        <div className="card-dark p-5 rounded-[3px] space-y-1">
-          <div className="flex items-center justify-between text-muted-foreground">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] p-5 rounded-[3px] space-y-1 shadow-2xs">
+          <div className="flex items-center justify-between text-[#96abbe]">
             <span className="text-xs font-semibold">{dict.admin.storageQuota}</span>
-            <HardDrive className="h-4 w-4 text-primary" />
+            <HardDrive className="h-4 w-4 text-[#c8d400]" />
           </div>
-          <div className="text-2xl font-extrabold text-foreground">0 MB</div>
-          <span className="text-[11px] text-muted-foreground font-light block">
+          <div className="text-2xl font-extrabold text-[#fafbfc]">0 MB</div>
+          <span className="text-[11px] text-[#96abbe] font-light block">
             Max {tierStorage} limit
           </span>
         </div>

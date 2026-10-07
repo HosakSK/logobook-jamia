@@ -120,13 +120,13 @@ export function BuilderEmptyState({ brandId, brandName }: BuilderEmptyStateProps
         </div>
 
         {/* Option 2: Blank Page Form */}
-        <div className="border border-border/60 rounded-[3px] p-6 bg-card/60 flex flex-col justify-between space-y-4">
+        <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-6 bg-[#17212a] text-[#fafbfc] flex flex-col justify-between space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-muted-foreground font-bold text-xs uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-[#96abbe] font-bold text-xs uppercase tracking-wider">
               <FilePlus className="h-4 w-4" />
               <span>Vlastná stránka</span>
             </div>
-            <h3 className="text-sm font-bold text-foreground">
+            <h3 className="text-sm font-bold text-[#fafbfc]">
               Vytvoriť prázdnu stránku
             </h3>
             <p className="text-[11px] text-muted-foreground leading-relaxed">

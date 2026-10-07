@@ -142,12 +142,12 @@ export function TypographyCard({
   const SourceIcon = sourceInfo.icon;
 
   return (
-    <div className="bg-card border border-border/80 rounded-[3px] p-5 shadow-xs transition-all hover:border-border flex flex-col justify-between gap-5 relative group">
+    <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-5 shadow-xs transition-all hover:border-[rgba(63,85,102,0.8)] flex flex-col justify-between gap-5 relative group">
       {/* Top Header Row */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-lg text-foreground tracking-tight flex items-center gap-2">
+            <h3 className="font-semibold text-lg text-[#fafbfc] tracking-tight flex items-center gap-2">
               <Type className="w-5 h-5 text-primary" />
               {typography.name}
             </h3>
@@ -166,16 +166,16 @@ export function TypographyCard({
             </span>
           </div>
 
-          <p className="text-xs text-muted-foreground">{roleInfo.desc}</p>
+          <p className="text-xs text-[#96abbe]">{roleInfo.desc}</p>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-1">
-          <div className="flex items-center border border-border/60 rounded-[3px] bg-background/50 p-0.5">
+          <div className="flex items-center border border-[rgba(63,85,102,0.5)] rounded-[3px] bg-[#070b0f] p-0.5">
             <button
               onClick={onMoveUp}
               disabled={index === 0}
-              className="p-1 hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none rounded-[2px]"
+              className="p-1 hover:bg-white/[0.06] text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:pointer-events-none rounded-[2px]"
               title="Posunúť vyššie"
             >
               <ChevronUp className="w-3.5 h-3.5" />
@@ -183,7 +183,7 @@ export function TypographyCard({
             <button
               onClick={onMoveDown}
               disabled={index === total - 1}
-              className="p-1 hover:bg-muted text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:pointer-events-none rounded-[2px]"
+              className="p-1 hover:bg-white/[0.06] text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:pointer-events-none rounded-[2px]"
               title="Posunúť nižšie"
             >
               <ChevronDown className="w-3.5 h-3.5" />
@@ -194,7 +194,7 @@ export function TypographyCard({
             variant="outline"
             size="sm"
             onClick={() => onEdit(typography)}
-            className="h-7 px-2.5 text-xs rounded-[3px] gap-1.5"
+            className="h-7 px-2.5 text-xs rounded-[3px] gap-1.5 bg-[#070b0f] text-[#fafbfc] border-[rgba(63,85,102,0.6)] hover:border-[#c8d400] hover:text-[#c8d400]"
           >
             <Pencil className="w-3 h-3" /> Upraviť
           </Button>
@@ -204,7 +204,7 @@ export function TypographyCard({
             size="sm"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-[3px]"
+            className="h-7 w-7 p-0 text-[#96abbe] hover:text-red-400 hover:bg-red-500/10 rounded-[3px]"
             title="Odstrániť písmo"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -213,12 +213,12 @@ export function TypographyCard({
       </div>
 
       {/* Live Font Sandbox / Interactive Preview Canvas */}
-      <div className="rounded-[3px] border border-border/60 bg-background/80 p-4 space-y-3">
+      <div className="rounded-[3px] border border-[rgba(63,85,102,0.5)] bg-[#070b0f] p-4 space-y-3">
         {/* Sandbox Toolbar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[rgba(63,85,102,0.35)] pb-2 text-xs text-[#96abbe]">
           {/* Weight Selectors */}
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-mono text-muted-foreground/80">Rez:</span>
+            <span className="text-[11px] font-mono text-[#96abbe]/80">Rez:</span>
             {availableWeights.map((w) => (
               <button
                 key={w}
@@ -226,8 +226,8 @@ export function TypographyCard({
                 onClick={() => setSelectedWeight(w)}
                 className={`px-2 py-0.5 text-[11px] font-mono rounded-[3px] transition-colors border ${
                   selectedWeight === w
-                    ? "bg-primary text-primary-foreground border-primary font-bold"
-                    : "bg-muted/40 hover:bg-muted border-border/60 text-foreground"
+                    ? "bg-[#c8d400] text-[#070b0f] border-[#c8d400] font-bold"
+                    : "bg-[#17212a] hover:bg-[#1f2c36] border-[rgba(63,85,102,0.6)] text-[#fafbfc]"
                 }`}
               >
                 {w}
@@ -237,7 +237,7 @@ export function TypographyCard({
 
           {/* Size slider / buttons */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono">{fontSize}px</span>
+            <span className="text-[11px] font-mono text-[#fafbfc]">{fontSize}px</span>
             <input
               type="range"
               min="14"
@@ -255,7 +255,7 @@ export function TypographyCard({
                 setSelectedWeight(availableWeights[0] || 400);
               }}
               title="Obnoviť predvolené nastavenie náhľadu"
-              className="p-1 hover:text-foreground text-muted-foreground"
+              className="p-1 hover:text-[#fafbfc] text-[#96abbe]"
             >
               <RotateCcw className="w-3 h-3" />
             </button>
@@ -267,7 +267,7 @@ export function TypographyCard({
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => setSampleText(e.currentTarget.textContent || "")}
-          className="focus:outline-hidden focus:ring-1 focus:ring-primary/40 rounded-[2px] p-1 transition-all text-foreground select-text"
+          className="focus:outline-hidden focus:ring-1 focus:ring-[#c8d400]/40 rounded-[2px] p-1 transition-all text-[#fafbfc] select-text"
           style={{
             fontFamily: cssFamily,
             fontSize: `${fontSize}px`,
@@ -280,14 +280,14 @@ export function TypographyCard({
         </div>
 
         {/* Pangram Presets Quick Bar */}
-        <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-muted-foreground/70">
+        <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-[#96abbe]/80">
           <span>Vzory:</span>
           {DEFAULT_PANGRAMS.slice(0, 3).map((p, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setSampleText(p)}
-              className="hover:text-primary transition-colors underline decoration-dotted"
+              className="hover:text-[#c8d400] transition-colors underline decoration-dotted text-[#96abbe]"
             >
               {i === 0 ? "Žltý kôň" : i === 1 ? "Kŕdeľ ďatľov" : "Grófa dcéra"}
             </button>
@@ -295,7 +295,7 @@ export function TypographyCard({
           <button
             type="button"
             onClick={() => setSampleText("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789")}
-            className="hover:text-primary transition-colors underline decoration-dotted"
+            className="hover:text-[#c8d400] transition-colors underline decoration-dotted text-[#96abbe]"
           >
             Abeceda & Čísla
           </button>
@@ -303,10 +303,10 @@ export function TypographyCard({
       </div>
 
       {/* Footer Info Row */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-border/40 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-[rgba(63,85,102,0.35)] text-xs">
         {/* CSS font-family & Copy Button */}
-        <div className="flex items-center gap-1.5 font-mono text-[11px] text-muted-foreground bg-muted/30 px-2 py-1 rounded-[3px] border border-border/40 max-w-full overflow-x-auto">
-          <span className="text-foreground/80">{cssFamily}</span>
+        <div className="flex items-center gap-1.5 font-mono text-[11px] text-[#96abbe] bg-[#070b0f] px-2 py-1 rounded-[3px] border border-[rgba(63,85,102,0.5)] max-w-full overflow-x-auto">
+          <span className="text-[#fafbfc]">{cssFamily}</span>
           <button
             onClick={handleCopyCss}
             className="ml-1 text-muted-foreground hover:text-foreground transition-colors"

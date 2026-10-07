@@ -126,12 +126,12 @@ export function EditAssetModal({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in-0">
-      <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col rounded-[3px] bg-card border border-border/60 shadow-2xl p-6 space-y-5 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in-0">
+      <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col rounded-[3px] bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] shadow-2xl p-6 space-y-5 overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-border/30 pb-3">
+        <div className="flex items-start justify-between gap-4 border-b border-[rgba(63,85,102,0.4)] pb-3">
           <div>
-            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#fafbfc] flex items-center gap-2">
               <Pencil className="h-4 w-4 text-[#c8d400]" />
               <span>Upraviť logo a náhľad</span>
             </h2>

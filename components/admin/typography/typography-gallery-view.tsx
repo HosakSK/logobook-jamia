@@ -118,14 +118,14 @@ export function TypographyGalleryView({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Typografia a Písma</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-[#fafbfc]">Typografia a Písma</h1>
             <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-[3px] bg-primary/10 text-primary border border-primary/20">
               {stats.total} {stats.total === 1 ? "písmo" : stats.total >= 2 && stats.total <= 4 ? "písma" : "písiem"}
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-[#96abbe] mt-1">
             Globálna hierarchia písiem a živé prepojenie na manuál pre brand{" "}
-            <span className="font-semibold text-foreground">{brandName}</span>.
+            <span className="font-semibold text-[#fafbfc]">{brandName}</span>.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export function TypographyGalleryView({
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="h-8 px-2.5 text-xs rounded-[3px] gap-1.5"
+            className="h-8 px-2.5 text-xs rounded-[3px] gap-1.5 bg-[#17212a] text-[#fafbfc] border-[rgba(63,85,102,0.6)] hover:bg-[#1f2c36]"
             title="Obnoviť knižnicu fontov"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
@@ -145,7 +145,7 @@ export function TypographyGalleryView({
           <Button
             size="sm"
             onClick={handleOpenAdd}
-            className="h-8 px-3 text-xs rounded-[3px] gap-1.5 font-medium shadow-xs"
+            className="h-8 px-3 text-xs rounded-[3px] gap-1.5 font-medium shadow-xs bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000]"
           >
             <Plus className="w-4 h-4" /> Pridať Písmo
           </Button>
@@ -154,57 +154,57 @@ export function TypographyGalleryView({
 
       {/* Stats Summary Pills */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center text-primary">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
             <Type className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.total}</div>
-            <div className="text-[11px] text-muted-foreground">Celkovo písiem</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.total}</div>
+            <div className="text-[11px] text-[#96abbe]">Celkovo písiem</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[3px] bg-sky-500/10 flex items-center justify-center text-sky-400">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-[3px] bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
             <Globe className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.google}</div>
-            <div className="text-[11px] text-muted-foreground">Google Fonts</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.google}</div>
+            <div className="text-[11px] text-[#96abbe]">Google Fonts</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[3px] bg-red-500/10 flex items-center justify-center text-red-400">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-[3px] bg-red-500/10 flex items-center justify-center text-red-400 border border-red-500/20">
             <Cloud className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.adobe}</div>
-            <div className="text-[11px] text-muted-foreground">Adobe Fonts</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.adobe}</div>
+            <div className="text-[11px] text-[#96abbe]">Adobe Fonts</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[3px] bg-lime-500/10 flex items-center justify-center text-lime-400">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-[3px] bg-lime-500/10 flex items-center justify-center text-lime-400 border border-lime-500/20">
             <Upload className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.custom}</div>
-            <div className="text-[11px] text-muted-foreground">Vlastné WOFF2</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.custom}</div>
+            <div className="text-[11px] text-[#96abbe]">Vlastné WOFF2</div>
           </div>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-card border border-border/80 rounded-[3px] p-3">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3">
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#96abbe]" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Hľadať podľa názvu, rodiny alebo ID..."
-            className="h-8 pl-8 text-xs rounded-[3px] bg-background"
+            className="h-8 pl-8 text-xs rounded-[3px] bg-[#070b0f] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] placeholder:text-[#96abbe]/60 focus:border-[#c8d400]"
           />
         </div>
 
@@ -212,11 +212,11 @@ export function TypographyGalleryView({
         <div className="flex items-center gap-2 flex-wrap text-xs">
           {/* Role Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-muted-foreground text-[11px]">Rola:</span>
+            <span className="text-[#96abbe] text-[11px]">Rola:</span>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value as any)}
-              className="h-8 px-2 rounded-[3px] border border-input bg-background text-xs focus:outline-hidden focus:ring-1 focus:ring-primary"
+              className="h-8 px-2 rounded-[3px] border border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc] text-xs focus:outline-hidden focus:border-[#c8d400]"
             >
               <option value="ALL">Všetky roly</option>
               <option value="HEADING">Nadpisy (HEADING)</option>
@@ -229,11 +229,11 @@ export function TypographyGalleryView({
 
           {/* Source Filter */}
           <div className="flex items-center gap-1">
-            <span className="text-muted-foreground text-[11px]">Zdroj:</span>
+            <span className="text-[#96abbe] text-[11px]">Zdroj:</span>
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value as any)}
-              className="h-8 px-2 rounded-[3px] border border-input bg-background text-xs focus:outline-hidden focus:ring-1 focus:ring-primary"
+              className="h-8 px-2 rounded-[3px] border border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc] text-xs focus:outline-hidden focus:border-[#c8d400]"
             >
               <option value="ALL">Všetky zdroje</option>
               <option value="GOOGLE_FONTS">Google Fonts</option>
@@ -261,17 +261,17 @@ export function TypographyGalleryView({
           ))}
         </div>
       ) : (
-        <div className="border border-dashed border-border/80 rounded-[3px] p-12 text-center bg-card/40 space-y-4">
-          <div className="w-12 h-12 rounded-[3px] bg-primary/10 text-primary mx-auto flex items-center justify-center">
+        <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-[3px] p-12 text-center bg-[#17212a] text-[#fafbfc] space-y-4">
+          <div className="w-12 h-12 rounded-[3px] bg-[#070b0f] text-[#c8d400] mx-auto flex items-center justify-center border border-[rgba(63,85,102,0.5)]">
             <Type className="w-6 h-6" />
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-base text-[#fafbfc]">
               {typographyList.length === 0
                 ? "Knižnica typografie je prázdna"
                 : "Žiadne písma nezodpovedajú zvolenému filtru"}
             </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-[#96abbe] leading-relaxed">
               {typographyList.length === 0
                 ? "Pridajte prvé písmo pre nadpisy alebo bežný text značky. Môžete použiť Google Fonts, Adobe Fonts (Typekit) alebo nahrať vlastný WOFF2 súbor."
                 : "Skúste upraviť vyhľadávací výraz alebo resetovať filter rolí a zdrojov."}

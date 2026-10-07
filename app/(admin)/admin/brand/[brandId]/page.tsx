@@ -70,14 +70,14 @@ export default async function BrandOverviewPage({
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {dict.admin.brandOverview}: <span className="text-primary">{brandName}</span>
+          <h1 className="text-2xl font-bold tracking-tight text-[#fafbfc]">
+            {dict.admin.brandOverview}: <span className="text-[#c8d400]">{brandName}</span>
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-[#96abbe] mt-1">
             Konfigurácia vizuálnych assetov, dizajnových tokenov a štruktúry brand manuálu.
           </p>
         </div>
-        <Button asChild variant="outline" size="sm" className="gap-2 self-start sm:self-auto text-xs rounded-[3px]">
+        <Button asChild variant="outline" size="sm" className="gap-2 self-start sm:self-auto text-xs rounded-[3px] bg-[#17212a] text-[#fafbfc] border-[rgba(63,85,102,0.6)] hover:bg-[#1f2c36] hover:text-[#fafbfc]">
           <Link href={`/m/${brandSlug}`} target="_blank">
             <span>{dict.admin.viewLiveManual}</span>
             <ExternalLink className="h-3.5 w-3.5" />
@@ -92,15 +92,15 @@ export default async function BrandOverviewPage({
             <Link
               key={sec.href}
               href={sec.href}
-              className="border border-border/40 rounded-[3px] p-5 bg-card hover:bg-neutral-800/40 transition-colors shadow-2xs space-y-2.5 block group"
+              className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-5 bg-[#17212a] hover:bg-[#1f2c36] transition-colors shadow-2xs space-y-2.5 block group"
             >
-              <div className="h-9 w-9 rounded-[3px] bg-neutral-900 border border-border/60 flex items-center justify-center text-primary group-hover:border-[#c8d400]/40 transition-colors">
+              <div className="h-9 w-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] flex items-center justify-center text-[#c8d400] group-hover:border-[#c8d400]/40 transition-colors">
                 <Icon className="h-4 w-4" />
               </div>
-              <h3 className="font-bold text-sm text-foreground group-hover:text-[#c8d400] transition-colors">
+              <h3 className="font-bold text-sm text-[#fafbfc] group-hover:text-[#c8d400] transition-colors">
                 {sec.title}
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{sec.desc}</p>
+              <p className="text-xs text-[#96abbe] leading-relaxed">{sec.desc}</p>
             </Link>
           );
         })}

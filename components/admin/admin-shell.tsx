@@ -26,7 +26,7 @@ export function AdminShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#0e161d] text-[#fafbfc]">
+    <div className="dark admin-studio flex min-h-screen bg-[#0e161d] text-[#fafbfc]" data-theme="dark" data-admin-root>
       {/* Sidebar (Desktop + Mobile Drawer) */}
       <AdminSidebar
         availableBrands={brands}

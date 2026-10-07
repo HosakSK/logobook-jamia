@@ -176,43 +176,43 @@ export function MediaGalleryView({
 
       {/* Stats Summary Pills */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-[3px] bg-primary/10 flex items-center justify-center text-primary">
             <FolderOpen className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.total}</div>
-            <div className="text-[11px] text-muted-foreground">Celkovo médií</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.total}</div>
+            <div className="text-[11px] text-[#96abbe]">Celkovo médií</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-[3px] bg-sky-500/10 flex items-center justify-center text-sky-400">
             <ImageIcon className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.images}</div>
-            <div className="text-[11px] text-muted-foreground">Obrázky & Ikony</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.images}</div>
+            <div className="text-[11px] text-[#96abbe]">Obrázky & Ikony</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-[3px] bg-amber-500/10 flex items-center justify-center text-amber-400">
             <FileText className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{stats.docs}</div>
-            <div className="text-[11px] text-muted-foreground">Dokumenty</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{stats.docs}</div>
+            <div className="text-[11px] text-[#96abbe]">Dokumenty</div>
           </div>
         </div>
 
-        <div className="bg-card border border-border/80 rounded-[3px] p-3 flex items-center gap-3">
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] rounded-[3px] p-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-[3px] bg-emerald-500/10 flex items-center justify-center text-emerald-400">
             <HardDrive className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-lg font-bold leading-tight">{formatBytes(stats.totalBytes)}</div>
-            <div className="text-[11px] text-muted-foreground">Obsadené v R2</div>
+            <div className="text-lg font-bold leading-tight text-[#fafbfc]">{formatBytes(stats.totalBytes)}</div>
+            <div className="text-[11px] text-[#96abbe]">Obsadené v R2</div>
           </div>
         </div>
       </div>
@@ -222,15 +222,15 @@ export function MediaGalleryView({
 
       {/* Search, Category Filters & Bulk Action Toolbar */}
       <div className="space-y-3">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-card border border-border/80 rounded-[3px] p-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3">
           {/* Search */}
           <div className="relative flex-1 max-w-sm">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#96abbe]" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Hľadať súbory podľa názvu alebo popisu..."
-              className="h-8 pl-8 text-xs rounded-[3px] bg-background"
+              className="h-8 pl-8 text-xs rounded-[3px] bg-[#070b0f] text-[#fafbfc] border-[rgba(63,85,102,0.6)] focus-visible:ring-[#c8d400]/40"
             />
           </div>
 
@@ -344,17 +344,17 @@ export function MediaGalleryView({
           ))}
         </div>
       ) : (
-        <div className="border border-dashed border-border/80 rounded-[3px] p-12 text-center bg-card/40 space-y-4">
-          <div className="w-12 h-12 rounded-[3px] bg-primary/10 text-primary mx-auto flex items-center justify-center">
+        <div className="border border-dashed border-[rgba(63,85,102,0.45)] rounded-[3px] p-12 text-center bg-[#17212a] text-[#fafbfc] space-y-4">
+          <div className="w-12 h-12 rounded-[3px] bg-[#070b0f] text-[#c8d400] mx-auto flex items-center justify-center border border-[rgba(63,85,102,0.5)]">
             <FolderOpen className="w-6 h-6" />
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
-            <h3 className="font-semibold text-base text-foreground">
+            <h3 className="font-semibold text-base text-[#fafbfc]">
               {mediaList.length === 0
                 ? "Knižnica médií je zatiaľ prázdna"
                 : "Žiadne súbory nezodpovedajú zvolenému filtru"}
             </h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-[#96abbe] leading-relaxed">
               {mediaList.length === 0
                 ? "Presuňte sem fotografie, produktové rendery, ikony alebo pridajte externý odkaz na Google Drive / Dropbox."
                 : "Skúste zmeniť vyhľadávací dotaz alebo kliknúť na 'Všetky'."}

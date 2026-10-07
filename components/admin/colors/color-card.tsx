@@ -75,7 +75,7 @@ export function ColorCard({
     color.cmykK !== null;
 
   return (
-    <div className="border border-border/40 rounded-[3px] bg-card overflow-hidden flex flex-col justify-between transition-all hover:border-border/80 shadow-xs group">
+    <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#17212a] text-[#fafbfc] overflow-hidden flex flex-col justify-between transition-all hover:border-[rgba(63,85,102,0.8)] shadow-xs group">
       {/* 1. Large Color Swatch Block */}
       <div
         className="h-36 w-full p-4 flex flex-col justify-between relative transition-transform duration-200"
@@ -145,26 +145,26 @@ export function ColorCard({
       </div>
 
       {/* 2. Color Details and Color Space Values */}
-      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-[#17212a] text-[#fafbfc]">
         <div>
-          <h3 className="font-bold text-sm text-foreground font-mono" title={displayName}>
+          <h3 className="font-bold text-sm text-[#fafbfc] font-mono" title={displayName}>
             {displayName}
           </h3>
 
           {/* Values Grid */}
           <div className="grid grid-cols-2 gap-2 mt-3 text-xs font-mono">
             {/* RGB */}
-            <div className="p-2 rounded-[2px] bg-neutral-900 border border-border/40">
-              <span className="text-[10px] uppercase text-muted-foreground block">RGB</span>
-              <span className="text-foreground text-[11px] font-semibold">
+            <div className="p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)]">
+              <span className="text-[10px] uppercase text-[#96abbe] block">RGB</span>
+              <span className="text-[#fafbfc] text-[11px] font-semibold">
                 {color.rgb || "—"}
               </span>
             </div>
 
             {/* CMYK */}
-            <div className="p-2 rounded-[2px] bg-neutral-900 border border-border/40">
-              <span className="text-[10px] uppercase text-muted-foreground block">CMYK</span>
-              <span className="text-foreground text-[11px] font-semibold">
+            <div className="p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)]">
+              <span className="text-[10px] uppercase text-[#96abbe] block">CMYK</span>
+              <span className="text-[#fafbfc] text-[11px] font-semibold">
                 {hasCmyk
                   ? `${color.cmykC ?? 0}, ${color.cmykM ?? 0}, ${color.cmykY ?? 0}, ${color.cmykK ?? 0}`
                   : "—"}
@@ -172,17 +172,17 @@ export function ColorCard({
             </div>
 
             {/* RAL */}
-            <div className="p-2 rounded-[2px] bg-neutral-900 border border-border/40">
-              <span className="text-[10px] uppercase text-muted-foreground block">RAL</span>
-              <span className="text-foreground text-[11px] font-semibold">
+            <div className="p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)]">
+              <span className="text-[10px] uppercase text-[#96abbe] block">RAL</span>
+              <span className="text-[#fafbfc] text-[11px] font-semibold">
                 {color.ral || "—"}
               </span>
             </div>
 
             {/* Pantone */}
-            <div className="p-2 rounded-[2px] bg-neutral-900 border border-border/40">
-              <span className="text-[10px] uppercase text-muted-foreground block">Pantone</span>
-              <span className="text-foreground text-[11px] font-semibold truncate block" title={color.pantoneC || color.pantoneU || ""}>
+            <div className="p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)]">
+              <span className="text-[10px] uppercase text-[#96abbe] block">Pantone</span>
+              <span className="text-[#fafbfc] text-[11px] font-semibold truncate block" title={color.pantoneC || color.pantoneU || ""}>
                 {color.pantoneC || color.pantoneU || color.pantoneTCX || "—"}
               </span>
             </div>
@@ -190,7 +190,7 @@ export function ColorCard({
         </div>
 
         {/* 3. Action Toolbar */}
-        <div className="pt-3 border-t border-border/30 flex items-center justify-between gap-1 text-xs">
+        <div className="pt-3 border-t border-[rgba(63,85,102,0.35)] flex items-center justify-between gap-1 text-xs">
           {/* Reordering arrows */}
           <div className="flex items-center gap-0.5">
             <Button
@@ -199,7 +199,7 @@ export function ColorCard({
               size="sm"
               disabled={index === 0}
               onClick={onMoveUp}
-              className="h-7 w-7 p-0 rounded-[2px] text-muted-foreground hover:text-foreground disabled:opacity-30"
+              className="h-7 w-7 p-0 rounded-[2px] text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.06] disabled:opacity-30 cursor-pointer"
               title="Posunúť vyššie v palete"
             >
               <ChevronUp className="h-4 w-4" />
@@ -210,7 +210,7 @@ export function ColorCard({
               size="sm"
               disabled={index === total - 1}
               onClick={onMoveDown}
-              className="h-7 w-7 p-0 rounded-[2px] text-muted-foreground hover:text-foreground disabled:opacity-30"
+              className="h-7 w-7 p-0 rounded-[2px] text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.06] disabled:opacity-30 cursor-pointer"
               title="Posunúť nižšie v palete"
             >
               <ChevronDown className="h-4 w-4" />
@@ -224,7 +224,7 @@ export function ColorCard({
               variant="outline"
               size="sm"
               onClick={() => onEdit(color)}
-              className="h-7 px-2.5 text-[11px] rounded-[2px] border-border/50 hover:border-[#c8d400]/60 hover:text-[#c8d400] gap-1"
+              className="h-7 px-2.5 text-[11px] rounded-[2px] border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc] hover:border-[#c8d400] hover:text-[#c8d400] gap-1 cursor-pointer"
             >
               <Pencil className="h-3 w-3" />
               <span>Upraviť</span>
@@ -235,7 +235,7 @@ export function ColorCard({
               size="sm"
               disabled={isDeleting}
               onClick={handleDelete}
-              className="h-7 w-7 p-0 rounded-[2px] text-muted-foreground hover:text-red-400"
+              className="h-7 w-7 p-0 rounded-[2px] text-[#96abbe] hover:text-red-400 hover:bg-red-500/10 cursor-pointer"
               title="Zmazať farbu"
             >
               <Trash2 className="h-3.5 w-3.5" />
