@@ -168,40 +168,40 @@ export function DimensionMatrixWizardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-[#fafbfc]"
+        className="bg-card border border-border rounded-[var(--brand-radius,6px)] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-card-foreground"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/40 shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-lg bg-primary/10 text-primary border border-primary/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#fafbfc]">
+              <h3 className="text-base font-bold text-foreground">
                 Sprievodca štruktúrou manuálu (Dimension Matrix)
               </h3>
-              <p className="text-[11px] text-[#96abbe]">
+              <p className="text-[11px] text-muted-foreground">
                 Nakonfigurujte zloženie identity a vygenerujte hotový manuál s blueprintmi za 1 sekundu
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#070b0f] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0e161d]">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-card">
           {error && (
-            <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
+            <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 text-xs flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -209,7 +209,7 @@ export function DimensionMatrixWizardModal({
 
           {/* Section 1: Reproduction Media */}
           <div className="space-y-2.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#fafbfc] flex items-center gap-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
               <span>1. Reprodukčné médiá a farebné priestory</span>
               <span className="text-[10px] text-primary font-mono">*</span>
             </label>
@@ -244,27 +244,27 @@ export function DimensionMatrixWizardModal({
                     className={`p-3.5 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between space-y-1.5 ${
                       isSelected
                         ? "border-primary bg-primary/10 shadow-2xs"
-                        : "border-[rgba(63,85,102,0.45)] bg-[#17212a] hover:bg-[#1f2c36] hover:border-[rgba(63,85,102,0.7)]"
+                        : "border-border bg-muted/20 hover:bg-muted/50 hover:border-border/80"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <IconComponent
-                          className={`w-4 h-4 ${isSelected ? "text-primary" : "text-[#96abbe]"}`}
+                          className={`w-4 h-4 ${isSelected ? "text-primary" : "text-muted-foreground"}`}
                         />
-                        <span className="text-xs font-bold text-[#fafbfc]">{item.label}</span>
+                        <span className="text-xs font-bold text-foreground">{item.label}</span>
                       </div>
                       <div
                         className={`w-4 h-4 rounded flex items-center justify-center border ${
                           isSelected
                             ? "bg-primary border-primary text-primary-foreground"
-                            : "border-[rgba(63,85,102,0.6)] bg-[#070b0f]"
+                            : "border-border bg-background"
                         }`}
                       >
                         {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
                       </div>
                     </div>
-                    <p className="text-[11px] text-[#96abbe] leading-relaxed">{item.desc}</p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
                   </button>
                 );
               })}
@@ -273,7 +273,7 @@ export function DimensionMatrixWizardModal({
 
           {/* Section 2: Logo Orientations */}
           <div className="space-y-2.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#fafbfc] flex items-center gap-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
               <span>2. Orientácie a kompozície loga</span>
               <span className="text-[10px] text-primary font-mono">*</span>
             </label>
@@ -307,25 +307,25 @@ export function DimensionMatrixWizardModal({
                     className={`p-3.5 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between space-y-1.5 ${
                       isSelected
                         ? "border-primary bg-primary/10 shadow-2xs"
-                        : "border-[rgba(63,85,102,0.45)] bg-[#17212a] hover:bg-[#1f2c36] hover:border-[rgba(63,85,102,0.7)]"
+                        : "border-border bg-muted/20 hover:bg-muted/50 hover:border-border/80"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-xs font-bold text-[#fafbfc]">{item.label}</div>
+                        <div className="text-xs font-bold text-foreground">{item.label}</div>
                         <div className="text-[10px] font-mono text-primary">{item.sub}</div>
                       </div>
                       <div
                         className={`w-4 h-4 rounded flex items-center justify-center border ${
                           isSelected
                             ? "bg-primary border-primary text-primary-foreground"
-                            : "border-[rgba(63,85,102,0.6)] bg-[#070b0f]"
+                            : "border-border bg-background"
                         }`}
                       >
                         {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
                       </div>
                     </div>
-                    <p className="text-[11px] text-[#96abbe] leading-relaxed">{item.desc}</p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">{item.desc}</p>
                   </button>
                 );
               })}
@@ -333,13 +333,13 @@ export function DimensionMatrixWizardModal({
           </div>
 
           {/* Section 3: Claim Option with Symbol Exclusion Notice */}
-          <div className="p-3.5 rounded-lg border border-[rgba(63,85,102,0.45)] bg-[#17212a] space-y-2">
+          <div className="p-3.5 rounded-lg border border-border bg-muted/20 space-y-2">
             <label className="flex items-center justify-between cursor-pointer">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-[#fafbfc]">
+                <span className="text-xs font-bold text-foreground">
                   3. Verzia s claimom / sloganom (Claim Option)
                 </span>
-                <p className="text-[11px] text-[#96abbe]">
+                <p className="text-[11px] text-muted-foreground">
                   Rozdelí horizontálne a vertikálne varianty na vetvy Základná a S claimom.
                 </p>
               </div>
@@ -347,12 +347,12 @@ export function DimensionMatrixWizardModal({
                 type="checkbox"
                 checked={hasClaimOption}
                 onChange={(e) => setHasClaimOption(e.target.checked)}
-                className="w-4 h-4 rounded border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-primary focus:ring-0 cursor-pointer"
+                className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
               />
             </label>
 
             {/* Symbol Exclusion Rule Badge */}
-            <div className="flex items-center gap-1.5 text-[10px] text-[#96abbe] bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)] font-mono">
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/50 p-2 rounded border border-border/60 font-mono">
               <Info className="w-3 h-3 text-primary shrink-0" />
               <span>
                 Pravidlo integrity: Samostatný symbol sa z princípu generuje výhradne bez claimu.
@@ -362,7 +362,7 @@ export function DimensionMatrixWizardModal({
 
           {/* Section 4: Additional Core Chapters */}
           <div className="space-y-2.5">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#fafbfc]">
+            <label className="text-xs font-bold uppercase tracking-wider text-foreground">
               4. Doplnkové základné kapitoly identity
             </label>
             <div className="grid sm:grid-cols-3 gap-2.5">
@@ -370,21 +370,21 @@ export function DimensionMatrixWizardModal({
                 className={`p-3 rounded-lg border text-left cursor-pointer flex items-center justify-between transition-all ${
                   includeColorsPage
                     ? "border-primary/60 bg-primary/10"
-                    : "border-[rgba(63,85,102,0.45)] bg-[#17212a] opacity-75"
+                    : "border-border bg-muted/20 opacity-75"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <Palette className="w-4 h-4 text-primary" />
                   <div>
-                    <span className="text-xs font-bold text-[#fafbfc]">Farby</span>
-                    <p className="text-[10px] text-[#96abbe]">Paleta, HSLuv odtiene</p>
+                    <span className="text-xs font-bold text-foreground">Farby</span>
+                    <p className="text-[10px] text-muted-foreground">Paleta, HSLuv odtiene</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeColorsPage}
                   onChange={(e) => setIncludeColorsPage(e.target.checked)}
-                  className="w-4 h-4 rounded border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-primary focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
                 />
               </label>
 
@@ -392,21 +392,21 @@ export function DimensionMatrixWizardModal({
                 className={`p-3 rounded-lg border text-left cursor-pointer flex items-center justify-between transition-all ${
                   includeTypographyPage
                     ? "border-primary/60 bg-primary/10"
-                    : "border-[rgba(63,85,102,0.45)] bg-[#17212a] opacity-75"
+                    : "border-border bg-muted/20 opacity-75"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <Type className="w-4 h-4 text-primary" />
                   <div>
-                    <span className="text-xs font-bold text-[#fafbfc]">Typografia</span>
-                    <p className="text-[10px] text-[#96abbe]">Rezy, type-tester</p>
+                    <span className="text-xs font-bold text-foreground">Typografia</span>
+                    <p className="text-[10px] text-muted-foreground">Rezy, type-tester</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeTypographyPage}
                   onChange={(e) => setIncludeTypographyPage(e.target.checked)}
-                  className="w-4 h-4 rounded border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-primary focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
                 />
               </label>
 
@@ -414,21 +414,21 @@ export function DimensionMatrixWizardModal({
                 className={`p-3 rounded-lg border text-left cursor-pointer flex items-center justify-between transition-all ${
                   includeIntroPage
                     ? "border-primary/60 bg-primary/10"
-                    : "border-[rgba(63,85,102,0.45)] bg-[#17212a] opacity-75"
+                    : "border-border bg-muted/20 opacity-75"
                 }`}
               >
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-primary" />
                   <div>
-                    <span className="text-xs font-bold text-[#fafbfc]">Úvod</span>
-                    <p className="text-[10px] text-[#96abbe]">Banner a poslanie</p>
+                    <span className="text-xs font-bold text-foreground">Úvod</span>
+                    <p className="text-[10px] text-muted-foreground">Banner a poslanie</p>
                   </div>
                 </div>
                 <input
                   type="checkbox"
                   checked={includeIntroPage}
                   onChange={(e) => setIncludeIntroPage(e.target.checked)}
-                  className="w-4 h-4 rounded border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-primary focus:ring-0 cursor-pointer"
+                  className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
                 />
               </label>
             </div>
@@ -441,15 +441,15 @@ export function DimensionMatrixWizardModal({
                 <Sparkles className="w-3.5 h-3.5" />
                 Matematika generátora (Dimension Matrix Engine)
               </span>
-              <p className="text-[11px] text-[#96abbe]">
+              <p className="text-[11px] text-muted-foreground">
                 Inkrementálny beh: existujúce stránky nebudú prepísané, vytvoria sa len chýbajúce vetvy.
               </p>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-sm font-mono font-bold text-[#fafbfc]">
+              <div className="text-sm font-mono font-bold text-foreground">
                 ~{stats.pagesCount} stránok
               </div>
-              <div className="text-[10px] font-mono text-[#96abbe]">
+              <div className="text-[10px] font-mono text-muted-foreground">
                 ~{stats.modulesCount} modulov
               </div>
             </div>
@@ -457,8 +457,8 @@ export function DimensionMatrixWizardModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] shrink-0">
-          <span className="text-xs text-[#96abbe] font-mono">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/30 shrink-0">
+          <span className="text-xs text-muted-foreground font-mono">
             {brandName} · Generator
           </span>
           <div className="flex items-center gap-2">
@@ -466,7 +466,7 @@ export function DimensionMatrixWizardModal({
               type="button"
               onClick={onClose}
               disabled={isGenerating}
-              className="px-4 py-2 text-xs font-medium rounded-md hover:bg-[#070b0f] text-[#96abbe] hover:text-[#fafbfc] cursor-pointer"
+              className="px-4 py-2 text-xs font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
             >
               Zrušiť
             </button>

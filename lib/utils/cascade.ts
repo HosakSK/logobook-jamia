@@ -96,44 +96,46 @@ export function computeBrandCssVariables(
   // Determine sub-surface / muted well color with contrast
   const mutedSurface = theme.isDark
     ? (theme.bgColor === "#070b0f" ? "#0e161d" : "#070b0f")
-    : (theme.bgColor === "#fafbfc" ? "#eef2f6" : "#f1f4f7");
+    : "#f1f5f9";
 
-    const primaryContrast = getWcagContrast(theme.primaryColor);
-    const primaryFg = primaryContrast.preferredText === "white" ? "#fafbfc" : "#070b0f";
+  const primaryContrast = getWcagContrast(theme.primaryColor);
+  const primaryFg = primaryContrast.preferredText === "white" ? "#fafbfc" : "#070b0f";
 
-    return {
-      "--brand-radius": radiusValue,
-      "--brand-radius-mode": radiusMode,
-      "--brand-border-width": borderWidthValue,
-      "--radius": radiusValue,
-      "--radius-element": radiusValue,
-      "--radius-card": radiusValue,
-      "--brand-color-primary": theme.primaryColor,
-      "--brand-color-secondary": secondary,
-      "--brand-color-accent": theme.accentColor,
-      "--brand-color-neutral": neutral,
-      "--brand-color-success": success,
-      "--brand-color-warning": warning,
-      "--brand-color-danger": danger,
-      "--brand-color-info": info,
-      "--brand-font-heading": headingFont,
-      "--brand-font-body": bodyFont,
-      "--brand-manual-bg": theme.bgColor,
+  const secondarySurface = theme.isDark ? theme.surfaceColor : "#f1f5f9";
 
-      // Adaptive Theme Variables (Fixes white text on white bg & sets card/border styles)
-      "--background": theme.bgColor,
-      "--foreground": theme.textColor,
-      "--card": theme.surfaceColor,
-      "--card-foreground": theme.textColor,
-      "--popover": theme.surfaceColor,
-      "--popover-foreground": theme.textColor,
-      "--muted": mutedSurface,
-      "--muted-foreground": theme.mutedColor,
-      "--secondary": theme.surfaceColor,
-      "--secondary-foreground": theme.textColor,
-      "--border": theme.borderColor,
-      "--primary": theme.primaryColor,
-      "--primary-foreground": primaryFg,
+  return {
+    "--brand-radius": radiusValue,
+    "--brand-radius-mode": radiusMode,
+    "--brand-border-width": borderWidthValue,
+    "--radius": radiusValue,
+    "--radius-element": radiusValue,
+    "--radius-card": radiusValue,
+    "--brand-color-primary": theme.primaryColor,
+    "--brand-color-secondary": secondary,
+    "--brand-color-accent": theme.accentColor,
+    "--brand-color-neutral": neutral,
+    "--brand-color-success": success,
+    "--brand-color-warning": warning,
+    "--brand-color-danger": danger,
+    "--brand-color-info": info,
+    "--brand-font-heading": headingFont,
+    "--brand-font-body": bodyFont,
+    "--brand-manual-bg": theme.bgColor,
+
+    // Adaptive Theme Variables (Fixes white text on white bg & sets card/border styles)
+    "--background": theme.bgColor,
+    "--foreground": theme.textColor,
+    "--card": theme.surfaceColor,
+    "--card-foreground": theme.textColor,
+    "--popover": theme.surfaceColor,
+    "--popover-foreground": theme.textColor,
+    "--muted": mutedSurface,
+    "--muted-foreground": theme.mutedColor,
+    "--secondary": secondarySurface,
+    "--secondary-foreground": theme.textColor,
+    "--border": theme.borderColor,
+    "--primary": theme.primaryColor,
+    "--primary-foreground": primaryFg,
 
     // Brand theme aliases
     "--brand-card-bg": theme.surfaceColor,

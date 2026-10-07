@@ -64,27 +64,27 @@ export const PRESET_THEMES: Record<Exclude<ManualThemeId, "custom">, ManualTheme
   },
   paper: {
     id: "paper",
-    name: { sk: "Light Canvas (Jemný papier)", en: "Light Canvas (Soft Paper)" },
-    description: { sk: "Mäkký svetlý podklad pre čistú a elegantnú prezentáciu", en: "Soft light canvas for clean and elegant presentation" },
+    name: { sk: "Light Canvas (Svetlý papier)", en: "Light Canvas (Clean Paper)" },
+    description: { sk: "Čistý svieži svetlý podklad so snehobielymi kartami", en: "Crisp light canvas with pure white cards" },
     isDark: false,
     bgColor: "#fafbfc",
-    surfaceColor: "#f1f4f7",
+    surfaceColor: "#ffffff",
     textColor: "#0e161d",
-    mutedColor: "#587489",
-    borderColor: "#bac8d6",
+    mutedColor: "#64748b",
+    borderColor: "#e2e8f0",
     primaryColor: "#c8d400",
     accentColor: "#009f80",
   },
   mist: {
     id: "mist",
-    name: { sk: "Cool Mist (Chladná hmla)", en: "Cool Mist (Subtle Gray)" },
-    description: { sk: "Chladný sivastý podklad so svetlým povrchom kariet", en: "Cool subtle gray backdrop with light card surfaces" },
+    name: { sk: "Cool Mist (Chladná hmla)", en: "Cool Mist (Subtle Slate)" },
+    description: { sk: "Jemný chladný podklad so snehobielymi kartami", en: "Subtle cool backdrop with pure white cards" },
     isDark: false,
-    bgColor: "#eef2f6",
-    surfaceColor: "#fafbfc",
+    bgColor: "#f8fafc",
+    surfaceColor: "#ffffff",
     textColor: "#0e161d",
-    mutedColor: "#587489",
-    borderColor: "#bac8d6",
+    mutedColor: "#64748b",
+    borderColor: "#e2e8f0",
     primaryColor: "#009f80",
     accentColor: "#bb4934",
   },
@@ -149,9 +149,9 @@ export function resolveManualTheme(
     }
 
     const textColor = custom.textColor || (isDark ? "#fafbfc" : "#0e161d");
-    const surfaceColor = custom.surfaceColor || (isDark ? "#17212a" : "#f1f4f7");
-    const mutedColor = custom.mutedColor || (isDark ? "#96abbe" : "#587489");
-    const borderColor = custom.borderColor || (isDark ? "rgba(63, 85, 102, 0.45)" : "#bac8d6");
+    const surfaceColor = custom.surfaceColor || (isDark ? "#17212a" : "#ffffff");
+    const mutedColor = custom.mutedColor || (isDark ? "#96abbe" : "#64748b");
+    const borderColor = custom.borderColor || (isDark ? "rgba(63, 85, 102, 0.45)" : "#e2e8f0");
     const primaryColor = custom.primaryColor || brandPrimary;
     const accentColor = custom.accentColor || brandAccent;
 

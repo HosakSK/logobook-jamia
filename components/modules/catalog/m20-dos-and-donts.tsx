@@ -457,7 +457,7 @@ export default function M20DosAndDontsModule({
             onClick={() => setActiveFilter("do")}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
               activeFilter === "do"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40"
                 : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -473,7 +473,7 @@ export default function M20DosAndDontsModule({
             onClick={() => setActiveFilter("dont")}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
               activeFilter === "dont"
-                ? "bg-rose-500/20 text-rose-400 border border-rose-500/40"
+                ? "bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/40"
                 : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -490,7 +490,7 @@ export default function M20DosAndDontsModule({
               onClick={() => setActiveFilter("warning")}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
                 activeFilter === "warning"
-                  ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
+                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/40"
                   : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
               }`}
             >

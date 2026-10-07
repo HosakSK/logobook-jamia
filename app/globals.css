@@ -111,34 +111,34 @@
     --ring: rgba(200, 212, 0, 0.4);
   }
 
-  /* Context 2: Light UI (Default for Logobook detail presentation) - strictly 6 design rules colors */
-  .theme-light, [data-context="logobook"], [data-theme="light"] {
+  /* Context 2: Light UI (Default for Logobook detail presentation) - crisp modern startup tokens */
+  .light, .theme-light, [data-context="logobook"], [data-theme="light"] {
     --background: #fafbfc;
     --foreground: #0e161d;
-    --card: #f1f4f7;
+    --card: #ffffff;
     --card-foreground: #0e161d;
-    --popover: #f1f4f7;
+    --popover: #ffffff;
     --popover-foreground: #0e161d;
     --primary: #c8d400;
     --primary-foreground: #070b0f;
-    --secondary: #f1f4f7;
+    --secondary: #f1f5f9;
     --secondary-foreground: #0e161d;
-    --muted: #eef2f6;
-    --muted-foreground: #587489;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
     --accent: #009f80;
-    --accent-foreground: #fafbfc;
+    --accent-foreground: #ffffff;
     --destructive: #bb4934;
     --destructive-foreground: #ffffff;
-    --border: #bac8d6;
-    --input: #fafbfc;
+    --border: #e2e8f0;
+    --input: #ffffff;
     --ring: rgba(200, 212, 0, 0.4);
 
     --bg-page-start: #fafbfc;
-    --bg-page-end: #eef2f6;
-    --bg-card: #f1f4f7;
-    --bg-card-hover: #fafbfc;
-    --bg-elevated: #eef2f6;
-    --shadow-card: 0 4px 20px -2px rgba(14, 22, 29, 0.06), 0 1px 3px rgba(14, 22, 29, 0.03);
+    --bg-page-end: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --bg-elevated: #ffffff;
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   }
 }
 

@@ -40,12 +40,12 @@ import { MediaAsset } from "@/lib/types/media";
 
 // Format visual badges configuration
 const FORMAT_BADGES: Record<string, { label: string; colorClass: string }> = {
-  SVG: { label: ".SVG", colorClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
-  PDF: { label: ".PDF", colorClass: "bg-rose-500/15 text-rose-400 border-rose-500/30" },
-  EPS: { label: ".EPS", colorClass: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
-  AI: { label: ".AI", colorClass: "bg-amber-500/15 text-amber-400 border-amber-500/30" },
-  PNG: { label: ".PNG", colorClass: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30" },
-  JPG: { label: ".JPG", colorClass: "bg-neutral-500/15 text-neutral-400 border-neutral-500/30" },
+  SVG: { label: ".SVG", colorClass: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30" },
+  PDF: { label: ".PDF", colorClass: "bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30" },
+  EPS: { label: ".EPS", colorClass: "bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-500/30" },
+  AI: { label: ".AI", colorClass: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30" },
+  PNG: { label: ".PNG", colorClass: "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border-cyan-500/30" },
+  JPG: { label: ".JPG", colorClass: "bg-neutral-500/15 text-neutral-600 dark:text-neutral-400 border-neutral-500/30" },
 };
 
 export default function M07ZobrazenieLogaModule({
@@ -450,7 +450,7 @@ export default function M07ZobrazenieLogaModule({
               return (
                 <div
                   key={fmt.id}
-                  className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4 transition-colors hover:bg-neutral-900/30 px-2 rounded-[2px]"
+                  className="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-4 transition-colors hover:bg-muted/50 px-2 rounded-[2px]"
                 >
                   {/* Left: Badge & Description */}
                   <div className="flex items-start gap-3 min-w-0">

@@ -625,12 +625,12 @@ export function BuilderTreeSidebar({
                 {activeMenuId === node.id && (
                   <div
                     ref={menuRef}
-                    className="absolute right-0 top-full mt-1 w-48 bg-neutral-900 border border-border/80 rounded-[3px] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
+                    className="absolute right-0 top-full mt-1 w-48 bg-popover text-popover-foreground border border-border rounded-[3px] shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
                   >
                     <button
                       type="button"
                       onClick={() => handleOpenAddSubpage(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
                     >
                       <FolderPlus className="h-3.5 w-3.5 text-primary" />
                       <span>Pridať podstránku</span>
@@ -639,7 +639,7 @@ export function BuilderTreeSidebar({
                     <button
                       type="button"
                       onClick={() => handleOpenRename(node)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
                     >
                       <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
                       <span>Premenovať</span>
@@ -648,7 +648,7 @@ export function BuilderTreeSidebar({
                     <button
                       type="button"
                       onClick={() => handleDuplicatePage(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
                     >
                       <Copy className="h-3.5 w-3.5 text-muted-foreground" />
                       <span>Duplikovať</span>
@@ -657,11 +657,11 @@ export function BuilderTreeSidebar({
                     <button
                       type="button"
                       onClick={() => handleToggleVisibility(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-neutral-800/80 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
                     >
                       {node.menuStyle === "hidden" ? (
                         <>
-                          <Eye className="h-3.5 w-3.5 text-emerald-400" />
+                          <Eye className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                           <span>Zobraziť v menu</span>
                         </>
                       ) : (
@@ -677,7 +677,7 @@ export function BuilderTreeSidebar({
                     <button
                       type="button"
                       onClick={() => handleDeletePage(node.id, getPageTitle(node))}
-                      className="w-full text-left px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-950/40 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-rose-500 hover:bg-rose-500/10 flex items-center gap-2"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       <span>Zmazať {hasChildren ? "kapitolu" : "stránku"}</span>
@@ -705,15 +705,15 @@ export function BuilderTreeSidebar({
   };
 
   return (
-    <aside className="w-full md:w-72 bg-[#17212a] border border-white/10 rounded-[6px] p-4 flex flex-col gap-4 shadow-sm text-[#fafbfc]">
+    <aside className="w-full md:w-72 bg-card border border-border rounded-[var(--brand-radius,6px)] p-4 flex flex-col gap-4 shadow-sm text-card-foreground">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+      <div className="flex items-center justify-between pb-3 border-b border-border">
         <div className="flex items-center gap-2">
           <FolderTree className="h-4 w-4 text-primary" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[#fafbfc]">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
             Strom Stránok
           </h2>
-          <span className="text-[10px] font-mono text-[#96abbe] px-1.5 py-0.2 rounded-full bg-[#070b0f] border border-white/10">
+          <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.2 rounded-full bg-muted border border-border">
             {pages.length}
           </span>
           {isUpdatingTree && (
@@ -759,7 +759,7 @@ export function BuilderTreeSidebar({
       {isCreating && (
         <form
           onSubmit={handleCreatePage}
-          className="p-3 rounded-[3px] bg-neutral-950/80 border border-primary/40 space-y-3 shadow-md"
+          className="p-3 rounded-[3px] bg-muted/40 border border-primary/40 space-y-3 shadow-md"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-foreground">
@@ -817,7 +817,7 @@ export function BuilderTreeSidebar({
               <select
                 value={newParentId}
                 onChange={(e) => setNewParentId(e.target.value)}
-                className="w-full h-7 rounded-[2px] bg-neutral-900 border border-border/50 text-xs px-2 text-foreground font-sans"
+                className="w-full h-7 rounded-[2px] bg-background border border-border text-xs px-2 text-foreground font-sans"
               >
                 <option value="">— Hlavná úroveň (Kapitola) —</option>
                 {renderParentOptions(localTree)}

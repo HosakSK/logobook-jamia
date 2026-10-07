@@ -91,16 +91,16 @@ export function BrandShapesForm({
     initialCustom.bgColor || initialShapes?.manualBgColor || "#fafbfc"
   );
   const [customSurface, setCustomSurface] = useState<string>(
-    initialCustom.surfaceColor || "#f1f4f7"
+    initialCustom.surfaceColor || "#ffffff"
   );
   const [customText, setCustomText] = useState<string>(
     initialCustom.textColor || "#0e161d"
   );
   const [customMuted, setCustomMuted] = useState<string>(
-    initialCustom.mutedColor || "#587489"
+    initialCustom.mutedColor || "#64748b"
   );
   const [customBorder, setCustomBorder] = useState<string>(
-    initialCustom.borderColor || "#bac8d6"
+    initialCustom.borderColor || "#e2e8f0"
   );
   const [customPrimary, setCustomPrimary] = useState<string>(
     initialCustom.primaryColor || "#c8d400"

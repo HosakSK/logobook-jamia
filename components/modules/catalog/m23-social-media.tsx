@@ -580,7 +580,7 @@ export default function M23SocialMediaModule({
               <span>{isAll ? "Všetky formáty" : info?.label || plat}</span>
               <span
                 className={`text-[10px] font-mono px-1 rounded ${
-                  activeTab === plat ? "bg-black/20 text-white" : "bg-black/30 text-muted-foreground"
+                  activeTab === plat ? "bg-black/15 text-primary-foreground font-bold" : "bg-muted text-muted-foreground"
                 }`}
               >
                 {count}

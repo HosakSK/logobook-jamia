@@ -589,7 +589,7 @@ export function BuilderCanvas({
 
           <div className="flex items-center gap-2">
             {/* Active Canvas Language Switcher (EN Primary) */}
-            <div className="flex items-center gap-1 bg-neutral-900 border border-border/50 rounded-[2px] p-0.5">
+            <div className="flex items-center gap-1 bg-muted border border-border/50 rounded-[2px] p-0.5">
               <Globe className="h-3 w-3 text-muted-foreground ml-1.5 mr-0.5" />
               {[
                 { code: "en", label: "EN" },
@@ -603,7 +603,7 @@ export function BuilderCanvas({
                   className={`px-2 py-0.5 text-xs font-mono rounded-[2px] transition-colors ${
                     activeLocale === l.code
                       ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
                   }`}
                   title={`Prepnúť editáciu a náhľad do jazyka ${l.label}`}
                 >
@@ -631,8 +631,7 @@ export function BuilderCanvas({
                     onClick={() => setIsTemplatesMenuOpen(false)}
                   />
                   <div
-                    className="absolute right-0 top-full mt-1.5 z-40 w-56 border border-[rgba(63,85,102,0.6)] rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc] overflow-hidden"
-                    style={{ backgroundColor: "#0e161d" }}
+                    className="absolute right-0 top-full mt-1.5 z-40 w-56 border border-border rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 bg-popover text-popover-foreground overflow-hidden"
                   >
                     <button
                       type="button"
@@ -640,12 +639,12 @@ export function BuilderCanvas({
                         setIsTemplatesMenuOpen(false);
                         setIsTemplateBrowserOpen(true);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#17212a] flex items-center gap-2.5 text-[#fafbfc] cursor-pointer transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-muted flex items-center gap-2.5 text-foreground cursor-pointer transition-colors"
                     >
                       <Sparkles className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold text-[#fafbfc]">Galéria šablón</div>
-                        <div className="text-[10px] text-[#96abbe]">Načítať hotové rozloženie</div>
+                        <div className="font-semibold text-foreground">Galéria šablón</div>
+                        <div className="text-[10px] text-muted-foreground">Načítať hotové rozloženie</div>
                       </div>
                     </button>
 
@@ -656,12 +655,12 @@ export function BuilderCanvas({
                         setIsTemplatesMenuOpen(false);
                         setIsSaveTemplateOpen(true);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#17212a] flex items-center gap-2.5 text-[#fafbfc] disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-white/10 transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-muted flex items-center gap-2.5 text-foreground disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-border transition-colors"
                     >
                       <BookmarkPlus className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold text-[#fafbfc]">Uložiť ako šablónu</div>
-                        <div className="text-[10px] text-[#96abbe]">Uložiť celú túto stránku</div>
+                        <div className="font-semibold text-foreground">Uložiť ako šablónu</div>
+                        <div className="text-[10px] text-muted-foreground">Uložiť celú túto stránku</div>
                       </div>
                     </button>
                   </div>
@@ -767,15 +766,14 @@ export function BuilderCanvas({
 
                 {/* Floating Hover Toolbar */}
                 <div
-                  className="opacity-0 group-hover/container:opacity-100 transition-opacity flex items-center gap-1 border border-white/25 rounded-[var(--brand-radius,6px)] p-1 shadow-xl text-[#fafbfc]"
-                  style={{ backgroundColor: "#070b0f", color: "#fafbfc" }}
+                  className="opacity-0 group-hover/container:opacity-100 transition-opacity flex items-center gap-1 border border-border rounded-[var(--brand-radius,6px)] p-1 shadow-lg bg-popover text-popover-foreground"
                 >
                   {/* Move Up */}
                   <button
                     type="button"
                     disabled={cIdx === 0}
                     onClick={() => handleMoveContainer(container.id, "up")}
-                    className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
+                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                     title="Posunúť riadok vyššie"
                   >
                     <ChevronUp className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -786,13 +784,13 @@ export function BuilderCanvas({
                     type="button"
                     disabled={cIdx === page.containers.length - 1}
                     onClick={() => handleMoveContainer(container.id, "down")}
-                    className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
+                    className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                     title="Posunúť riadok nižšie"
                   >
                     <ChevronDown className="h-3.5 w-3.5 stroke-[2.2]" />
                   </button>
 
-                  <div className="w-[1px] h-3.5 bg-white/20 my-auto mx-0.5" />
+                  <div className="w-[1px] h-3.5 bg-border my-auto mx-0.5" />
 
                   {/* Layout Preset Dropdown Trigger */}
                   <div className="relative">
@@ -803,7 +801,7 @@ export function BuilderCanvas({
                           activeLayoutMenuContainerId === container.id ? null : container.id
                         )
                       }
-                      className="p-1 text-[#fafbfc] hover:text-primary hover:bg-white/15 rounded-[2px] transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
+                      className="p-1 text-muted-foreground hover:text-primary hover:bg-muted rounded-[2px] transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
                       title="Zmeniť rozloženie stĺpcov"
                     >
                       <LayoutGrid className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -813,10 +811,9 @@ export function BuilderCanvas({
                     {/* Layout Dropdown Menu */}
                     {activeLayoutMenuContainerId === container.id && (
                       <div
-                        className="absolute right-0 top-full mt-1.5 w-56 bg-[#0e161d] border border-white/20 rounded-[var(--brand-radius,6px)] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc]"
-                        style={{ backgroundColor: "#0e161d" }}
+                        className="absolute right-0 top-full mt-1.5 w-56 bg-popover border border-border rounded-[var(--brand-radius,6px)] shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-popover-foreground"
                       >
-                        <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-[#96abbe] border-b border-white/10">
+                        <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-muted-foreground border-b border-border/60">
                           Zvoľte mriežku stĺpcov
                         </div>
                         {LAYOUT_PRESETS.map((preset) => (
@@ -824,10 +821,10 @@ export function BuilderCanvas({
                             key={preset.type}
                             type="button"
                             onClick={() => handleUpdateContainerLayout(container.id, preset.type)}
-                            className={`w-full text-left px-3 py-2 text-xs hover:bg-[#17212a] flex items-center justify-between gap-2 cursor-pointer transition-colors ${
+                            className={`w-full text-left px-3 py-2 text-xs hover:bg-muted flex items-center justify-between gap-2 cursor-pointer transition-colors ${
                               container.layoutType === preset.type
                                 ? "text-primary font-bold bg-primary/10"
-                                : "text-[#fafbfc]"
+                                : "text-foreground"
                             }`}
                           >
                             <span>{preset.label}</span>
@@ -881,7 +878,7 @@ export function BuilderCanvas({
                     className="text-lg font-bold tracking-tight text-foreground"
                     placeholder="Sem zadajte názov sekcie (H2)..."
                   />
-                  <span className="text-[10px] uppercase font-mono text-muted-foreground px-1.5 py-0.5 rounded-[1px] bg-neutral-900 border border-border/40">
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground px-1.5 py-0.5 rounded-[1px] bg-muted border border-border/40">
                     Sekcia H2
                   </span>
                 </div>
@@ -936,17 +933,16 @@ export function BuilderCanvas({
                               borderRadius: "var(--brand-radius, 8px)",
                             }}
                           >
-                            {/* Module Hover Toolbar (High Contrast Inverted Toolbar) */}
+                            {/* Module Hover Toolbar */}
                             <div
-                              className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity border border-white/25 rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-xl text-[#fafbfc]"
-                              style={{ backgroundColor: "#070b0f", color: "#fafbfc" }}
+                              className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity border border-border rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-lg bg-popover text-popover-foreground"
                             >
                               {/* Move Up */}
                               <button
                                 type="button"
                                 disabled={mIdx === 0}
                                 onClick={() => handleMoveModule(mod.id, "up")}
-                                className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
+                                className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                                 title="Posunúť modul vyššie"
                               >
                                 <ChevronUp className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -957,44 +953,44 @@ export function BuilderCanvas({
                                 type="button"
                                 disabled={mIdx === column.modules.length - 1}
                                 onClick={() => handleMoveModule(mod.id, "down")}
-                                className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
+                                className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                                 title="Posunúť modul nižšie"
                               >
                                 <ChevronDown className="h-3.5 w-3.5 stroke-[2.2]" />
                               </button>
 
-                              <div className="w-[1px] h-3.5 bg-white/20 my-auto mx-0.5" />
+                              <div className="w-[1px] h-3.5 bg-border my-auto mx-0.5" />
 
                               {/* Linked Sync indicator / Link button */}
                               {mod.linkGroupId ? (
                                 <button
                                   type="button"
                                   onClick={() => handleUnlinkModule(mod.id)}
-                                  className="px-1.5 py-0.5 text-[10px] font-mono text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-[2px] flex items-center gap-1 transition-colors cursor-pointer"
+                                  className="px-1.5 py-0.5 text-[10px] font-mono text-amber-600 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-[2px] flex items-center gap-1 transition-colors cursor-pointer"
                                   title={`Modul je zrkadlený v skupine "${mod.linkGroupId}". Kliknite pre odpojenie.`}
                                 >
-                                  <Link2 className="h-3 w-3 text-amber-300" />
+                                  <Link2 className="h-3 w-3 text-amber-600 dark:text-amber-300" />
                                   <span>{mod.linkGroupId}</span>
-                                  <Link2Off className="h-2.5 w-2.5 ml-0.5 opacity-60 hover:opacity-100 text-rose-400" />
+                                  <Link2Off className="h-2.5 w-2.5 ml-0.5 opacity-60 hover:opacity-100 text-rose-500" />
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   onClick={() => handleOpenLinkModal(mod.id)}
-                                  className="p-1 text-[#fafbfc] hover:text-amber-400 hover:bg-white/15 rounded-[2px] transition-colors flex items-center gap-1 text-[10px] cursor-pointer"
+                                  className="p-1 text-muted-foreground hover:text-amber-500 hover:bg-muted rounded-[2px] transition-colors flex items-center gap-1 text-[10px] cursor-pointer"
                                   title="Zrkadliť tento modul (Linked Sync)"
                                 >
                                   <Link2 className="h-3.5 w-3.5 stroke-[2.2]" />
                                 </button>
                               )}
 
-                              <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
+                              <div className="w-[1px] h-3 bg-border my-auto mx-0.5" />
 
                               {/* Settings / Config Modal */}
                               <button
                                 type="button"
                                 onClick={() => handleOpenSettings(mod)}
-                                className="p-1 text-[#fafbfc] hover:text-primary hover:bg-white/15 rounded-[2px] transition-colors cursor-pointer"
+                                className="p-1 text-muted-foreground hover:text-primary hover:bg-muted rounded-[2px] transition-colors cursor-pointer"
                                 title="Nastavenia a konfigurácia modulu"
                               >
                                 <Settings2 className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -1004,7 +1000,7 @@ export function BuilderCanvas({
                               <button
                                 type="button"
                                 onClick={() => handleDeleteModule(mod.id)}
-                                className="p-1 text-[#fafbfc] hover:text-rose-400 hover:bg-white/15 rounded-[2px] transition-colors cursor-pointer"
+                                className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-[2px] transition-colors cursor-pointer"
                                 title="Vymazať modul"
                               >
                                 <Trash2 className="h-3.5 w-3.5 stroke-[2.2]" />
@@ -1084,37 +1080,35 @@ export function BuilderCanvas({
       {/* Linked Sync Modal / Dialog */}
       {linkingModuleId && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
         >
           <div
-            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-[#fafbfc]"
-            style={{ backgroundColor: "#0e161d" }}
+            className="bg-card border border-border rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-card-foreground"
           >
-            <div className="flex items-center justify-between border-b border-[rgba(63,85,102,0.45)] pb-3">
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <Link2 className="h-4 w-4 text-amber-400" />
-                <h3 className="text-sm font-bold text-[#fafbfc]">
+                <Link2 className="h-4 w-4 text-amber-500" />
+                <h3 className="text-sm font-bold text-foreground">
                   Zrkadlenie modulu (Linked Sync)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setLinkingModuleId(null)}
-                className="text-xs text-[#96abbe] hover:text-[#fafbfc] p-1 cursor-pointer transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground p-1 cursor-pointer transition-colors"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-[#96abbe] leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Moduly so spoločným <strong>linkGroupId</strong> zdieľajú identický obsah. Úprava
               textu, farby alebo nastavenia v jednom module sa okamžite premietne do všetkých
               prepojených modulov v tomto brande.
             </p>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
+              <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
                 Identifikátor skupiny (linkGroupId)
               </Label>
               <Input
@@ -1123,7 +1117,7 @@ export function BuilderCanvas({
                 value={linkGroupInput}
                 onChange={(e) => setLinkGroupInput(e.target.value.toLowerCase())}
                 placeholder="napr. sync-logo-clearance"
-                className="h-9 text-xs font-mono rounded-[var(--brand-radius,6px)] bg-[#070b0f] border border-[rgba(63,85,102,0.5)] text-[#fafbfc] placeholder:text-[#96abbe] focus:border-primary"
+                className="h-9 text-xs font-mono rounded-[var(--brand-radius,6px)] bg-background border border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 autoFocus
               />
             </div>
@@ -1131,7 +1125,7 @@ export function BuilderCanvas({
             {/* List of existing brand groups */}
             {existingLinkGroups.length > 0 && (
               <div className="space-y-1.5 pt-1">
-                <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
+                <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
                   Alebo vyberte existujúcu skupinu:
                 </Label>
                 <div className="max-h-28 overflow-y-auto space-y-1 pr-1">
@@ -1140,10 +1134,10 @@ export function BuilderCanvas({
                       key={g.linkGroupId}
                       type="button"
                       onClick={() => setLinkGroupInput(g.linkGroupId)}
-                      className="w-full text-left px-2.5 py-1.5 rounded-[var(--brand-radius,4px)] bg-[#17212a] border border-[rgba(63,85,102,0.45)] hover:border-amber-500/60 text-xs flex items-center justify-between cursor-pointer transition-colors"
+                      className="w-full text-left px-2.5 py-1.5 rounded-[var(--brand-radius,4px)] bg-muted/50 border border-border hover:border-amber-500/60 text-xs flex items-center justify-between cursor-pointer transition-colors"
                     >
-                      <span className="font-mono text-amber-300">{g.linkGroupId}</span>
-                      <span className="text-[10px] text-[#96abbe]">
+                      <span className="font-mono text-amber-600 dark:text-amber-300">{g.linkGroupId}</span>
+                      <span className="text-[10px] text-muted-foreground">
                         {g.count} {g.count === 1 ? "modul" : "moduly"}
                       </span>
                     </button>
@@ -1152,13 +1146,13 @@ export function BuilderCanvas({
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[rgba(63,85,102,0.35)]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/60">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => setLinkingModuleId(null)}
-                className="h-8 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#17212a] rounded-[var(--brand-radius,4px)] cursor-pointer"
+                className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-[var(--brand-radius,4px)] cursor-pointer"
               >
                 Zrušiť
               </Button>
@@ -1167,7 +1161,7 @@ export function BuilderCanvas({
                 size="sm"
                 onClick={handleConfirmLink}
                 disabled={!linkGroupInput.trim()}
-                className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-amber-500 hover:bg-amber-600 text-black cursor-pointer"
+                className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
               >
                 Prepojiť modul
               </Button>
@@ -1188,18 +1182,15 @@ export function BuilderCanvas({
 
         return (
           <div
-            className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
           >
             <form
               onSubmit={handleSaveSettings}
-              className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
-              style={{ backgroundColor: "#0e161d" }}
+              className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-card-foreground"
             >
               {/* Modal Header */}
               <div
-                className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0 text-[#fafbfc]"
-                style={{ backgroundColor: "#17212a" }}
+                className="p-4 border-b border-border flex items-center justify-between bg-muted/40 shrink-0 text-foreground"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-[var(--brand-radius,4px)] bg-primary/10 border border-primary/20 text-primary">
@@ -1207,14 +1198,14 @@ export function BuilderCanvas({
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-[#fafbfc]">
+                      <h3 className="text-sm font-bold text-foreground">
                         {moduleTitle}
                       </h3>
-                      <span className="px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] text-[10px] font-medium bg-[#070b0f] text-[#96abbe] border border-[rgba(63,85,102,0.45)]">
+                      <span className="px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] text-[10px] font-medium bg-muted text-muted-foreground border border-border">
                         {moduleCat}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#96abbe]">
+                    <p className="text-[11px] text-muted-foreground">
                       Vizuálne prispôsobenie a nastavenia tohto stavebného bloku
                     </p>
                   </div>
@@ -1222,7 +1213,7 @@ export function BuilderCanvas({
                 <button
                   type="button"
                   onClick={() => setEditingModule(null)}
-                  className="p-1.5 text-[#96abbe] hover:text-[#fafbfc] rounded-[var(--brand-radius,4px)] hover:bg-[#1f2c36] transition-colors cursor-pointer"
+                  className="p-1.5 text-muted-foreground hover:text-foreground rounded-[var(--brand-radius,4px)] hover:bg-muted transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1230,8 +1221,7 @@ export function BuilderCanvas({
 
               {/* Scrollable Modal Content */}
               <div
-                className="p-5 overflow-y-auto space-y-5 flex-1 bg-[#0e161d]"
-                style={{ backgroundColor: "#0e161d" }}
+                className="p-5 overflow-y-auto space-y-5 flex-1 bg-card"
               >
                 {/* Linked Sync Warning Banner */}
                 {editingModule.linkGroupId && (
@@ -1250,7 +1240,7 @@ export function BuilderCanvas({
                 )}
 
                 {/* Sekcia 1: Záhlavie a Nadpis modulu (H3) */}
-                <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-3">
+                <div className="p-4 rounded-[var(--brand-radius,6px)] border border-border bg-muted/20 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
@@ -1296,7 +1286,7 @@ export function BuilderCanvas({
                 {/* Sekcia 2: Špecifické nastavenia podľa typu modulu */}
                 {/* M04 Rázcestník */}
                 {(editingModule.moduleType.startsWith("M04") || editingModule.moduleType === "M04_Razcestnik") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
+                  <div className="p-4 rounded-[var(--brand-radius,6px)] border border-border bg-muted/20 space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Rozloženie a správanie rázcestníka
@@ -1401,7 +1391,7 @@ export function BuilderCanvas({
 
                 {/* M10 Obrazová Galéria */}
                 {(editingModule.moduleType.startsWith("M10") || editingModule.moduleType === "M10_ObrazokGaleria") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
+                  <div className="p-4 rounded-[var(--brand-radius,6px)] border border-border bg-muted/20 space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Rozloženie fotogalérie
@@ -1544,7 +1534,7 @@ export function BuilderCanvas({
 
                 {/* M06 Oddelovac a medzera */}
                 {(editingModule.moduleType.startsWith("M06") || editingModule.moduleType === "M06_OddelovacMedzera") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
+                  <div className="p-4 rounded-[var(--brand-radius,6px)] border border-border bg-muted/20 space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Nastavenie rozostupu a linky
@@ -1649,7 +1639,7 @@ export function BuilderCanvas({
                 )}
 
                 {/* Sekcia 3: Vizuálny štýl karty modulu (Kaskáda štýlov) */}
-                <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
+                <div className="p-4 rounded-[var(--brand-radius,6px)] border border-border bg-muted/20 space-y-4">
                   <div className="border-b border-border/30 pb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Paintbrush className="h-4 w-4 text-primary" />
@@ -1663,7 +1653,7 @@ export function BuilderCanvas({
                   </p>
 
                   {/* Farba pozadia karty */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[var(--brand-radius,4px)] bg-muted/40 border border-border/60">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-medium text-foreground">
                         Farba pozadia karty modulu
@@ -1688,7 +1678,7 @@ export function BuilderCanvas({
                     <div className="flex items-center gap-2">
                       <label className="relative cursor-pointer shrink-0">
                         <div
-                          className="h-8 w-8 rounded-[2px] border border-white/20 shadow-2xs hover:scale-105 transition-transform flex items-center justify-center"
+                          className="h-8 w-8 rounded-[2px] border border-border shadow-2xs hover:scale-105 transition-transform flex items-center justify-center"
                           style={{
                             backgroundColor: editingModule.backgroundColor || "transparent",
                           }}
@@ -1718,7 +1708,7 @@ export function BuilderCanvas({
                             prev ? { ...prev, backgroundColor: e.target.value } : null
                           )
                         }
-                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-[#141f2b]"
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-background border border-border text-foreground"
                       />
                     </div>
 
@@ -1743,11 +1733,11 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                 }`}
                               >
                                 <span
-                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                   style={{ backgroundColor: item.hex }}
                                 />
                                 <span>{item.name}</span>
@@ -1780,11 +1770,11 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                 }`}
                               >
                                 <span
-                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                   style={{ backgroundColor: item.hex }}
                                 />
                                 <span>{item.name || item.hex}</span>
@@ -1798,7 +1788,7 @@ export function BuilderCanvas({
                   </div>
 
                   {/* Farba textu modulu */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[var(--brand-radius,4px)] bg-muted/40 border border-border/60">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-medium text-foreground">
                         Farba textu modulu
@@ -1823,7 +1813,7 @@ export function BuilderCanvas({
                     <div className="flex items-center gap-2">
                       <label className="relative cursor-pointer shrink-0">
                         <div
-                          className="h-8 w-8 rounded-[2px] border border-white/20 shadow-2xs hover:scale-105 transition-transform flex items-center justify-center font-bold text-xs"
+                          className="h-8 w-8 rounded-[2px] border border-border shadow-2xs hover:scale-105 transition-transform flex items-center justify-center font-bold text-xs"
                           style={{
                             backgroundColor: editingModule.textColor || "transparent",
                             color: editingModule.textColor ? "#000" : undefined,
@@ -1856,7 +1846,7 @@ export function BuilderCanvas({
                             prev ? { ...prev, textColor: e.target.value } : null
                           )
                         }
-                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-[#141f2b]"
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-background border border-border text-foreground"
                       />
                     </div>
 
@@ -1881,11 +1871,11 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                 }`}
                               >
                                 <span
-                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                   style={{ backgroundColor: item.hex }}
                                 />
                                 <span>{item.name}</span>
@@ -1918,11 +1908,11 @@ export function BuilderCanvas({
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
                                     ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                 }`}
                               >
                                 <span
-                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                   style={{ backgroundColor: item.hex }}
                                 />
                                 <span>{item.name || item.hex}</span>
@@ -1936,7 +1926,7 @@ export function BuilderCanvas({
                   </div>
 
                   {/* Rámik karty */}
-                  <div className="space-y-2.5 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
+                  <div className="space-y-2.5 p-3 rounded-[var(--brand-radius,4px)] bg-muted/40 border border-border/60">
                     <Label className="text-xs font-medium text-foreground">
                       Hrúbka rámika karty modulu
                     </Label>
@@ -1958,7 +1948,7 @@ export function BuilderCanvas({
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             editingModule.borderWidthPx === item.val
                               ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                           }`}
                         >
                           {item.label}
@@ -1989,7 +1979,7 @@ export function BuilderCanvas({
                         <div className="flex items-center gap-2">
                           <label className="relative cursor-pointer shrink-0">
                             <div
-                              className="h-7 w-7 rounded-[2px] border border-white/20 shadow-2xs flex items-center justify-center"
+                              className="h-7 w-7 rounded-[2px] border border-border shadow-2xs flex items-center justify-center"
                               style={{
                                 backgroundColor: editingModule.borderColor || "transparent",
                               }}
@@ -2018,7 +2008,7 @@ export function BuilderCanvas({
                                 prev ? { ...prev, borderColor: e.target.value } : null
                               )
                             }
-                            className="font-mono text-xs uppercase h-7 rounded-[2px] flex-1 bg-[#141f2b]"
+                            className="font-mono text-xs uppercase h-7 rounded-[2px] flex-1 bg-background border border-border text-foreground"
                           />
                         </div>
 
@@ -2043,11 +2033,11 @@ export function BuilderCanvas({
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                       isSelected
                                         ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                     }`}
                                   >
                                     <span
-                                      className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                      className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                       style={{ backgroundColor: item.hex }}
                                     />
                                     <span>{item.name}</span>
@@ -2080,11 +2070,11 @@ export function BuilderCanvas({
                                     className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                       isSelected
                                         ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                                     }`}
                                   >
                                     <span
-                                      className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                      className="h-2.5 w-2.5 rounded-[1px] border border-border inline-block shrink-0"
                                       style={{ backgroundColor: item.hex }}
                                     />
                                     <span>{item.name || item.hex}</span>
@@ -2100,7 +2090,7 @@ export function BuilderCanvas({
                   </div>
 
                   {/* Vnútorné odsadenie karty (Padding) */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[var(--brand-radius,4px)] bg-muted/40 border border-border/60">
                     <Label className="text-xs font-medium text-foreground">
                       Vnútorné odsadenie karty (Padding)
                     </Label>
@@ -2122,7 +2112,7 @@ export function BuilderCanvas({
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             (editingModule.paddingY || "normal") === pad.id
                               ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-card"
                           }`}
                         >
                           {pad.label}
@@ -2135,15 +2125,14 @@ export function BuilderCanvas({
 
               {/* Modal Footer */}
               <div
-                className="p-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-end gap-2.5 shrink-0"
-                style={{ backgroundColor: "#17212a" }}
+                className="p-4 border-t border-border bg-muted/30 flex items-center justify-end gap-2.5 shrink-0"
               >
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setEditingModule(null)}
-                  className="h-8 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#1f2c36] rounded-[var(--brand-radius,4px)] cursor-pointer"
+                  className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-[var(--brand-radius,4px)] cursor-pointer"
                 >
                   Zrušiť
                 </Button>
@@ -2151,7 +2140,7 @@ export function BuilderCanvas({
                   type="submit"
                   size="sm"
                   disabled={isSavingConfig}
-                  className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-[#070b0f] hover:bg-primary/90 px-4 cursor-pointer"
+                  className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground hover:bg-primary/90 px-4 cursor-pointer"
                 >
                   {isSavingConfig ? (
                     <span className="flex items-center gap-1.5">
@@ -2171,23 +2160,20 @@ export function BuilderCanvas({
       {/* Module Catalogue Modal */}
       {activeColumnForNewModule && (
         <div
-          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
         >
           <div
-            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
-            style={{ backgroundColor: "#0e161d" }}
+            className="bg-card border border-border rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-card-foreground"
           >
             {/* Modal Header */}
             <div
-              className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0"
-              style={{ backgroundColor: "#17212a" }}
+              className="p-4 border-b border-border flex items-center justify-between bg-muted/40 shrink-0"
             >
               <div>
-                <h3 className="text-sm font-bold text-[#fafbfc]">
+                <h3 className="text-sm font-bold text-foreground">
                   Katalóg Modulov (M01 – M25)
                 </h3>
-                <p className="text-[11px] text-[#96abbe]">
+                <p className="text-[11px] text-muted-foreground">
                   Zvoľte stavebný blok, ktorý chcete vložiť do vybraného stĺpca.
                 </p>
               </div>
@@ -2197,7 +2183,7 @@ export function BuilderCanvas({
                   setActiveColumnForNewModule(null);
                   setModuleSearch("");
                 }}
-                className="p-1.5 text-[#96abbe] hover:text-[#fafbfc] rounded-[var(--brand-radius,4px)] hover:bg-[#1f2c36] transition-colors cursor-pointer"
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded-[var(--brand-radius,4px)] hover:bg-muted transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -2205,8 +2191,7 @@ export function BuilderCanvas({
 
             {/* Modal Category Tabs */}
             <div
-              className="px-4 py-2 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] flex items-center gap-1.5 overflow-x-auto"
-              style={{ backgroundColor: "#17212a" }}
+              className="px-4 py-2 border-b border-border bg-muted/20 flex items-center gap-1.5 overflow-x-auto"
             >
               {categories.map((cat) => (
                 <button
@@ -2215,8 +2200,8 @@ export function BuilderCanvas({
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-2.5 py-1 text-[11px] rounded-[var(--brand-radius,4px)] whitespace-nowrap transition-colors cursor-pointer ${
                     selectedCategory === cat
-                      ? "bg-primary text-[#070b0f] font-bold shadow-2xs"
-                      : "text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#1f2c36]"
+                      ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
                   {cat}
@@ -2226,24 +2211,22 @@ export function BuilderCanvas({
 
             {/* Modal Search */}
             <div
-              className="p-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] relative"
-              style={{ backgroundColor: "#17212a" }}
+              className="p-3 border-b border-border bg-card relative"
             >
-              <Search className="h-4 w-4 text-[#96abbe] absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="h-4 w-4 text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 autoFocus
                 value={moduleSearch}
                 onChange={(e) => setModuleSearch(e.target.value)}
                 placeholder="Hľadať modul podľa názvu, popisu alebo kategórie..."
-                className="w-full h-9 pl-9 pr-3 rounded-[var(--brand-radius,6px)] bg-[#070b0f] border border-[rgba(63,85,102,0.5)] text-xs text-[#fafbfc] placeholder:text-[#96abbe] outline-hidden focus:border-primary"
+                className="w-full h-9 pl-9 pr-3 rounded-[var(--brand-radius,6px)] bg-muted/40 border border-border text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary focus:bg-background"
               />
             </div>
 
             {/* Modal List */}
             <div
-              className="p-4 overflow-y-auto space-y-2 flex-1 bg-[#0e161d]"
-              style={{ backgroundColor: "#0e161d" }}
+              className="p-4 overflow-y-auto space-y-2 flex-1 bg-card"
             >
               <div className="grid sm:grid-cols-2 gap-2.5">
                 {filteredModules.map((m) => (
@@ -2251,17 +2234,17 @@ export function BuilderCanvas({
                     key={m.type}
                     type="button"
                     onClick={() => handleAddModule(m.type)}
-                    className="p-3.5 rounded-[var(--brand-radius,6px)] border border-[rgba(63,85,102,0.45)] hover:border-primary bg-[#17212a] hover:bg-[#1f2c36] text-left transition-all group space-y-1.5 cursor-pointer shadow-xs"
+                    className="p-3.5 rounded-[var(--brand-radius,6px)] border border-border hover:border-primary bg-card hover:bg-muted/50 text-left transition-all group space-y-1.5 cursor-pointer shadow-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-xs text-[#fafbfc] group-hover:text-primary transition-colors">
+                      <span className="font-bold text-xs text-foreground group-hover:text-primary transition-colors">
                         {m.name}
                       </span>
-                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#96abbe]">
+                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] bg-muted border border-border/60 text-muted-foreground">
                         {m.category}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#96abbe] line-clamp-1 leading-relaxed">
+                    <p className="text-[11px] text-muted-foreground line-clamp-1 leading-relaxed">
                       {m.desc}
                     </p>
                   </button>

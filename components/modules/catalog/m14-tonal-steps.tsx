@@ -369,12 +369,12 @@ export default function M14TonalStepsModule({
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <h4 className="font-bold text-sm text-foreground">
                 Pravidlo 4 krokov (WCAG 2.1 Bezpečný kontrast)
               </h4>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold shrink-0">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-semibold shrink-0">
               A11Y Best Practice
             </span>
           </div>
@@ -586,46 +586,37 @@ export default function M14TonalStepsModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0e161d] border border-[rgba(63,85,102,0.65)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
-            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
+            className="w-full max-w-2xl bg-card border border-border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-card-foreground"
+            style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div
-              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
-              style={{ backgroundColor: "#17212a" }}
-            >
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-muted/40">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-[#fafbfc]">
+                <h3 className="text-sm font-semibold text-foreground">
                   Nastavenia tonálnych odtieňov (M14)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
+                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div
-              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
-              style={{ backgroundColor: "#17212a" }}
-            >
+            <div className="flex border-b border-border bg-muted/20 px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("colors")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "colors"
                     ? "border-primary text-primary font-bold"
-                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 1. Výber základných farieb
@@ -636,7 +627,7 @@ export default function M14TonalStepsModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "overrides"
                     ? "border-primary text-primary font-bold"
-                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 2. Ručné úpravy (Hybrid)
@@ -647,7 +638,7 @@ export default function M14TonalStepsModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "display"
                     ? "border-primary text-primary font-bold"
-                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
                 3. Nastavenia zobrazenia
@@ -655,24 +646,21 @@ export default function M14TonalStepsModule({
             </div>
 
             {/* Modal Body */}
-            <div
-              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
-              style={{ backgroundColor: "#0e161d" }}
-            >
+            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-card">
               {/* TAB 1: BASE COLORS SELECT */}
               {modalTab === "colors" && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#fafbfc] text-xs">
+                    <span className="font-semibold text-foreground text-xs">
                       Vyberte farby značky, pre ktoré sa vygenerujú odtiene:
                     </span>
-                    <span className="text-[11px] text-[#96abbe] font-mono">
+                    <span className="text-[11px] text-muted-foreground font-mono">
                       Zvolených: {cfg.baseColorIds.length > 0 ? cfg.baseColorIds.length : activeBaseColors.length}
                     </span>
                   </div>
 
                   {brandColors.length === 0 ? (
-                    <div className="text-[#96abbe] py-6 text-center italic bg-[#17212a] p-4 rounded border border-white/10 space-y-2">
+                    <div className="text-muted-foreground py-6 text-center italic bg-muted/40 p-4 rounded border border-border space-y-2">
                       <p>V projekte zatiaľ nie sú vytvorené vlastné farby v globálnej palete.</p>
                       <p className="text-[11px] text-primary">
                         Modul momentálne generuje odtiene z predvolených systémových farieb.
@@ -696,8 +684,8 @@ export default function M14TonalStepsModule({
                             key={color.id}
                             className={`p-2.5 rounded-[3px] border flex items-center gap-3 cursor-pointer transition-all ${
                               isSelected
-                                ? "border-primary bg-primary/20 ring-1 ring-primary/40"
-                                : "border-white/10 bg-[#17212a] hover:border-white/20"
+                                ? "border-primary bg-primary/10 ring-1 ring-primary/30"
+                                : "border-border bg-card hover:bg-muted/30"
                             }`}
                           >
                             <input
@@ -718,17 +706,17 @@ export default function M14TonalStepsModule({
                                 }
                                 handleSaveConfig({ ...cfg, baseColorIds: newIds });
                               }}
-                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
+                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-background border-border"
                             />
                             <div
                               className="w-6 h-6 rounded-[2px] border border-black/20 shrink-0 shadow-xs"
                               style={{ backgroundColor: color.hex }}
                             />
                             <div className="min-w-0 flex-1">
-                              <span className="font-semibold text-[#fafbfc] text-xs block truncate">
+                              <span className="font-semibold text-foreground text-xs block truncate">
                                 {cName}
                               </span>
-                              <span className="font-mono text-[10px] text-[#96abbe] block">
+                              <span className="font-mono text-[10px] text-muted-foreground block">
                                 {color.hex}
                               </span>
                             </div>
@@ -744,7 +732,7 @@ export default function M14TonalStepsModule({
               {modalTab === "overrides" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-[#fafbfc] text-xs">
+                    <span className="font-semibold text-foreground text-xs">
                       Manuálna úprava vygenerovaných HEX kódov:
                     </span>
                     <button
@@ -756,7 +744,7 @@ export default function M14TonalStepsModule({
                           overrides: {},
                         })
                       }
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-[#070b0f] border border-white/10 text-[#96abbe] hover:text-[#fafbfc] text-[11px] font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-muted border border-border text-muted-foreground hover:text-foreground text-[11px] font-medium transition-colors"
                       title="Zmazať všetky ručné úpravy a obnoviť čistý HSLuv výpočet"
                     >
                       <RefreshCw className="w-3 h-3" />
@@ -774,13 +762,13 @@ export default function M14TonalStepsModule({
                       return (
                         <div
                           key={baseColor.id}
-                          className="bg-[#17212a] p-3.5 rounded-[3px] border border-white/10 space-y-2.5"
+                          className="bg-muted/30 p-3.5 rounded-[3px] border border-border space-y-2.5"
                         >
-                          <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                            <span className="font-bold text-[#fafbfc] text-xs">
+                          <div className="flex items-center justify-between border-b border-border pb-1.5">
+                            <span className="font-bold text-foreground text-xs">
                               {bName}
                             </span>
-                            <span className="font-mono text-[10px] text-[#96abbe]">
+                            <span className="font-mono text-[10px] text-muted-foreground">
                               {baseColor.hex}
                             </span>
                           </div>
@@ -788,7 +776,7 @@ export default function M14TonalStepsModule({
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                             {steps.map((s) => (
                               <div key={s.step} className="space-y-1">
-                                <span className="font-mono text-[10px] text-[#96abbe] block">
+                                <span className="font-mono text-[10px] text-muted-foreground block">
                                   Krok {s.step}:
                                 </span>
                                 <div className="flex items-center gap-1.5">
@@ -813,7 +801,7 @@ export default function M14TonalStepsModule({
                                         overrides: updatedOverrides,
                                       });
                                     }}
-                                    className="w-full font-mono text-[10px] bg-[#070b0f] border border-white/20 rounded-[2px] px-1.5 py-0.5 text-[#fafbfc] focus:border-primary focus:outline-none"
+                                    className="w-full font-mono text-[10px] bg-background border border-border rounded-[2px] px-1.5 py-0.5 text-foreground focus:border-primary focus:outline-none"
                                   />
                                 </div>
                               </div>
@@ -828,8 +816,8 @@ export default function M14TonalStepsModule({
 
               {/* TAB 3: DISPLAY SETTINGS */}
               {modalTab === "display" && (
-                <div className="space-y-3 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
-                  <span className="font-semibold text-[#fafbfc] text-xs block">
+                <div className="space-y-3 bg-muted/30 p-4 rounded-[3px] border border-border">
+                  <span className="font-semibold text-foreground text-xs block">
                     Zobrazenie doplnkových sekcií modulu:
                   </span>
                   <div className="space-y-3 pt-1">
@@ -843,13 +831,13 @@ export default function M14TonalStepsModule({
                             showContrastRule: e.target.checked,
                           })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-background border-border"
                       />
                       <div>
-                        <span className="text-[#fafbfc] text-[11px] font-medium block">
+                        <span className="text-foreground text-[11px] font-medium block">
                           Zobraziť edukačný WCAG blok (Pravidlo 4 krokov)
                         </span>
-                        <span className="text-[#96abbe] text-[10px] block">
+                        <span className="text-muted-foreground text-[10px] block">
                           Vysvetľovač bezpečného kontrastu s live výpočtom pomeru
                         </span>
                       </div>
@@ -865,13 +853,13 @@ export default function M14TonalStepsModule({
                             showUiExamples: e.target.checked,
                           })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-background border-border"
                       />
                       <div>
-                        <span className="text-[#fafbfc] text-[11px] font-medium block">
+                        <span className="text-foreground text-[11px] font-medium block">
                           Zobraziť reálne UI ukážky (Live Components)
                         </span>
-                        <span className="text-[#96abbe] text-[10px] block">
+                        <span className="text-muted-foreground text-[10px] block">
                           Ukážka tlačidiel, kariet a inputu oživených vo vygenerovanej škále
                         </span>
                       </div>
@@ -882,10 +870,7 @@ export default function M14TonalStepsModule({
             </div>
 
             {/* Modal Footer */}
-            <div
-              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
-              style={{ backgroundColor: "#17212a" }}
-            >
+            <div className="flex items-center justify-end px-5 py-3 border-t border-border bg-muted/40">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
