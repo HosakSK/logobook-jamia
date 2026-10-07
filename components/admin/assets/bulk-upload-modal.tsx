@@ -86,62 +86,6 @@ function getBaseKey(fileName: string): string {
   return withoutExt.trim().toLowerCase();
 }
 
-async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: string; file: File | null; width: number; height: number } | null> {
-  try {
-    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-    }
-
-    const arrayBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjs.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      useSystemFonts: true,
-    });
-    const pdfDoc = await loadingTask.promise;
-    if (pdfDoc.numPages < 1) return null;
-
-    const page = await pdfDoc.getPage(1);
-    const unscaledViewport = page.getViewport({ scale: 1 });
-    
-    // Scale to max 500px dimension to ensure preview is fast, crisp and stays safely under 60-80 KB DataURL
-    const maxDim = Math.max(unscaledViewport.width, unscaledViewport.height) || 500;
-    const targetScale = Math.min(1.5, 500 / maxDim);
-    const viewport = page.getViewport({ scale: targetScale });
-
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.floor(viewport.width);
-    canvas.height = Math.floor(viewport.height);
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!ctx) return null;
-
-    const renderContext = {
-      canvasContext: ctx,
-      viewport: viewport,
-      canvas: canvas,
-    };
-    await page.render(renderContext).promise;
-
-    // Remove white artboard background to ensure true transparency
-    removeCanvasWhiteBackground(canvas);
-
-    // Use PNG with transparent background
-    const dataUrl = canvas.toDataURL("image/png");
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
-    const previewFile = blob ? new File([blob], "thumbnail.png", { type: "image/png" }) : null;
-
-    return {
-      dataUrl,
-      file: previewFile,
-      width: Math.floor(viewport.width),
-      height: Math.floor(viewport.height),
-    };
-  } catch (err) {
-    console.error("PDF thumbnail rendering failed:", err);
-    return null;
-  }
-}
-
 export function BulkUploadModal({
   brandId,
   brandName = "logobook",
@@ -334,30 +278,8 @@ export function BulkUploadModal({
         } catch (err) {
           console.error("Failed to read PNG preview:", err);
         }
-      } else if (pdfFile) {
-        try {
-          const rendered = await renderPdfFirstPageToDataUrl(pdfFile);
-          if (rendered) {
-            const pdfSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rendered.width} ${rendered.height}"><image href="${rendered.dataUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
-            setQueue((curr) =>
-              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: pdfSvg, previewFile: rendered.file } : it))
-            );
-          } else {
-            // Fallback document SVG
-            const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
-            setQueue((curr) =>
-              curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
-            );
-          }
-        } catch (err) {
-          console.error("Failed to render PDF preview:", err);
-          const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
-          setQueue((curr) =>
-            curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
-          );
-        }
       } else {
-        // Fallback document SVG
+        // Fallback document SVG for PDF, EPS, AI, ZIP when no SVG or PNG is present
         const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${groupFiles[0]?.name.split(".").pop()?.toUpperCase() || "FORMAT"}</text></svg>`;
         setQueue((curr) =>
           curr.map((it) => (it.baseKey === baseKey && !it.svgContent ? { ...it, svgContent: fallbackSvg } : it))
@@ -461,6 +383,33 @@ export function BulkUploadModal({
           return item;
         })
         .filter((item): item is QueuedLogoItem => item !== null)
+    );
+  };
+
+  // Remove all .AI format files from attachedFiles across all queued logos
+  const handleRemoveAllAi = () => {
+    setQueue((prev) =>
+      prev.map((item) => ({
+        ...item,
+        attachedFiles: item.attachedFiles.filter((f) => f.format !== "AI"),
+      }))
+    );
+  };
+
+  // Remove attached SVG file from print mediums (PRINT_CMYK, PRINT_PANTONE, PRINT_MONOCHROME, PRINT_WB)
+  // Keeps item.svgContent intact so the visual preview remains, but removes SVG from downloadable attachments
+  const handleRemoveSvgFromPrint = () => {
+    setQueue((prev) =>
+      prev.map((item) => {
+        const isPrint = item.medium.startsWith("PRINT_");
+        if (!isPrint) return item;
+
+        return {
+          ...item,
+          attachedFiles: item.attachedFiles.filter((f) => f.format !== "SVG"),
+          svgFile: null,
+        };
+      })
     );
   };
 
@@ -690,17 +639,43 @@ export function BulkUploadModal({
           {/* Queue List */}
           {queue.length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="font-semibold uppercase tracking-wider">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground pb-1">
+                <span className="font-semibold uppercase tracking-wider font-mono">
                   Pripravené na nahratie ({queue.length})
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setQueue([])}
-                  className="text-red-400 hover:underline text-[11px] cursor-pointer"
-                >
-                  Vyčistiť zoznam
-                </button>
+
+                {/* Bulk filter & cleanup actions */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveAllAi}
+                    className="h-6 px-2 text-[10px] font-mono border-amber-500/40 text-amber-300 hover:bg-amber-500/10 hover:border-amber-500/60 rounded-[2px]"
+                    title="Odstráni súbory .AI zo všetkých položiek na nahratie (klientom zostane EPS a PDF)"
+                  >
+                    Odstrániť všetky .AI
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRemoveSvgFromPrint}
+                    className="h-6 px-2 text-[10px] font-mono border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-500/60 rounded-[2px]"
+                    title="Odstráni priložený .SVG súbor z tlačových formátov (CMYK/Pantone/Mono/WB). Vizuálny náhľad zostane zachovaný."
+                  >
+                    Odstrániť SVG z tlačových formátov
+                  </Button>
+
+                  <button
+                    type="button"
+                    onClick={() => setQueue([])}
+                    className="text-red-400 hover:underline text-[11px] cursor-pointer ml-1"
+                  >
+                    Vyčistiť zoznam
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">
