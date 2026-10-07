@@ -309,17 +309,17 @@ export default function M05DownloadTlacidloModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m05:opacity-100 transition-opacity duration-150 absolute -top-9 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 bg-[#17212a] border border-border/70 rounded-[3px] p-1 shadow-lg text-xs">
+        <div className="opacity-0 group-hover/m05:opacity-100 transition-opacity duration-150 absolute -top-9 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 shadow-xl text-xs text-white">
           {/* Alignment Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
             <button
               type="button"
               title="Zarovnať vľavo"
               onClick={() => handleSaveConfig({ ...cfg, align: "left" })}
-              className={`p-1 rounded-[2px] transition-colors ${
+              className={`p-1 rounded-[1px] transition-colors ${
                 cfg.align === "left"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <AlignLeft className="w-3.5 h-3.5" />
@@ -328,10 +328,10 @@ export default function M05DownloadTlacidloModule({
               type="button"
               title="Zarovnať na stred"
               onClick={() => handleSaveConfig({ ...cfg, align: "center" })}
-              className={`p-1 rounded-[2px] transition-colors ${
+              className={`p-1 rounded-[1px] transition-colors ${
                 cfg.align === "center"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <AlignCenter className="w-3.5 h-3.5" />
@@ -340,10 +340,10 @@ export default function M05DownloadTlacidloModule({
               type="button"
               title="Zarovnať vpravo"
               onClick={() => handleSaveConfig({ ...cfg, align: "right" })}
-              className={`p-1 rounded-[2px] transition-colors ${
+              className={`p-1 rounded-[1px] transition-colors ${
                 cfg.align === "right"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <AlignRight className="w-3.5 h-3.5" />
@@ -352,10 +352,10 @@ export default function M05DownloadTlacidloModule({
               type="button"
               title="Plná šírka"
               onClick={() => handleSaveConfig({ ...cfg, align: "full" })}
-              className={`p-1 rounded-[2px] transition-colors ${
+              className={`p-1 rounded-[1px] transition-colors ${
                 cfg.align === "full"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -363,17 +363,17 @@ export default function M05DownloadTlacidloModule({
           </div>
 
           {/* Size Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
             {(["small", "medium", "large"] as const).map((sz) => (
               <button
                 key={sz}
                 type="button"
                 title={`Veľkosť: ${sz}`}
                 onClick={() => handleSaveConfig({ ...cfg, size: sz })}
-                className={`px-1.5 py-0.5 rounded-[2px] text-[11px] font-mono transition-colors uppercase ${
+                className={`px-1.5 py-0.5 rounded-[1px] text-[11px] font-mono transition-colors uppercase ${
                   cfg.size === sz
-                    ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                    ? "bg-primary text-[#070b0f] font-bold"
+                    : "text-white/75 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {sz[0]}
@@ -382,17 +382,17 @@ export default function M05DownloadTlacidloModule({
           </div>
 
           {/* Style Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
             {(["primary", "secondary", "outline", "ghost", "custom"] as const).map((st) => (
               <button
                 key={st}
                 type="button"
                 title={`Štýl: ${st}`}
                 onClick={() => handleSaveConfig({ ...cfg, style: st })}
-                className={`px-1.5 py-0.5 rounded-[2px] text-[10px] capitalize transition-colors ${
+                className={`px-1.5 py-0.5 rounded-[1px] text-[10px] capitalize transition-colors ${
                   cfg.style === st
-                    ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                    ? "bg-primary text-[#070b0f] font-bold"
+                    : "text-white/75 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {st}
@@ -404,7 +404,7 @@ export default function M05DownloadTlacidloModule({
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-[2px] bg-primary/20 hover:bg-primary/30 text-primary font-medium text-[11px] transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--brand-radius,4px)] bg-primary text-[#070b0f] font-bold text-[11px] transition-colors cursor-pointer"
           >
             <Settings2 className="w-3 h-3" />
             <span>Odkaz & Ikona</span>
@@ -452,37 +452,37 @@ export default function M05DownloadTlacidloModule({
 
       {/* Settings Modal (Link Picker, Icon Picker, Custom Colors) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
           <div
-            className="bg-[#17212a] border border-border/80 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia tlačidla (M05 CTA / Download)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("link")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "link"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 Cieľ odkazu (Link)
@@ -490,10 +490,10 @@ export default function M05DownloadTlacidloModule({
               <button
                 type="button"
                 onClick={() => setModalTab("icon")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "icon"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 Ikona tlačidla
@@ -502,10 +502,10 @@ export default function M05DownloadTlacidloModule({
                 <button
                   type="button"
                   onClick={() => setModalTab("style")}
-                  className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                  className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                     modalTab === "style"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                   }`}
                 >
                   Vlastné farby
@@ -514,7 +514,7 @@ export default function M05DownloadTlacidloModule({
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
               {/* TAB 1: LINK PICKER */}
               {modalTab === "link" && (
                 <div className="space-y-4">

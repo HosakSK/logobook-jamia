@@ -324,13 +324,13 @@ export default function M13PaletaFariebModule({
                 >
                   {color.role && (
                     <span
-                      className="self-start text-[9px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-[2px] backdrop-blur-xs border"
+                      className="self-start text-[9px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-[2px] border"
                       style={{
                         color: badgeTextColor,
                         backgroundColor:
                           badgeTextColor === "#ffffff"
-                            ? "rgba(0,0,0,0.3)"
-                            : "rgba(255,255,255,0.4)",
+                            ? "rgba(0,0,0,0.4)"
+                            : "rgba(255,255,255,0.6)",
                         borderColor:
                           badgeTextColor === "#ffffff"
                             ? "rgba(255,255,255,0.2)"
@@ -496,12 +496,12 @@ export default function M13PaletaFariebModule({
                 {/* Top Badge: Role or Order */}
                 <div className="flex items-center justify-between">
                   <span
-                    className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] backdrop-blur-xs border"
+                    className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] border"
                     style={{
                       backgroundColor:
                         contrastTextColor === "#ffffff"
-                          ? "rgba(0,0,0,0.3)"
-                          : "rgba(255,255,255,0.4)",
+                          ? "rgba(0,0,0,0.4)"
+                          : "rgba(255,255,255,0.6)",
                       borderColor:
                         contrastTextColor === "#ffffff"
                           ? "rgba(255,255,255,0.2)"
@@ -528,12 +528,12 @@ export default function M13PaletaFariebModule({
                           onClick={() =>
                             handleCopy(`${color.id}-hex`, color.hex.replace("#", ""))
                           }
-                          className="px-2 py-0.5 rounded-[2px] backdrop-blur-xs border text-[11px] font-bold tracking-wide transition-transform active:scale-95 text-left inline-block"
+                          className="px-2 py-0.5 rounded-[2px] border text-[11px] font-bold tracking-wide transition-transform active:scale-95 text-left inline-block"
                           style={{
                             backgroundColor:
                               contrastTextColor === "#ffffff"
-                                ? "rgba(0,0,0,0.35)"
-                                : "rgba(255,255,255,0.45)",
+                                ? "rgba(0,0,0,0.4)"
+                                : "rgba(255,255,255,0.6)",
                             borderColor:
                               contrastTextColor === "#ffffff"
                                 ? "rgba(255,255,255,0.25)"
@@ -576,37 +576,37 @@ export default function M13PaletaFariebModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-xl bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-xl bg-[#0e161d] border border-white/20 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia farebnej palety (M13)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("select")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "select"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Výber farieb
@@ -617,7 +617,7 @@ export default function M13PaletaFariebModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "order"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Poradie (Drag & Drop)
@@ -628,7 +628,7 @@ export default function M13PaletaFariebModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "layout"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 3. Rozloženie a systémy
@@ -641,16 +641,16 @@ export default function M13PaletaFariebModule({
               {modalTab === "select" && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-xs">
+                    <span className="font-semibold text-[#fafbfc] text-xs">
                       Vyberte farby značky, ktoré patria do tejto palety:
                     </span>
-                    <span className="text-[11px] text-muted-foreground font-mono">
+                    <span className="text-[11px] text-[#96abbe] font-mono">
                       Zvolených: {cfg.colorIds.length > 0 ? cfg.colorIds.length : activeColors.length}
                     </span>
                   </div>
 
                   {brandColors.length === 0 ? (
-                    <div className="text-muted-foreground py-6 text-center italic bg-[#17212a] p-4 rounded border border-border/40 space-y-2">
+                    <div className="text-[#96abbe] py-6 text-center italic bg-[#17212a] p-4 rounded border border-white/10 space-y-2">
                       <p>V projekte zatiaľ nie sú vytvorené vlastné farby v globálnej palete.</p>
                       <p className="text-[11px] text-primary">
                         Modul momentálne používa 4 vzorové systémové farby značky.
@@ -674,8 +674,8 @@ export default function M13PaletaFariebModule({
                             key={color.id}
                             className={`p-2.5 rounded-[3px] border flex items-center gap-3 cursor-pointer transition-all ${
                               isSelected
-                                ? "border-primary bg-primary/10 ring-1 ring-primary/40"
-                                : "border-border/50 bg-[#17212a] hover:border-border"
+                                ? "border-primary bg-primary/20 ring-1 ring-primary/40"
+                                : "border-white/10 bg-[#17212a] hover:border-white/20"
                             }`}
                           >
                             <input
@@ -696,17 +696,17 @@ export default function M13PaletaFariebModule({
                                 }
                                 handleSaveConfig({ ...cfg, colorIds: newIds });
                               }}
-                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                             />
                             <div
                               className="w-6 h-6 rounded-[2px] border border-black/20 shrink-0 shadow-xs"
                               style={{ backgroundColor: color.hex }}
                             />
                             <div className="min-w-0 flex-1">
-                              <span className="font-semibold text-foreground text-xs block truncate">
+                              <span className="font-semibold text-[#fafbfc] text-xs block truncate">
                                 {cName}
                               </span>
-                              <span className="font-mono text-[10px] text-muted-foreground block">
+                              <span className="font-mono text-[10px] text-[#96abbe] block">
                                 {color.hex}
                               </span>
                             </div>
@@ -722,7 +722,7 @@ export default function M13PaletaFariebModule({
               {modalTab === "order" && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-xs">
+                    <span className="font-semibold text-[#fafbfc] text-xs">
                       Presúvajte položky ťahaním myšou (Drag & Drop) alebo šípkami:
                     </span>
                   </div>
@@ -748,12 +748,12 @@ export default function M13PaletaFariebModule({
                             isDragging
                               ? "opacity-40 border-dashed border-primary"
                               : isOver
-                              ? "border-primary bg-primary/10"
-                              : "border-border/50 hover:border-border"
+                              ? "border-primary bg-primary/20"
+                              : "border-white/10 hover:border-white/20"
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <span className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                            <span className="cursor-grab active:cursor-grabbing text-[#96abbe] hover:text-[#fafbfc]">
                               <GripVertical className="w-4 h-4" />
                             </span>
                             <div
@@ -761,10 +761,10 @@ export default function M13PaletaFariebModule({
                               style={{ backgroundColor: color.hex }}
                             />
                             <div className="min-w-0">
-                              <span className="font-semibold text-foreground text-xs block truncate">
+                              <span className="font-semibold text-[#fafbfc] text-xs block truncate">
                                 {cName}
                               </span>
-                              <span className="font-mono text-[10px] text-muted-foreground">
+                              <span className="font-mono text-[10px] text-[#96abbe]">
                                 #{color.hex.replace("#", "")}
                               </span>
                             </div>
@@ -776,7 +776,7 @@ export default function M13PaletaFariebModule({
                               type="button"
                               onClick={() => moveColor(index, "left")}
                               disabled={index === 0}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded bg-[#070b0f] border border-white/10 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Posunúť doľava / hore"
                             >
                               <ArrowLeft className="w-3.5 h-3.5" />
@@ -785,7 +785,7 @@ export default function M13PaletaFariebModule({
                               type="button"
                               onClick={() => moveColor(index, "right")}
                               disabled={index === activeColors.length - 1}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded bg-[#070b0f] border border-white/10 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Posunúť doprava / dole"
                             >
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -803,7 +803,7 @@ export default function M13PaletaFariebModule({
                 <div className="space-y-4">
                   {/* Layout Selector */}
                   <div className="space-y-2">
-                    <span className="font-semibold text-foreground text-xs block">
+                    <span className="font-semibold text-[#fafbfc] text-xs block">
                       Štýl rozloženia palety:
                     </span>
                     <div className="grid grid-cols-2 gap-3">
@@ -812,13 +812,13 @@ export default function M13PaletaFariebModule({
                         onClick={() => handleSaveConfig({ ...cfg, layout: "tiles" })}
                         className={`p-3 rounded-[3px] border flex flex-col items-center gap-2 text-center transition-all ${
                           cfg.layout === "tiles"
-                            ? "border-primary bg-primary/10 ring-1 ring-primary/40 text-foreground"
-                            : "border-border/50 bg-[#17212a] text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/20 ring-1 ring-primary/40 text-[#fafbfc]"
+                            : "border-white/10 bg-[#17212a] text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <LayoutGrid className="w-5 h-5 text-primary" />
                         <span className="font-semibold text-xs">Dlaždice (Tiles)</span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-[#96abbe]">
                           Klasické samostatné karty v mriežke
                         </span>
                       </button>
@@ -830,13 +830,13 @@ export default function M13PaletaFariebModule({
                         }
                         className={`p-3 rounded-[3px] border flex flex-col items-center gap-2 text-center transition-all ${
                           cfg.layout === "vertical_bars"
-                            ? "border-primary bg-primary/10 ring-1 ring-primary/40 text-foreground"
-                            : "border-border/50 bg-[#17212a] text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/20 ring-1 ring-primary/40 text-[#fafbfc]"
+                            : "border-white/10 bg-[#17212a] text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <Columns3 className="w-5 h-5 text-primary" />
                         <span className="font-semibold text-xs">Zvislé prúžky (Bars)</span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-[#96abbe]">
                           Moderný súvislý pás vertikálnych farieb
                         </span>
                       </button>
@@ -844,11 +844,11 @@ export default function M13PaletaFariebModule({
                   </div>
 
                   {/* Display Systems Checkboxes */}
-                  <div className="space-y-2.5 pt-2 border-t border-border/40">
-                    <span className="font-semibold text-foreground text-xs block">
+                  <div className="space-y-2.5 pt-2 border-t border-white/10">
+                    <span className="font-semibold text-[#fafbfc] text-xs block">
                       Zobrazené farebné priestory:
                     </span>
-                    <div className="grid grid-cols-2 gap-2 bg-[#17212a] p-3.5 rounded-[3px] border border-border/40">
+                    <div className="grid grid-cols-2 gap-2 bg-[#17212a] p-3.5 rounded-[3px] border border-white/10">
                       {(
                         [
                           { id: "hex", label: "HEX (Web & Digitál)" },
@@ -875,9 +875,9 @@ export default function M13PaletaFariebModule({
                                   },
                                 })
                               }
-                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                             />
-                            <span className="text-foreground text-[11px]">{sys.label}</span>
+                            <span className="text-[#fafbfc] text-[11px]">{sys.label}</span>
                           </label>
                         );
                       })}
@@ -888,7 +888,7 @@ export default function M13PaletaFariebModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

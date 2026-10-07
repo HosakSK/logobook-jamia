@@ -415,18 +415,18 @@ export default function M07ZobrazenieLogaModule({
 
           {/* Metadata Badges for M11 Grid Integration */}
           <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-muted-foreground">
-            <span className="px-2 py-0.5 rounded-[2px] bg-neutral-900 border border-border/40 uppercase">
+            <span className="px-2 py-0.5 rounded-[var(--brand-radius,3px)] bg-muted border border-border/40 uppercase">
               {cfg.meta.medium}
             </span>
-            <span className="px-2 py-0.5 rounded-[2px] bg-neutral-900 border border-border/40 uppercase">
+            <span className="px-2 py-0.5 rounded-[var(--brand-radius,3px)] bg-muted border border-border/40 uppercase">
               {cfg.meta.orientation}
             </span>
             {cfg.meta.hasClaim && (
-              <span className="px-2 py-0.5 rounded-[2px] bg-neutral-900 border border-border/40 uppercase">
+              <span className="px-2 py-0.5 rounded-[var(--brand-radius,3px)] bg-muted border border-border/40 uppercase">
                 Claim / Slogan
               </span>
             )}
-            <span className="px-2 py-0.5 rounded-[2px] bg-neutral-900 border border-border/40 uppercase">
+            <span className="px-2 py-0.5 rounded-[var(--brand-radius,3px)] bg-muted border border-border/40 uppercase">
               {cfg.meta.backgroundType}
             </span>
           </div>
@@ -533,37 +533,37 @@ export default function M07ZobrazenieLogaModule({
 
       {/* Admin Settings Modal (Tabs: Preview, Formats & Bulk, Meta for M11) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia modulu M07 (Asset Viewer & Formáty)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("preview")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "preview"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Vizuálny náhľad (Preview)
@@ -571,10 +571,10 @@ export default function M07ZobrazenieLogaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("formats")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "formats"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Formáty a sťahovanie (Download)
@@ -582,10 +582,10 @@ export default function M07ZobrazenieLogaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("meta")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "meta"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 3. Metadáta pre maticu M11
@@ -593,7 +593,7 @@ export default function M07ZobrazenieLogaModule({
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
               {/* TAB 1: PREVIEW SETTINGS */}
               {modalTab === "preview" && (
                 <div className="space-y-4">

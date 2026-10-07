@@ -399,7 +399,7 @@ export default function M11MaticaLogotypovModule({
 
       {/* Admin Information Banner */}
       {isEditor && (
-        <div className="flex items-center justify-between px-4 py-2.5 rounded-[3px] bg-[#17212a] border border-border/60 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between px-4 py-2.5 rounded-[3px] bg-muted/60 border border-border/60 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />
             <span>
@@ -407,7 +407,7 @@ export default function M11MaticaLogotypovModule({
               modulov M07 a knižnice surových lôg značky.
             </span>
           </div>
-          <span className="text-[10px] font-mono uppercase bg-neutral-900 px-2 py-0.5 rounded border border-border/40">
+          <span className="text-[10px] font-mono uppercase bg-card px-2 py-0.5 rounded border border-border/60 text-muted-foreground">
             {allLogos.length} logotypov v databáze
           </span>
         </div>
@@ -466,7 +466,7 @@ export default function M11MaticaLogotypovModule({
                     className={`px-2 py-1 rounded-[2px] text-[11px] transition-colors ${
                       mediumFilter === item.id
                         ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                        : "bg-[#17212a] text-muted-foreground hover:text-foreground hover:bg-[#1f2c36]"
+                        : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                     }`}
                   >
                     {item.label}
@@ -496,7 +496,7 @@ export default function M11MaticaLogotypovModule({
                     className={`px-2 py-1 rounded-[2px] text-[11px] transition-colors ${
                       orientationFilter === item.id
                         ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                        : "bg-[#17212a] text-muted-foreground hover:text-foreground hover:bg-[#1f2c36]"
+                        : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                     }`}
                   >
                     {item.label}
@@ -525,7 +525,7 @@ export default function M11MaticaLogotypovModule({
                     className={`px-2 py-1 rounded-[2px] text-[11px] transition-colors ${
                       claimFilter === item.id
                         ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                        : "bg-[#17212a] text-muted-foreground hover:text-foreground hover:bg-[#1f2c36]"
+                        : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                     }`}
                   >
                     {item.label}
@@ -618,7 +618,7 @@ export default function M11MaticaLogotypovModule({
                     <button
                       type="button"
                       onClick={() => handleCopySvg(item)}
-                      className="absolute bottom-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-[2px] bg-[#070b0f]/80 hover:bg-black text-foreground border border-border/60 text-[10px] font-medium backdrop-blur-xs transition-colors shadow-sm"
+                      className="absolute bottom-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-[2px] bg-[#070b0f] hover:bg-black text-[#fafbfc] border border-white/20 text-[10px] font-medium transition-colors shadow-sm"
                       title="Kopírovať SVG kód"
                     >
                       {isCopied ? (
@@ -628,7 +628,7 @@ export default function M11MaticaLogotypovModule({
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3 h-3 text-muted-foreground" />
+                          <Copy className="w-3 h-3 text-white/70" />
                           <span>Kopírovať SVG</span>
                         </>
                       )}
@@ -644,18 +644,18 @@ export default function M11MaticaLogotypovModule({
 
                   {/* Badges */}
                   <div className="flex flex-wrap items-center gap-1 text-[9px] font-mono text-muted-foreground uppercase">
-                    <span className="px-1.5 py-0.5 rounded bg-neutral-900 border border-border/40">
+                    <span className="px-1.5 py-0.5 rounded bg-muted border border-border/60">
                       {item.medium}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-neutral-900 border border-border/40">
+                    <span className="px-1.5 py-0.5 rounded bg-muted border border-border/60">
                       {item.orientation}
                     </span>
                     {item.hasClaim && (
-                      <span className="px-1.5 py-0.5 rounded bg-neutral-900 border border-border/40">
+                      <span className="px-1.5 py-0.5 rounded bg-muted border border-border/60">
                         Claim
                       </span>
                     )}
-                    <span className="px-1.5 py-0.5 rounded bg-neutral-900 border border-border/40">
+                    <span className="px-1.5 py-0.5 rounded bg-muted border border-border/60">
                       {item.backgroundType}
                     </span>
                   </div>
@@ -668,7 +668,7 @@ export default function M11MaticaLogotypovModule({
                     {item.formats.map((fmt, idx) => {
                       const pill = FORMAT_PILLS[fmt.format] || {
                         label: fmt.format,
-                        colorClass: "bg-neutral-800 text-foreground border-border",
+                        colorClass: "bg-muted text-muted-foreground border-border/60",
                       };
                       return (
                         <a
@@ -692,23 +692,23 @@ export default function M11MaticaLogotypovModule({
 
       {/* SETTINGS MODAL */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-white/20 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia matice logotypov (M11)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -717,8 +717,8 @@ export default function M11MaticaLogotypovModule({
             {/* Modal Body */}
             <div className="p-5 overflow-y-auto space-y-4 text-xs">
               {/* Allowed Filters Toggles */}
-              <div className="bg-[#17212a] p-4 rounded-[3px] border border-border/40 space-y-3">
-                <span className="font-semibold text-foreground text-xs block">
+              <div className="bg-[#17212a] p-4 rounded-[3px] border border-white/10 space-y-3">
+                <span className="font-semibold text-[#fafbfc] text-xs block">
                   Zobrazené filtre v hornej lište
                 </span>
                 <div className="space-y-2">
@@ -742,9 +742,9 @@ export default function M11MaticaLogotypovModule({
                               : cfg.allowedFilters.filter((x) => x !== f.id);
                             handleSaveConfig({ ...cfg, allowedFilters: updated });
                           }}
-                          className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                          className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                         />
-                        <span className="text-foreground text-[11px]">{f.label}</span>
+                        <span className="text-[#fafbfc] text-[11px]">{f.label}</span>
                       </label>
                     );
                   })}
@@ -752,8 +752,8 @@ export default function M11MaticaLogotypovModule({
               </div>
 
               {/* Columns Selector */}
-              <div className="bg-[#17212a] p-4 rounded-[3px] border border-border/40 space-y-2">
-                <span className="font-semibold text-foreground text-xs block">
+              <div className="bg-[#17212a] p-4 rounded-[3px] border border-white/10 space-y-2">
+                <span className="font-semibold text-[#fafbfc] text-xs block">
                   Počet stĺpcov mriežky na desktope
                 </span>
                 <div className="grid grid-cols-3 gap-2">
@@ -765,7 +765,7 @@ export default function M11MaticaLogotypovModule({
                       className={`p-2 rounded border text-center transition-colors ${
                         cfg.columns === col
                           ? "bg-primary text-primary-foreground font-bold border-primary"
-                          : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                          : "bg-[#070b0f] border-white/10 text-[#96abbe] hover:text-[#fafbfc]"
                       }`}
                     >
                       {col} stĺpce
@@ -776,7 +776,7 @@ export default function M11MaticaLogotypovModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

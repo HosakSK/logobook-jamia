@@ -272,7 +272,7 @@ export default function M08OchrannaZonaLogaModule({
         style={{ borderRadius: brandRadius }}
       >
         {/* VISUAL DIAGRAM AREA */}
-        <div className="relative w-full min-h-[300px] sm:min-h-[360px] bg-neutral-900/40 rounded-[3px] border border-border/40 flex items-center justify-center overflow-hidden p-8 select-none">
+        <div className="relative w-full min-h-[300px] sm:min-h-[360px] bg-muted/40 rounded-[var(--brand-radius,6px)] border border-border/40 flex items-center justify-center overflow-hidden p-8 select-none">
           {cfg.customDiagramUrl ? (
             /* Custom Diagram Fallback Image */
             <div className="relative max-w-full max-h-[320px] flex items-center justify-center">
@@ -294,7 +294,7 @@ export default function M08OchrannaZonaLogaModule({
                     height: `${circleDiameterPx}px`,
                   }}
                 >
-                  <span className="text-[10px] font-mono font-bold text-sky-400 bg-[#0e161d] px-1.5 py-0.5 rounded border border-sky-400/50 -translate-y-1/2 shadow-xs">
+                  <span className="text-[10px] font-mono font-bold text-sky-400 bg-[#070b0f] px-1.5 py-0.5 rounded border border-sky-400/50 -translate-y-1/2 shadow-xs">
                     R = +{circPct}%
                   </span>
                 </div>
@@ -306,11 +306,11 @@ export default function M08OchrannaZonaLogaModule({
                   className="absolute border-2 border-dashed border-primary/80 bg-primary/5 transition-all duration-300 pointer-events-none"
                   style={{
                     inset: `-${rectOffsetPx}px`,
-                    borderRadius: "2px",
+                    borderRadius: "var(--brand-radius, 4px)",
                   }}
                 >
                   {/* Top Measurement Callout (Percentage of width/height) */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#0e161d] px-2 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#070b0f] px-2 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
                     <ArrowLeftRight className="w-3 h-3" />
                     <span>
                       {rectPct}% ({cfg.zones.rectangular.dimension === "width" ? "šírka" : "výška"})
@@ -318,7 +318,7 @@ export default function M08OchrannaZonaLogaModule({
                   </div>
 
                   {/* Right Edge Measurement Callout */}
-                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 flex items-center gap-0.5 bg-[#0e161d] px-1.5 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
+                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 flex items-center gap-0.5 bg-[#070b0f] px-1.5 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
                     <ArrowUpDown className="w-3 h-3" />
                     <span>{rectPct}%</span>
                   </div>
@@ -350,7 +350,7 @@ export default function M08OchrannaZonaLogaModule({
         </div>
 
         {/* RULE TEXT & EXPLANATION (Direct Inline Editable in Editor) */}
-        <div className="bg-muted/40 border border-border/50 p-4 rounded-[3px]">
+        <div className="bg-muted/40 border border-border/50 p-4 rounded-[var(--brand-radius,6px)]">
           <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-xs uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Pravidlo ochrannej zóny</span>
@@ -374,37 +374,37 @@ export default function M08OchrannaZonaLogaModule({
 
       {/* Settings Modal (Percentages & Sliders, Logo Source, Custom Diagram) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia ochrannej zóny (M08)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("zones")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "zones"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Kótovanie v %
@@ -412,10 +412,10 @@ export default function M08OchrannaZonaLogaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("source")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "source"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Zdroj loga
@@ -423,10 +423,10 @@ export default function M08OchrannaZonaLogaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("diagram")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "diagram"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? "border-primary text-primary font-bold"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 3. Vlastný diagram
@@ -434,7 +434,7 @@ export default function M08OchrannaZonaLogaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
               {/* TAB 1: PERCENTAGES & SLIDERS */}
               {modalTab === "zones" && (
                 <div className="space-y-4">

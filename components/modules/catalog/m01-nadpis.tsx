@@ -183,19 +183,19 @@ export default function M01NadpisModule({
               <button
                 type="button"
                 onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
-                className="p-1 rounded-[2px] border border-border/40 flex items-center gap-1 hover:border-primary/60 transition-colors"
+                className="p-1 rounded-[2px] border border-white/20 flex items-center gap-1 hover:border-primary/60 transition-colors text-white/70 hover:text-white"
                 title="Farba dekoračnej linky"
               >
                 <div
                   className="w-3 h-3 rounded-full border border-black/40 shadow-xs"
                   style={{ backgroundColor: accentColor }}
                 />
-                <Palette className="h-2.5 w-2.5 text-muted-foreground" />
+                <Palette className="h-2.5 w-2.5 text-white/75" />
               </button>
 
               {isColorPickerOpen && (
-                <div className="absolute left-0 top-full mt-1 bg-neutral-950 border border-border/80 rounded-[3px] p-2.5 shadow-2xl z-50 w-44 space-y-2 animate-in fade-in zoom-in-95">
-                  <div className="text-[10px] uppercase font-bold text-muted-foreground">
+                <div className="absolute left-0 top-full mt-1 bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] p-2.5 shadow-2xl z-50 w-44 space-y-2 animate-in fade-in zoom-in-95 text-[#fafbfc]">
+                  <div className="text-[10px] uppercase font-bold text-[#96abbe]">
                     Farba linky
                   </div>
 
@@ -231,7 +231,7 @@ export default function M01NadpisModule({
                     type="text"
                     value={accentColor}
                     onChange={(e) => handleUpdateConfig({ accentColor: e.target.value })}
-                    className="w-full h-6 px-1.5 text-[10px] font-mono rounded-[2px] bg-neutral-900 border border-border/40 text-foreground"
+                    className="w-full h-6 px-1.5 text-[10px] font-mono rounded-[var(--brand-radius,4px)] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] focus:border-primary focus:outline-none"
                     placeholder="#HEX"
                   />
                 </div>
@@ -240,7 +240,7 @@ export default function M01NadpisModule({
           )}
 
           {/* Active Locale indicator */}
-          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-neutral-900 border border-border/40 text-muted-foreground">
+          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-white/10 border border-white/20 text-white/70">
             {locale}
           </span>
         </div>

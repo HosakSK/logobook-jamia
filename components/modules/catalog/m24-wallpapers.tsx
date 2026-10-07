@@ -337,7 +337,7 @@ export default function M24FiremneTapetyAPozadiaModule({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
               deviceFramesActive
                 ? "bg-primary/10 text-primary border-primary/30"
-                : "bg-[#17212a] border-border/50 text-muted-foreground hover:text-foreground"
+                : "bg-muted border-border/50 text-muted-foreground hover:text-foreground"
             }`}
             title="Prepnúť vizualizáciu v rámoch zariadení"
           >
@@ -496,7 +496,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                 )}
 
                 {/* Hover zoom lightbox badge */}
-                <div className="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover/preview:opacity-100 transition-opacity bg-black/75 backdrop-blur-xs p-1.5 rounded-md text-white/90 hover:text-white pointer-events-none">
+                <div className="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover/preview:opacity-100 transition-opacity bg-black/80 p-1.5 rounded-md text-white/90 hover:text-white pointer-events-none">
                   <Maximize2 className="w-3.5 h-3.5" />
                 </div>
               </div>
@@ -542,7 +542,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                       href={item.resolutions.uhd_4k}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 rounded bg-[#0e161d] hover:bg-[#1a232c] border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      className="px-2 py-1 rounded bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
                     >
                       <Download className="w-3 h-3 text-primary" />
                       <span>4K UHD (3840×2160)</span>
@@ -554,7 +554,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                       href={item.resolutions.qhd}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 rounded bg-[#0e161d] hover:bg-[#1a232c] border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      className="px-2 py-1 rounded bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
                     >
                       <Download className="w-3 h-3 text-primary" />
                       <span>QHD (2560×1440)</span>
@@ -566,7 +566,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                       href={item.resolutions.fhd}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 rounded bg-[#0e161d] hover:bg-[#1a232c] border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      className="px-2 py-1 rounded bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
                     >
                       <Download className="w-3 h-3 text-primary" />
                       <span>FHD (1920×1080)</span>
@@ -578,7 +578,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                       href={item.resolutions.mobile}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 rounded bg-[#0e161d] hover:bg-[#1a232c] border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      className="px-2 py-1 rounded bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
                     >
                       <Download className="w-3 h-3 text-primary" />
                       <span>Mobile (1170×2532)</span>
@@ -590,7 +590,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                       href={item.resolutions.tablet}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2 py-1 rounded bg-[#0e161d] hover:bg-[#1a232c] border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
+                      className="px-2 py-1 rounded bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/50 text-foreground text-[10px] font-mono font-bold flex items-center gap-1 transition-all"
                     >
                       <Download className="w-3 h-3 text-primary" />
                       <span>Tablet (2048×2732)</span>
@@ -606,27 +606,27 @@ export default function M24FiremneTapetyAPozadiaModule({
       {/* FULLSCREEN LIGHTBOX INSPECTION DIALOG */}
       {lightboxItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 animate-in fade-in duration-200"
           onClick={() => setLightboxItem(null)}
         >
           <div
-            className="w-full max-w-5xl bg-[#131c24] border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+            className="w-full max-w-5xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-[#fafbfc]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Lightbox Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div>
-                <h4 className="font-bold text-foreground text-sm">
+                <h4 className="font-bold text-[#fafbfc] text-sm">
                   {resolveI18nText(lightboxItem.title, locale)}
                 </h4>
-                <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                <span className="text-[10px] font-mono text-[#96abbe] uppercase">
                   {lightboxItem.category} Wallpaper
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setLightboxItem(null)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -646,8 +646,8 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
 
             {/* Lightbox Footer with Resolution Downloads */}
-            <div className="p-4 border-t border-border/60 bg-[#17212a] flex flex-wrap items-center justify-between gap-3">
-              <span className="text-xs text-muted-foreground font-mono">
+            <div className="p-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex flex-wrap items-center justify-between gap-3">
+              <span className="text-xs text-[#96abbe] font-mono">
                 Vyberte rozlíšenie pre stiahnutie:
               </span>
 
@@ -669,7 +669,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                     href={lightboxItem.resolutions.qhd}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#0e161d] hover:bg-[#1f2c36] border border-border text-foreground font-bold text-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded bg-[#070b0f] hover:bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] font-bold text-xs flex items-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5 text-primary" />
                     <span>QHD (2560×1440)</span>
@@ -681,7 +681,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                     href={lightboxItem.resolutions.fhd}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#0e161d] hover:bg-[#1f2c36] border border-border text-foreground font-bold text-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded bg-[#070b0f] hover:bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] font-bold text-xs flex items-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5 text-primary" />
                     <span>FHD (1920×1080)</span>
@@ -693,7 +693,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                     href={lightboxItem.resolutions.mobile}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#0e161d] hover:bg-[#1f2c36] border border-border text-foreground font-bold text-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded bg-[#070b0f] hover:bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] font-bold text-xs flex items-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5 text-primary" />
                     <span>Mobile (1170×2532)</span>
@@ -705,7 +705,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                     href={lightboxItem.resolutions.tablet}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded bg-[#0e161d] hover:bg-[#1f2c36] border border-border text-foreground font-bold text-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded bg-[#070b0f] hover:bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] font-bold text-xs flex items-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5 text-primary" />
                     <span>Tablet (2048×2732)</span>
@@ -721,34 +721,34 @@ export default function M24FiremneTapetyAPozadiaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
                   Správa firemných tapiet (M24)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-border/60 bg-[#101820] px-5 gap-2 pt-2">
+            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setModalTab("wallpapers")}
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "wallpapers"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
@@ -761,7 +761,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "settings"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Sliders className="w-3.5 h-3.5" />
@@ -770,16 +770,16 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
               {/* TAB 1: WALLPAPERS LIST */}
               {modalTab === "wallpapers" && (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Zoznam tapiet a rozlíšení
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Pridajte tapety a doplňte URL odkazy pre jednotlivé rozlíšenia (4K, QHD, FHD,
                         Mobile).
                       </p>
@@ -807,7 +807,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                           wallpapers: [...cfg.wallpapers, newWp],
                         });
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded text-xs font-semibold hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-[var(--brand-radius,4px)] text-xs font-semibold hover:opacity-90 transition-opacity"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Pridať tapetu</span>
@@ -819,10 +819,10 @@ export default function M24FiremneTapetyAPozadiaModule({
                     {cfg.wallpapers.map((wp, index) => (
                       <div
                         key={wp.id}
-                        className="bg-[#17212a] border border-border/50 rounded-lg p-4 space-y-3"
+                        className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-lg p-4 space-y-3"
                       >
                         {/* Header: Category & Frame Type + Delete */}
-                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                        <div className="flex items-center justify-between border-b border-[rgba(63,85,102,0.45)] pb-2">
                           <div className="flex items-center gap-2">
                             {/* Category Select */}
                             <select
@@ -835,7 +835,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                                 };
                                 handleSaveConfig({ ...cfg, wallpapers: updated });
                               }}
-                              className="bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-semibold focus:border-primary focus:outline-none"
+                              className="bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] font-semibold focus:border-primary focus:outline-none"
                             >
                               <option value="desktop">Desktop</option>
                               <option value="mobile">Smartfón</option>
@@ -854,7 +854,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                                 };
                                 handleSaveConfig({ ...cfg, wallpapers: updated });
                               }}
-                              className="bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             >
                               <option value="desktop">Rám: Notebook / Monitor</option>
                               <option value="mobile">Rám: Smartfón</option>
@@ -878,7 +878,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                         {/* Title SK & EN */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov tapety (SK):
                             </label>
                             <input
@@ -897,12 +897,12 @@ export default function M24FiremneTapetyAPozadiaModule({
                                 };
                                 handleSaveConfig({ ...cfg, wallpapers: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov tapety (EN):
                             </label>
                             <input
@@ -921,7 +921,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                                 };
                                 handleSaveConfig({ ...cfg, wallpapers: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
                         </div>
@@ -929,7 +929,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                         {/* Preview Image URL & Upload */}
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Náhľadový obrázok (Preview):
                             </label>
                             <button
@@ -957,20 +957,20 @@ export default function M24FiremneTapetyAPozadiaModule({
                               updated[index].previewUrl = e.target.value;
                               handleSaveConfig({ ...cfg, wallpapers: updated });
                             }}
-                            className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                            className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:border-primary focus:outline-none"
                           />
                         </div>
 
                         {/* Resolution URLs */}
-                        <div className="pt-2 border-t border-border/30 space-y-2">
-                          <span className="text-[11px] font-semibold text-foreground block">
+                        <div className="pt-2 border-t border-[rgba(63,85,102,0.45)] space-y-2">
+                          <span className="text-[11px] font-semibold text-[#fafbfc] block">
                             Odkazy na stiahnutie jednotlivých rozlíšení:
                           </span>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                             {/* 4K UHD */}
-                            <div className="space-y-1 bg-[#0e161d] p-2 rounded border border-border/40">
-                              <span className="text-[10px] font-mono text-muted-foreground block font-bold">
+                            <div className="space-y-1 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)]">
+                              <span className="text-[10px] font-mono text-[#96abbe] block font-bold">
                                 4K UHD (3840×2160):
                               </span>
                               <input
@@ -982,13 +982,13 @@ export default function M24FiremneTapetyAPozadiaModule({
                                   updated[index].resolutions.uhd_4k = e.target.value || null;
                                   handleSaveConfig({ ...cfg, wallpapers: updated });
                                 }}
-                                className="w-full bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="w-full bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
                             </div>
 
                             {/* QHD */}
-                            <div className="space-y-1 bg-[#0e161d] p-2 rounded border border-border/40">
-                              <span className="text-[10px] font-mono text-muted-foreground block font-bold">
+                            <div className="space-y-1 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)]">
+                              <span className="text-[10px] font-mono text-[#96abbe] block font-bold">
                                 QHD (2560×1440):
                               </span>
                               <input
@@ -1000,13 +1000,13 @@ export default function M24FiremneTapetyAPozadiaModule({
                                   updated[index].resolutions.qhd = e.target.value || null;
                                   handleSaveConfig({ ...cfg, wallpapers: updated });
                                 }}
-                                className="w-full bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="w-full bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
                             </div>
 
                             {/* FHD */}
-                            <div className="space-y-1 bg-[#0e161d] p-2 rounded border border-border/40">
-                              <span className="text-[10px] font-mono text-muted-foreground block font-bold">
+                            <div className="space-y-1 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)]">
+                              <span className="text-[10px] font-mono text-[#96abbe] block font-bold">
                                 FHD 1080p (1920×1080):
                               </span>
                               <input
@@ -1018,13 +1018,13 @@ export default function M24FiremneTapetyAPozadiaModule({
                                   updated[index].resolutions.fhd = e.target.value || null;
                                   handleSaveConfig({ ...cfg, wallpapers: updated });
                                 }}
-                                className="w-full bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="w-full bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
                             </div>
 
                             {/* Mobile */}
-                            <div className="space-y-1 bg-[#0e161d] p-2 rounded border border-border/40">
-                              <span className="text-[10px] font-mono text-muted-foreground block font-bold">
+                            <div className="space-y-1 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)]">
+                              <span className="text-[10px] font-mono text-[#96abbe] block font-bold">
                                 Mobile (1170×2532):
                               </span>
                               <input
@@ -1036,13 +1036,13 @@ export default function M24FiremneTapetyAPozadiaModule({
                                   updated[index].resolutions.mobile = e.target.value || null;
                                   handleSaveConfig({ ...cfg, wallpapers: updated });
                                 }}
-                                className="w-full bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="w-full bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
                             </div>
 
                             {/* Tablet */}
-                            <div className="space-y-1 bg-[#0e161d] p-2 rounded border border-border/40 sm:col-span-2">
-                              <span className="text-[10px] font-mono text-muted-foreground block font-bold">
+                            <div className="space-y-1 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)] sm:col-span-2">
+                              <span className="text-[10px] font-mono text-[#96abbe] block font-bold">
                                 Tablet (2048×2732):
                               </span>
                               <input
@@ -1054,7 +1054,7 @@ export default function M24FiremneTapetyAPozadiaModule({
                                   updated[index].resolutions.tablet = e.target.value || null;
                                   handleSaveConfig({ ...cfg, wallpapers: updated });
                                 }}
-                                className="w-full bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="w-full bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
                             </div>
                           </div>
@@ -1069,8 +1069,8 @@ export default function M24FiremneTapetyAPozadiaModule({
               {modalTab === "settings" && (
                 <div className="space-y-6">
                   {/* Grid Columns */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Rozloženie mriežky tapiet
                     </h4>
                     <div className="flex items-center gap-3">
@@ -1079,10 +1079,10 @@ export default function M24FiremneTapetyAPozadiaModule({
                           key={cols}
                           type="button"
                           onClick={() => handleSaveConfig({ ...cfg, gridColumns: cols })}
-                          className={`flex-1 py-2 rounded border text-xs font-bold transition-all ${
+                          className={`flex-1 py-2 rounded-[var(--brand-radius,4px)] border text-xs font-bold transition-all ${
                             cfg.gridColumns === cols
                               ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                              : "bg-[#070b0f] border-[rgba(63,85,102,0.45)] text-[#96abbe] hover:text-[#fafbfc]"
                           }`}
                         >
                           {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
@@ -1092,12 +1092,12 @@ export default function M24FiremneTapetyAPozadiaModule({
                   </div>
 
                   {/* Device Frames Default */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Rámy zariadení (Device Frames)
                     </h4>
-                    <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                      <span className="text-xs text-foreground font-medium">
+                    <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                      <span className="text-xs text-[#fafbfc] font-medium">
                         Zobraziť tapety v rámoch zariadení predvolene
                       </span>
                       <input
@@ -1109,20 +1109,20 @@ export default function M24FiremneTapetyAPozadiaModule({
                             showDeviceFrames: e.target.checked,
                           })
                         }
-                        className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                        className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                       />
                     </label>
                   </div>
 
                   {/* Download All ZIP Settings */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Hromadný ZIP balíček tapiet
                     </h4>
 
                     <div className="space-y-3">
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground font-medium">
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc] font-medium">
                           Zobraziť tlačidlo na stiahnutie všetkých tapiet
                         </span>
                         <input
@@ -1134,12 +1134,12 @@ export default function M24FiremneTapetyAPozadiaModule({
                               showDownloadAllZip: e.target.checked,
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Vlastná URL adresa ZIP archívu (voliteľné):
                         </label>
                         <input
@@ -1152,9 +1152,9 @@ export default function M24FiremneTapetyAPozadiaModule({
                               downloadAllZipUrl: e.target.value || null,
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:border-primary focus:outline-none"
                         />
-                        <span className="text-[10px] text-muted-foreground block">
+                        <span className="text-[10px] text-[#96abbe] block">
                           Ak ponecháte prázdne, systém vygeneruje ZIP súbor automaticky priamo v
                           prehliadači zo všetkých dostupných rozlíšení.
                         </span>
@@ -1166,11 +1166,11 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="px-4 py-1.5 rounded-[3px] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
+                className="px-4 py-1.5 rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
               >
                 Hotovo
               </button>

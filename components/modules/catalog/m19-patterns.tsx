@@ -433,7 +433,7 @@ export default function M19PatternyModule({
                         className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
                       />
                       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="p-2 rounded-full bg-black/60 text-white backdrop-blur-xs">
+                        <span className="p-2 rounded-full bg-black/80 text-white">
                           <Maximize2 className="w-5 h-5" />
                         </span>
                       </div>
@@ -466,7 +466,7 @@ export default function M19PatternyModule({
                         download
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-[3px] bg-[#17212a] border border-border/60 hover:border-primary text-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+                        className="px-3 py-1.5 rounded-[3px] bg-card border border-border/60 hover:border-primary hover:bg-muted/50 text-foreground font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
                       >
                         <Download className="w-3.5 h-3.5 text-primary" />
                         <span>{resolveI18nText(dl.label, locale) || `.${dl.format}`}</span>
@@ -507,7 +507,7 @@ export default function M19PatternyModule({
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 animate-in fade-in duration-200"
           onClick={() => setActiveLightboxImg(null)}
         >
           <div
@@ -536,37 +536,37 @@ export default function M19PatternyModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-2xl bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Grid className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia vzorov a patternov (M19)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("patterns")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "patterns"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Položky vzorov ({cfg.items.length})
@@ -577,7 +577,7 @@ export default function M19PatternyModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "layout"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Rozloženie kariet
@@ -590,7 +590,7 @@ export default function M19PatternyModule({
               {modalTab === "patterns" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-xs">
+                    <span className="font-semibold text-[#fafbfc] text-xs">
                       Zoznam firemných vzorov a textúr:
                     </span>
                     <button
@@ -635,11 +635,11 @@ export default function M19PatternyModule({
                     {cfg.items.map((pattern, index) => (
                       <div
                         key={pattern.id}
-                        className="p-3.5 rounded-[3px] border border-border/50 bg-[#17212a] space-y-3"
+                        className="p-3.5 rounded-[3px] border border-white/10 bg-[#17212a] space-y-3"
                       >
                         {/* Pattern Header */}
-                        <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
-                          <span className="font-bold text-foreground truncate">
+                        <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
+                          <span className="font-bold text-[#fafbfc] truncate">
                             {resolveI18nText(pattern.title, locale) || "Vzor"}
                           </span>
 
@@ -648,7 +648,7 @@ export default function M19PatternyModule({
                               type="button"
                               onClick={() => moveItem(index, "up")}
                               disabled={index === 0}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded bg-[#070b0f] border border-white/15 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Posunúť hore"
                             >
                               <ArrowUp className="w-3.5 h-3.5" />
@@ -657,7 +657,7 @@ export default function M19PatternyModule({
                               type="button"
                               onClick={() => moveItem(index, "down")}
                               disabled={index === cfg.items.length - 1}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-1 rounded bg-[#070b0f] border border-white/15 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Posunúť dole"
                             >
                               <ArrowDown className="w-3.5 h-3.5" />
@@ -668,7 +668,7 @@ export default function M19PatternyModule({
                                 const updated = cfg.items.filter((_, i) => i !== index);
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="p-1 rounded bg-[#0e161d] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
+                              className="p-1 rounded bg-[#070b0f] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
                               title="Zmazať vzor"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -679,7 +679,7 @@ export default function M19PatternyModule({
                         {/* Fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov vzoru:
                             </label>
                             <input
@@ -694,12 +694,12 @@ export default function M19PatternyModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               URL adresa hlavného SVG vzoru / dlaždice:
                             </label>
                             <input
@@ -713,12 +713,12 @@ export default function M19PatternyModule({
                                 }
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           <div className="sm:col-span-2 space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Popis vzoru:
                             </label>
                             <input
@@ -733,7 +733,7 @@ export default function M19PatternyModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
                         </div>
@@ -745,9 +745,9 @@ export default function M19PatternyModule({
 
               {/* TAB 2: LAYOUT */}
               {modalTab === "layout" && (
-                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-border/40">
+                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
                   <div className="space-y-2">
-                    <span className="font-semibold text-foreground text-xs block">
+                    <span className="font-semibold text-[#fafbfc] text-xs block">
                       Spôsob zobrazenia:
                     </span>
                     <div className="grid grid-cols-2 gap-3">
@@ -756,12 +756,12 @@ export default function M19PatternyModule({
                         onClick={() => handleSaveConfig({ ...cfg, layout: "grid" })}
                         className={`p-3 rounded border text-left transition-all ${
                           cfg.layout === "grid"
-                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                            : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                         }`}
                       >
                         <span className="font-bold text-xs block">Mriežka (Grid)</span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-[#96abbe]">
                           Karty vzorov vedľa seba v stĺpcoch
                         </span>
                       </button>
@@ -771,12 +771,12 @@ export default function M19PatternyModule({
                         onClick={() => handleSaveConfig({ ...cfg, layout: "stack" })}
                         className={`p-3 rounded border text-left transition-all ${
                           cfg.layout === "stack"
-                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                            : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                         }`}
                       >
                         <span className="font-bold text-xs block">Zoznam (Stack)</span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-[#96abbe]">
                           Široké karty pod sebou
                         </span>
                       </button>
@@ -784,8 +784,8 @@ export default function M19PatternyModule({
                   </div>
 
                   {cfg.layout === "grid" && (
-                    <div className="space-y-2 pt-2 border-t border-border/40">
-                      <span className="text-xs font-semibold text-foreground block">
+                    <div className="space-y-2 pt-2 border-t border-white/10">
+                      <span className="text-xs font-semibold text-[#fafbfc] block">
                         Počet stĺpcov na veľkých obrazovkách:
                       </span>
                       <div className="flex items-center gap-3">
@@ -797,7 +797,7 @@ export default function M19PatternyModule({
                             className={`px-3 py-1.5 rounded border text-xs font-bold transition-all ${
                               cfg.columns === cols
                                 ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                                : "bg-[#070b0f] border-white/15 text-[#96abbe] hover:text-[#fafbfc]"
                             }`}
                           >
                             {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
@@ -811,7 +811,7 @@ export default function M19PatternyModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

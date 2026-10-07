@@ -11,12 +11,13 @@
   --radius-3xl: 24px;
   --radius-full: 9999px;
 
-  /* Modern startup palette tokens from Design Rules (shifted 1 step lighter for clarity) */
+  /* Modern startup palette tokens from Design Rules (Strictly 6 colors) */
   --color-abyss: #070b0f;
   --color-deep: #0e161d;
   --color-raised: #17212a;
-  --color-elevated: #1f2c36;
-  --color-surface: #2b3b48;
+  --color-canvas-light: #fafbfc;
+  --color-sub-surface: #f1f4f7;
+  --color-gradient-end: #eef2f6;
 
   /* Semantic Theme Tokens bound to CSS variables */
   --color-background: var(--background);
@@ -42,50 +43,49 @@
 
 @layer base {
   html {
-    /* Slightly increased root font size (~3-4%) for better readability and airier proportions */
     font-size: 16.5px;
   }
 
   :root {
-    /* Ergonomic modern radius */
-    --radius: 8px;
-    --radius-element: 8px;
-    --radius-card: 14px;
+    /* Ergonomic modern radius - dynamically inherits --brand-radius */
+    --radius: var(--brand-radius, 8px);
+    --radius-element: var(--brand-radius, 8px);
+    --radius-card: var(--brand-radius, 12px);
 
     /* Brand Accents */
     --color-accent-red: #bb4934;
     --color-accent-lime: #c8d400;
     --color-accent-teal: #009f80;
 
-    /* Default UI is shifted 1 step lighter (Deep as base, Raised as cards, Elevated as popovers) */
+    /* Default UI: Deep base #0e161d, Raised cards #17212a */
     --background: #0e161d;
     --foreground: #fafbfc;
     --card: #17212a;
     --card-foreground: #fafbfc;
-    --popover: #1f2c36;
+    --popover: #17212a;
     --popover-foreground: #fafbfc;
     --primary: #c8d400;
     --primary-foreground: #070b0f;
-    --secondary: #1f2c36;
+    --secondary: #17212a;
     --secondary-foreground: #fafbfc;
-    --muted: #17212a;
+    --muted: #070b0f;
     --muted-foreground: #96abbe;
-    --accent: #1f2c36;
+    --accent: #009f80;
     --accent-foreground: #fafbfc;
     --destructive: #bb4934;
     --destructive-foreground: #ffffff;
     --border: rgba(63, 85, 102, 0.45);
-    --input: #17212a;
+    --input: #070b0f;
     --ring: rgba(200, 212, 0, 0.4);
 
     /* Layered Surfaces */
     --bg-page-start: #0e161d;
     --bg-page-end: #17212a;
-    --bg-card: rgba(23, 33, 42, 0.85);
-    --bg-card-hover: rgba(31, 44, 54, 0.95);
+    --bg-card: #17212a;
+    --bg-card-hover: #1f2c36;
     --bg-elevated: #1f2c36;
     --bg-surface: #2b3b48;
-    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
   }
 
   /* Explicit dark mode class */
@@ -94,51 +94,51 @@
     --foreground: #fafbfc;
     --card: #17212a;
     --card-foreground: #fafbfc;
-    --popover: #1f2c36;
+    --popover: #17212a;
     --popover-foreground: #fafbfc;
     --primary: #c8d400;
     --primary-foreground: #070b0f;
-    --secondary: #1f2c36;
+    --secondary: #17212a;
     --secondary-foreground: #fafbfc;
-    --muted: #17212a;
+    --muted: #070b0f;
     --muted-foreground: #96abbe;
-    --accent: #1f2c36;
+    --accent: #009f80;
     --accent-foreground: #fafbfc;
     --destructive: #bb4934;
     --destructive-foreground: #ffffff;
     --border: rgba(63, 85, 102, 0.45);
-    --input: #17212a;
+    --input: #070b0f;
     --ring: rgba(200, 212, 0, 0.4);
   }
 
-  /* Context 2: Light UI (Default for Logobook detail presentation) */
+  /* Context 2: Light UI (Default for Logobook detail presentation) - strictly 6 design rules colors */
   .theme-light, [data-context="logobook"], [data-theme="light"] {
-    --background: #f9fafb;
-    --foreground: #090e15;
-    --card: #ffffff;
-    --card-foreground: #090e15;
-    --popover: #ffffff;
-    --popover-foreground: #090e15;
+    --background: #fafbfc;
+    --foreground: #0e161d;
+    --card: #f1f4f7;
+    --card-foreground: #0e161d;
+    --popover: #f1f4f7;
+    --popover-foreground: #0e161d;
     --primary: #c8d400;
     --primary-foreground: #070b0f;
-    --secondary: #f0f3f6;
-    --secondary-foreground: #090e15;
-    --muted: #f0f3f6;
-    --muted-foreground: #5a6e82;
-    --accent: #e8ecf1;
-    --accent-foreground: #090e15;
-    --destructive: #d04f38;
+    --secondary: #f1f4f7;
+    --secondary-foreground: #0e161d;
+    --muted: #eef2f6;
+    --muted-foreground: #587489;
+    --accent: #009f80;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
     --destructive-foreground: #ffffff;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: #ffffff;
+    --border: #bac8d6;
+    --input: #fafbfc;
     --ring: rgba(200, 212, 0, 0.4);
 
-    --bg-page-start: #f9fafb;
-    --bg-page-end: #edf1f5;
-    --bg-card: #ffffff;
-    --bg-card-hover: #fbfcfd;
-    --bg-elevated: #f0f3f6;
-    --shadow-card: 0 4px 20px -2px rgba(9, 14, 21, 0.06), 0 1px 3px rgba(9, 14, 21, 0.03);
+    --bg-page-start: #fafbfc;
+    --bg-page-end: #eef2f6;
+    --bg-card: #f1f4f7;
+    --bg-card-hover: #fafbfc;
+    --bg-elevated: #eef2f6;
+    --shadow-card: 0 4px 20px -2px rgba(14, 22, 29, 0.06), 0 1px 3px rgba(14, 22, 29, 0.03);
   }
 }
 
@@ -151,66 +151,23 @@ body {
 }
 
 /* ============================================================================== */
-/* AUTOMATIC RADIUS OVERRIDES (Eliminates legacy boxy 3px look globally)         */
-/* ============================================================================== */
-
-/* 1. Base interactive elements -> 8px */
-[class*="rounded-[3px]"],
-[class*="rounded-[2px]"] {
-  border-radius: 8px !important;
-}
-
-/* 2. Cards, panels, modal dialogs, large containers -> 14px */
-div[class*="rounded-[3px]"][class*="border"],
-div[class*="rounded-[3px]"][class*="bg-raised"],
-div[class*="rounded-[3px]"][class*="card-dark"],
-div[class*="rounded-[3px]"][class*="shadow"],
-div[class*="rounded-[6px]"],
-section[class*="rounded-[3px]"],
-article[class*="rounded-[3px]"],
-form[class*="rounded-[3px]"] {
-  border-radius: 14px !important;
-}
-
-/* 3. Badges, tags, chips, status pills -> Full pill */
-span[class*="rounded-[3px]"][class*="text-[10px]"],
-span[class*="rounded-[3px]"][class*="text-[9px]"],
-span[class*="rounded-[3px]"][class*="text-xs"],
-span[class*="rounded-[3px]"][class*="uppercase"] {
-  border-radius: 9999px !important;
-}
-
-/* 4. Mini swatches */
-div[class*="rounded-[2px]"] {
-  border-radius: 6px !important;
-}
-
-/* ============================================================================== */
 /* 100% SOLID OPAQUE MODALS & DIALOGS (Zero transparency, no bleed-through)      */
 /* ============================================================================== */
 
-/* All modal dialog contents, popup sheets, and drawers */
-.fixed.inset-0.z-50 > div:not([class*="bg-black"]):not([class*="bg-opacity"]),
-.fixed.inset-0.z-50 > div.relative,
-[role="dialog"],
+/* Modal overlays: 100% solid dark overlay, ZERO blur */
+.modal-overlay,
+div[class*="fixed"][class*="inset-0"][class*="bg-black"] {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* All modal dialog contents: solid, opaque, no transparency */
 .modal-content,
-div[class*="fixed"][class*="z-50"] > div[class*="max-w-"],
-div[class*="fixed"][class*="z-50"] > div[class*="w-full"][class*="bg-"] {
-  background-color: #0e161d !important;
-  background-image: none !important;
+[role="dialog"] {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   opacity: 1 !important;
-  border: 1px solid rgba(63, 85, 102, 0.65) !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-}
-
-/* Modal overlays: 100% solid dark overlay, ZERO blur */
-div[class*="fixed"][class*="inset-0"][class*="bg-black"],
-div[class*="fixed"][class*="inset-0"][class*="bg-[#070b0f]"] {
-  background-color: rgba(0, 0, 0, 0.88) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 /* Popover menus, dropdowns, and flyouts: 100% solid opaque */
@@ -220,30 +177,13 @@ div[class*="absolute"][class*="z-50"] {
   -webkit-backdrop-filter: none !important;
 }
 
-/* ============================================================================== */
-/* AIRY SPACING & BREATHING ROOM                                                  */
-/* ============================================================================== */
-
-/* Form inputs comfort padding */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="search"],
-textarea {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  padding-left: 0.85rem;
-  padding-right: 0.85rem;
-}
-
 /* Clean heading spacing */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
 /* ============================================================================== */
-/* MODERN STARTUP SURFACES & GLASSMORPHISM                                        */
+/* MODERN STARTUP SURFACES                                                       */
 /* ============================================================================== */
 
 /* Canvas background with subtle high-tech ambient glows (Deep base) */
@@ -259,29 +199,17 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(180deg, #fafbfc 0%, #eef2f6 100%);
 }
 
-/* Glassmorphic cards (Raised base) with crisp top-edge highlight and slate borders */
-.card-dark,
-[class*="bg-raised/70"],
-[class*="bg-raised"] {
-  background: rgba(23, 33, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Solid cards (Raised base) */
+.card-dark {
+  background-color: #17212a;
   border: 1px solid rgba(63, 85, 102, 0.45);
-  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-dark:hover,
-[class*="bg-raised"]:hover {
-  background: rgba(31, 44, 54, 0.95);
+.card-dark:hover {
+  background-color: #1f2c36;
   border-color: rgba(63, 85, 102, 0.75);
-  box-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-/* Modern slate borders on dark mode */
-.border-border,
-[class*="border-border"] {
-  border-color: rgba(63, 85, 102, 0.45);
 }
 
 /* Electric lime glow utility */
@@ -317,11 +245,11 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Micro-transitions for links and buttons */

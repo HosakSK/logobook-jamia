@@ -378,23 +378,23 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-lg bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-lg bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia edukatívneho sprievodcu (M17)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -404,11 +404,11 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
             <div className="p-5 overflow-y-auto space-y-5 text-xs">
               {/* Checkboxes for systems */}
               <div className="space-y-2.5">
-                <span className="font-semibold text-foreground text-xs block">
+                <span className="font-semibold text-[#fafbfc] text-xs block">
                   Vyberte farebné systémy, ktoré sa majú v tabuľke zobraziť:
                 </span>
 
-                <div className="space-y-2 bg-[#17212a] p-3.5 rounded-[3px] border border-border/40">
+                <div className="space-y-2 bg-[#17212a] p-3.5 rounded-[3px] border border-white/10">
                   {(
                     [
                       { id: "hex", label: "HEX (Web & Digitálne aplikácie)" },
@@ -435,9 +435,9 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
                               },
                             })
                           }
-                          className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                          className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                         />
-                        <span className="text-foreground text-[11px]">{sys.label}</span>
+                        <span className="text-[#fafbfc] text-[11px]">{sys.label}</span>
                       </label>
                     );
                   })}
@@ -446,7 +446,7 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
 
               {/* Custom Note input */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-foreground block">
+                <label className="text-[11px] font-semibold text-[#fafbfc] block">
                   Vlastná doplňujúca poznámka značky (voliteľné):
                 </label>
                 <textarea
@@ -460,16 +460,16 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
                       customNote: val ? { en: val, sk: val } : undefined,
                     });
                   }}
-                  className="w-full bg-[#17212a] border border-border/50 rounded-[2px] p-2 text-xs text-foreground focus:border-primary focus:outline-none"
+                  className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] p-2 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                 />
-                <span className="text-[10px] text-muted-foreground block">
+                <span className="text-[10px] text-[#96abbe] block">
                   Táto poznámka sa vykreslí v spodnej časti ako informačný blok.
                 </span>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

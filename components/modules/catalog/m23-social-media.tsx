@@ -598,10 +598,10 @@ export default function M23SocialMediaModule({
 
                 {/* Top Badges: Platform & Dimensions */}
                 <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
-                  <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-black/70 backdrop-blur-xs text-white border border-white/10">
+                  <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-black/80 text-white border border-white/10">
                     {platInfo?.label || item.platform}
                   </span>
-                  <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-black/50 backdrop-blur-xs text-muted-foreground border border-white/5">
+                  <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-black/60 text-white/80 border border-white/5">
                     {item.type}
                   </span>
                 </div>
@@ -676,7 +676,7 @@ export default function M23SocialMediaModule({
                           href={dl.url || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0e161d] hover:bg-[#1f2c36] border border-border/50 text-foreground text-xs font-medium transition-colors"
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted/60 hover:bg-muted border border-border/50 text-foreground text-xs font-medium transition-colors"
                         >
                           <FormatBadge format={dl.format} />
                           <span className="truncate max-w-[140px] text-[11px]">{dlLabel}</span>
@@ -716,34 +716,34 @@ export default function M23SocialMediaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
                   Správa formátov pre sociálne siete (M23)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-border/60 bg-[#101820] px-5 gap-2 pt-2">
+            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setModalTab("formats")}
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "formats"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
@@ -756,7 +756,7 @@ export default function M23SocialMediaModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "settings"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Settings2 className="w-3.5 h-3.5" />
@@ -765,16 +765,16 @@ export default function M23SocialMediaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
               {/* TAB 1: FORMATS MANAGER */}
               {modalTab === "formats" && (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Zoznam šablón a formátov
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Definujte rozlíšenia a priraďte sťahovacie súbory pre jednotlivé siete.
                       </p>
                     </div>
@@ -799,7 +799,7 @@ export default function M23SocialMediaModule({
                           formats: [...cfg.formats, newFmt],
                         });
                       }}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded text-xs font-semibold hover:opacity-90 transition-opacity"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-[var(--brand-radius,4px)] text-xs font-semibold hover:opacity-90 transition-opacity"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Pridať formát</span>
@@ -811,10 +811,10 @@ export default function M23SocialMediaModule({
                     {cfg.formats.map((fmt, index) => (
                       <div
                         key={fmt.id}
-                        className="bg-[#17212a] border border-border/50 rounded-lg p-4 space-y-3"
+                        className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-lg p-4 space-y-3"
                       >
                         {/* Header: Platform & Type select + Delete */}
-                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                        <div className="flex items-center justify-between border-b border-[rgba(63,85,102,0.45)] pb-2">
                           <div className="flex items-center gap-2">
                             {/* Platform Select */}
                             <select
@@ -827,7 +827,7 @@ export default function M23SocialMediaModule({
                                 };
                                 handleSaveConfig({ ...cfg, formats: updated });
                               }}
-                              className="bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-semibold focus:border-primary focus:outline-none"
+                              className="bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] font-semibold focus:border-primary focus:outline-none"
                             >
                               <option value="instagram">Instagram</option>
                               <option value="linkedin">LinkedIn</option>
@@ -849,7 +849,7 @@ export default function M23SocialMediaModule({
                                 };
                                 handleSaveConfig({ ...cfg, formats: updated });
                               }}
-                              className="bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             >
                               <option value="avatar">Avatar (Profil)</option>
                               <option value="cover">Cover (Hlavička)</option>
@@ -874,7 +874,7 @@ export default function M23SocialMediaModule({
                         {/* Title & Dimensions */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div className="sm:col-span-2 space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov formátu:
                             </label>
                             <input
@@ -893,14 +893,14 @@ export default function M23SocialMediaModule({
                                 };
                                 handleSaveConfig({ ...cfg, formats: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           {/* Dimensions Width x Height */}
                           <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Šírka (px):
                               </label>
                               <input
@@ -917,11 +917,11 @@ export default function M23SocialMediaModule({
                                   };
                                   handleSaveConfig({ ...cfg, formats: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Výška (px):
                               </label>
                               <input
@@ -938,7 +938,7 @@ export default function M23SocialMediaModule({
                                   };
                                   handleSaveConfig({ ...cfg, formats: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                               />
                             </div>
                           </div>
@@ -947,7 +947,7 @@ export default function M23SocialMediaModule({
                         {/* Preview Image URL & Upload */}
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               URL obrázka náhľadu:
                             </label>
                             <button
@@ -974,14 +974,14 @@ export default function M23SocialMediaModule({
                               };
                               handleSaveConfig({ ...cfg, formats: updated });
                             }}
-                            className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                            className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:border-primary focus:outline-none"
                           />
                         </div>
 
                         {/* Downloads for this format */}
-                        <div className="pt-2 border-t border-border/30 space-y-2">
+                        <div className="pt-2 border-t border-[rgba(63,85,102,0.45)] space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-semibold text-foreground">
+                            <span className="text-[11px] font-semibold text-[#fafbfc]">
                               Tlačidlá na stiahnutie:
                             </span>
                             <button
@@ -1010,7 +1010,7 @@ export default function M23SocialMediaModule({
                           {fmt.downloads.map((dl, dlIdx) => (
                             <div
                               key={dl.id}
-                              className="flex items-center gap-2 bg-[#0e161d] p-2 rounded border border-border/40"
+                              className="flex items-center gap-2 bg-[#070b0f] p-2 rounded border border-[rgba(63,85,102,0.45)]"
                             >
                               <select
                                 value={dl.format}
@@ -1022,7 +1022,7 @@ export default function M23SocialMediaModule({
                                   };
                                   handleSaveConfig({ ...cfg, formats: updated });
                                 }}
-                                className="bg-[#17212a] border border-border/50 rounded px-2 py-1 text-[11px] text-foreground font-mono focus:outline-none"
+                                className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-[11px] text-[#fafbfc] font-mono focus:outline-none"
                               >
                                 <option value="PNG">PNG</option>
                                 <option value="PSD">PSD</option>
@@ -1048,7 +1048,7 @@ export default function M23SocialMediaModule({
                                   };
                                   handleSaveConfig({ ...cfg, formats: updated });
                                 }}
-                                className="flex-1 bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:outline-none"
+                                className="flex-1 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 focus:outline-none"
                               />
 
                               <input
@@ -1063,7 +1063,7 @@ export default function M23SocialMediaModule({
                                   };
                                   handleSaveConfig({ ...cfg, formats: updated });
                                 }}
-                                className="flex-1 bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:outline-none"
+                                className="flex-1 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded px-2 py-1 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:outline-none"
                               />
 
                               <button
@@ -1092,11 +1092,11 @@ export default function M23SocialMediaModule({
               {modalTab === "settings" && (
                 <div className="space-y-6">
                   {/* Platforms toggles */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Povolené sociálne siete
                     </h4>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[11px] text-[#96abbe]">
                       Označte siete, pre ktoré chcete zobrazovať záložky a filtre.
                     </p>
 
@@ -1108,9 +1108,9 @@ export default function M23SocialMediaModule({
                         return (
                           <label
                             key={platKey}
-                            className="flex items-center justify-between p-2 rounded bg-[#0e161d] border border-border/40 cursor-pointer"
+                            className="flex items-center justify-between p-2 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer"
                           >
-                            <span className="text-xs text-foreground font-medium">
+                            <span className="text-xs text-[#fafbfc] font-medium">
                               {info.label}
                             </span>
                             <input
@@ -1122,7 +1122,7 @@ export default function M23SocialMediaModule({
                                   : cfg.platforms.filter((p) => p !== platKey);
                                 handleSaveConfig({ ...cfg, platforms: updated });
                               }}
-                              className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                              className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                             />
                           </label>
                         );
@@ -1131,14 +1131,14 @@ export default function M23SocialMediaModule({
                   </div>
 
                   {/* Download All ZIP Settings */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Globálny balíček (Stiahnuť celý Social Kit)
                     </h4>
 
                     <div className="space-y-3">
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground font-medium">
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc] font-medium">
                           Zobraziť tlačidlo na stiahnutie celého balíčka
                         </span>
                         <input
@@ -1150,12 +1150,12 @@ export default function M23SocialMediaModule({
                               showDownloadAllZip: e.target.checked,
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Vlastná URL adresa ZIP balíčka (voliteľné):
                         </label>
                         <input
@@ -1168,9 +1168,9 @@ export default function M23SocialMediaModule({
                               downloadAllZipUrl: e.target.value || null,
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:border-primary focus:outline-none"
                         />
-                        <span className="text-[10px] text-muted-foreground block">
+                        <span className="text-[10px] text-[#96abbe] block">
                           Ak ponecháte prázdne, systém vygeneruje ZIP súbor automaticky priamo v
                           prehliadači zo všetkých dostupných náhľadov.
                         </span>
@@ -1182,11 +1182,11 @@ export default function M23SocialMediaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="px-4 py-1.5 rounded-[3px] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
+                className="px-4 py-1.5 rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
               >
                 Hotovo
               </button>

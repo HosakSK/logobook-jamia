@@ -126,17 +126,17 @@ export default function M06OddelovacMedzeraModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m06:opacity-100 transition-opacity duration-150 absolute -top-10 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs whitespace-nowrap">
+        <div className="opacity-0 group-hover/m06:opacity-100 transition-opacity duration-150 absolute -top-10 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 shadow-xl text-xs whitespace-nowrap text-white">
           {/* Mode Switch: Divider vs Spacer */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
             <button
               type="button"
               title="Deliaca čiara (Divider)"
               onClick={() => handleSaveConfig({ ...cfg, type: "divider" })}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] transition-colors ${
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-[1px] transition-colors ${
                 cfg.type === "divider"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <Minus className="w-3.5 h-3.5" />
@@ -146,10 +146,10 @@ export default function M06OddelovacMedzeraModule({
               type="button"
               title="Vertikálna medzera (Spacer)"
               onClick={() => handleSaveConfig({ ...cfg, type: "spacer" })}
-              className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] transition-colors ${
+              className={`flex items-center gap-1 px-2 py-0.5 rounded-[1px] transition-colors ${
                 cfg.type === "spacer"
-                  ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  ? "bg-primary text-[#070b0f] font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               }`}
             >
               <MoveVertical className="w-3.5 h-3.5" />
@@ -159,8 +159,8 @@ export default function M06OddelovacMedzeraModule({
 
           {/* Spacer Controls */}
           {cfg.type === "spacer" && (
-            <div className="flex items-center gap-0.5">
-              <span className="text-[10px] text-muted-foreground px-1 font-mono uppercase">
+            <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5">
+              <span className="text-[10px] text-white/70 px-1 font-mono uppercase">
                 Výška:
               </span>
               {SPACER_HEIGHTS.map((h) => (
@@ -169,10 +169,10 @@ export default function M06OddelovacMedzeraModule({
                   type="button"
                   title={`${h}px`}
                   onClick={() => handleSaveConfig({ ...cfg, height: h })}
-                  className={`px-1.5 py-0.5 rounded-[2px] text-[11px] font-mono transition-colors ${
+                  className={`px-1.5 py-0.5 rounded-[1px] text-[11px] font-mono transition-colors ${
                     cfg.height === h
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   {h}
@@ -185,7 +185,7 @@ export default function M06OddelovacMedzeraModule({
           {cfg.type === "divider" && (
             <>
               {/* Style Selector (Solid, Dashed, Dotted, None/0px) */}
-              <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+              <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
                 {(
                   [
                     { id: "solid", label: "Plná" },
@@ -205,10 +205,10 @@ export default function M06OddelovacMedzeraModule({
                         thickness: st.id === "none" ? 0 : cfg.thickness === 0 ? 1 : cfg.thickness,
                       })
                     }
-                    className={`px-1.5 py-0.5 rounded-[2px] text-[11px] transition-colors ${
+                    className={`px-1.5 py-0.5 rounded-[1px] text-[11px] transition-colors ${
                       cfg.style === st.id
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                        ? "bg-primary text-[#070b0f] font-bold"
+                        : "text-white/75 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     {st.id === "none" ? <EyeOff className="w-3 h-3" /> : st.label}
@@ -218,7 +218,7 @@ export default function M06OddelovacMedzeraModule({
 
               {/* Thickness Selector if not style "none" */}
               {cfg.style !== "none" && (
-                <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+                <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
                   {[0, 1, 2, 4].map((th) => (
                     <button
                       key={th}
@@ -231,10 +231,10 @@ export default function M06OddelovacMedzeraModule({
                           style: th === 0 ? "none" : cfg.style === "none" ? "solid" : cfg.style,
                         })
                       }
-                      className={`px-1.5 py-0.5 rounded-[2px] text-[10px] font-mono transition-colors ${
+                      className={`px-1.5 py-0.5 rounded-[1px] text-[10px] font-mono transition-colors ${
                         cfg.thickness === th
-                          ? "bg-primary text-primary-foreground font-bold"
-                          : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                          ? "bg-primary text-[#070b0f] font-bold"
+                          : "text-white/75 hover:text-white hover:bg-white/10"
                       }`}
                     >
                       {th}px
@@ -244,15 +244,15 @@ export default function M06OddelovacMedzeraModule({
               )}
 
               {/* Width Selector */}
-              <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+              <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
                 <button
                   type="button"
                   title="Šírka 100%"
                   onClick={() => handleSaveConfig({ ...cfg, width: "100" })}
-                  className={`p-1 rounded-[2px] transition-colors ${
+                  className={`p-1 rounded-[1px] transition-colors ${
                     cfg.width === "100"
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <Maximize2 className="w-3 h-3" />
@@ -261,10 +261,10 @@ export default function M06OddelovacMedzeraModule({
                   type="button"
                   title="Šírka 50% na stred"
                   onClick={() => handleSaveConfig({ ...cfg, width: "50_center" })}
-                  className={`p-1 rounded-[2px] transition-colors ${
+                  className={`p-1 rounded-[1px] transition-colors ${
                     cfg.width === "50_center"
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <AlignCenter className="w-3 h-3" />
@@ -273,10 +273,10 @@ export default function M06OddelovacMedzeraModule({
                   type="button"
                   title="Šírka 25% vľavo"
                   onClick={() => handleSaveConfig({ ...cfg, width: "25_left" })}
-                  className={`p-1 rounded-[2px] transition-colors ${
+                  className={`p-1 rounded-[1px] transition-colors ${
                     cfg.width === "25_left"
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <AlignLeft className="w-3 h-3" />
@@ -284,8 +284,8 @@ export default function M06OddelovacMedzeraModule({
               </div>
 
               {/* Margin Selector (Small, Medium, Large, None) */}
-              <div className="flex items-center border-r border-border/50 pr-1 mr-1">
-                <span className="text-[10px] text-muted-foreground px-1 font-mono uppercase">
+              <div className="flex items-center border-r border-white/20 pr-1 mr-1 gap-0.5 bg-white/10 rounded-[2px] p-0.5">
+                <span className="text-[10px] text-white/70 px-1 font-mono uppercase">
                   Medzera:
                 </span>
                 {(
@@ -301,10 +301,10 @@ export default function M06OddelovacMedzeraModule({
                     type="button"
                     title={`Medzera: ${mg.id}`}
                     onClick={() => handleSaveConfig({ ...cfg, margin: mg.id })}
-                    className={`px-1.5 py-0.5 rounded-[2px] text-[10px] font-mono transition-colors ${
+                    className={`px-1.5 py-0.5 rounded-[1px] text-[10px] font-mono transition-colors ${
                       cfg.margin === mg.id
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                        ? "bg-primary text-[#070b0f] font-bold"
+                        : "text-white/75 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     {mg.label}
@@ -314,15 +314,15 @@ export default function M06OddelovacMedzeraModule({
 
               {/* Color Selector */}
               {!isInvisibleDivider && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 bg-white/10 rounded-[2px] p-0.5">
                   <button
                     type="button"
                     title="Neutrálna farba"
                     onClick={() => handleSaveConfig({ ...cfg, color: "neutral" })}
-                    className={`px-1.5 py-0.5 rounded-[2px] text-[10px] transition-colors ${
+                    className={`px-1.5 py-0.5 rounded-[1px] text-[10px] transition-colors ${
                       cfg.color === "neutral"
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                        ? "bg-primary text-[#070b0f] font-bold"
+                        : "text-white/75 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     Neutral
@@ -331,10 +331,10 @@ export default function M06OddelovacMedzeraModule({
                     type="button"
                     title="Akcentná farba značky"
                     onClick={() => handleSaveConfig({ ...cfg, color: "accent" })}
-                    className={`px-1.5 py-0.5 rounded-[2px] text-[10px] transition-colors ${
+                    className={`px-1.5 py-0.5 rounded-[1px] text-[10px] transition-colors ${
                       cfg.color === "accent"
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                        ? "bg-primary text-[#070b0f] font-bold"
+                        : "text-white/75 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     Akcent
@@ -343,10 +343,10 @@ export default function M06OddelovacMedzeraModule({
                     type="button"
                     title="Vlastná farba"
                     onClick={() => setIsColorPickerOpen(!isColorPickerOpen)}
-                    className={`p-1 rounded-[2px] transition-colors ${
+                    className={`p-1 rounded-[1px] transition-colors ${
                       cfg.color === "custom"
-                        ? "bg-primary text-primary-foreground font-bold"
-                        : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                        ? "bg-primary text-[#070b0f] font-bold"
+                        : "text-white/75 hover:text-white hover:bg-white/10"
                     }`}
                   >
                     <Palette className="w-3 h-3" />
@@ -360,7 +360,7 @@ export default function M06OddelovacMedzeraModule({
 
       {/* Color Picker Flyout for Custom Hex */}
       {isEditor && isColorPickerOpen && (
-        <div className="absolute top-0 right-4 z-40 bg-[#17212a] border border-border/80 rounded-[3px] p-2.5 shadow-2xl flex items-center gap-2">
+        <div className="absolute top-0 right-4 z-40 bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] p-2.5 shadow-2xl flex items-center gap-2 text-[#fafbfc]">
           <input
             type="color"
             value={cfg.customHex || "#009f80"}
@@ -371,7 +371,7 @@ export default function M06OddelovacMedzeraModule({
                 customHex: e.target.value,
               })
             }
-            className="w-7 h-7 rounded border border-border/60 bg-transparent cursor-pointer"
+            className="w-7 h-7 rounded border border-white/20 bg-transparent cursor-pointer"
           />
           <input
             type="text"
@@ -384,12 +384,12 @@ export default function M06OddelovacMedzeraModule({
                 customHex: e.target.value,
               })
             }
-            className="w-24 bg-[#0e161d] border border-border/70 rounded-[2px] px-2 py-1 text-foreground font-mono text-xs"
+            className="w-24 bg-[#070b0f] border border-[rgba(63,85,102,0.5)] rounded-[var(--brand-radius,4px)] px-2 py-1 text-[#fafbfc] font-mono text-xs focus:border-primary focus:outline-none"
           />
           <button
             type="button"
             onClick={() => setIsColorPickerOpen(false)}
-            className="p-1 rounded bg-primary text-primary-foreground hover:opacity-90"
+            className="p-1 rounded bg-primary text-[#070b0f] font-bold hover:opacity-90"
           >
             <Check className="w-3.5 h-3.5" />
           </button>
@@ -408,7 +408,7 @@ export default function M06OddelovacMedzeraModule({
           }`}
         >
           {isEditor && (
-            <span className="text-[10px] font-mono text-muted-foreground/80 px-2 py-0.5 rounded-[2px] bg-[#0e161d]/80 border border-border/40">
+            <span className="text-[10px] font-mono text-muted-foreground/80 px-2 py-0.5 rounded-[var(--brand-radius,4px)] bg-muted/80 border border-border/40">
               Spacer: {cfg.height}px
             </span>
           )}

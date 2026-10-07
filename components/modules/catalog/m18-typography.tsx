@@ -373,7 +373,7 @@ export default function M18TypografiaModule({
                     setTestSize(36);
                     setTestWeight(400);
                   }}
-                  className="p-1 rounded text-muted-foreground hover:text-foreground border border-border/40 bg-[#0e161d]"
+                  className="p-1 rounded text-muted-foreground hover:text-foreground border border-border/40 bg-card hover:bg-muted transition-colors"
                   title="Obnoviť predvolený text a nastavenia"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -388,7 +388,7 @@ export default function M18TypografiaModule({
                 value={testText}
                 onChange={(e) => setTestText(e.target.value)}
                 placeholder="Napíšte si vlastný text..."
-                className="w-full bg-[#17212a] border border-border/60 rounded-[3px] p-4 text-foreground focus:outline-none focus:border-primary transition-all resize-y min-h-[110px]"
+                className="w-full bg-muted/40 border border-border/60 rounded-[3px] p-4 text-foreground focus:outline-none focus:border-primary transition-all resize-y min-h-[110px]"
                 style={{
                   fontFamily: targetFontFamily,
                   fontSize: `${testSize}px`,
@@ -408,7 +408,7 @@ export default function M18TypografiaModule({
               Typografická hierarchia & Rytmus:
             </span>
 
-            <div className="space-y-4 bg-[#17212a] p-5 rounded-[3px] border border-border/50 divide-y divide-border/30">
+            <div className="space-y-4 bg-muted/30 p-5 rounded-[3px] border border-border/50 divide-y divide-border/30">
               {/* H1 */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
@@ -499,37 +499,37 @@ export default function M18TypografiaModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-xl bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-xl bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Type className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia typografického modulu (M18)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("font")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "font"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Výber písma
@@ -540,7 +540,7 @@ export default function M18TypografiaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "weights"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Rezy písma
@@ -551,7 +551,7 @@ export default function M18TypografiaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "hierarchy"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 3. Hierarchia a sekcie
@@ -564,12 +564,12 @@ export default function M18TypografiaModule({
               {modalTab === "font" && (
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-semibold text-foreground block">
+                    <label className="text-[11px] font-semibold text-[#fafbfc] block">
                       Zvoľte písmo z globálnej typografie značky:
                     </label>
 
                     {brandTypography.length === 0 ? (
-                      <div className="text-muted-foreground p-3.5 bg-[#17212a] rounded border border-border/40">
+                      <div className="text-[#96abbe] p-3.5 bg-[#17212a] rounded border border-white/10">
                         V projekte zatiaľ nie sú vytvorené vlastné záznamy písiem. Modul používa predvolené písmo Plus Jakarta Sans.
                       </div>
                     ) : (
@@ -581,7 +581,7 @@ export default function M18TypografiaModule({
                             typographyId: e.target.value || null,
                           })
                         }
-                        className="w-full bg-[#17212a] border border-border/50 rounded-[2px] p-2 text-xs text-foreground focus:border-primary focus:outline-none"
+                        className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] p-2 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       >
                         {brandTypography.map((t) => (
                           <option key={t.id} value={t.id}>
@@ -592,9 +592,9 @@ export default function M18TypografiaModule({
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/40">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-muted-foreground block">
+                      <label className="text-[10px] font-mono text-[#96abbe] block">
                         Autor / Písmoliatňa:
                       </label>
                       <input
@@ -603,12 +603,12 @@ export default function M18TypografiaModule({
                         onChange={(e) =>
                           handleSaveConfig({ ...cfg, authors: e.target.value })
                         }
-                        className="w-full bg-[#17212a] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                        className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-muted-foreground block">
+                      <label className="text-[10px] font-mono text-[#96abbe] block">
                         Licenčné podmienky:
                       </label>
                       <input
@@ -617,13 +617,13 @@ export default function M18TypografiaModule({
                         onChange={(e) =>
                           handleSaveConfig({ ...cfg, license: e.target.value })
                         }
-                        className="w-full bg-[#17212a] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                        className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer bg-[#17212a] p-3 rounded-[3px] border border-border/40">
+                    <label className="flex items-center gap-2 cursor-pointer bg-[#17212a] p-3 rounded-[3px] border border-white/10">
                       <input
                         type="checkbox"
                         checked={cfg.isVariableFont}
@@ -633,13 +633,13 @@ export default function M18TypografiaModule({
                             isVariableFont: e.target.checked,
                           })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                       />
                       <div>
-                        <span className="text-foreground text-[11px] font-semibold block">
+                        <span className="text-[#fafbfc] text-[11px] font-semibold block">
                           Písmo je variabilné (Variable Font)
                         </span>
-                        <span className="text-muted-foreground text-[10px] block">
+                        <span className="text-[#96abbe] text-[10px] block">
                           Umožní v Type Testeri plynulý posuvník hrúbky 100 až 900
                         </span>
                       </div>
@@ -651,11 +651,11 @@ export default function M18TypografiaModule({
               {/* TAB 2: WEIGHTS CHECKBOX LIST */}
               {modalTab === "weights" && (
                 <div className="space-y-3">
-                  <span className="font-semibold text-foreground text-xs block">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Vyberte hrúbky rezu (Weights), ktoré sa majú vo vzorkovníku prezentovať:
                   </span>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-[#17212a] p-3.5 rounded-[3px] border border-border/40">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-[#17212a] p-3.5 rounded-[3px] border border-white/10">
                     {AVAILABLE_WEIGHTS.map((weight) => {
                       const isChecked = cfg.selectedWeights.includes(weight.value);
 
@@ -677,9 +677,9 @@ export default function M18TypografiaModule({
                               updated.sort((a, b) => a - b);
                               handleSaveConfig({ ...cfg, selectedWeights: updated });
                             }}
-                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                           />
-                          <span className="text-foreground text-[11px] font-mono">
+                          <span className="text-[#fafbfc] text-[11px] font-mono">
                             {weight.label}
                           </span>
                         </label>
@@ -693,7 +693,7 @@ export default function M18TypografiaModule({
               {modalTab === "hierarchy" && (
                 <div className="space-y-4">
                   {/* Toggles */}
-                  <div className="space-y-2 bg-[#17212a] p-3 rounded-[3px] border border-border/40">
+                  <div className="space-y-2 bg-[#17212a] p-3 rounded-[3px] border border-white/10">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -701,9 +701,9 @@ export default function M18TypografiaModule({
                         onChange={(e) =>
                           handleSaveConfig({ ...cfg, showGlyphSet: e.target.checked })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                       />
-                      <span className="text-foreground text-[11px]">
+                      <span className="text-[#fafbfc] text-[11px]">
                         Zobraziť znakovú sadu a rezy písma (Glyph Set)
                       </span>
                     </label>
@@ -715,9 +715,9 @@ export default function M18TypografiaModule({
                         onChange={(e) =>
                           handleSaveConfig({ ...cfg, showTypeTester: e.target.checked })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                       />
-                      <span className="text-foreground text-[11px]">
+                      <span className="text-[#fafbfc] text-[11px]">
                         Zobraziť interaktívny Type Tester s posuvníkmi
                       </span>
                     </label>
@@ -729,9 +729,9 @@ export default function M18TypografiaModule({
                         onChange={(e) =>
                           handleSaveConfig({ ...cfg, showHierarchyTable: e.target.checked })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                       />
-                      <span className="text-foreground text-[11px]">
+                      <span className="text-[#fafbfc] text-[11px]">
                         Zobraziť tabuľku typografickej hierarchie (H1, H2, H3, Body)
                       </span>
                     </label>
@@ -740,7 +740,7 @@ export default function M18TypografiaModule({
                   {/* Hierarchy Inputs */}
                   {cfg.showHierarchyTable && (
                     <div className="space-y-3">
-                      <span className="font-semibold text-foreground text-xs block">
+                      <span className="font-semibold text-[#fafbfc] text-xs block">
                         Technické parametre hierarchie:
                       </span>
 
@@ -750,13 +750,13 @@ export default function M18TypografiaModule({
                           return (
                             <div
                               key={level}
-                              className="bg-[#17212a] p-2.5 rounded-[2px] border border-border/50 space-y-1.5"
+                              className="bg-[#17212a] p-2.5 rounded-[2px] border border-white/10 space-y-1.5"
                             >
                               <span className="text-primary font-bold uppercase block">
                                 {level}
                               </span>
                               <div>
-                                <span className="text-[10px] text-muted-foreground block">
+                                <span className="text-[10px] text-[#96abbe] block">
                                   Veľkosť (px):
                                 </span>
                                 <input
@@ -772,12 +772,12 @@ export default function M18TypografiaModule({
                                       },
                                     });
                                   }}
-                                  className="w-full bg-[#0e161d] border border-border/50 rounded px-1.5 py-0.5 text-foreground"
+                                  className="w-full bg-[#070b0f] border border-white/15 rounded px-1.5 py-0.5 text-[#fafbfc]"
                                 />
                               </div>
 
                               <div>
-                                <span className="text-[10px] text-muted-foreground block">
+                                <span className="text-[10px] text-[#96abbe] block">
                                   Line-height:
                                 </span>
                                 <input
@@ -794,7 +794,7 @@ export default function M18TypografiaModule({
                                       },
                                     });
                                   }}
-                                  className="w-full bg-[#0e161d] border border-border/50 rounded px-1.5 py-0.5 text-foreground"
+                                  className="w-full bg-[#070b0f] border border-white/15 rounded px-1.5 py-0.5 text-[#fafbfc]"
                                 />
                               </div>
                             </div>
@@ -808,7 +808,7 @@ export default function M18TypografiaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

@@ -760,7 +760,7 @@ export default function M20DosAndDontsModule({
           {/* WARNING SECTION (AK SÚ DEFINOVANÉ VÝSTRAHY) */}
           {warningItems.length > 0 && (
             <div
-              className="bg-[#17212a] border rounded-lg p-4 sm:p-5 space-y-3"
+              className="bg-card border rounded-lg p-4 sm:p-5 space-y-3"
               style={{
                 borderColor: `${resolvedWarningColor}40`,
                 borderRadius: brandRadius,
@@ -785,7 +785,7 @@ export default function M20DosAndDontsModule({
                   return (
                     <div
                       key={item.id}
-                      className="flex items-start gap-2 p-2 rounded bg-[#0e161d] border border-border/40"
+                      className="flex items-start gap-2 p-2 rounded bg-muted/40 border border-border/40"
                     >
                       <div
                         className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
@@ -814,34 +814,37 @@ export default function M20DosAndDontsModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+          <div
+            className="w-full max-w-3xl bg-[#0e161d] border border-white/15 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
+            style={{ borderRadius: brandRadius }}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
                   Správa pravidiel Do's & Don'ts (M20)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Navigation Tabs */}
-            <div className="flex items-center border-b border-border/60 bg-[#101820] px-5 gap-2 pt-2">
+            <div className="flex items-center border-b border-white/10 bg-[#070b0f] px-5 gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setModalTab("items")}
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "items"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
@@ -854,7 +857,7 @@ export default function M20DosAndDontsModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "settings"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Palette className="w-3.5 h-3.5" />
@@ -863,16 +866,16 @@ export default function M20DosAndDontsModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 text-xs">
               {/* TAB 1: ITEMS MANAGEMENT */}
               {modalTab === "items" && (
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Zoznam pravidiel
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Definujte povolené a zakázané zásady používania identity.
                       </p>
                     </div>
@@ -912,12 +915,12 @@ export default function M20DosAndDontsModule({
                     {cfg.items.map((item, index) => (
                       <div
                         key={item.id}
-                        className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3 relative group/item"
+                        className="bg-[#17212a] border border-white/10 rounded p-4 space-y-3 relative group/item"
                       >
                         {/* Top bar with type selector and controls */}
-                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
                           {/* Type toggle */}
-                          <div className="flex items-center gap-1 bg-[#0e161d] p-0.5 rounded border border-border/40">
+                          <div className="flex items-center gap-1 bg-[#070b0f] p-0.5 rounded border border-white/15">
                             <button
                               type="button"
                               onClick={() => {
@@ -928,7 +931,7 @@ export default function M20DosAndDontsModule({
                               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold transition-all ${
                                 item.type === "do"
                                   ? "bg-emerald-500 text-white shadow-xs"
-                                  : "text-muted-foreground hover:text-foreground"
+                                  : "text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               <Check className="w-3 h-3 stroke-[3]" />
@@ -945,7 +948,7 @@ export default function M20DosAndDontsModule({
                               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold transition-all ${
                                 item.type === "dont"
                                   ? "bg-rose-500 text-white shadow-xs"
-                                  : "text-muted-foreground hover:text-foreground"
+                                  : "text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               <X className="w-3 h-3 stroke-[3]" />
@@ -962,7 +965,7 @@ export default function M20DosAndDontsModule({
                               className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold transition-all ${
                                 item.type === "warning"
                                   ? "bg-amber-500 text-white shadow-xs"
-                                  : "text-muted-foreground hover:text-foreground"
+                                  : "text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               <AlertTriangle className="w-3 h-3 stroke-[3]" />
@@ -976,7 +979,7 @@ export default function M20DosAndDontsModule({
                               type="button"
                               disabled={index === 0}
                               onClick={() => moveItem(index, "up")}
-                              className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                              className="p-1 rounded text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 transition-colors"
                               title="Posunúť vyššie"
                             >
                               <ArrowUp className="w-4 h-4" />
@@ -985,7 +988,7 @@ export default function M20DosAndDontsModule({
                               type="button"
                               disabled={index === cfg.items.length - 1}
                               onClick={() => moveItem(index, "down")}
-                              className="p-1 rounded text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+                              className="p-1 rounded text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 transition-colors"
                               title="Posunúť nižšie"
                             >
                               <ArrowDown className="w-4 h-4" />
@@ -1008,7 +1011,7 @@ export default function M20DosAndDontsModule({
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                           {/* Title SK */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov pravidla (SK):
                             </label>
                             <input
@@ -1027,13 +1030,13 @@ export default function M20DosAndDontsModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           {/* Title EN */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov pravidla (EN):
                             </label>
                             <input
@@ -1052,13 +1055,13 @@ export default function M20DosAndDontsModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           {/* Description SK */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Popis pravidla (SK):
                             </label>
                             <textarea
@@ -1077,13 +1080,13 @@ export default function M20DosAndDontsModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none resize-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none resize-none"
                             />
                           </div>
 
                           {/* Description EN */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Popis pravidla (EN):
                             </label>
                             <textarea
@@ -1102,14 +1105,14 @@ export default function M20DosAndDontsModule({
                                 };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none resize-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none resize-none"
                             />
                           </div>
 
                           {/* Image source with direct file upload */}
                           <div className="space-y-1 sm:col-span-2">
                             <div className="flex items-center justify-between">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Obrázok ukážky (JPG, PNG, SVG):
                               </label>
                               <div className="flex items-center gap-2">
@@ -1145,7 +1148,7 @@ export default function M20DosAndDontsModule({
                                         assetPickerRuleIndex === index ? null : index
                                       )
                                     }
-                                    className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                    className="text-[10px] text-[#96abbe] hover:text-[#fafbfc] flex items-center gap-1"
                                   >
                                     <ImageIcon className="w-3 h-3" />
                                     <span>Z knižnice log</span>
@@ -1164,13 +1167,13 @@ export default function M20DosAndDontsModule({
                                 updated[index] = { ...updated[index], imageUrl: val };
                                 handleSaveConfig({ ...cfg, items: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none font-mono"
                             />
                           </div>
 
                           {/* Card background selector */}
                           <div className="space-y-1 sm:col-span-2">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Podklad plátna náhľadu:
                             </label>
                             <div className="flex items-center gap-2">
@@ -1182,7 +1185,7 @@ export default function M20DosAndDontsModule({
                                   updated[index] = { ...updated[index], background: val };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="flex-1 bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="flex-1 bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               >
                                 <option value="auto">Auto (Dediť z modulu)</option>
                                 <option value="dark">Tmavé (#0E161D)</option>
@@ -1192,8 +1195,8 @@ export default function M20DosAndDontsModule({
                               </select>
 
                               {item.background === "custom" && (
-                                <div className="flex items-center gap-1 bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs">
-                                  <span className="text-muted-foreground font-mono">#</span>
+                                <div className="flex items-center gap-1 bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs">
+                                  <span className="text-[#96abbe] font-mono">#</span>
                                   <input
                                     type="text"
                                     maxLength={6}
@@ -1211,7 +1214,7 @@ export default function M20DosAndDontsModule({
                                       };
                                       handleSaveConfig({ ...cfg, items: updated });
                                     }}
-                                    className="w-16 bg-transparent text-foreground font-mono focus:outline-none"
+                                    className="w-16 bg-transparent text-[#fafbfc] font-mono focus:outline-none"
                                   />
                                 </div>
                               )}
@@ -1221,8 +1224,8 @@ export default function M20DosAndDontsModule({
 
                         {/* Quick Brand Assets Picker Dropdown */}
                         {assetPickerRuleIndex === index && brandAssets.length > 0 && (
-                          <div className="mt-2 p-3 bg-[#0e161d] border border-border/60 rounded space-y-2">
-                            <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider block">
+                          <div className="mt-2 p-3 bg-[#070b0f] border border-white/15 rounded space-y-2">
+                            <span className="text-[10px] font-mono text-[#96abbe] uppercase tracking-wider block">
                               Kliknutím vyberte logo značky pre túto kartu:
                             </span>
                             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-36 overflow-y-auto p-1">
@@ -1253,7 +1256,7 @@ export default function M20DosAndDontsModule({
                                       handleSaveConfig({ ...cfg, items: updated });
                                       setAssetPickerRuleIndex(null);
                                     }}
-                                    className="p-2 bg-[#17212a] hover:bg-[#1f2c36] border border-border/50 rounded flex flex-col items-center gap-1 transition-all"
+                                    className="p-2 bg-[#17212a] hover:bg-[#1f2c36] border border-white/10 rounded flex flex-col items-center gap-1 transition-all"
                                   >
                                     <div className="w-full h-10 flex items-center justify-center overflow-hidden">
                                       {logoUrl ? (
@@ -1263,10 +1266,10 @@ export default function M20DosAndDontsModule({
                                           className="max-h-8 max-w-full object-contain"
                                         />
                                       ) : (
-                                        <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                        <ImageIcon className="w-5 h-5 text-[#96abbe]" />
                                       )}
                                     </div>
-                                    <span className="text-[9px] text-muted-foreground truncate w-full text-center">
+                                    <span className="text-[9px] text-[#96abbe] truncate w-full text-center">
                                       {assetName}
                                     </span>
                                   </button>
@@ -1285,8 +1288,8 @@ export default function M20DosAndDontsModule({
               {modalTab === "settings" && (
                 <div className="space-y-6">
                   {/* Layout Display Mode: Cards vs Minimal Text Summary */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <span className="font-semibold text-foreground text-xs block">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-3">
+                    <span className="font-semibold text-[#fafbfc] text-xs block">
                       Štýl prezentácie pravidiel:
                     </span>
                     <div className="grid grid-cols-2 gap-3">
@@ -1295,15 +1298,15 @@ export default function M20DosAndDontsModule({
                         onClick={() => handleSaveConfig({ ...cfg, layout: "cards" })}
                         className={`p-3 rounded border text-left transition-all ${
                           cfg.layout === "cards"
-                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                            : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                         }`}
                       >
                         <div className="flex items-center gap-1.5 mb-1">
                           <LayoutGrid className="w-4 h-4 text-primary" />
                           <span className="font-bold text-xs">Vizuálne karty</span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground leading-normal block">
+                        <span className="text-[10px] text-[#96abbe] leading-normal block">
                           Veľké karty s obrázkami, náhľadmi chýb a statusovými odznakmi.
                         </span>
                       </button>
@@ -1313,15 +1316,15 @@ export default function M20DosAndDontsModule({
                         onClick={() => handleSaveConfig({ ...cfg, layout: "minimal" })}
                         className={`p-3 rounded border text-left transition-all ${
                           cfg.layout === "minimal"
-                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                            : "border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                            : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                         }`}
                       >
                         <div className="flex items-center gap-1.5 mb-1">
                           <FileText className="w-4 h-4 text-primary" />
                           <span className="font-bold text-xs">Minimalistické zhrnutie</span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground leading-normal block">
+                        <span className="text-[10px] text-[#96abbe] leading-normal block">
                           Kompaktný textový prehľad rozdelený na DO a DON'T iba v niekoľkých vetách.
                         </span>
                       </button>
@@ -1329,13 +1332,13 @@ export default function M20DosAndDontsModule({
                   </div>
 
                   {/* Semantic Color Overrides */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                         <Palette className="w-4 h-4 text-primary" />
                         <span>Sémantické farby indikátorov</span>
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Predvolene preberajú farby zo systémových tokenov značky (--color-success,
                         --color-danger, --color-warning). Môžete ich však predefinovať pre vlastnú
                         estetiku značky.
@@ -1344,9 +1347,9 @@ export default function M20DosAndDontsModule({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                       {/* DO color */}
-                      <div className="space-y-2 bg-[#0e161d] p-3 rounded border border-border/40">
+                      <div className="space-y-2 bg-[#070b0f] p-3 rounded border border-white/10">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-[#fafbfc] flex items-center gap-1.5">
                             <span
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: resolvedDoColor }}
@@ -1357,7 +1360,7 @@ export default function M20DosAndDontsModule({
                             <button
                               type="button"
                               onClick={() => handleSaveConfig({ ...cfg, doColor: null })}
-                              className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                              className="text-[10px] text-[#96abbe] hover:text-primary flex items-center gap-1"
                               title="Reset na systémový token"
                             >
                               <RotateCcw className="w-3 h-3" />
@@ -1367,8 +1370,8 @@ export default function M20DosAndDontsModule({
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs">
-                            <span className="text-muted-foreground font-mono">#</span>
+                          <div className="flex items-center gap-1 bg-[#17212a] border border-white/15 rounded px-2 py-1 text-xs">
+                            <span className="text-[#96abbe] font-mono">#</span>
                             <input
                               type="text"
                               maxLength={6}
@@ -1384,19 +1387,19 @@ export default function M20DosAndDontsModule({
                                   doColor: val || null,
                                 });
                               }}
-                              className="w-20 bg-transparent text-foreground font-mono focus:outline-none"
+                              className="w-20 bg-transparent text-[#fafbfc] font-mono focus:outline-none"
                             />
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-mono">
+                          <span className="text-[10px] text-[#96abbe] font-mono">
                             {cfg.doColor ? "Vlastná" : "Systémová"}
                           </span>
                         </div>
                       </div>
 
                       {/* DON'T color */}
-                      <div className="space-y-2 bg-[#0e161d] p-3 rounded border border-border/40">
+                      <div className="space-y-2 bg-[#070b0f] p-3 rounded border border-white/10">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-[#fafbfc] flex items-center gap-1.5">
                             <span
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: resolvedDontColor }}
@@ -1407,7 +1410,7 @@ export default function M20DosAndDontsModule({
                             <button
                               type="button"
                               onClick={() => handleSaveConfig({ ...cfg, dontColor: null })}
-                              className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                              className="text-[10px] text-[#96abbe] hover:text-primary flex items-center gap-1"
                               title="Reset na systémový token"
                             >
                               <RotateCcw className="w-3 h-3" />
@@ -1417,8 +1420,8 @@ export default function M20DosAndDontsModule({
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs">
-                            <span className="text-muted-foreground font-mono">#</span>
+                          <div className="flex items-center gap-1 bg-[#17212a] border border-white/15 rounded px-2 py-1 text-xs">
+                            <span className="text-[#96abbe] font-mono">#</span>
                             <input
                               type="text"
                               maxLength={6}
@@ -1434,19 +1437,19 @@ export default function M20DosAndDontsModule({
                                   dontColor: val || null,
                                 });
                               }}
-                              className="w-20 bg-transparent text-foreground font-mono focus:outline-none"
+                              className="w-20 bg-transparent text-[#fafbfc] font-mono focus:outline-none"
                             />
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-mono">
+                          <span className="text-[10px] text-[#96abbe] font-mono">
                             {cfg.dontColor ? "Vlastná" : "Systémová"}
                           </span>
                         </div>
                       </div>
 
                       {/* WARNING color */}
-                      <div className="space-y-2 bg-[#0e161d] p-3 rounded border border-border/40">
+                      <div className="space-y-2 bg-[#070b0f] p-3 rounded border border-white/10">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                          <span className="text-xs font-bold text-[#fafbfc] flex items-center gap-1.5">
                             <span
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: resolvedWarningColor }}
@@ -1457,7 +1460,7 @@ export default function M20DosAndDontsModule({
                             <button
                               type="button"
                               onClick={() => handleSaveConfig({ ...cfg, warningColor: null })}
-                              className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1"
+                              className="text-[10px] text-[#96abbe] hover:text-primary flex items-center gap-1"
                               title="Reset na systémový token"
                             >
                               <RotateCcw className="w-3 h-3" />
@@ -1467,8 +1470,8 @@ export default function M20DosAndDontsModule({
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 bg-[#17212a] border border-border/50 rounded px-2 py-1 text-xs">
-                            <span className="text-muted-foreground font-mono">#</span>
+                          <div className="flex items-center gap-1 bg-[#17212a] border border-white/15 rounded px-2 py-1 text-xs">
+                            <span className="text-[#96abbe] font-mono">#</span>
                             <input
                               type="text"
                               maxLength={6}
@@ -1484,10 +1487,10 @@ export default function M20DosAndDontsModule({
                                   warningColor: val || null,
                                 });
                               }}
-                              className="w-20 bg-transparent text-foreground font-mono focus:outline-none"
+                              className="w-20 bg-transparent text-[#fafbfc] font-mono focus:outline-none"
                             />
                           </div>
-                          <span className="text-[10px] text-muted-foreground font-mono">
+                          <span className="text-[10px] text-[#96abbe] font-mono">
                             {cfg.warningColor ? "Vlastná" : "Systémová"}
                           </span>
                         </div>
@@ -1497,8 +1500,8 @@ export default function M20DosAndDontsModule({
 
                   {/* Grid Layout & General Settings (for cards mode) */}
                   {cfg.layout === "cards" && (
-                    <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
-                      <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                    <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                         <LayoutGrid className="w-4 h-4 text-primary" />
                         <span>Rozloženie mriežky a zobrazenie</span>
                       </h4>
@@ -1506,7 +1509,7 @@ export default function M20DosAndDontsModule({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Columns count */}
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-foreground block">
+                          <label className="text-xs font-semibold text-[#fafbfc] block">
                             Počet stĺpcov kariet:
                           </label>
                           <div className="flex items-center gap-2">
@@ -1518,7 +1521,7 @@ export default function M20DosAndDontsModule({
                                 className={`flex-1 py-1.5 rounded border text-xs font-bold transition-all ${
                                   cfg.columns === cols
                                     ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                                    : "bg-[#070b0f] border-white/15 text-[#96abbe] hover:text-[#fafbfc]"
                                 }`}
                               >
                                 {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
@@ -1529,7 +1532,7 @@ export default function M20DosAndDontsModule({
 
                         {/* Badge position */}
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-foreground block">
+                          <label className="text-xs font-semibold text-[#fafbfc] block">
                             Umiestnenie stavového odznaku:
                           </label>
                           <div className="grid grid-cols-2 gap-2">
@@ -1541,7 +1544,7 @@ export default function M20DosAndDontsModule({
                               className={`py-1.5 rounded border text-xs font-bold transition-all ${
                                 cfg.badgePosition === "top-left"
                                   ? "bg-primary text-primary-foreground border-primary"
-                                  : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                                  : "bg-[#070b0f] border-white/15 text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               Vľavo hore
@@ -1554,7 +1557,7 @@ export default function M20DosAndDontsModule({
                               className={`py-1.5 rounded border text-xs font-bold transition-all ${
                                 cfg.badgePosition === "top-right"
                                   ? "bg-primary text-primary-foreground border-primary"
-                                  : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                                  : "bg-[#070b0f] border-white/15 text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               Vpravo hore
@@ -1564,7 +1567,7 @@ export default function M20DosAndDontsModule({
 
                         {/* Default Preview Background */}
                         <div className="space-y-1.5">
-                          <label className="text-xs font-semibold text-foreground block">
+                          <label className="text-xs font-semibold text-[#fafbfc] block">
                             Predvolený podklad plátna:
                           </label>
                           <select
@@ -1575,7 +1578,7 @@ export default function M20DosAndDontsModule({
                                 defaultBackground: e.target.value as M20BackgroundMode,
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                            className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                           >
                             <option value="auto">Auto (Neutrálne tmavé s jemnou mriežkou)</option>
                             <option value="dark">Tmavé (#0E161D)</option>
@@ -1586,7 +1589,7 @@ export default function M20DosAndDontsModule({
 
                         {/* Category Filter Toggle */}
                         <div className="space-y-1.5 flex flex-col justify-end">
-                          <label className="text-xs font-semibold text-foreground flex items-center justify-between cursor-pointer">
+                          <label className="text-xs font-semibold text-[#fafbfc] flex items-center justify-between cursor-pointer">
                             <span>Zobraziť filter kategórií</span>
                             <input
                               type="checkbox"
@@ -1594,10 +1597,10 @@ export default function M20DosAndDontsModule({
                               onChange={(e) =>
                                 handleSaveConfig({ ...cfg, showFilter: e.target.checked })
                               }
-                              className="rounded border-border/60 bg-[#0e161d] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                              className="rounded border-white/20 bg-[#070b0f] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                             />
                           </label>
-                          <span className="text-[11px] text-muted-foreground">
+                          <span className="text-[11px] text-[#96abbe]">
                             Umožní návštevníkom rýchlo filtrovať karty podľa DO, DON'T alebo POZOR.
                           </span>
                         </div>
@@ -1609,7 +1612,7 @@ export default function M20DosAndDontsModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

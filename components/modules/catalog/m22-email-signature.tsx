@@ -1041,34 +1041,34 @@ export default function M22EmailPodpisModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
                   Nastavenia e-mailových podpisov (M22)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-border/60 bg-[#101820] px-5 gap-2 pt-2">
+            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setModalTab("templates")}
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "templates"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Layout className="w-3.5 h-3.5" />
@@ -1081,7 +1081,7 @@ export default function M22EmailPodpisModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "fields"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <FileText className="w-3.5 h-3.5" />
@@ -1094,7 +1094,7 @@ export default function M22EmailPodpisModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "custom_code"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Code className="w-3.5 h-3.5" />
@@ -1103,16 +1103,16 @@ export default function M22EmailPodpisModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
               {/* TAB 1: 7 TEMPLATES SELECTOR */}
               {modalTab === "templates" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Výber štýlu e-mailového podpisu
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Zvoľte šablónu, ktorá bude platiť pre všetkých zamestnancov značky. Vo všetkých
                         šablónach je firemné logo povinné a fotografia voliteľná.
                       </p>
@@ -1133,19 +1133,19 @@ export default function M22EmailPodpisModule({
                         }
                         className={`p-3.5 rounded-lg border text-left transition-all relative ${
                           cfg.templateId === tmpl.id && cfg.mode === "preset_template"
-                            ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-xs"
-                            : "border-border/50 bg-[#17212a] text-muted-foreground hover:text-foreground hover:border-border"
+                            ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40 shadow-xs"
+                            : "border-[rgba(63,85,102,0.45)] bg-[#17212a] text-[#96abbe] hover:text-[#fafbfc] hover:border-[rgba(63,85,102,0.7)]"
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-xs text-foreground">
+                          <span className="font-bold text-xs text-[#fafbfc]">
                             {tmpl.title}
                           </span>
-                          <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-neutral-900 border border-border/40 text-primary">
+                          <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-primary">
                             {tmpl.badge}
                           </span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        <p className="text-[11px] text-[#96abbe] leading-relaxed">
                           {tmpl.description}
                         </p>
                       </button>
@@ -1158,17 +1158,17 @@ export default function M22EmailPodpisModule({
               {modalTab === "fields" && (
                 <div className="space-y-6">
                   {/* Form fields visibility */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Povolené polia vo formulári zamestnanca
                     </h4>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[11px] text-[#96abbe]">
                       Určite, ktoré kontaktné údaje môžu zamestnanci do podpisu zadávať.
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground">Povoliť fotografiu zamestnanca</span>
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc]">Povoliť fotografiu zamestnanca</span>
                         <input
                           type="checkbox"
                           checked={cfg.fields.showPhoto}
@@ -1178,12 +1178,12 @@ export default function M22EmailPodpisModule({
                               fields: { ...cfg.fields, showPhoto: e.target.checked },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground">Povoliť pracovnú pozíciu</span>
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc]">Povoliť pracovnú pozíciu</span>
                         <input
                           type="checkbox"
                           checked={cfg.fields.showRole}
@@ -1193,12 +1193,12 @@ export default function M22EmailPodpisModule({
                               fields: { ...cfg.fields, showRole: e.target.checked },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground">Povoliť telefónne číslo</span>
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc]">Povoliť telefónne číslo</span>
                         <input
                           type="checkbox"
                           checked={cfg.fields.showPhone}
@@ -1208,12 +1208,12 @@ export default function M22EmailPodpisModule({
                               fields: { ...cfg.fields, showPhone: e.target.checked },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground">Zobraziť sociálne siete firmy</span>
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer">
+                        <span className="text-xs text-[#fafbfc]">Zobraziť sociálne siete firmy</span>
                         <input
                           type="checkbox"
                           checked={cfg.fields.showSocials}
@@ -1223,12 +1223,12 @@ export default function M22EmailPodpisModule({
                               fields: { ...cfg.fields, showSocials: e.target.checked },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer sm:col-span-2">
-                        <span className="text-xs text-foreground">
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-[rgba(63,85,102,0.45)] cursor-pointer sm:col-span-2">
+                        <span className="text-xs text-[#fafbfc]">
                           Zobraziť právnu doložku o mlčanlivosti (Disclaimer)
                         </span>
                         <input
@@ -1240,21 +1240,21 @@ export default function M22EmailPodpisModule({
                               fields: { ...cfg.fields, showDisclaimer: e.target.checked },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-[rgba(63,85,102,0.6)] bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
                     </div>
                   </div>
 
                   {/* Company defaults */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Globálne údaje firmy v podpise
                     </h4>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Názov firmy / Štúdia:
                         </label>
                         <input
@@ -1266,12 +1266,12 @@ export default function M22EmailPodpisModule({
                               defaults: { ...cfg.defaults, company: e.target.value },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Webová adresa firmy:
                         </label>
                         <input
@@ -1283,12 +1283,12 @@ export default function M22EmailPodpisModule({
                               defaults: { ...cfg.defaults, website: e.target.value },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none font-mono"
                         />
                       </div>
 
                       <div className="space-y-1 sm:col-span-2">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           URL adresa loga v podpise (Povinné v každej šablóne):
                         </label>
                         <input
@@ -1300,20 +1300,20 @@ export default function M22EmailPodpisModule({
                               defaults: { ...cfg.defaults, logoUrl: e.target.value },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none font-mono"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Promo Banner Settings */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-3">
-                    <h4 className="font-semibold text-foreground text-xs">
+                  <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded p-4 space-y-3">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs">
                       Marketingový promo banner pod podpisom (voliteľné)
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           URL obrázka banneru:
                         </label>
                         <input
@@ -1326,12 +1326,12 @@ export default function M22EmailPodpisModule({
                               promoBannerUrl: e.target.value || null,
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 focus:border-primary focus:outline-none font-mono"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Cieľový odkaz banneru:
                         </label>
                         <input
@@ -1344,7 +1344,7 @@ export default function M22EmailPodpisModule({
                               promoBannerLink: e.target.value || null,
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                          className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded px-2.5 py-1.5 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 focus:border-primary focus:outline-none font-mono"
                         />
                       </div>
                     </div>
@@ -1357,10 +1357,10 @@ export default function M22EmailPodpisModule({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Vlastný HTML e-mailový kód (PRO Mode)
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Vložte vlastný tabuľkový HTML kód. Kód môže obsahovať zástupné premenné (Merge
                         Tags).
                       </p>
@@ -1377,7 +1377,7 @@ export default function M22EmailPodpisModule({
                       className={`px-3 py-1 rounded text-xs font-bold transition-all ${
                         cfg.mode === "custom_html"
                           ? "bg-primary text-primary-foreground"
-                          : "bg-[#0e161d] border border-border/60 text-muted-foreground hover:text-foreground"
+                          : "bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#96abbe] hover:text-[#fafbfc]"
                       }`}
                     >
                       {cfg.mode === "custom_html" ? "PRO režim aktívny" : "Aktivovať PRO režim"}
@@ -1385,36 +1385,36 @@ export default function M22EmailPodpisModule({
                   </div>
 
                   {/* Merge Tags Help Box */}
-                  <div className="p-3 bg-[#0e161d] border border-border/40 rounded space-y-1 text-xs">
+                  <div className="p-3 bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded space-y-1 text-xs">
                     <span className="font-mono text-[10px] uppercase text-primary font-bold block">
                       Dostupné zástupné značky (Merge Tags):
                     </span>
-                    <div className="flex flex-wrap gap-1.5 text-[10px] font-mono text-muted-foreground">
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                    <div className="flex flex-wrap gap-1.5 text-[10px] font-mono text-[#96abbe]">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{name}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{role}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{company}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{email}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{phone}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{website}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{photo_url}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{logo_url}}"}
                       </span>
-                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-border/40 text-foreground">
+                      <span className="bg-[#17212a] px-1.5 py-0.5 rounded border border-[rgba(63,85,102,0.45)] text-[#fafbfc]">
                         {"{{primary_color}}"}
                       </span>
                     </div>
@@ -1430,18 +1430,18 @@ export default function M22EmailPodpisModule({
                         customHtml: e.target.value,
                       })
                     }
-                    className="w-full bg-[#0e161d] border border-border/50 rounded p-3 text-xs text-foreground font-mono focus:border-primary focus:outline-none resize-none leading-relaxed"
+                    className="w-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] rounded p-3 text-xs text-[#fafbfc] placeholder:text-[#96abbe]/50 font-mono focus:border-primary focus:outline-none resize-none leading-relaxed"
                   />
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="px-4 py-1.5 rounded-[3px] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
+                className="px-4 py-1.5 rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
               >
                 Hotovo
               </button>

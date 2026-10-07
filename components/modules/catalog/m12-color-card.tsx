@@ -207,9 +207,9 @@ export default function M12KartaFarbyModule({
           {/* Top Swatch Row: Role & WCAG Badge */}
           <div className="flex items-start justify-between gap-4">
             <span
-              className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] backdrop-blur-xs border"
+              className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] border"
               style={{
-                backgroundColor: swatchTextColor === "#ffffff" ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.4)",
+                backgroundColor: swatchTextColor === "#ffffff" ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.6)",
                 borderColor: swatchTextColor === "#ffffff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)",
               }}
             >
@@ -219,9 +219,9 @@ export default function M12KartaFarbyModule({
             {/* WCAG Accessibility Badge */}
             {cfg.displaySystems.wcag && (
               <div
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] backdrop-blur-xs text-xs font-mono font-bold border shadow-xs"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[3px] text-xs font-mono font-bold border shadow-xs"
                 style={{
-                  backgroundColor: swatchTextColor === "#ffffff" ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.5)",
+                  backgroundColor: swatchTextColor === "#ffffff" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.7)",
                   borderColor: swatchTextColor === "#ffffff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)",
                 }}
                 title={`WCAG 2.1 Contrast Ratio: ${wcagRatio}:1 voči ${wcagResult.preferredText === "white" ? "bielemu" : "čiernemu"} textu`}
@@ -428,37 +428,37 @@ export default function M12KartaFarbyModule({
 
       {/* SETTINGS MODAL */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-white/20 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia karty farby (M12)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("colors")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "colors"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Výber farby z palety
@@ -469,7 +469,7 @@ export default function M12KartaFarbyModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "systems"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Zobrazené systémy
@@ -481,12 +481,12 @@ export default function M12KartaFarbyModule({
               {/* TAB 1: SELECT COLOR */}
               {modalTab === "colors" && (
                 <div className="space-y-3">
-                  <span className="font-semibold text-foreground text-xs block">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Zvoľte farbu z globálnej palety značky:
                   </span>
 
                   {brandColors.length === 0 ? (
-                    <div className="text-muted-foreground py-6 text-center italic bg-[#17212a] p-4 rounded border border-border/40">
+                    <div className="text-[#96abbe] py-6 text-center italic bg-[#17212a] p-4 rounded border border-white/10">
                       V projekte zatiaľ nie sú vytvorené žiadne vlastné farby v globálnej palete.
                     </div>
                   ) : (
@@ -510,8 +510,8 @@ export default function M12KartaFarbyModule({
                             }
                             className={`p-2.5 rounded-[3px] border flex items-center gap-3 text-left transition-all ${
                               isSelected
-                                ? "border-primary bg-primary/10 ring-1 ring-primary/40"
-                                : "border-border/50 bg-[#17212a] hover:border-border"
+                                ? "border-primary bg-primary/20 ring-1 ring-primary/40"
+                                : "border-white/10 bg-[#17212a] hover:border-white/20 text-[#fafbfc]"
                             }`}
                           >
                             <div
@@ -519,10 +519,10 @@ export default function M12KartaFarbyModule({
                               style={{ backgroundColor: c.hex }}
                             />
                             <div className="min-w-0">
-                              <span className="font-semibold text-foreground text-xs block truncate">
+                              <span className="font-semibold text-[#fafbfc] text-xs block truncate">
                                 {cName}
                               </span>
-                              <span className="font-mono text-[10px] text-muted-foreground block">
+                              <span className="font-mono text-[10px] text-[#96abbe] block">
                                 {c.hex}
                               </span>
                             </div>
@@ -536,8 +536,8 @@ export default function M12KartaFarbyModule({
 
               {/* TAB 2: DISPLAY SYSTEMS */}
               {modalTab === "systems" && (
-                <div className="space-y-3 bg-[#17212a] p-4 rounded-[3px] border border-border/40">
-                  <span className="font-semibold text-foreground text-xs block">
+                <div className="space-y-3 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Vyberte farebné priestory, ktoré sa majú zobraziť:
                   </span>
                   <div className="space-y-2.5 pt-1">
@@ -568,9 +568,9 @@ export default function M12KartaFarbyModule({
                                 },
                               })
                             }
-                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                           />
-                          <span className="text-foreground text-[11px]">{sys.label}</span>
+                          <span className="text-[#fafbfc] text-[11px]">{sys.label}</span>
                         </label>
                       );
                     })}
@@ -580,7 +580,7 @@ export default function M12KartaFarbyModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

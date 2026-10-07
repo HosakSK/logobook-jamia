@@ -92,10 +92,18 @@ export function computeBrandCssVariables(
     }
   }
 
+  // Determine sub-surface / muted well color with contrast
+  const mutedSurface = theme.isDark
+    ? (theme.bgColor === "#070b0f" ? "#0e161d" : "#070b0f")
+    : (theme.bgColor === "#fafbfc" ? "#eef2f6" : "#f1f4f7");
+
   return {
     "--brand-radius": radiusValue,
     "--brand-radius-mode": radiusMode,
     "--brand-border-width": borderWidthValue,
+    "--radius": radiusValue,
+    "--radius-element": radiusValue,
+    "--radius-card": radiusValue,
     "--brand-color-primary": theme.primaryColor,
     "--brand-color-secondary": secondary,
     "--brand-color-accent": theme.accentColor,
@@ -115,8 +123,10 @@ export function computeBrandCssVariables(
     "--card-foreground": theme.textColor,
     "--popover": theme.surfaceColor,
     "--popover-foreground": theme.textColor,
-    "--muted": theme.surfaceColor,
+    "--muted": mutedSurface,
     "--muted-foreground": theme.mutedColor,
+    "--secondary": theme.surfaceColor,
+    "--secondary-foreground": theme.textColor,
     "--border": theme.borderColor,
     "--primary": theme.primaryColor,
     "--primary-foreground": theme.isDark ? "#070b0f" : "#ffffff",

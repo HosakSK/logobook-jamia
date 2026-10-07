@@ -347,12 +347,12 @@ export default function M15NeutralneASystemovePodkladyModule({
               <div className="space-y-2 max-w-xl">
                 <div className="flex items-center gap-2">
                   <span
-                    className="text-[9px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] backdrop-blur-xs border"
+                    className="text-[9px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-[2px] border"
                     style={{
                       backgroundColor:
-                        isDarkSurface ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)",
+                        isDarkSurface ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)",
                       borderColor:
-                        isDarkSurface ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)",
+                        isDarkSurface ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.15)",
                     }}
                   >
                     {isDarkSurface ? "Tmavý podklad / Dark Mode" : "Svetlý podklad / Light Mode"}
@@ -374,12 +374,12 @@ export default function M15NeutralneASystemovePodkladyModule({
                   <button
                     type="button"
                     onClick={() => handleCopy(`surf-${surface.id}`, hex.replace("#", ""))}
-                    className="group/copy px-3 py-1.5 rounded-[3px] border font-mono text-xs font-extrabold tracking-wider transition-all duration-150 active:scale-95 text-left flex items-center gap-2 backdrop-blur-xs shadow-2xs"
+                    className="group/copy px-3 py-1.5 rounded-[3px] border font-mono text-xs font-extrabold tracking-wider transition-all duration-150 active:scale-95 text-left flex items-center gap-2 shadow-2xs"
                     style={{
                       backgroundColor:
-                        isDarkSurface ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)",
+                        isDarkSurface ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)",
                       borderColor:
-                        isDarkSurface ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)",
+                        isDarkSurface ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.2)",
                     }}
                     title="Kliknutím skopíruješ HEX bez mriežky"
                   >
@@ -451,37 +451,37 @@ export default function M15NeutralneASystemovePodkladyModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-2xl bg-[#0e161d] border border-white/20 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Správa neutrálnych a systémových podkladov (M15)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("surfaces")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "surfaces"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Zoznam plôch a farieb ({cfg.surfaces.length})
@@ -492,7 +492,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "logo"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Testovacie logo
@@ -505,7 +505,7 @@ export default function M15NeutralneASystemovePodkladyModule({
               {modalTab === "surfaces" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-xs">
+                    <span className="font-semibold text-[#fafbfc] text-xs">
                       Jednotlivé systémové povrchy (3 svetlé & 3 tmavé):
                     </span>
                     <button
@@ -549,21 +549,21 @@ export default function M15NeutralneASystemovePodkladyModule({
                             isDragging
                               ? "opacity-40 border-dashed border-primary"
                               : isOver
-                              ? "border-primary bg-primary/10"
-                              : "border-border/50 hover:border-border"
+                              ? "border-primary bg-primary/20"
+                              : "border-white/10 hover:border-white/20"
                           }`}
                         >
                           {/* Surface Row Header */}
-                          <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
+                          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                              <span className="cursor-grab active:cursor-grabbing text-[#96abbe] hover:text-[#fafbfc]">
                                 <GripVertical className="w-4 h-4" />
                               </span>
                               <div
                                 className="w-5 h-5 rounded-[2px] border border-black/30 shrink-0 shadow-2xs"
                                 style={{ backgroundColor: surf.customHex }}
                               />
-                              <span className="font-bold text-foreground truncate">
+                              <span className="font-bold text-[#fafbfc] truncate">
                                 {resolveI18nText(surf.name, locale) || surf.customHex}
                               </span>
                             </div>
@@ -573,7 +573,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                                 type="button"
                                 onClick={() => moveSurface(index, "up")}
                                 disabled={index === 0}
-                                className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-1 rounded bg-[#070b0f] border border-white/10 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                                 title="Posunúť hore"
                               >
                                 <ArrowUp className="w-3.5 h-3.5" />
@@ -582,7 +582,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                                 type="button"
                                 onClick={() => moveSurface(index, "down")}
                                 disabled={index === cfg.surfaces.length - 1}
-                                className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-1 rounded bg-[#070b0f] border border-white/10 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                                 title="Posunúť dole"
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
@@ -593,7 +593,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                                   const updated = cfg.surfaces.filter((_, i) => i !== index);
                                   handleSaveConfig({ ...cfg, surfaces: updated });
                                 }}
-                                className="p-1 rounded bg-[#0e161d] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
+                                className="p-1 rounded bg-[#070b0f] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
                                 title="Zmazať povrch"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -605,7 +605,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                             {/* Name Input */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Názov povrchu (SK / EN):
                               </label>
                               <input
@@ -620,13 +620,13 @@ export default function M15NeutralneASystemovePodkladyModule({
                                   };
                                   handleSaveConfig({ ...cfg, surfaces: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/20 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
 
                             {/* Color Hex & Picker */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 HEX kód farby:
                               </label>
                               <div className="flex items-center gap-2">
@@ -642,7 +642,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                                     };
                                     handleSaveConfig({ ...cfg, surfaces: updated });
                                   }}
-                                  className="w-7 h-7 rounded border border-border/60 bg-transparent cursor-pointer shrink-0"
+                                  className="w-7 h-7 rounded border border-white/20 bg-transparent cursor-pointer shrink-0"
                                 />
                                 <input
                                   type="text"
@@ -656,14 +656,14 @@ export default function M15NeutralneASystemovePodkladyModule({
                                     };
                                     handleSaveConfig({ ...cfg, surfaces: updated });
                                   }}
-                                  className="w-full font-mono bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                  className="w-full font-mono bg-[#070b0f] border border-white/20 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                                 />
                               </div>
                             </div>
 
                             {/* Description Input */}
                             <div className="sm:col-span-2 space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Účel / Popis použitia povrchu:
                               </label>
                               <input
@@ -678,7 +678,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                                   };
                                   handleSaveConfig({ ...cfg, surfaces: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/20 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
                           </div>
@@ -692,12 +692,12 @@ export default function M15NeutralneASystemovePodkladyModule({
               {/* TAB 2: TEST LOGO SELECTION */}
               {modalTab === "logo" && (
                 <div className="space-y-4">
-                  <span className="font-semibold text-foreground text-xs block">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Vyberte logo pre vizuálny test na všetkých podkladoch:
                   </span>
 
                   {brandAssets.length === 0 ? (
-                    <div className="p-4 rounded bg-[#17212a] border border-border/50 space-y-2 text-center text-muted-foreground">
+                    <div className="p-4 rounded bg-[#17212a] border border-white/10 space-y-2 text-center text-[#96abbe]">
                       <p>V projekte zatiaľ nie sú nahraté žiadne logá v knižnici Assetov.</p>
                       <p className="text-[11px] text-primary">
                         Modul automaticky používa predvolený vektorový symbol značky.
@@ -723,11 +723,11 @@ export default function M15NeutralneASystemovePodkladyModule({
                             }
                             className={`p-3 rounded-[3px] border flex items-center gap-3 text-left transition-all ${
                               isSelected
-                                ? "border-primary bg-primary/10 ring-1 ring-primary/40 text-foreground"
-                                : "border-border/50 bg-[#17212a] text-muted-foreground hover:text-foreground"
+                                ? "border-primary bg-primary/20 ring-1 ring-primary/40 text-[#fafbfc]"
+                                : "border-white/10 bg-[#17212a] text-[#96abbe] hover:text-[#fafbfc]"
                             }`}
                           >
-                            <div className="w-12 h-10 rounded bg-[#0e161d] border border-border/40 p-1 flex items-center justify-center shrink-0">
+                            <div className="w-12 h-10 rounded bg-[#070b0f] border border-white/10 p-1 flex items-center justify-center shrink-0">
                               {svgFile ? (
                                 /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
@@ -736,14 +736,14 @@ export default function M15NeutralneASystemovePodkladyModule({
                                   className="max-h-full max-w-full object-contain"
                                 />
                               ) : (
-                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                <ImageIcon className="w-4 h-4 text-white/50" />
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <span className="font-bold text-xs block truncate text-foreground">
+                              <span className="font-bold text-xs block truncate text-[#fafbfc]">
                                 {aName}
                               </span>
-                              <span className="text-[10px] text-muted-foreground font-mono block">
+                              <span className="text-[10px] text-[#96abbe] font-mono block">
                                 {asset.medium} • {asset.orientation}
                               </span>
                             </div>
@@ -754,8 +754,8 @@ export default function M15NeutralneASystemovePodkladyModule({
                   )}
 
                   {/* Option for custom logo URL */}
-                  <div className="space-y-1.5 pt-3 border-t border-border/40">
-                    <label className="text-[11px] font-semibold text-foreground block">
+                  <div className="space-y-1.5 pt-3 border-t border-white/10">
+                    <label className="text-[11px] font-semibold text-[#fafbfc] block">
                       Alebo zadajte priamu URL adresu testovacieho SVG/PNG loga:
                     </label>
                     <input
@@ -769,7 +769,7 @@ export default function M15NeutralneASystemovePodkladyModule({
                           assetIdToTest: null,
                         })
                       }
-                      className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                      className="w-full bg-[#070b0f] border border-white/20 rounded-[2px] px-3 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                     />
                   </div>
                 </div>
@@ -777,7 +777,7 @@ export default function M15NeutralneASystemovePodkladyModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

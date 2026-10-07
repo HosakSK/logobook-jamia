@@ -153,32 +153,32 @@ export function TemplateBrowserModal({
       onClick={onClose}
     >
       <div
-        className="bg-[#0e161d] border border-border/80 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-foreground"
+        className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-[#fafbfc]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-[#131d27]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] text-[#fafbfc]">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <LayoutTemplate className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">Galéria šablón stránok (Templates)</h3>
-              <p className="text-[11px] text-muted-foreground">
+              <h3 className="text-base font-bold text-[#fafbfc]">Galéria šablón stránok (Templates)</h3>
+              <p className="text-[11px] text-[#96abbe]">
                 Zvoľte overené rozloženie a okamžite naplňte stránku pripravenými modulmi
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#1f2c36] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Navigation Tabs (System vs Personal) */}
-        <div className="flex items-center justify-between px-6 pt-3 border-b border-border/40 bg-[#131d27]">
+        <div className="flex items-center justify-between px-6 pt-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a]">
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -188,7 +188,7 @@ export function TemplateBrowserModal({
               className={`px-3 py-2 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === "system"
                   ? "border-primary text-primary font-bold"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
               }`}
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -202,7 +202,7 @@ export function TemplateBrowserModal({
               className={`px-3 py-2 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
                 activeTab === "personal"
                   ? "border-primary text-primary font-bold"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
               }`}
             >
               <User className="w-3.5 h-3.5" />
@@ -211,26 +211,26 @@ export function TemplateBrowserModal({
           </div>
 
           <div className="relative w-48 sm:w-64 pb-2">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#96abbe] pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Filtrovať šablóny..."
-              className="w-full pl-8 pr-3 py-1 text-xs rounded border border-border/60 bg-[#0c1218] text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-primary"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded border border-[rgba(63,85,102,0.5)] bg-[#070b0f] text-[#fafbfc] placeholder:text-[#96abbe] focus:border-primary focus:outline-none"
             />
           </div>
         </div>
 
         {/* Category Filter Pills */}
         {availableCategories.length > 0 && (
-          <div className="px-6 py-2 border-b border-border/30 flex items-center gap-1.5 overflow-x-auto text-xs bg-[#141f2b]">
+          <div className="px-6 py-2.5 border-b border-[rgba(63,85,102,0.35)] flex items-center gap-1.5 overflow-x-auto text-xs bg-[#17212a]">
             <button
               onClick={() => setSelectedCategory("all")}
               className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
                 selectedCategory === "all"
-                  ? "bg-primary text-primary-foreground shadow-2xs"
-                  : "bg-[#0c1218] text-muted-foreground hover:text-foreground border border-border/40"
+                  ? "bg-primary text-[#070b0f] font-bold shadow-2xs"
+                  : "bg-[#070b0f] text-[#96abbe] hover:text-[#fafbfc] border border-[rgba(63,85,102,0.45)]"
               }`}
             >
               Všetky kategórie
@@ -241,8 +241,8 @@ export function TemplateBrowserModal({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-primary text-primary-foreground shadow-2xs"
-                    : "bg-[#0c1218] text-muted-foreground hover:text-foreground border border-border/40"
+                    ? "bg-primary text-[#070b0f] font-bold shadow-2xs"
+                    : "bg-[#070b0f] text-[#96abbe] hover:text-[#fafbfc] border border-[rgba(63,85,102,0.45)]"
                 }`}
               >
                 {cat}
@@ -263,18 +263,18 @@ export function TemplateBrowserModal({
           {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center text-center space-y-3">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <p className="text-xs text-muted-foreground">Načítavam galériu šablón...</p>
+              <p className="text-xs text-[#96abbe]">Načítavam galériu šablón...</p>
             </div>
           ) : filteredTemplates.length === 0 ? (
-            <div className="py-16 text-center space-y-3 border border-dashed border-border/60 rounded-xl p-8 bg-muted/10">
-              <FolderKanban className="w-10 h-10 text-muted-foreground mx-auto" />
+            <div className="py-16 text-center space-y-3 border border-dashed border-[rgba(63,85,102,0.45)] rounded-xl p-8 bg-[#070b0f]">
+              <FolderKanban className="w-10 h-10 text-[#96abbe] mx-auto" />
               <div>
-                <p className="text-sm font-semibold text-foreground">
+                <p className="text-sm font-semibold text-[#fafbfc]">
                   {activeTab === "personal"
                     ? "Zatiaľ nemáte žiadne vlastné šablóny"
                     : "Nenašli sa žiadne vyhovujúce šablóny"}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+                <p className="text-xs text-[#96abbe] mt-1 max-w-sm mx-auto">
                   {activeTab === "personal"
                     ? "Akúkoľvek hotovú stránku s modulmi si môžete uložiť do vlastných šablón pomocou tlačidla 'Uložiť stránku ako šablónu'."
                     : "Skúste upraviť filter alebo vyhľadávanie."}
@@ -303,7 +303,7 @@ export function TemplateBrowserModal({
                 return (
                   <div
                     key={tpl.id}
-                    className="border border-border/60 rounded-lg p-5 bg-[#141f2b] hover:bg-[#1a2837] hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-2xs group"
+                    className="border border-[rgba(63,85,102,0.45)] rounded-lg p-5 bg-[#17212a] hover:bg-[#1f2c36] hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-sm group"
                   >
                     <div className="space-y-2.5">
                       {/* Top Badges */}
@@ -312,14 +312,14 @@ export function TemplateBrowserModal({
                           {tpl.category || "Všeobecné"}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-muted-foreground">
+                          <span className="text-[10px] font-mono text-[#96abbe]">
                             {containerCount} {containerCount === 1 ? "riadok" : "riadkov"}
                           </span>
                           {!tpl.isSystem && (
                             <button
                               onClick={() => handleDeletePersonalTemplate(tpl.id)}
                               disabled={isDeletingId === tpl.id}
-                              className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors cursor-pointer"
+                              className="text-[#96abbe] hover:text-rose-400 p-1 rounded transition-colors cursor-pointer"
                               title="Vymazať vlastnú šablónu"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -330,11 +330,11 @@ export function TemplateBrowserModal({
 
                       {/* Title & Description */}
                       <div>
-                        <h4 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                        <h4 className="text-sm font-bold text-[#fafbfc] group-hover:text-primary transition-colors">
                           {title}
                         </h4>
                         {desc && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-[#96abbe] mt-1 line-clamp-2 leading-relaxed">
                             {desc}
                           </p>
                         )}
@@ -347,7 +347,7 @@ export function TemplateBrowserModal({
                           return (
                             <span
                               key={mType}
-                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/40"
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#070b0f] text-[#96abbe] border border-[rgba(63,85,102,0.35)]"
                               title={mType}
                             >
                               {shortName}
@@ -368,7 +368,7 @@ export function TemplateBrowserModal({
                           handleApply(tpl.id, "replace");
                         }
                       }}
-                      className="w-full py-2 px-3 text-xs font-semibold rounded-md bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground border border-border/60 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
+                      className="w-full py-2 px-3 text-xs font-semibold rounded-md bg-[#070b0f] text-[#fafbfc] hover:bg-primary hover:text-[#070b0f] border border-[rgba(63,85,102,0.45)] transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                     >
                       <Layers className="w-3.5 h-3.5" />
                       <span>Použiť túto šablónu</span>
@@ -381,13 +381,13 @@ export function TemplateBrowserModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-border/50 bg-[#131d27] text-xs text-muted-foreground">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] text-xs text-[#96abbe]">
           <span>
-            Zobrazených <strong>{filteredTemplates.length}</strong> šablón
+            Zobrazených <strong className="text-[#fafbfc]">{filteredTemplates.length}</strong> šablón
           </span>
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs font-medium rounded hover:bg-neutral-800 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded hover:bg-[#1f2c36] text-[#96abbe] hover:text-[#fafbfc] cursor-pointer transition-colors"
           >
             Zavrieť
           </button>
@@ -401,7 +401,7 @@ export function TemplateBrowserModal({
           onClick={() => setSelectedTemplateForApply(null)}
         >
           <div
-            className="bg-[#0e161d] border border-border/80 rounded-xl shadow-2xl max-w-md w-full p-6 text-foreground space-y-4"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-md w-full p-6 text-[#fafbfc] space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">
@@ -409,10 +409,10 @@ export function TemplateBrowserModal({
                 <AlertCircle className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-foreground">
+                <h4 className="text-sm font-bold text-[#fafbfc]">
                   Aplikovanie šablóny na existujúci obsah
                 </h4>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-[#96abbe] mt-0.5">
                   Táto stránka už obsahuje vytvorené riadky a moduly. Ako si želáte šablónu použiť?
                 </p>
               </div>
@@ -433,7 +433,7 @@ export function TemplateBrowserModal({
                   </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[11px] text-[#96abbe]">
                   Vymaže všetky súčasné riadky na tejto stránke a kompletne ich nahradí vybranou šablónou.
                 </p>
               </button>
@@ -443,16 +443,16 @@ export function TemplateBrowserModal({
                 type="button"
                 disabled={isApplying}
                 onClick={() => handleApply(selectedTemplateForApply.id, "append")}
-                className="w-full text-left p-3 rounded-lg border border-border/60 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer space-y-1"
+                className="w-full text-left p-3 rounded-lg border border-[rgba(63,85,102,0.45)] bg-[#17212a] hover:bg-[#1f2c36] transition-colors cursor-pointer space-y-1"
               >
-                <div className="flex items-center justify-between text-xs font-bold text-foreground">
+                <div className="flex items-center justify-between text-xs font-bold text-[#fafbfc]">
                   <span className="flex items-center gap-1.5">
                     <CopyPlus className="w-3.5 h-3.5 text-primary" />
                     Pridať šablónu pod existujúci obsah
                   </span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </div>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[11px] text-[#96abbe]">
                   Ponechá vaše doterajšie riadky nedotknuté a vloží riadky zo šablóny na koniec stránky.
                 </p>
               </button>
@@ -463,7 +463,7 @@ export function TemplateBrowserModal({
                 type="button"
                 disabled={isApplying}
                 onClick={() => setSelectedTemplateForApply(null)}
-                className="px-3 py-1.5 text-xs font-medium rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                className="px-3 py-1.5 text-xs font-medium rounded hover:bg-[#17212a] text-[#96abbe] hover:text-[#fafbfc] cursor-pointer"
               >
                 Zrušiť
               </button>

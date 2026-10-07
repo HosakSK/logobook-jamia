@@ -438,37 +438,37 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
           <div
-            className="w-full max-w-2xl bg-[#0e161d] border border-border/80 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+            className="w-full max-w-2xl bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <FolderArchive className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia stiahnuteľných vzorkovníkov (M16)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("items")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "items"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Súbory a odkazy ({cfg.items.length})
@@ -479,7 +479,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "general"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Nadpisy modulu
@@ -492,14 +492,14 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
               {modalTab === "items" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground text-xs">
+                    <span className="font-semibold text-[#fafbfc] text-xs">
                       Položky na stiahnutie:
                     </span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => handleSaveConfig({ ...cfg, items: defaultItems })}
-                        className="flex items-center gap-1.5 px-2 py-1 rounded-[2px] bg-[#17212a] border border-border/50 text-muted-foreground hover:text-foreground text-[11px] font-medium transition-colors"
+                        className="flex items-center gap-1.5 px-2 py-1 rounded-[2px] bg-[#17212a] border border-white/15 text-[#96abbe] hover:text-[#fafbfc] text-[11px] font-medium transition-colors"
                         title="Obnoviť 3 štandardné vzorové položky (Illustrator, CMYK, CSS)"
                       >
                         <RefreshCw className="w-3 h-3" />
@@ -549,19 +549,19 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                               ? "opacity-40 border-dashed border-primary"
                               : isOver
                               ? "border-primary bg-primary/10"
-                              : "border-border/50 hover:border-border"
+                              : "border-white/10 hover:border-white/25"
                           }`}
                         >
                           {/* Row Header */}
-                          <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
+                          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
                             <div className="flex items-center gap-2 min-w-0">
-                              <span className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                              <span className="cursor-grab active:cursor-grabbing text-[#96abbe] hover:text-[#fafbfc]">
                                 <GripVertical className="w-4 h-4" />
                               </span>
-                              <span className="font-mono text-[11px] font-extrabold px-1.5 py-0.5 rounded-[2px] bg-[#0e161d] border border-border/60 text-primary">
+                              <span className="font-mono text-[11px] font-extrabold px-1.5 py-0.5 rounded-[2px] bg-[#070b0f] border border-white/15 text-primary">
                                 {item.badgeText || "ASE"}
                               </span>
-                              <span className="font-bold text-foreground truncate">
+                              <span className="font-bold text-[#fafbfc] truncate">
                                 {resolveI18nText(item.title, locale) || "Položka"}
                               </span>
                             </div>
@@ -571,7 +571,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                 type="button"
                                 onClick={() => moveItem(index, "up")}
                                 disabled={index === 0}
-                                className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-1 rounded bg-[#070b0f] border border-white/15 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                                 title="Posunúť hore"
                               >
                                 <ArrowUp className="w-3.5 h-3.5" />
@@ -580,7 +580,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                 type="button"
                                 onClick={() => moveItem(index, "down")}
                                 disabled={index === cfg.items.length - 1}
-                                className="p-1 rounded bg-[#0e161d] border border-border/40 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="p-1 rounded bg-[#070b0f] border border-white/15 text-[#96abbe] hover:text-[#fafbfc] disabled:opacity-30 disabled:cursor-not-allowed"
                                 title="Posunúť dole"
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
@@ -591,7 +591,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   const updated = cfg.items.filter((_, i) => i !== index);
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="p-1 rounded bg-[#0e161d] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
+                                className="p-1 rounded bg-[#070b0f] border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors ml-1"
                                 title="Zmazať položku"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -603,7 +603,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                             {/* Title */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Názov vzorkovníka:
                               </label>
                               <input
@@ -618,13 +618,13 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
 
                             {/* Badge text (Pure typography tag, e.g. ASE, AI, JSON, CSS, ZIP) */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Typografická skratka formátu:
                               </label>
                               <input
@@ -640,13 +640,13 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="w-full font-mono uppercase bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full font-mono uppercase bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
 
                             {/* Description */}
                             <div className="sm:col-span-2 space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Popis vzorkovníka:
                               </label>
                               <input
@@ -661,13 +661,13 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
 
                             {/* Button Label */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Text tlačidla:
                               </label>
                               <input
@@ -682,13 +682,13 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               />
                             </div>
 
                             {/* Storage Type */}
                             <div className="space-y-1">
-                              <label className="text-[10px] font-mono text-muted-foreground block">
+                              <label className="text-[10px] font-mono text-[#96abbe] block">
                                 Typ zdroja:
                               </label>
                               <select
@@ -703,7 +703,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                   };
                                   handleSaveConfig({ ...cfg, items: updated });
                                 }}
-                                className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                               >
                                 <option value="EXTERNAL_LINK">Externý odkaz (Dropbox / Drive / Figma)</option>
                                 <option value="AUTO_GENERATE">Automatický Live export (CSS / JSON)</option>
@@ -713,11 +713,11 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
 
                             {/* File URL or Auto-generate options */}
                             {item.storageType === "AUTO_GENERATE" ? (
-                              <div className="sm:col-span-2 space-y-1 bg-[#0e161d] p-2.5 rounded-[2px] border border-border/40">
+                              <div className="sm:col-span-2 space-y-1 bg-[#070b0f] p-2.5 rounded-[2px] border border-white/10">
                                 <label className="text-[10px] font-mono text-primary font-bold block">
                                   Formát generovaného kódu:
                                 </label>
-                                <div className="flex items-center gap-4 pt-0.5">
+                                <div className="flex items-center gap-4 pt-0.5 text-[#fafbfc]">
                                   <label className="flex items-center gap-1.5 cursor-pointer">
                                     <input
                                       type="radio"
@@ -757,7 +757,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                               </div>
                             ) : (
                               <div className="sm:col-span-2 space-y-1">
-                                <label className="text-[10px] font-mono text-muted-foreground block">
+                                <label className="text-[10px] font-mono text-[#96abbe] block">
                                   Odkaz na stiahnutie (URL):
                                 </label>
                                 <input
@@ -773,7 +773,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                                     };
                                     handleSaveConfig({ ...cfg, items: updated });
                                   }}
-                                  className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                                  className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                                 />
                               </div>
                             )}
@@ -787,9 +787,9 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
 
               {/* TAB 2: GENERAL TEXTS */}
               {modalTab === "general" && (
-                <div className="space-y-3 bg-[#17212a] p-4 rounded-[3px] border border-border/40">
+                <div className="space-y-3 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-mono text-muted-foreground block">
+                    <label className="text-[10px] font-mono text-[#96abbe] block">
                       Hlavný nadpis bloku:
                     </label>
                     <input
@@ -802,12 +802,12 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                           title: { en: val, sk: val },
                         });
                       }}
-                      className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2.5 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                      className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2.5 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] font-mono text-muted-foreground block">
+                    <label className="text-[10px] font-mono text-[#96abbe] block">
                       Sprievodný text:
                     </label>
                     <textarea
@@ -820,7 +820,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
                           description: { en: val, sk: val },
                         });
                       }}
-                      className="w-full bg-[#0e161d] border border-border/50 rounded-[2px] px-2.5 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                      className="w-full bg-[#070b0f] border border-white/15 rounded-[2px] px-2.5 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                     />
                   </div>
                 </div>
@@ -828,7 +828,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

@@ -149,12 +149,12 @@ export default function M02RichTextModule({
       {/* Editor Hover & Active Formatting Toolbar (Prevents Pencil Hell) */}
       {isEditor && (
         <div
-          className={`absolute -top-9 left-0 z-30 transition-opacity bg-neutral-950/95 border border-border/80 rounded-[3px] p-1 flex items-center gap-1 shadow-xl ${
+          className={`absolute -top-9 left-0 z-30 transition-opacity bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-xl ${
             isFocused ? "opacity-100 pointer-events-auto" : "opacity-0 group-hover/m02:opacity-100"
           }`}
         >
           {/* Size Switcher */}
-          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+          <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5 border border-white/10">
             {[
               { key: "small", label: "Small" },
               { key: "body", label: "Body" },
@@ -166,8 +166,8 @@ export default function M02RichTextModule({
                 onClick={() => handleUpdateConfig({ size: s.key as "small" | "body" | "lead" })}
                 className={`px-1.5 py-0.5 text-[10px] font-mono rounded-[1px] transition-colors ${
                   currentSize === s.key
-                    ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                    ? "bg-primary text-[#070b0f] font-bold"
+                    : "text-white/75 hover:text-white hover:bg-white/10"
                 }`}
                 title={`Veľkosť textu: ${s.label}`}
               >
@@ -176,7 +176,7 @@ export default function M02RichTextModule({
             ))}
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Width Constraint Switcher */}
           <button
@@ -186,8 +186,8 @@ export default function M02RichTextModule({
             }
             className={`px-1.5 py-0.5 text-[10px] font-mono rounded-[2px] border transition-colors flex items-center gap-1 ${
               currentMaxWidth === "prose"
-                ? "bg-primary/10 border-primary text-primary font-bold"
-                : "border-border/40 text-muted-foreground hover:text-foreground hover:bg-neutral-900"
+                ? "bg-primary text-[#070b0f] border-primary font-bold"
+                : "border-white/20 text-white/75 hover:text-white hover:bg-white/10"
             }`}
             title={
               currentMaxWidth === "prose"
@@ -211,17 +211,17 @@ export default function M02RichTextModule({
           {/* Tiptap RichText Formatting Actions */}
           {editor && (
             <>
-              <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+              <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
-              <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+              <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5 border border-white/10">
                 {/* Bold */}
                 <button
                   type="button"
                   onClick={() => editor.chain().focus().toggleBold().run()}
                   className={`p-1 rounded-[1px] transition-colors ${
                     editor.isActive("bold")
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                   title="Tučné písmo (Ctrl+B)"
                 >
@@ -234,8 +234,8 @@ export default function M02RichTextModule({
                   onClick={() => editor.chain().focus().toggleItalic().run()}
                   className={`p-1 rounded-[1px] transition-colors ${
                     editor.isActive("italic")
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                   title="Kurzíva (Ctrl+I)"
                 >
@@ -248,8 +248,8 @@ export default function M02RichTextModule({
                   onClick={handleSetLink}
                   className={`p-1 rounded-[1px] transition-colors ${
                     editor.isActive("link")
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                   title="Vložiť odkaz (Link)"
                 >
@@ -262,8 +262,8 @@ export default function M02RichTextModule({
                   onClick={() => editor.chain().focus().toggleBulletList().run()}
                   className={`p-1 rounded-[1px] transition-colors ${
                     editor.isActive("bulletList")
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                   title="Odrážkový zoznam"
                 >
@@ -276,8 +276,8 @@ export default function M02RichTextModule({
                   onClick={() => editor.chain().focus().toggleOrderedList().run()}
                   className={`p-1 rounded-[1px] transition-colors ${
                     editor.isActive("orderedList")
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-[#070b0f] font-bold"
+                      : "text-white/75 hover:text-white hover:bg-white/10"
                   }`}
                   title="Číslovaný zoznam"
                 >
@@ -288,7 +288,7 @@ export default function M02RichTextModule({
           )}
 
           {/* Active Locale indicator */}
-          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-neutral-900 border border-border/40 text-muted-foreground ml-0.5">
+          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-white/10 border border-white/20 text-white/70 ml-0.5">
             {locale}
           </span>
         </div>

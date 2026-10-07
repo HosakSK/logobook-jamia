@@ -643,9 +643,9 @@ export default function M21FiremnaVizitkaModule({
           </div>
 
           {/* Visualizer Controls Bar */}
-          <div className="w-full flex flex-wrap items-center justify-between gap-3 bg-[#17212a] border border-border/50 px-4 py-2.5 rounded-lg shadow-xs">
+          <div className="w-full flex flex-wrap items-center justify-between gap-3 bg-card border border-border/60 px-4 py-2.5 rounded-lg shadow-xs">
             {/* Front / Back Flip Switch */}
-            <div className="flex items-center gap-1.5 bg-[#0e161d] p-1 rounded border border-border/40">
+            <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded border border-border/40">
               <button
                 type="button"
                 onClick={() => setIsFlipped(false)}
@@ -677,13 +677,13 @@ export default function M21FiremnaVizitkaModule({
               onClick={() => setShowTechnicalGuides((prev) => !prev)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border transition-all ${
                 showTechnicalGuides
-                  ? "bg-rose-500/10 text-rose-400 border-rose-500/40"
-                  : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
+                  ? "bg-rose-500/10 text-rose-500 border-rose-500/40"
+                  : "bg-muted/40 border-border/50 text-muted-foreground hover:text-foreground"
               }`}
             >
               {showTechnicalGuides ? (
                 <>
-                  <EyeOff className="w-3.5 h-3.5 text-rose-400" />
+                  <EyeOff className="w-3.5 h-3.5 text-rose-500" />
                   <span>Skryť orez & spadávku</span>
                 </>
               ) : (
@@ -719,7 +719,7 @@ export default function M21FiremnaVizitkaModule({
           </div>
 
           {/* Technical Dimensions Table */}
-          <div className="bg-[#17212a] border border-border/50 rounded-lg overflow-hidden divide-y divide-border/40">
+          <div className="bg-card border border-border/60 rounded-lg overflow-hidden divide-y divide-border/40">
             {/* Trim Size */}
             <div className="p-3.5 flex items-center justify-between">
               <div>
@@ -745,7 +745,7 @@ export default function M21FiremnaVizitkaModule({
                   Presah grafiky na orez
                 </span>
               </div>
-              <span className="font-mono text-xs font-semibold text-rose-400">
+              <span className="font-mono text-xs font-semibold text-rose-500">
                 +{cfg.dimensions.bleed} mm (Hrubý: {grossWidth} × {grossHeight} mm)
               </span>
             </div>
@@ -760,7 +760,7 @@ export default function M21FiremnaVizitkaModule({
                   Minimálny odstup písma od rezu
                 </span>
               </div>
-              <span className="font-mono text-xs font-semibold text-emerald-400">
+              <span className="font-mono text-xs font-semibold text-emerald-500">
                 {cfg.dimensions.safeZone} mm
               </span>
             </div>
@@ -810,7 +810,7 @@ export default function M21FiremnaVizitkaModule({
             </span>
 
             {cfg.downloads.length === 0 ? (
-              <div className="p-4 bg-[#17212a] border border-border/40 rounded text-center text-xs text-muted-foreground">
+              <div className="p-4 bg-card border border-border/60 rounded text-center text-xs text-muted-foreground">
                 Zatiaľ neboli priložené žiadne šablóny na stiahnutie.
               </div>
             ) : (
@@ -823,7 +823,7 @@ export default function M21FiremnaVizitkaModule({
                       href={dl.url || "#"}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group/dl flex items-center justify-between p-3 rounded-lg bg-[#17212a] hover:bg-[#1f2c36] border border-border/60 hover:border-primary/50 transition-all shadow-2xs"
+                      className="group/dl flex items-center justify-between p-3 rounded-lg bg-card hover:bg-muted/50 border border-border/60 hover:border-primary/50 transition-all shadow-2xs"
                     >
                       <div className="flex items-center gap-2.5 min-w-0 pr-2">
                         <FormatBadge format={dl.format} />
@@ -855,34 +855,37 @@ export default function M21FiremnaVizitkaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#131c24] border border-border rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+          <div
+            className="w-full max-w-3xl bg-[#0e161d] border border-white/15 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
+            style={{ borderRadius: brandRadius }}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Printer className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-foreground text-sm tracking-tight">
+                <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
                   Nastavenia vizitky a tlačovín (M21)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-border/60 bg-[#101820] px-5 gap-2 pt-2">
+            <div className="flex items-center border-b border-white/10 bg-[#070b0f] px-5 gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setModalTab("previews")}
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "previews"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <ImageIcon className="w-3.5 h-3.5" />
@@ -895,7 +898,7 @@ export default function M21FiremnaVizitkaModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "dimensions"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Sliders className="w-3.5 h-3.5" />
@@ -908,7 +911,7 @@ export default function M21FiremnaVizitkaModule({
                 className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
                   modalTab === "downloads"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 <Download className="w-3.5 h-3.5" />
@@ -917,22 +920,22 @@ export default function M21FiremnaVizitkaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 overflow-y-auto space-y-6 flex-1 text-xs">
               {/* TAB 1: PREVIEWS & TECHNICAL OVERLAY */}
               {modalTab === "previews" && (
                 <div className="space-y-6">
                   {/* Front & Back Images */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
-                    <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                       <ImageIcon className="w-4 h-4 text-primary" />
                       <span>Grafické náhľady strán (JPG / PNG)</span>
                     </h4>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Front Face */}
-                      <div className="space-y-2 bg-[#0e161d] p-3 rounded border border-border/40">
+                      <div className="space-y-2 bg-[#070b0f] p-3 rounded border border-white/10">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-foreground">
+                          <span className="text-xs font-bold text-[#fafbfc]">
                             Predná strana (Face)
                           </span>
                           <button
@@ -962,14 +965,14 @@ export default function M21FiremnaVizitkaModule({
                               previews: { ...cfg.previews, face: e.target.value },
                             })
                           }
-                          className="w-full bg-[#17212a] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#17212a] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       {/* Back Face */}
-                      <div className="space-y-2 bg-[#0e161d] p-3 rounded border border-border/40">
+                      <div className="space-y-2 bg-[#070b0f] p-3 rounded border border-white/10">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-foreground">
+                          <span className="text-xs font-bold text-[#fafbfc]">
                             Zadná strana (Back)
                           </span>
                           <button
@@ -999,20 +1002,20 @@ export default function M21FiremnaVizitkaModule({
                               previews: { ...cfg.previews, back: e.target.value },
                             })
                           }
-                          className="w-full bg-[#17212a] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#17212a] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Technical Overlay Configuration */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                         <Layers className="w-4 h-4 text-primary" />
                         <span>Vodiace orezové čiary (Spadávka a bezpečné zóny)</span>
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Môžete použiť automaticky prepočítané vodiace čiary, alebo nahrať vlastný SVG
                         výkres (dieline) s technickými čiarami výseku a orezu.
                       </p>
@@ -1034,14 +1037,14 @@ export default function M21FiremnaVizitkaModule({
                           }
                           className={`p-3 rounded border text-left transition-all ${
                             cfg.technicalOverlay.mode === "generated"
-                              ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                              : "border-border/50 text-muted-foreground hover:text-foreground"
+                              ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                              : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                           }`}
                         >
                           <span className="font-bold text-xs block">
                             Automaticky generované čiary
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] text-[#96abbe]">
                             Podľa zadaných hodnôt mm spadávky a bezpečnej zóny
                           </span>
                         </button>
@@ -1059,14 +1062,14 @@ export default function M21FiremnaVizitkaModule({
                           }
                           className={`p-3 rounded border text-left transition-all ${
                             cfg.technicalOverlay.mode === "custom_svg"
-                              ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40"
-                              : "border-border/50 text-muted-foreground hover:text-foreground"
+                              ? "border-primary bg-primary/10 text-[#fafbfc] ring-1 ring-primary/40"
+                              : "border-white/10 text-[#96abbe] hover:text-[#fafbfc] bg-[#070b0f]"
                           }`}
                         >
                           <span className="font-bold text-xs block">
                             Vlastné technické SVG čiary
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] text-[#96abbe]">
                             Nahratie vlastného vektorového súboru dieline
                           </span>
                         </button>
@@ -1074,9 +1077,9 @@ export default function M21FiremnaVizitkaModule({
 
                       {/* Custom SVG upload if mode is custom_svg */}
                       {cfg.technicalOverlay.mode === "custom_svg" && (
-                        <div className="p-3 bg-[#0e161d] border border-border/40 rounded space-y-2">
+                        <div className="p-3 bg-[#070b0f] border border-white/15 rounded space-y-2">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-semibold text-foreground">
+                            <span className="text-xs font-semibold text-[#fafbfc]">
                               Súbor vlastných SVG vodiacich čiar:
                             </span>
                             <button
@@ -1108,14 +1111,14 @@ export default function M21FiremnaVizitkaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#17212a] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                            className="w-full bg-[#17212a] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                           />
                         </div>
                       )}
 
                       {/* Default active toggle */}
-                      <label className="flex items-center justify-between p-2.5 rounded bg-[#0e161d] border border-border/40 cursor-pointer">
-                        <span className="text-xs text-foreground font-medium">
+                      <label className="flex items-center justify-between p-2.5 rounded bg-[#070b0f] border border-white/10 cursor-pointer">
+                        <span className="text-xs text-[#fafbfc] font-medium">
                           Zobraziť technické čiary predvolene zapnuté pri načítaní stránky
                         </span>
                         <input
@@ -1130,7 +1133,7 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="rounded border-border/60 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
+                          className="rounded border-white/20 bg-[#17212a] text-primary focus:ring-0 w-4 h-4 cursor-pointer"
                         />
                       </label>
                     </div>
@@ -1142,8 +1145,8 @@ export default function M21FiremnaVizitkaModule({
               {modalTab === "dimensions" && (
                 <div className="space-y-6">
                   {/* Product Type & Presets */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
-                    <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                       <Sliders className="w-4 h-4 text-primary" />
                       <span>Typ tlačového produktu & Normovaný štandard</span>
                     </h4>
@@ -1151,7 +1154,7 @@ export default function M21FiremnaVizitkaModule({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Product Type */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Druh tlačoviny:
                         </label>
                         <select
@@ -1162,7 +1165,7 @@ export default function M21FiremnaVizitkaModule({
                               productType: e.target.value as M21ProductType,
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                         >
                           <option value="business_card">Vizitka (Business Card)</option>
                           <option value="flyer">Leták (Flyer / Folder)</option>
@@ -1173,7 +1176,7 @@ export default function M21FiremnaVizitkaModule({
 
                       {/* Dimension Standard Preset */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Formátový preset:
                         </label>
                         <select
@@ -1192,7 +1195,7 @@ export default function M21FiremnaVizitkaModule({
                               },
                             });
                           }}
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                         >
                           <option value="eu_90_50">EU Vizitka: 90 × 50 mm</option>
                           <option value="eu_85_55">EU Kreditka: 85 × 55 mm</option>
@@ -1208,7 +1211,7 @@ export default function M21FiremnaVizitkaModule({
                       {/* Custom Title if product is custom */}
                       {cfg.productType === "custom" && (
                         <div className="sm:col-span-2 space-y-1.5">
-                          <label className="text-xs font-semibold text-foreground block">
+                          <label className="text-xs font-semibold text-[#fafbfc] block">
                             Vlastný názov produktu:
                           </label>
                           <input
@@ -1228,16 +1231,16 @@ export default function M21FiremnaVizitkaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                            className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                           />
                         </div>
                       )}
                     </div>
 
                     {/* Numeric Dimension Inputs (in mm) */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-border/40">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-white/10">
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Šírka (mm):
                         </label>
                         <input
@@ -1253,12 +1256,12 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Výška (mm):
                         </label>
                         <input
@@ -1274,12 +1277,12 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Spadávka / Bleed (mm):
                         </label>
                         <input
@@ -1294,12 +1297,12 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-[10px] font-mono text-muted-foreground block">
+                        <label className="text-[10px] font-mono text-[#96abbe] block">
                           Bezpečná zóna (mm):
                         </label>
                         <input
@@ -1314,22 +1317,22 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Paper Specs & Color Profile */}
-                  <div className="bg-[#17212a] border border-border/50 rounded p-4 space-y-4">
-                    <h4 className="font-semibold text-foreground text-xs flex items-center gap-1.5">
+                  <div className="bg-[#17212a] border border-white/10 rounded p-4 space-y-4">
+                    <h4 className="font-semibold text-[#fafbfc] text-xs flex items-center gap-1.5">
                       <FileText className="w-4 h-4 text-primary" />
                       <span>Odporúčaný papier a profil tlače</span>
                     </h4>
 
                     <div className="space-y-3">
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Odporúčaný papier / gramáž:
                         </label>
                         <input
@@ -1353,12 +1356,12 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Zušľachtenie & laminácia (voliteľné):
                         </label>
                         <input
@@ -1380,12 +1383,12 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-foreground block">
+                        <label className="text-xs font-semibold text-[#fafbfc] block">
                           Farebný profil (Color Mode):
                         </label>
                         <input
@@ -1400,7 +1403,7 @@ export default function M21FiremnaVizitkaModule({
                               },
                             })
                           }
-                          className="w-full bg-[#0e161d] border border-border/50 rounded px-2.5 py-1.5 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                          className="w-full bg-[#070b0f] border border-white/15 rounded px-2.5 py-1.5 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1413,10 +1416,10 @@ export default function M21FiremnaVizitkaModule({
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-foreground text-xs">
+                      <h4 className="font-semibold text-[#fafbfc] text-xs">
                         Tlačové šablóny a otvorené dáta
                       </h4>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-[11px] text-[#96abbe]">
                         Poskytnite tlačiarni a grafickému štúdiu hotové tlačové PDF a otvorené súbory
                         InDesign alebo Illustrator.
                       </p>
@@ -1451,11 +1454,11 @@ export default function M21FiremnaVizitkaModule({
                     {cfg.downloads.map((dl, index) => (
                       <div
                         key={dl.id}
-                        className="bg-[#17212a] border border-border/50 rounded p-3 space-y-3"
+                        className="bg-[#17212a] border border-white/10 rounded p-3 space-y-3"
                       >
-                        <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-foreground">
+                            <span className="text-xs font-bold text-[#fafbfc]">
                               Súbor #{index + 1}
                             </span>
                             <FormatBadge format={dl.format} />
@@ -1477,7 +1480,7 @@ export default function M21FiremnaVizitkaModule({
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {/* Format Selector */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Formát súboru:
                             </label>
                             <select
@@ -1490,7 +1493,7 @@ export default function M21FiremnaVizitkaModule({
                                 };
                                 handleSaveConfig({ ...cfg, downloads: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             >
                               <option value="PDF">PDF (Print-ready)</option>
                               <option value="INDD">INDD (Adobe InDesign Package)</option>
@@ -1504,7 +1507,7 @@ export default function M21FiremnaVizitkaModule({
 
                           {/* Label */}
                           <div className="space-y-1 sm:col-span-2">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Názov tlačidla:
                             </label>
                             <input
@@ -1523,13 +1526,13 @@ export default function M21FiremnaVizitkaModule({
                                 };
                                 handleSaveConfig({ ...cfg, downloads: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           {/* URL */}
                           <div className="space-y-1 sm:col-span-2">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               URL adresa na stiahnutie:
                             </label>
                             <input
@@ -1544,13 +1547,13 @@ export default function M21FiremnaVizitkaModule({
                                 };
                                 handleSaveConfig({ ...cfg, downloads: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                             />
                           </div>
 
                           {/* File Size */}
                           <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-muted-foreground block">
+                            <label className="text-[10px] font-mono text-[#96abbe] block">
                               Veľkosť (voliteľné):
                             </label>
                             <input
@@ -1565,7 +1568,7 @@ export default function M21FiremnaVizitkaModule({
                                 };
                                 handleSaveConfig({ ...cfg, downloads: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/50 rounded px-2 py-1 text-xs text-foreground font-mono focus:border-primary focus:outline-none"
+                              className="w-full bg-[#070b0f] border border-white/15 rounded px-2 py-1 text-xs text-[#fafbfc] font-mono focus:border-primary focus:outline-none"
                             />
                           </div>
                         </div>
@@ -1577,7 +1580,7 @@ export default function M21FiremnaVizitkaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

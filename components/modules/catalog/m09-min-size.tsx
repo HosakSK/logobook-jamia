@@ -233,7 +233,7 @@ export default function M09MinimalnaVelkostLogaModule({
                   <Printer className="w-4 h-4" />
                   <span>Tlač & Ofset (CMYK / Pantone)</span>
                 </div>
-                <span className="text-[10px] font-mono text-muted-foreground uppercase px-2 py-0.5 rounded bg-neutral-900 border border-border/40">
+                <span className="text-[10px] font-mono text-muted-foreground uppercase px-2 py-0.5 rounded bg-card border border-border/60">
                   Fyzické milimetre
                 </span>
               </div>
@@ -265,7 +265,7 @@ export default function M09MinimalnaVelkostLogaModule({
                     <span>Náhľad 1:1 (Reálna mierka {printWidth} mm)</span>
                   </span>
                 </div>
-                <div className="min-h-[90px] bg-[#0e161d] rounded-[3px] border border-border/50 p-4 flex items-center justify-center overflow-hidden">
+                <div className="min-h-[90px] bg-card rounded-[3px] border border-border/60 p-4 flex items-center justify-center overflow-hidden">
                   {resolvedLogoUrl ? (
                     <img
                       src={resolvedLogoUrl}
@@ -294,7 +294,7 @@ export default function M09MinimalnaVelkostLogaModule({
                   <Monitor className="w-4 h-4" />
                   <span>Digitál & Obrazovka (RGB / Web)</span>
                 </div>
-                <span className="text-[10px] font-mono text-muted-foreground uppercase px-2 py-0.5 rounded bg-neutral-900 border border-border/40">
+                <span className="text-[10px] font-mono text-muted-foreground uppercase px-2 py-0.5 rounded bg-card border border-border/60">
                   Obrazovkové pixely
                 </span>
               </div>
@@ -372,37 +372,37 @@ export default function M09MinimalnaVelkostLogaModule({
 
       {/* Settings Modal (Dimensions Inputs & Logo Picker) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-white/20 w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia minimálnej veľkosti (M09)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("dimensions")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "dimensions"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Rozmery (mm / px)
@@ -413,7 +413,7 @@ export default function M09MinimalnaVelkostLogaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "source"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Zdroj loga
@@ -427,7 +427,7 @@ export default function M09MinimalnaVelkostLogaModule({
                 <div className="space-y-4">
                   {/* Medium Mode Selector */}
                   <div className="space-y-1.5">
-                    <label className="font-semibold text-muted-foreground uppercase tracking-wider text-[10px]">
+                    <label className="font-semibold text-[#96abbe] uppercase tracking-wider text-[10px]">
                       Režim média
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -436,8 +436,8 @@ export default function M09MinimalnaVelkostLogaModule({
                         onClick={() => handleSaveConfig({ ...cfg, mediumMode: "print" })}
                         className={`flex items-center justify-center gap-1.5 p-2 rounded-[3px] border transition-colors ${
                           cfg.mediumMode === "print"
-                            ? "bg-primary/10 border-primary text-primary font-bold"
-                            : "bg-[#17212a] border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "bg-primary/20 border-primary text-primary font-bold"
+                            : "bg-[#17212a] border-white/10 text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <Printer className="w-3.5 h-3.5" />
@@ -448,8 +448,8 @@ export default function M09MinimalnaVelkostLogaModule({
                         onClick={() => handleSaveConfig({ ...cfg, mediumMode: "digital" })}
                         className={`flex items-center justify-center gap-1.5 p-2 rounded-[3px] border transition-colors ${
                           cfg.mediumMode === "digital"
-                            ? "bg-primary/10 border-primary text-primary font-bold"
-                            : "bg-[#17212a] border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "bg-primary/20 border-primary text-primary font-bold"
+                            : "bg-[#17212a] border-white/10 text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <Monitor className="w-3.5 h-3.5" />
@@ -460,8 +460,8 @@ export default function M09MinimalnaVelkostLogaModule({
                         onClick={() => handleSaveConfig({ ...cfg, mediumMode: "both" })}
                         className={`flex items-center justify-center gap-1.5 p-2 rounded-[3px] border transition-colors ${
                           cfg.mediumMode === "both"
-                            ? "bg-primary/10 border-primary text-primary font-bold"
-                            : "bg-[#17212a] border-border/50 text-muted-foreground hover:text-foreground"
+                            ? "bg-primary/20 border-primary text-primary font-bold"
+                            : "bg-[#17212a] border-white/10 text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <Columns className="w-3.5 h-3.5" />
@@ -472,14 +472,14 @@ export default function M09MinimalnaVelkostLogaModule({
 
                   {/* Print Dimensions (mm) */}
                   {showPrint && (
-                    <div className="bg-[#17212a] p-3 rounded-[3px] border border-border/40 space-y-3">
+                    <div className="bg-[#17212a] p-3 rounded-[3px] border border-white/10 space-y-3">
                       <div className="flex items-center gap-2 text-rose-400 font-semibold text-xs">
                         <Printer className="w-3.5 h-3.5" />
                         <span>Rozmery pre Tlač (milimetre - mm)</span>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                          <label className="text-[11px] text-muted-foreground">Min. šírka (mm) *</label>
+                          <label className="text-[11px] text-[#96abbe]">Min. šírka (mm) *</label>
                           <input
                             type="number"
                             min="1"
@@ -493,11 +493,11 @@ export default function M09MinimalnaVelkostLogaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground font-mono text-xs focus:outline-none focus:border-primary"
+                            className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] font-mono text-xs focus:outline-none focus:border-primary"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[11px] text-muted-foreground">Min. výška (mm, voliteľné)</label>
+                          <label className="text-[11px] text-[#96abbe]">Min. výška (mm, voliteľné)</label>
                           <input
                             type="number"
                             min="1"
@@ -512,7 +512,7 @@ export default function M09MinimalnaVelkostLogaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground font-mono text-xs focus:outline-none focus:border-primary"
+                            className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] font-mono text-xs focus:outline-none focus:border-primary"
                           />
                         </div>
                       </div>
@@ -521,14 +521,14 @@ export default function M09MinimalnaVelkostLogaModule({
 
                   {/* Digital Dimensions (px) */}
                   {showDigital && (
-                    <div className="bg-[#17212a] p-3 rounded-[3px] border border-border/40 space-y-3">
+                    <div className="bg-[#17212a] p-3 rounded-[3px] border border-white/10 space-y-3">
                       <div className="flex items-center gap-2 text-sky-400 font-semibold text-xs">
                         <Monitor className="w-3.5 h-3.5" />
                         <span>Rozmery pre Digitál (pixely - px)</span>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1">
-                          <label className="text-[11px] text-muted-foreground">Min. šírka (px) *</label>
+                          <label className="text-[11px] text-[#96abbe]">Min. šírka (px) *</label>
                           <input
                             type="number"
                             min="1"
@@ -542,11 +542,11 @@ export default function M09MinimalnaVelkostLogaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground font-mono text-xs focus:outline-none focus:border-primary"
+                            className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] font-mono text-xs focus:outline-none focus:border-primary"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[11px] text-muted-foreground">Min. výška (px, voliteľné)</label>
+                          <label className="text-[11px] text-[#96abbe]">Min. výška (px, voliteľné)</label>
                           <input
                             type="number"
                             min="1"
@@ -561,7 +561,7 @@ export default function M09MinimalnaVelkostLogaModule({
                                 },
                               })
                             }
-                            className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground font-mono text-xs focus:outline-none focus:border-primary"
+                            className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] font-mono text-xs focus:outline-none focus:border-primary"
                           />
                         </div>
                       </div>
@@ -574,7 +574,7 @@ export default function M09MinimalnaVelkostLogaModule({
               {modalTab === "source" && (
                 <div className="space-y-4">
                   {/* Select from Brand Assets */}
-                  <div className="bg-[#17212a] p-3 rounded-[3px] border border-border/50 space-y-2">
+                  <div className="bg-[#17212a] p-3 rounded-[3px] border border-white/10 space-y-2">
                     <label className="font-semibold text-primary uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                       <Database className="w-3.5 h-3.5" />
                       <span>Knižnica surových lôg</span>
@@ -596,15 +596,15 @@ export default function M09MinimalnaVelkostLogaModule({
                               }
                               className={`p-2 rounded-[3px] border text-left flex items-center gap-2 transition-colors ${
                                 isSelected
-                                  ? "bg-primary/10 border-primary text-primary"
-                                  : "bg-[#0e161d] border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                  ? "bg-primary/20 border-primary text-primary"
+                                  : "bg-[#070b0f] border-white/10 hover:border-white/20 text-[#96abbe] hover:text-[#fafbfc]"
                               }`}
                             >
                               {asset.preview ? (
                                 <img
                                   src={asset.preview}
                                   alt=""
-                                  className="w-8 h-8 object-contain shrink-0 bg-neutral-900 rounded p-1"
+                                  className="w-8 h-8 object-contain shrink-0 bg-[#070b0f] rounded p-1 border border-white/10"
                                 />
                               ) : (
                                 <FileCode className="w-6 h-6 shrink-0 opacity-50" />
@@ -619,15 +619,15 @@ export default function M09MinimalnaVelkostLogaModule({
                         })}
                       </div>
                     ) : (
-                      <p className="text-[11px] text-muted-foreground italic">
+                      <p className="text-[11px] text-[#96abbe] italic">
                         Žiadne assety v knižnici lôg.
                       </p>
                     )}
                   </div>
 
                   {/* Direct SVG URL input */}
-                  <div className="space-y-1 bg-[#17212a] p-3 rounded-[3px] border border-border/40">
-                    <label className="text-muted-foreground text-[11px] font-medium">
+                  <div className="space-y-1 bg-[#17212a] p-3 rounded-[3px] border border-white/10">
+                    <label className="text-[#96abbe] text-[11px] font-medium">
                       Priama URL adresa SVG loga
                     </label>
                     <input
@@ -640,7 +640,7 @@ export default function M09MinimalnaVelkostLogaModule({
                           customSvgUrl: e.target.value || null,
                         })
                       }
-                      className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary"
+                      className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] text-xs focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -648,7 +648,7 @@ export default function M09MinimalnaVelkostLogaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

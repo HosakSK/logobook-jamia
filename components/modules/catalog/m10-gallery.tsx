@@ -274,10 +274,10 @@ export default function M10ObrazokGaleriaModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m10:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs whitespace-nowrap">
+        <div className="opacity-0 group-hover/m10:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs whitespace-nowrap">
           {/* Columns Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
-            <span className="text-[10px] text-muted-foreground px-1 font-mono uppercase">Stĺpce:</span>
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1">
+            <span className="text-[10px] text-white/60 px-1 font-mono uppercase">Stĺpce:</span>
             {[1, 2, 3, 4].map((col) => (
               <button
                 key={col}
@@ -287,7 +287,7 @@ export default function M10ObrazokGaleriaModule({
                 className={`px-1.5 py-0.5 rounded-[2px] text-[11px] font-mono transition-colors ${
                   cfg.columns === col
                     ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {col}
@@ -296,7 +296,7 @@ export default function M10ObrazokGaleriaModule({
           </div>
 
           {/* Aspect Ratio Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1">
             {(
               [
                 { id: "16/9", label: "16:9" },
@@ -313,7 +313,7 @@ export default function M10ObrazokGaleriaModule({
                 className={`px-1.5 py-0.5 rounded-[2px] text-[10px] font-mono transition-colors ${
                   cfg.aspectRatio === ar.id
                     ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {ar.label}
@@ -322,7 +322,7 @@ export default function M10ObrazokGaleriaModule({
           </div>
 
           {/* Show/Hide Captions Toggle */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1">
             <button
               type="button"
               title={cfg.showCaptions ? "Skryť popisky fotiek" : "Zobraziť popisky fotiek"}
@@ -330,7 +330,7 @@ export default function M10ObrazokGaleriaModule({
               className={`flex items-center gap-1 px-1.5 py-0.5 rounded-[2px] transition-colors text-[11px] ${
                 cfg.showCaptions
                   ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               {cfg.showCaptions ? (
@@ -351,7 +351,7 @@ export default function M10ObrazokGaleriaModule({
           <button
             type="button"
             onClick={() => setIsManageModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary/20 hover:bg-primary/30 text-primary font-semibold text-xs transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs transition-colors hover:opacity-90"
           >
             <Settings2 className="w-3.5 h-3.5" />
             <span>Spravovať galériu ({cfg.images.length})</span>
@@ -390,7 +390,7 @@ export default function M10ObrazokGaleriaModule({
                       setActiveLightboxIndex(idx);
                     }
                   }}
-                  className={`relative w-full overflow-hidden bg-[#0e161d] border border-border/60 shadow-xs transition-all duration-300 ${aspectRatioClass} ${
+                  className={`relative w-full overflow-hidden bg-card border border-border/60 shadow-xs transition-all duration-300 ${aspectRatioClass} ${
                     cfg.lightbox.enabled ? "cursor-zoom-in group-hover/card:border-primary/60" : ""
                   }`}
                   style={{ borderRadius: brandRadius }}
@@ -404,7 +404,7 @@ export default function M10ObrazokGaleriaModule({
 
                   {/* Subtle Lightbox Hover Pill */}
                   {cfg.lightbox.enabled && (
-                    <div className="opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 absolute top-2.5 right-2.5 p-1.5 rounded-[3px] bg-black/75 text-foreground backdrop-blur-xs shadow-md">
+                    <div className="opacity-0 group-hover/card:opacity-100 transition-opacity duration-200 absolute top-2.5 right-2.5 p-1.5 rounded-[3px] bg-[#070b0f] text-white border border-white/20 shadow-md">
                       <Maximize2 className="w-3.5 h-3.5" />
                     </div>
                   )}
@@ -439,15 +439,11 @@ export default function M10ObrazokGaleriaModule({
       {activeLightboxIndex !== null && cfg.images[activeLightboxIndex] && (
         <div
           onClick={() => setActiveLightboxIndex(null)}
-          className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-10 select-none animate-in fade-in duration-200 ${
-            cfg.lightbox.backdrop === "solid"
-              ? "bg-black/95"
-              : "bg-black/85 backdrop-blur-md"
-          }`}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-10 select-none animate-in fade-in duration-200 bg-black/95"
         >
           {/* Top Bar: Counter & Close */}
-          <div className="absolute top-4 inset-x-4 sm:inset-x-8 flex items-center justify-between z-50 text-foreground">
-            <span className="text-xs font-mono px-2.5 py-1 rounded bg-black/60 border border-border/40 backdrop-blur-xs">
+          <div className="absolute top-4 inset-x-4 sm:inset-x-8 flex items-center justify-between z-50 text-[#fafbfc]">
+            <span className="text-xs font-mono px-2.5 py-1 rounded bg-[#070b0f] border border-white/20 text-[#fafbfc]">
               {activeLightboxIndex + 1} / {cfg.images.length}
             </span>
             <button
@@ -456,7 +452,7 @@ export default function M10ObrazokGaleriaModule({
                 e.stopPropagation();
                 setActiveLightboxIndex(null);
               }}
-              className="p-2 rounded bg-black/60 hover:bg-black/80 text-foreground border border-border/40 backdrop-blur-xs transition-colors"
+              className="p-2 rounded bg-[#070b0f] hover:bg-white/10 text-[#fafbfc] border border-white/20 transition-colors"
               title="Zavrieť (Esc)"
             >
               <X className="w-5 h-5" />
@@ -473,7 +469,7 @@ export default function M10ObrazokGaleriaModule({
                   prev !== null ? (prev > 0 ? prev - 1 : cfg.images.length - 1) : null
                 );
               }}
-              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/60 hover:bg-black/80 text-foreground border border-border/40 backdrop-blur-xs transition-transform active:scale-90"
+              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-[#070b0f] hover:bg-white/10 text-[#fafbfc] border border-white/20 transition-transform active:scale-90"
               title="Predchádzajúci (←)"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -493,8 +489,8 @@ export default function M10ObrazokGaleriaModule({
 
             {/* Bottom Caption Bar */}
             {resolveI18nText(cfg.images[activeLightboxIndex].caption, locale) && (
-              <div className="mt-3 px-4 py-2 rounded bg-black/75 border border-border/40 text-center max-w-xl backdrop-blur-xs">
-                <p className="text-xs sm:text-sm text-foreground/90 font-medium">
+              <div className="mt-3 px-4 py-2 rounded bg-[#070b0f] border border-white/20 text-center max-w-xl">
+                <p className="text-xs sm:text-sm text-[#fafbfc] font-medium">
                   {resolveI18nText(cfg.images[activeLightboxIndex].caption, locale)}
                 </p>
               </div>
@@ -511,7 +507,7 @@ export default function M10ObrazokGaleriaModule({
                   prev !== null ? (prev < cfg.images.length - 1 ? prev + 1 : 0) : null
                 );
               }}
-              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/60 hover:bg-black/80 text-foreground border border-border/40 backdrop-blur-xs transition-transform active:scale-90"
+              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-[#070b0f] hover:bg-white/10 text-[#fafbfc] border border-white/20 transition-transform active:scale-90"
               title="Nasledujúci (→)"
             >
               <ChevronRight className="w-6 h-6" />
@@ -522,37 +518,37 @@ export default function M10ObrazokGaleriaModule({
 
       {/* GALLERY MANAGER MODAL (Add from Media, URL, Reorder, Captions) */}
       {isManageModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
           <div
-            className="bg-[#0e161d] border border-border/80 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            className="bg-[#0e161d] border border-white/20 w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             style={{ borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Správa Mockup Galérie (M10)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsManageModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-neutral-800/60 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border/40 bg-neutral-900/40 px-5 pt-2 gap-2">
+            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("list")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "list"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 Zoznam obrázkov ({cfg.images.length})
@@ -563,7 +559,7 @@ export default function M10ObrazokGaleriaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "media"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 + Hromadne z Media knižnice
@@ -574,7 +570,7 @@ export default function M10ObrazokGaleriaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "url"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 + Pridať cez URL
@@ -585,7 +581,7 @@ export default function M10ObrazokGaleriaModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
                   modalTab === "settings"
                     ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 Nastavenia Lightboxu
@@ -598,7 +594,7 @@ export default function M10ObrazokGaleriaModule({
               {modalTab === "list" && (
                 <div className="space-y-3">
                   {cfg.images.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-6 italic">
+                    <p className="text-[#96abbe] text-center py-6 italic">
                       Zatiaľ nemáte pridané žiadne obrázky.
                     </p>
                   ) : (
@@ -606,13 +602,13 @@ export default function M10ObrazokGaleriaModule({
                       {cfg.images.map((item, idx) => (
                         <div
                           key={item.id || idx}
-                          className="bg-[#17212a] p-3 rounded-[3px] border border-border/40 flex items-center gap-3"
+                          className="bg-[#17212a] p-3 rounded-[3px] border border-white/10 flex items-center gap-3"
                         >
                           {/* Thumbnail */}
                           <img
                             src={item.url}
                             alt=""
-                            className="w-14 h-10 object-cover rounded-[2px] border border-border/60 shrink-0"
+                            className="w-14 h-10 object-cover rounded-[2px] border border-white/10 shrink-0"
                           />
 
                           {/* Caption Input */}
@@ -627,9 +623,9 @@ export default function M10ObrazokGaleriaModule({
                                 updated[idx] = { ...item, caption: updatedCap };
                                 handleSaveConfig({ ...cfg, images: updated });
                               }}
-                              className="w-full bg-[#0e161d] border border-border/70 rounded px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary"
+                              className="w-full bg-[#070b0f] border border-white/20 rounded px-2.5 py-1 text-xs text-[#fafbfc] focus:outline-none focus:border-primary"
                             />
-                            <span className="text-[10px] text-muted-foreground truncate block font-mono">
+                            <span className="text-[10px] text-[#96abbe] truncate block font-mono">
                               {item.url}
                             </span>
                           </div>
@@ -640,7 +636,7 @@ export default function M10ObrazokGaleriaModule({
                               type="button"
                               disabled={idx === 0}
                               onClick={() => handleMoveImage(idx, "up")}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 hover:border-border disabled:opacity-30"
+                              className="p-1 rounded bg-[#070b0f] border border-white/10 hover:border-white/20 text-[#fafbfc] disabled:opacity-30"
                               title="Posunúť nahor"
                             >
                               <ChevronUp className="w-3 h-3" />
@@ -649,7 +645,7 @@ export default function M10ObrazokGaleriaModule({
                               type="button"
                               disabled={idx === cfg.images.length - 1}
                               onClick={() => handleMoveImage(idx, "down")}
-                              className="p-1 rounded bg-[#0e161d] border border-border/40 hover:border-border disabled:opacity-30"
+                              className="p-1 rounded bg-[#070b0f] border border-white/10 hover:border-white/20 text-[#fafbfc] disabled:opacity-30"
                               title="Posunúť nadol"
                             >
                               <ChevronDown className="w-3 h-3" />
@@ -660,7 +656,7 @@ export default function M10ObrazokGaleriaModule({
                           <button
                             type="button"
                             onClick={() => handleDeleteImage(idx)}
-                            className="p-1.5 rounded hover:bg-rose-500/20 text-muted-foreground hover:text-rose-400 transition-colors shrink-0"
+                            className="p-1.5 rounded hover:bg-rose-500/20 text-[#96abbe] hover:text-rose-400 transition-colors shrink-0"
                             title="Odstrániť obrázok"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -677,10 +673,10 @@ export default function M10ObrazokGaleriaModule({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-semibold text-foreground text-xs block">
+                      <span className="font-semibold text-[#fafbfc] text-xs block">
                         Knižnica fotografií a mockupov značky
                       </span>
-                      <span className="text-[11px] text-muted-foreground block">
+                      <span className="text-[11px] text-[#96abbe] block">
                         Zakliknite viacero obrázkov naraz pre hromadné vloženie
                       </span>
                     </div>
@@ -689,19 +685,19 @@ export default function M10ObrazokGaleriaModule({
                       type="button"
                       disabled={selectedMediaIds.length === 0}
                       onClick={handleAddSelectedMedia}
-                      className="px-3.5 py-1.5 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs transition-opacity disabled:opacity-40"
+                      className="px-3.5 py-1.5 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs transition-opacity disabled:opacity-40 hover:opacity-90"
                     >
                       Pridať vybrané ({selectedMediaIds.length})
                     </button>
                   </div>
 
                   {isLoadingMedia ? (
-                    <div className="text-center py-10 text-muted-foreground flex items-center justify-center gap-2">
+                    <div className="text-center py-10 text-[#96abbe] flex items-center justify-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-primary" />
                       <span>Načítavam médiá značky...</span>
                     </div>
                   ) : brandMedia.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-8 italic">
+                    <p className="text-[#96abbe] text-center py-8 italic">
                       V Media knižnici zatiaľ nie sú nahrané žiadne fotografie.
                     </p>
                   ) : (
@@ -721,7 +717,7 @@ export default function M10ObrazokGaleriaModule({
                             className={`relative aspect-4/3 rounded-[3px] border overflow-hidden cursor-pointer group/media transition-all ${
                               isSelected
                                 ? "border-primary ring-2 ring-primary/40"
-                                : "border-border/50 hover:border-border"
+                                : "border-white/10 hover:border-white/30"
                             }`}
                           >
                             <img
@@ -737,7 +733,7 @@ export default function M10ObrazokGaleriaModule({
                             >
                               <Check className="w-3 h-3" />
                             </div>
-                            <span className="absolute bottom-0 inset-x-0 bg-black/75 px-1 py-0.5 text-[9px] truncate text-muted-foreground block">
+                            <span className="absolute bottom-0 inset-x-0 bg-black/75 px-1 py-0.5 text-[9px] truncate text-[#fafbfc] block">
                               {m.fileName}
                             </span>
                           </div>
@@ -750,9 +746,9 @@ export default function M10ObrazokGaleriaModule({
 
               {/* TAB 3: ADD VIA URL */}
               {modalTab === "url" && (
-                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-border/40">
+                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
                   <div className="space-y-1">
-                    <label className="text-muted-foreground text-[11px] font-medium">
+                    <label className="text-[#96abbe] text-[11px] font-medium">
                       URL adresa fotografie / mockupu *
                     </label>
                     <input
@@ -760,12 +756,12 @@ export default function M10ObrazokGaleriaModule({
                       value={urlInput}
                       placeholder="https://images.unsplash.com/..."
                       onChange={(e) => setUrlInput(e.target.value)}
-                      className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary"
+                      className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] text-xs focus:outline-none focus:border-primary"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-muted-foreground text-[11px] font-medium">
+                    <label className="text-[#96abbe] text-[11px] font-medium">
                       Popis obrázka (caption, voliteľné)
                     </label>
                     <input
@@ -773,7 +769,7 @@ export default function M10ObrazokGaleriaModule({
                       value={urlCaption}
                       placeholder="Aplikácia na vizitkách..."
                       onChange={(e) => setUrlCaption(e.target.value)}
-                      className="w-full bg-[#0e161d] border border-border/70 rounded-[3px] px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary"
+                      className="w-full bg-[#070b0f] border border-white/20 rounded-[3px] px-3 py-1.5 text-[#fafbfc] text-xs focus:outline-none focus:border-primary"
                     />
                   </div>
 
@@ -782,7 +778,7 @@ export default function M10ObrazokGaleriaModule({
                       type="button"
                       disabled={!urlInput.trim()}
                       onClick={handleAddUrl}
-                      className="px-4 py-1.5 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs disabled:opacity-40"
+                      className="px-4 py-1.5 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs disabled:opacity-40 hover:opacity-90"
                     >
                       Pridať do galérie
                     </button>
@@ -792,13 +788,13 @@ export default function M10ObrazokGaleriaModule({
 
               {/* TAB 4: LIGHTBOX SETTINGS */}
               {modalTab === "settings" && (
-                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-border/40">
+                <div className="space-y-4 bg-[#17212a] p-4 rounded-[3px] border border-white/10">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-semibold text-foreground text-xs block">
+                      <span className="font-semibold text-[#fafbfc] text-xs block">
                         Celoobrazovkový Lightbox
                       </span>
-                      <span className="text-[11px] text-muted-foreground block">
+                      <span className="text-[11px] text-[#96abbe] block">
                         Umožňuje návštevníkovi po kliknutí na fotku otvoriť detail
                       </span>
                     </div>
@@ -812,65 +808,16 @@ export default function M10ObrazokGaleriaModule({
                             lightbox: { ...cfg.lightbox, enabled: e.target.checked },
                           })
                         }
-                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#0e161d] border-border/70"
+                        className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-white/20"
                       />
                     </label>
                   </div>
-
-                  {cfg.lightbox.enabled && (
-                    <div className="space-y-2 pt-2 border-t border-border/40">
-                      <label className="text-[11px] text-muted-foreground font-medium block">
-                        Vizuálny štýl pozadia Lightboxu:
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSaveConfig({
-                              ...cfg,
-                              lightbox: { ...cfg.lightbox, backdrop: "frosted_glass" },
-                            })
-                          }
-                          className={`p-2.5 rounded-[3px] border text-left transition-colors ${
-                            cfg.lightbox.backdrop === "frosted_glass"
-                              ? "bg-primary/10 border-primary text-primary font-bold"
-                              : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <span className="block text-xs font-semibold">Rozostrené sklo</span>
-                          <span className="text-[10px] text-muted-foreground block">
-                            Moderný frosted glass blur efekt
-                          </span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleSaveConfig({
-                              ...cfg,
-                              lightbox: { ...cfg.lightbox, backdrop: "solid" },
-                            })
-                          }
-                          className={`p-2.5 rounded-[3px] border text-left transition-colors ${
-                            cfg.lightbox.backdrop === "solid"
-                              ? "bg-primary/10 border-primary text-primary font-bold"
-                              : "bg-[#0e161d] border-border/50 text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          <span className="block text-xs font-semibold">Plná čierna</span>
-                          <span className="text-[10px] text-muted-foreground block">
-                            Klasické nepriehľadné tmavé pozadie
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsManageModalOpen(false)}

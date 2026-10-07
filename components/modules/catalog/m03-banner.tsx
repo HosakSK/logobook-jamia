@@ -37,61 +37,61 @@ const PRESET_STYLES: Record<
   }
 > = {
   info: {
-    bg: "rgba(23, 33, 42, 0.7)",
-    border: "rgba(43, 59, 72, 0.8)",
-    titleColor: "#FFFFFF",
-    bodyColor: "#CBD5E1",
-    iconClass: "text-neutral-300",
+    bg: "color-mix(in srgb, #3b82f6 10%, var(--card))",
+    border: "color-mix(in srgb, #3b82f6 40%, transparent)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
+    iconClass: "text-blue-500",
     role: "region",
     defaultIcon: "info",
     label: "Info",
   },
   warning: {
-    bg: "rgba(245, 158, 11, 0.12)",
-    border: "rgba(245, 158, 11, 0.4)",
-    titleColor: "#FDE68A",
-    bodyColor: "#FEF3C7",
-    iconClass: "text-amber-400",
+    bg: "color-mix(in srgb, #f59e0b 12%, var(--card))",
+    border: "color-mix(in srgb, #f59e0b 45%, transparent)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
+    iconClass: "text-amber-500",
     role: "alert",
     defaultIcon: "alert-triangle",
     label: "Warning",
   },
   danger: {
-    bg: "rgba(225, 29, 72, 0.12)",
-    border: "rgba(225, 29, 72, 0.4)",
-    titleColor: "#FECDD3",
-    bodyColor: "#FFE4E6",
-    iconClass: "text-rose-400",
+    bg: "color-mix(in srgb, #bb4934 12%, var(--card))",
+    border: "color-mix(in srgb, #bb4934 45%, transparent)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
+    iconClass: "text-rose-500",
     role: "alert",
     defaultIcon: "alert-circle",
     label: "Danger",
   },
   success: {
-    bg: "rgba(16, 185, 129, 0.12)",
-    border: "rgba(16, 185, 129, 0.4)",
-    titleColor: "#A7F3D0",
-    bodyColor: "#D1FAE5",
-    iconClass: "text-emerald-400",
+    bg: "color-mix(in srgb, #009f80 12%, var(--card))",
+    border: "color-mix(in srgb, #009f80 45%, transparent)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
+    iconClass: "text-emerald-500",
     role: "region",
     defaultIcon: "check-circle",
     label: "Success",
   },
   accent: {
-    bg: "color-mix(in srgb, var(--brand-color-primary, #c8d400) 14%, transparent)",
-    border: "color-mix(in srgb, var(--brand-color-primary, #c8d400) 45%, transparent)",
-    titleColor: "var(--brand-color-primary, #c8d400)",
-    bodyColor: "#F1F5F9",
+    bg: "color-mix(in srgb, var(--primary, #c8d400) 12%, var(--card))",
+    border: "color-mix(in srgb, var(--primary, #c8d400) 45%, transparent)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
     iconClass: "text-primary",
     role: "region",
     defaultIcon: "sparkles",
     label: "Brand Accent",
   },
   custom: {
-    bg: "rgba(23, 33, 42, 0.6)",
-    border: "rgba(43, 59, 72, 0.7)",
-    titleColor: "#FFFFFF",
-    bodyColor: "#CBD5E1",
-    iconClass: "text-foreground",
+    bg: "var(--card)",
+    border: "var(--border)",
+    titleColor: "var(--foreground)",
+    bodyColor: "var(--muted-foreground)",
+    iconClass: "text-primary",
     role: "region",
     defaultIcon: "info",
     label: "Custom",
@@ -219,9 +219,9 @@ export default function M03BannerModule({
     <div className="group/m03 relative w-full py-1">
       {/* Editor Hover Toolbar (Prevents Pencil Hell - only visible on hover) */}
       {isEditor && (
-        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m03:opacity-100 transition-opacity bg-neutral-950/95 border border-border/80 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
+        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m03:opacity-100 transition-opacity bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-xl text-white">
           {/* Variant / Tone Selector */}
-          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+          <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5 border border-white/10">
             {(["info", "warning", "danger", "success", "accent"] as const).map((v) => (
               <button
                 key={v}
@@ -237,8 +237,8 @@ export default function M03BannerModule({
                 }
                 className={`px-1.5 py-0.5 text-[10px] font-mono rounded-[1px] transition-colors ${
                   variant === v
-                    ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                    ? "bg-primary text-[#070b0f] font-bold"
+                    : "text-white/75 hover:text-white hover:bg-white/10"
                 }`}
                 title={`Štýl banneru: ${PRESET_STYLES[v].label}`}
               >
@@ -247,14 +247,14 @@ export default function M03BannerModule({
             ))}
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Icon Selector Popover */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsIconMenuOpen(!isIconMenuOpen)}
-              className="px-1.5 py-0.5 text-[10px] rounded-[2px] border border-border/40 flex items-center gap-1 hover:border-primary/60 text-muted-foreground hover:text-foreground transition-colors"
+              className="px-1.5 py-0.5 text-[10px] rounded-[2px] border border-white/20 flex items-center gap-1 hover:border-primary/60 text-white/75 hover:text-white transition-colors"
               title="Nastavenie ikony banneru"
             >
               <IconComponent className="h-3 w-3" />
@@ -262,13 +262,13 @@ export default function M03BannerModule({
             </button>
 
             {isIconMenuOpen && (
-              <div className="absolute left-0 top-full mt-1 bg-neutral-950 border border-border/80 rounded-[3px] p-2.5 shadow-2xl z-50 w-52 space-y-2.5 animate-in fade-in zoom-in-95">
-                <div className="flex items-center justify-between text-[10px] uppercase font-bold text-muted-foreground border-b border-border/30 pb-1">
+              <div className="absolute left-0 top-full mt-1 bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] p-2.5 shadow-2xl z-50 w-52 space-y-2.5 animate-in fade-in zoom-in-95 text-[#fafbfc]">
+                <div className="flex items-center justify-between text-[10px] uppercase font-bold text-[#96abbe] border-b border-[rgba(63,85,102,0.45)] pb-1">
                   <span>Výber ikony</span>
                   <button
                     type="button"
                     onClick={() => setIsIconMenuOpen(false)}
-                    className="hover:text-foreground"
+                    className="hover:text-[#fafbfc] text-[#96abbe]"
                   >
                     ✕
                   </button>
@@ -288,10 +288,10 @@ export default function M03BannerModule({
                           });
                           setIsIconMenuOpen(false);
                         }}
-                        className={`p-1.5 rounded-[2px] border flex flex-col items-center gap-1 text-[9px] transition-colors ${
+                        className={`p-1.5 rounded-[2px] border flex flex-col items-center gap-1 text-[9px] transition-colors cursor-pointer ${
                           iconConfig.iconId === item.id
-                            ? "bg-primary/20 border-primary text-primary"
-                            : "border-border/30 hover:border-border/80 text-muted-foreground hover:text-foreground"
+                            ? "bg-primary text-[#070b0f] border-primary font-bold"
+                            : "border-[rgba(63,85,102,0.45)] hover:border-primary/60 bg-[#17212a] text-[#fafbfc]"
                         }`}
                       >
                         <CurrentIcon className="h-3.5 w-3.5" />
@@ -302,8 +302,8 @@ export default function M03BannerModule({
                 </div>
 
                 {/* Position Switcher */}
-                <div className="pt-1 border-t border-border/30 flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground">Pozícia:</span>
+                <div className="pt-1 border-t border-[rgba(63,85,102,0.45)] flex items-center justify-between">
+                  <span className="text-[10px] text-[#96abbe]">Pozícia:</span>
                   <div className="flex items-center gap-1">
                     {(["left", "right", "none"] as const).map((pos) => (
                       <button
@@ -316,8 +316,8 @@ export default function M03BannerModule({
                         }
                         className={`px-1.5 py-0.5 text-[9px] rounded-[1px] uppercase ${
                           iconPosition === pos
-                            ? "bg-primary text-primary-foreground font-bold"
-                            : "text-muted-foreground hover:text-foreground bg-neutral-900"
+                            ? "bg-primary text-[#070b0f] font-bold"
+                            : "text-[#96abbe] hover:text-[#fafbfc] bg-[#17212a]"
                         }`}
                       >
                         {pos}
@@ -329,7 +329,7 @@ export default function M03BannerModule({
             )}
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* CTA Button Toggle & URL Setting */}
           <button
@@ -341,8 +341,8 @@ export default function M03BannerModule({
             }
             className={`px-1.5 py-0.5 text-[10px] font-medium rounded-[2px] border transition-colors flex items-center gap-1 ${
               buttonConfig.show
-                ? "bg-primary/10 border-primary text-primary font-bold"
-                : "border-border/40 text-muted-foreground hover:text-foreground hover:bg-neutral-900"
+                ? "bg-primary text-[#070b0f] border-primary font-bold"
+                : "border-white/20 text-white/75 hover:text-white hover:bg-white/10"
             }`}
             title="Prepnúť CTA akčné tlačidlo"
           >
@@ -357,15 +357,15 @@ export default function M03BannerModule({
                   setTempUrl(buttonConfig.url || "#");
                   setIsUrlMenuOpen(!isUrlMenuOpen);
                 }}
-                className="p-1 rounded-[2px] border border-border/40 hover:border-primary/60 text-muted-foreground hover:text-foreground transition-colors"
+                className="p-1 rounded-[2px] border border-white/20 hover:border-primary/60 text-white/75 hover:text-white transition-colors"
                 title="Nastaviť cieľovú URL adresu tlačidla"
               >
                 <LinkIcon className="h-3 w-3" />
               </button>
 
               {isUrlMenuOpen && (
-                <div className="absolute left-0 top-full mt-1 bg-neutral-950 border border-border/80 rounded-[3px] p-2.5 shadow-2xl z-50 w-60 space-y-2 animate-in fade-in zoom-in-95">
-                  <div className="text-[10px] uppercase font-bold text-muted-foreground">
+                <div className="absolute left-0 top-full mt-1 bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] p-2.5 shadow-2xl z-50 w-60 space-y-2 animate-in fade-in zoom-in-95 text-[#fafbfc]">
+                  <div className="text-[10px] uppercase font-bold text-[#96abbe]">
                     URL adresa tlačidla
                   </div>
                   <input
@@ -373,21 +373,21 @@ export default function M03BannerModule({
                     value={tempUrl}
                     onChange={(e) => setTempUrl(e.target.value)}
                     placeholder="https://..."
-                    className="w-full h-7 px-2 text-xs font-mono rounded-[2px] bg-neutral-900 border border-border/50 text-foreground"
+                    className="w-full h-7 px-2 text-xs font-mono rounded-[var(--brand-radius,4px)] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] focus:border-primary focus:outline-none"
                     autoFocus
                   />
                   <div className="flex items-center justify-end gap-1 pt-1">
                     <button
                       type="button"
                       onClick={() => setIsUrlMenuOpen(false)}
-                      className="px-2 py-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+                      className="px-2 py-0.5 text-[10px] text-[#96abbe] hover:text-[#fafbfc]"
                     >
                       Zrušiť
                     </button>
                     <button
                       type="button"
                       onClick={handleSaveButtonUrl}
-                      className="px-2 py-0.5 text-[10px] font-bold rounded-[2px] bg-primary text-primary-foreground"
+                      className="px-2.5 py-0.5 text-[10px] font-bold rounded-[2px] bg-primary text-[#070b0f]"
                     >
                       Uložiť
                     </button>
@@ -398,7 +398,7 @@ export default function M03BannerModule({
           )}
 
           {/* Active Locale indicator */}
-          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-neutral-900 border border-border/40 text-muted-foreground ml-0.5">
+          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-white/10 border border-white/20 text-white/70 ml-0.5">
             {locale}
           </span>
         </div>
@@ -421,7 +421,7 @@ export default function M03BannerModule({
           {/* Left Icon */}
           {iconPosition === "left" && (
             <div
-              className={`p-2 rounded-[2px] bg-neutral-950/40 border border-border/20 shrink-0 mt-0.5 ${preset.iconClass}`}
+              className={`p-2 rounded-[var(--brand-radius,4px)] bg-black/10 dark:bg-white/10 border border-current/15 shrink-0 mt-0.5 ${preset.iconClass}`}
               aria-hidden="true"
             >
               <IconComponent className="h-5 w-5" />
@@ -470,7 +470,7 @@ export default function M03BannerModule({
           {/* Right Icon */}
           {iconPosition === "right" && (
             <div
-              className={`p-2 rounded-[2px] bg-neutral-950/40 border border-border/20 shrink-0 mt-0.5 ${preset.iconClass}`}
+              className={`p-2 rounded-[var(--brand-radius,4px)] bg-black/10 dark:bg-white/10 border border-current/15 shrink-0 mt-0.5 ${preset.iconClass}`}
               aria-hidden="true"
             >
               <IconComponent className="h-5 w-5" />
@@ -482,7 +482,7 @@ export default function M03BannerModule({
         {buttonConfig.show && (
           <div className="shrink-0 self-end sm:self-center pt-2 sm:pt-0">
             {isEditor ? (
-              <div className="px-3.5 py-1.5 text-xs font-bold rounded-[2px] bg-neutral-900 border border-border/80 shadow-xs flex items-center gap-1.5 text-foreground cursor-pointer">
+              <div className="px-3.5 py-1.5 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-card border border-border/80 shadow-xs flex items-center gap-1.5 text-foreground cursor-pointer">
                 <InlineEditableText
                   value={resolvedButtonLabel}
                   onSave={handleSaveButtonLabel}
@@ -496,10 +496,7 @@ export default function M03BannerModule({
                 href={buttonConfig.url || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-1.5 text-xs font-bold rounded-[2px] bg-neutral-900/90 hover:bg-neutral-800 text-foreground border border-border/80 shadow-xs transition-colors flex items-center gap-1.5"
-                style={{
-                  borderRadius: "var(--brand-radius, 3px)",
-                }}
+                className="px-3.5 py-1.5 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-card hover:bg-muted text-foreground border border-border/80 shadow-xs transition-colors flex items-center gap-1.5"
               >
                 <span>{resolvedButtonLabel}</span>
                 <ExternalLink className="h-3 w-3 text-muted-foreground" />
