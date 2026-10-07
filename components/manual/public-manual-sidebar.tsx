@@ -91,9 +91,9 @@ export function PublicManualSidebar({
     return roots;
   }, [pages]);
 
-  // Expanded nodes state (Set of node IDs)
+  // Expanded nodes state (Set of node IDs) - default collapsed
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
-    const initial = new Set<string>(collectAllParentIds(tree));
+    const initial = new Set<string>();
     if (activeSlug) {
       const ancestors = collectAncestorIds(tree, activeSlug);
       if (ancestors) {
@@ -168,14 +168,11 @@ export function PublicManualSidebar({
         <div
           className={`group flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-colors ${
             isCurrent
-              ? "bg-primary/15 font-bold border-l-2 border-primary"
-              : "hover:bg-primary/10"
+              ? "bg-black/[0.05] dark:bg-white/[0.08] shadow-xs"
+              : "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
           }`}
           style={{
             paddingLeft: `${Math.max(8, depth * 12 + 8)}px`,
-            color: isCurrent
-              ? "var(--brand-color-primary, var(--primary, #c8d400))"
-              : "var(--foreground)",
           }}
         >
           <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -190,15 +187,19 @@ export function PublicManualSidebar({
               >
                 <ChevronRight
                   className={`h-3.5 w-3.5 transition-transform duration-150 ${
-                    isExpanded ? "rotate-90 text-primary" : ""
+                    isExpanded ? "rotate-90 text-foreground" : ""
                   }`}
                 />
               </button>
             ) : (
               <div className="w-4 h-4 flex items-center justify-center shrink-0">
                 <FileText
-                  className="h-3.5 w-3.5 opacity-60 shrink-0"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="h-3.5 w-3.5 opacity-50 shrink-0"
+                  style={{
+                    color: isCurrent
+                      ? "var(--brand-color-primary, #c8d400)"
+                      : "var(--muted-foreground)",
+                  }}
                 />
               </div>
             )}
@@ -207,11 +208,13 @@ export function PublicManualSidebar({
             <Link
               href={href}
               onClick={onPageSelect}
-              className="flex items-center gap-2 flex-1 truncate py-0.5 cursor-pointer font-medium"
+              className={`flex items-center gap-2 flex-1 truncate py-0.5 cursor-pointer ${
+                isCurrent
+                  ? "font-semibold"
+                  : "text-muted-foreground hover:text-foreground font-normal"
+              }`}
               style={{
-                color: isCurrent
-                  ? "var(--brand-color-primary, var(--primary, #c8d400))"
-                  : "var(--foreground)",
+                color: isCurrent ? "var(--foreground)" : undefined,
               }}
               title={title}
             >
@@ -219,16 +222,28 @@ export function PublicManualSidebar({
                 (isExpanded ? (
                   <FolderOpen
                     className="h-3.5 w-3.5 shrink-0 opacity-80"
-                    style={{ color: "var(--brand-color-primary, var(--primary, #c8d400))" }}
+                    style={{
+                      color: isCurrent
+                        ? "var(--brand-color-primary, var(--primary, #c8d400))"
+                        : "var(--muted-foreground)",
+                    }}
                   />
                 ) : (
                   <Folder
-                    className="h-3.5 w-3.5 shrink-0 opacity-70"
+                    className="h-3.5 w-3.5 shrink-0 opacity-60"
                     style={{ color: "var(--muted-foreground)" }}
                   />
                 ))}
               <span className="truncate">{title}</span>
             </Link>
+
+            {/* Subtle Active Pill Dot */}
+            {isCurrent && (
+              <span
+                className="h-1.5 w-1.5 rounded-full shrink-0 mr-1"
+                style={{ backgroundColor: "var(--brand-color-primary, #c8d400)" }}
+              />
+            )}
           </div>
         </div>
 
@@ -322,19 +337,29 @@ export function PublicManualSidebar({
                     key={page.id}
                     href={href}
                     onClick={onPageSelect}
-                    style={{
-                      color: isCurrent
-                        ? "var(--brand-color-primary, var(--primary, #c8d400))"
-                        : "var(--foreground)",
-                    }}
-                    className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
+                    className={`flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-colors ${
                       isCurrent
-                        ? "bg-primary/15 font-bold border-l-2 border-primary"
-                        : "hover:bg-primary/10"
+                        ? "bg-black/[0.05] dark:bg-white/[0.08] font-semibold text-foreground shadow-xs"
+                        : "text-muted-foreground hover:text-foreground hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
                     }`}
                   >
-                    <FileText className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                    <span className="truncate">{title}</span>
+                    <div className="flex items-center gap-2 truncate">
+                      <FileText
+                        className="h-3.5 w-3.5 shrink-0 opacity-60"
+                        style={{
+                          color: isCurrent
+                            ? "var(--brand-color-primary, #c8d400)"
+                            : "var(--muted-foreground)",
+                        }}
+                      />
+                      <span className="truncate">{title}</span>
+                    </div>
+                    {isCurrent && (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full shrink-0"
+                        style={{ backgroundColor: "var(--brand-color-primary, #c8d400)" }}
+                      />
+                    )}
                   </Link>
                 );
               })
