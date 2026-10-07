@@ -4,6 +4,7 @@ import { useState, useRef, useTransition } from "react";
 import { uploadBrandAssetAction } from "@/actions/assets";
 import { normalizeAndScopeSvg } from "@/lib/utils/svg";
 import { suggestLogoName } from "@/lib/utils/asset-naming";
+import { removeCanvasWhiteBackground } from "@/lib/utils/image";
 import {
   ASSET_MEDIUMS,
   ASSET_ORIENTATIONS,
@@ -51,6 +52,7 @@ interface QueuedLogoItem {
   background: AssetBackground;
   svgContent: string;
   svgFile: File | null;
+  previewFile?: File | null;
   attachedFiles: QueuedAttachedFile[];
 }
 
@@ -84,7 +86,7 @@ function getBaseKey(fileName: string): string {
   return withoutExt.trim().toLowerCase();
 }
 
-async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: string; width: number; height: number } | null> {
+async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: string; file: File | null; width: number; height: number } | null> {
   try {
     const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
     if (!pdfjs.GlobalWorkerOptions.workerSrc) {
@@ -110,7 +112,7 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     const canvas = document.createElement("canvas");
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return null;
 
     const renderContext = {
@@ -120,11 +122,17 @@ async function renderPdfFirstPageToDataUrl(file: File): Promise<{ dataUrl: strin
     };
     await page.render(renderContext).promise;
 
+    // Remove white artboard background to ensure true transparency
+    removeCanvasWhiteBackground(canvas);
+
     // Use PNG with transparent background
     const dataUrl = canvas.toDataURL("image/png");
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    const previewFile = blob ? new File([blob], "thumbnail.png", { type: "image/png" }) : null;
 
     return {
       dataUrl,
+      file: previewFile,
       width: Math.floor(viewport.width),
       height: Math.floor(viewport.height),
     };
@@ -306,14 +314,18 @@ export function BulkUploadModal({
               const c = document.createElement("canvas");
               c.width = w;
               c.height = h;
-              const ctx = c.getContext("2d");
+              const ctx = c.getContext("2d", { willReadFrequently: true });
               if (ctx) {
                 ctx.drawImage(img, 0, 0, w, h);
+                removeCanvasWhiteBackground(c);
                 const compactUrl = c.toDataURL("image/png");
-                const rasterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><image href="${compactUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
-                setQueue((curr) =>
-                  curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: rasterSvg } : it))
-                );
+                c.toBlob((blob) => {
+                  const pFile = blob ? new File([blob], "thumbnail.png", { type: "image/png" }) : null;
+                  const rasterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}"><image href="${compactUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
+                  setQueue((curr) =>
+                    curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: rasterSvg, previewFile: pFile } : it))
+                  );
+                }, "image/png");
               }
             };
             img.src = rawUrl;
@@ -328,7 +340,7 @@ export function BulkUploadModal({
           if (rendered) {
             const pdfSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rendered.width} ${rendered.height}"><image href="${rendered.dataUrl}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" /></svg>`;
             setQueue((curr) =>
-              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: pdfSvg } : it))
+              curr.map((it) => (it.baseKey === baseKey ? { ...it, svgContent: pdfSvg, previewFile: rendered.file } : it))
             );
           } else {
             // Fallback document SVG
@@ -484,7 +496,7 @@ export function BulkUploadModal({
             const canvas = document.createElement("canvas");
             canvas.width = 300;
             canvas.height = 300;
-            const ctx = canvas.getContext("2d");
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
             if (!ctx) {
               safeResolve(null, url);
               return;
@@ -497,6 +509,9 @@ export function BulkUploadModal({
             const y = (300 - h) / 2;
             ctx.drawImage(img, x, y, w, h);
 
+            // Strip any white background from SVG rasterization
+            removeCanvasWhiteBackground(canvas);
+
             canvas.toBlob(
               (blob) => {
                 if (blob) {
@@ -505,8 +520,7 @@ export function BulkUploadModal({
                   safeResolve(null, url);
                 }
               },
-              "image/png",
-              0.85
+              "image/png"
             );
           } catch {
             safeResolve(null, url);
@@ -566,8 +580,10 @@ export function BulkUploadModal({
             formData.append("hasRealSvg", "false");
           }
 
-          // Try to generate thumbnail safely
-          if (item.svgContent) {
+          // Append preview thumbnail (prefer direct transparent previewFile, or fallback to generating from svgContent)
+          if (item.previewFile) {
+            formData.append("previewFile", item.previewFile);
+          } else if (item.svgContent) {
             try {
               const thumbnail = await generatePngThumbnail(item.svgContent);
               if (thumbnail) {
@@ -719,11 +735,7 @@ export function BulkUploadModal({
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4 pt-1">
                       {/* Thumbnail preview */}
                       <div
-                        className={`h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden ${
-                          item.background === "LIGHT"
-                            ? "bg-white text-black"
-                            : "bg-[#070b0f] text-white"
-                        }`}
+                        className="h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden bg-neutral-900 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:12px_12px] [background-position:0_0,0_6px,6px_-6px,-6px_0px]"
                       >
                         {item.svgContent ? (
                           <div

@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import { BrandAsset } from "@/lib/types/asset";
 import { updateBrandAssetAction } from "@/actions/assets";
 import { suggestLogoName } from "@/lib/utils/asset-naming";
+import { removeCanvasWhiteBackground } from "@/lib/utils/image";
 import {
   ASSET_MEDIUMS,
   ASSET_ORIENTATIONS,
@@ -270,6 +271,51 @@ export function EditAssetModal({
               )}
             </div>
 
+            {/* Visual preview box of active / chosen preview */}
+            <div className="flex items-center gap-3 p-2.5 rounded-[3px] bg-neutral-900 border border-border/40">
+              <div className="h-16 w-24 rounded-[2px] shrink-0 flex items-center justify-center p-1.5 border border-border/40 overflow-hidden bg-neutral-950 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:10px_10px] [background-position:0_0,0_5px,5px_-5px,-5px_0px]">
+                {customPreviewUrl ? (
+                  <img
+                    src={customPreviewUrl}
+                    alt="Nový náhľad"
+                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                  />
+                ) : selectedSourceSvgContent ? (
+                  <div
+                    className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain"
+                    dangerouslySetInnerHTML={{ __html: selectedSourceSvgContent }}
+                  />
+                ) : asset.previewUrl ? (
+                  <img
+                    src={asset.previewUrl}
+                    alt={asset.name.sk || "Náhľad"}
+                    className="max-w-full max-h-full w-auto h-auto object-contain"
+                  />
+                ) : asset.svgContent ? (
+                  <div
+                    className="w-full h-full flex items-center justify-center [&>svg]:max-w-full [&>svg]:max-h-full [&>svg]:w-auto [&>svg]:h-auto [&>svg]:object-contain"
+                    dangerouslySetInnerHTML={{ __html: asset.svgContent }}
+                  />
+                ) : (
+                  <span className="text-[9px] text-muted-foreground">Bez náhľadu</span>
+                )}
+              </div>
+              <div className="text-[11px] text-muted-foreground min-w-0">
+                <span className="font-semibold text-foreground block">
+                  {customPreviewUrl
+                    ? "Nový nahraný obrázok (transparent)"
+                    : selectedSourceSvgContent
+                    ? "Prevzatý vektor z iného SVG"
+                    : asset.previewUrl
+                    ? "Aktuálny náhľad v systéme"
+                    : "Pôvodné SVG logo"}
+                </span>
+                <span className="text-[10px] block text-muted-foreground/80 truncate">
+                  Zobrazené na priehľadnej mriežke (transparent)
+                </span>
+              </div>
+            </div>
+
             {/* Option 1: Upload Custom Preview Image */}
             <div className="space-y-1.5">
               <span className="text-[11px] text-muted-foreground block">
@@ -281,8 +327,35 @@ export function EditAssetModal({
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    setCustomPreviewFile(file);
-                    setCustomPreviewUrl(URL.createObjectURL(file));
+                    if (file.type.startsWith("image/png") || file.type.startsWith("image/jpeg") || file.type.startsWith("image/webp")) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const img = new Image();
+                        img.onload = () => {
+                          const c = document.createElement("canvas");
+                          c.width = img.width;
+                          c.height = img.height;
+                          const ctx = c.getContext("2d", { willReadFrequently: true });
+                          if (ctx) {
+                            ctx.drawImage(img, 0, 0);
+                            removeCanvasWhiteBackground(c);
+                            const cleanedUrl = c.toDataURL("image/png");
+                            c.toBlob((blob) => {
+                              const cleanedFile = blob
+                                ? new File([blob], file.name.replace(/\.[a-zA-Z0-9]+$/, ".png"), { type: "image/png" })
+                                : file;
+                              setCustomPreviewFile(cleanedFile);
+                              setCustomPreviewUrl(cleanedUrl);
+                            }, "image/png");
+                          }
+                        };
+                        img.src = ev.target?.result as string;
+                      };
+                      reader.readAsDataURL(file);
+                    } else {
+                      setCustomPreviewFile(file);
+                      setCustomPreviewUrl(URL.createObjectURL(file));
+                    }
                     setSelectedSourceSvgId("");
                     setSelectedSourceSvgContent(null);
                   }

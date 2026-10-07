@@ -63,18 +63,23 @@ export function AssetCard({
 
   // Compute actual canvas background class
   let canvasBgClass = "";
-  const effectiveBg = bgMode === "auto" ? asset.background : bgMode.toUpperCase();
-
-  if (effectiveBg === "LIGHT") {
+  if (bgMode === "light") {
     canvasBgClass = "bg-white text-neutral-900";
-  } else if (effectiveBg === "DARK" || effectiveBg === "INVERSE") {
+  } else if (bgMode === "dark") {
     canvasBgClass = "bg-[#070b0f] text-white";
-  } else if (effectiveBg === "MONOCHROME") {
-    canvasBgClass = "bg-neutral-800 text-neutral-100";
-  } else {
-    // Checkerboard for TRANSPARENT or CHECKERED
+  } else if (bgMode === "checkered") {
     canvasBgClass =
       "bg-neutral-900 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
+  } else {
+    // "auto": subtle checkered pattern matching the asset's intended lighting to make transparency immediately visible
+    if (asset.background === "DARK") {
+      canvasBgClass =
+        "bg-[#070b0f] text-white [background-image:linear-gradient(45deg,#151f28_25%,transparent_25%),linear-gradient(-45deg,#151f28_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#151f28_75%),linear-gradient(-45deg,transparent_75%,#151f28_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
+    } else {
+      // Default LIGHT with soft light checkered pattern
+      canvasBgClass =
+        "bg-neutral-100 text-neutral-900 [background-image:linear-gradient(45deg,#e5e7eb_25%,transparent_25%),linear-gradient(-45deg,#e5e7eb_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#e5e7eb_75%),linear-gradient(-45deg,transparent_75%,#e5e7eb_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
+    }
   }
 
   // Check if asset has a real SVG file or pure SVG code
@@ -219,7 +224,7 @@ export function AssetCard({
           <div className="inline-flex rounded-[3px] bg-neutral-900 border border-border/40 p-0.5">
             <button
               type="button"
-              onClick={() => setBgMode("light")}
+              onClick={() => setBgMode(bgMode === "light" ? "auto" : "light")}
               title="Svetlé plátno"
               className={`p-1 rounded-[2px] transition-colors ${
                 bgMode === "light"
@@ -231,7 +236,7 @@ export function AssetCard({
             </button>
             <button
               type="button"
-              onClick={() => setBgMode("dark")}
+              onClick={() => setBgMode(bgMode === "dark" ? "auto" : "dark")}
               title="Tmavé plátno"
               className={`p-1 rounded-[2px] transition-colors ${
                 bgMode === "dark"
@@ -243,7 +248,7 @@ export function AssetCard({
             </button>
             <button
               type="button"
-              onClick={() => setBgMode("checkered")}
+              onClick={() => setBgMode(bgMode === "checkered" ? "auto" : "checkered")}
               title="Priehľadná mriežka"
               className={`p-1 rounded-[2px] transition-colors ${
                 bgMode === "checkered"
