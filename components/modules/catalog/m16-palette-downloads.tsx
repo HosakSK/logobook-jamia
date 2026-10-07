@@ -299,7 +299,7 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m16:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m16:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -355,14 +355,14 @@ export default function M16VzorkovnikyAPaletyNaStiahnutieModule({
           return (
             <div
               key={item.id || `item-${idx}`}
-              className="bg-[#0e161d] border border-border/60 p-4 sm:p-5 transition-all duration-200 shadow-xs hover:border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="bg-card border border-border/60 p-4 sm:p-5 transition-all duration-200 shadow-xs hover:border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               style={{ borderRadius: brandRadius }}
             >
               {/* Left & Middle: Pure Typographic Tag + Content */}
               <div className="flex items-start gap-4 min-w-0">
                 {/* Pure Typographic Format Badge (Legal compliant, no trademark logos) */}
                 <div
-                  className="w-13 h-13 rounded-[3px] bg-[#17212a] border border-border/80 flex flex-col items-center justify-center shrink-0 shadow-2xs select-none"
+                  className="w-13 h-13 rounded-[3px] bg-muted/60 border border-border/80 flex flex-col items-center justify-center shrink-0 shadow-2xs select-none"
                   style={{ borderRadius: brandRadius }}
                 >
                   <span className="font-mono text-sm font-extrabold text-primary tracking-wider uppercase">

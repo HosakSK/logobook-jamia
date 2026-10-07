@@ -344,7 +344,7 @@ export default function M07ZobrazenieLogaModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m07:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m07:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -358,7 +358,7 @@ export default function M07ZobrazenieLogaModule({
 
       {/* Main Two-Column Layout */}
       <div
-        className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#0e161d] border border-border/60 p-6 shadow-sm overflow-hidden"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-card border border-border/60 p-6 shadow-sm overflow-hidden"
         style={{ borderRadius: brandRadius }}
       >
         {/* LEFT COLUMN: Logo Preview & Interactive Mockup Reveal (40% / 5 cols) */}
@@ -478,7 +478,7 @@ export default function M07ZobrazenieLogaModule({
                         href={fmt.url || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[#17212a] hover:bg-[#1f2c36] text-foreground border border-border/60 text-xs font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-medium transition-colors"
                         title="Otvoriť externé úložisko"
                       >
                         <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
@@ -488,7 +488,7 @@ export default function M07ZobrazenieLogaModule({
                       <a
                         href={fmt.url || "#"}
                         download={fmt.fileName || true}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-[#17212a] hover:bg-[#1f2c36] text-foreground border border-border/60 text-xs font-medium transition-colors"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] bg-muted hover:bg-muted/80 text-foreground border border-border/60 text-xs font-medium transition-colors"
                         title="Stiahnuť súbor"
                       >
                         <Download className="w-3.5 h-3.5 text-primary" />

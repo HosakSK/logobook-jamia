@@ -358,7 +358,7 @@ export default function M20DosAndDontsModule({
 
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m20:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/95 backdrop-blur-md border border-border/80 px-2.5 py-1.5 rounded-[3px] shadow-md">
+        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m20:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#070b0f] border border-white/20 px-2.5 py-1.5 rounded-[3px] shadow-md">
           {/* Quick toggle between visual cards and minimal summary */}
           <button
             type="button"
@@ -368,7 +368,7 @@ export default function M20DosAndDontsModule({
                 layout: cfg.layout === "minimal" ? "cards" : "minimal",
               })
             }
-            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors border-r border-border/60 pr-2 mr-1"
+            className="flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors border-r border-white/20 pr-2 mr-1"
             title="Prepnúť režim zobrazenia (Karty vs Minimalistický text)"
           >
             {cfg.layout === "minimal" ? (
@@ -387,7 +387,7 @@ export default function M20DosAndDontsModule({
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors"
             title="Upraviť pravidlá Do's and Don'ts"
           >
             <Settings2 className="w-3.5 h-3.5 text-primary" />
@@ -414,7 +414,7 @@ export default function M20DosAndDontsModule({
             className={`px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
               activeFilter === "all"
                 ? "bg-primary text-primary-foreground shadow-xs"
-                : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+                : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
             Všetky ({cfg.items.length})
@@ -426,7 +426,7 @@ export default function M20DosAndDontsModule({
             className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
               activeFilter === "do"
                 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+                : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
             <span
@@ -442,7 +442,7 @@ export default function M20DosAndDontsModule({
             className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
               activeFilter === "dont"
                 ? "bg-rose-500/20 text-rose-400 border border-rose-500/40"
-                : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+                : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
             }`}
           >
             <span
@@ -459,7 +459,7 @@ export default function M20DosAndDontsModule({
               className={`flex items-center gap-1.5 px-3 py-1 rounded-[3px] text-xs font-semibold transition-all ${
                 activeFilter === "warning"
                   ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
-                  : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+                  : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
               }`}
             >
               <span
@@ -502,7 +502,7 @@ export default function M20DosAndDontsModule({
             return (
               <div
                 key={item.id}
-                className="flex flex-col bg-[#17212a] border border-border/60 overflow-hidden shadow-xs hover:border-border transition-all duration-200"
+                className="flex flex-col bg-card border border-border/60 overflow-hidden shadow-xs hover:border-border transition-all duration-200"
                 style={{ borderRadius: brandRadius }}
               >
                 {/* Visual Preview Box */}
@@ -638,7 +638,7 @@ export default function M20DosAndDontsModule({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* DO COLUMN: ČO DODRŽIAVAŤ */}
             <div
-              className="bg-[#17212a] border rounded-lg p-5 sm:p-6 space-y-4"
+              className="bg-card border rounded-lg p-5 sm:p-6 space-y-4"
               style={{
                 borderColor: `${resolvedDoColor}40`,
                 borderRadius: brandRadius,
@@ -698,7 +698,7 @@ export default function M20DosAndDontsModule({
 
             {/* DON'T COLUMN: ČOHO SA VYVAROVAŤ */}
             <div
-              className="bg-[#17212a] border rounded-lg p-5 sm:p-6 space-y-4"
+              className="bg-card border rounded-lg p-5 sm:p-6 space-y-4"
               style={{
                 borderColor: `${resolvedDontColor}40`,
                 borderRadius: brandRadius,

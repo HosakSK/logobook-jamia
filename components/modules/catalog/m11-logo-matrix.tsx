@@ -364,10 +364,10 @@ export default function M11MaticaLogotypovModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m11:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs whitespace-nowrap">
+        <div className="opacity-0 group-hover/m11:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs whitespace-nowrap">
           {/* Columns Selector */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
-            <span className="text-[10px] text-muted-foreground px-1 font-mono uppercase">Stĺpce:</span>
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1">
+            <span className="text-[10px] text-white/60 px-1 font-mono uppercase">Stĺpce:</span>
             {[2, 3, 4].map((col) => (
               <button
                 key={col}
@@ -377,7 +377,7 @@ export default function M11MaticaLogotypovModule({
                 className={`px-1.5 py-0.5 rounded-[2px] text-[11px] font-mono transition-colors ${
                   cfg.columns === col
                     ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {col}
@@ -389,7 +389,7 @@ export default function M11MaticaLogotypovModule({
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary/20 hover:bg-primary/30 text-primary font-semibold text-xs transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs transition-colors hover:opacity-90"
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>Nastavenia filtrov</span>
@@ -415,7 +415,7 @@ export default function M11MaticaLogotypovModule({
 
       {/* FILTER BAR CONTAINER */}
       <div
-        className="bg-[#0e161d] border border-border/60 p-4 sm:p-5 shadow-xs space-y-3.5"
+        className="bg-card border border-border/60 p-4 sm:p-5 shadow-xs space-y-3.5"
         style={{ borderRadius: brandRadius }}
       >
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
@@ -554,7 +554,7 @@ export default function M11MaticaLogotypovModule({
                     className={`px-2 py-1 rounded-[2px] text-[11px] transition-colors ${
                       backgroundFilter === item.id
                         ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                        : "bg-[#17212a] text-muted-foreground hover:text-foreground hover:bg-[#1f2c36]"
+                        : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                     }`}
                   >
                     {item.label}
@@ -589,7 +589,7 @@ export default function M11MaticaLogotypovModule({
             return (
               <div
                 key={item.id}
-                className="bg-[#0e161d] border border-border/60 p-4 shadow-sm flex flex-col justify-between space-y-4 group/card hover:border-border transition-all duration-200"
+                className="bg-card border border-border/60 p-4 shadow-sm flex flex-col justify-between space-y-4 group/card hover:border-border transition-all duration-200"
                 style={{ borderRadius: brandRadius }}
               >
                 {/* Visual Preview Box with Hover Reveal */}

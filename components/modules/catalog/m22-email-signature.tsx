@@ -745,11 +745,11 @@ export default function M22EmailPodpisModule({
 
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m22:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/95 backdrop-blur-md border border-border/80 px-2.5 py-1.5 rounded-[3px] shadow-md">
+        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m22:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#070b0f] border border-white/20 px-2.5 py-1.5 rounded-[3px] shadow-md">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors"
             title="Nastavenia e-mailových šablón"
           >
             <Settings2 className="w-3.5 h-3.5 text-primary" />
@@ -772,7 +772,7 @@ export default function M22EmailPodpisModule({
         {/* ======================================================== */}
         {/* LEFT COLUMN: EMPLOYEE LIVE FORM (~40%)                  */}
         {/* ======================================================== */}
-        <div className="lg:col-span-5 bg-[#17212a] border border-border/60 rounded-xl p-5 sm:p-6 space-y-5 shadow-xs">
+        <div className="lg:col-span-5 bg-card border border-border/60 rounded-xl p-5 sm:p-6 space-y-5 shadow-xs">
           <div className="border-b border-border/40 pb-3">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight flex items-center gap-1.5">
@@ -811,7 +811,7 @@ export default function M22EmailPodpisModule({
                 value={employeeName}
                 onChange={(e) => setEmployeeName(e.target.value)}
                 placeholder="napr. John Doe"
-                className="w-full bg-[#0e161d] border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                className="w-full bg-background border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
               />
             </div>
 
@@ -826,7 +826,7 @@ export default function M22EmailPodpisModule({
                   value={employeeRole}
                   onChange={(e) => setEmployeeRole(e.target.value)}
                   placeholder="napr. Creative Director"
-                  className="w-full bg-[#0e161d] border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
+                  className="w-full bg-background border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
             )}
@@ -841,7 +841,7 @@ export default function M22EmailPodpisModule({
                 value={employeeEmail}
                 onChange={(e) => setEmployeeEmail(e.target.value)}
                 placeholder="john.doe@company.com"
-                className="w-full bg-[#0e161d] border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                className="w-full bg-background border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
               />
             </div>
 
@@ -856,7 +856,7 @@ export default function M22EmailPodpisModule({
                   value={employeePhone}
                   onChange={(e) => setEmployeePhone(e.target.value)}
                   placeholder="+421 900 123 456"
-                  className="w-full bg-[#0e161d] border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
+                  className="w-full bg-background border border-border/50 rounded px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none font-mono"
                 />
               </div>
             )}
@@ -880,7 +880,7 @@ export default function M22EmailPodpisModule({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[#0e161d] border border-border/60 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-muted border border-border/60 flex items-center justify-center shrink-0">
                     {employeePhotoUrl ? (
                       <img
                         src={employeePhotoUrl}
@@ -897,7 +897,7 @@ export default function M22EmailPodpisModule({
                       type="button"
                       disabled={isUploadingPhoto}
                       onClick={() => photoFileInputRef.current?.click()}
-                      className="w-full py-1.5 px-3 bg-[#0e161d] hover:bg-[#131c24] border border-border/50 rounded text-xs font-medium text-foreground flex items-center justify-center gap-1.5 transition-colors"
+                      className="w-full py-1.5 px-3 bg-muted hover:bg-muted/80 border border-border/50 rounded text-xs font-medium text-foreground flex items-center justify-center gap-1.5 transition-colors"
                     >
                       {isUploadingPhoto ? (
                         <>
@@ -999,7 +999,7 @@ export default function M22EmailPodpisModule({
               className={`py-3 px-4 rounded-lg font-medium text-xs border flex items-center justify-center gap-1.5 transition-all ${
                 isCopiedCode
                   ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400"
-                  : "bg-[#17212a] border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
+                  : "bg-muted border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
               }`}
               title="Kopírovať čistý HTML kód pre webmastera a CRM"
             >
@@ -1018,7 +1018,7 @@ export default function M22EmailPodpisModule({
           </div>
 
           {/* Helper Tips */}
-          <div className="bg-[#17212a] border border-border/40 rounded-lg p-3 flex items-start gap-2.5 text-xs text-muted-foreground">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-3 flex items-start gap-2.5 text-xs text-muted-foreground">
             <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <strong className="text-foreground block text-[11px]">
@@ -1027,7 +1027,7 @@ export default function M22EmailPodpisModule({
               <p className="text-[11px] leading-relaxed">
                 Kliknite na tlačidlo <em>„Kopírovať podpis do schránky“</em> vyššie, otvorte
                 nastavenia podpisu v <strong>Outlooku, Gmaile alebo Apple Maili</strong> a stlačte{" "}
-                <kbd className="px-1.5 py-0.5 rounded bg-[#0e161d] border border-border text-[10px] font-mono text-foreground">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono text-foreground">
                   Ctrl + V
                 </kbd>{" "}
                 (Cmd + V na Macu). Podpis sa vloží priamo s formátovaním, logom a preklikmi.

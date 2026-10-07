@@ -474,11 +474,11 @@ export default function M21FiremnaVizitkaModule({
 
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m21:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/95 backdrop-blur-md border border-border/80 px-2.5 py-1.5 rounded-[3px] shadow-md">
+        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m21:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#070b0f] border border-white/20 px-2.5 py-1.5 rounded-[3px] shadow-md">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors"
             title="Konfigurovať vizitku a tlačové podklady"
           >
             <Settings2 className="w-3.5 h-3.5 text-primary" />

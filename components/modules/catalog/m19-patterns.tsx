@@ -217,7 +217,7 @@ export default function M19PatternyModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m19:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m19:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -263,13 +263,13 @@ export default function M19PatternyModule({
           return (
             <div
               key={item.id || `pattern-${idx}`}
-              className="bg-[#0e161d] border border-border/60 shadow-sm overflow-hidden flex flex-col justify-between transition-all duration-200 hover:border-border"
+              className="bg-card border border-border/60 shadow-sm overflow-hidden flex flex-col justify-between transition-all duration-200 hover:border-border"
               style={{ borderRadius: brandRadius }}
             >
               {/* UPPER PRESENTATION BOX */}
               <div className="relative border-b border-border/50 bg-[#070b0f] flex flex-col">
                 {/* Top Bar: Tabs & Interactive Tiler Controls */}
-                <div className="px-4 py-2.5 bg-[#17212a] border-b border-border/50 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="px-4 py-2.5 bg-muted/50 border-b border-border/50 flex flex-wrap items-center justify-between gap-3 text-xs">
                   {/* Previews Tabs */}
                   {item.previews.length > 1 ? (
                     <div className="flex items-center gap-1.5 overflow-x-auto">
@@ -306,7 +306,7 @@ export default function M19PatternyModule({
 
                   {/* Viewer Controls Bar (Repeat Toggle + Zoom Slider) */}
                   {isViewer && (
-                    <div className="flex items-center gap-3 ml-auto text-xs bg-[#0e161d] px-2.5 py-1 rounded-[3px] border border-border/60">
+                    <div className="flex items-center gap-3 ml-auto text-xs bg-card px-2.5 py-1 rounded-[3px] border border-border/60">
                       {/* Repeat / No-Repeat Toggle (User explicit request) */}
                       <button
                         type="button"
@@ -322,7 +322,7 @@ export default function M19PatternyModule({
                         className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[11px] font-semibold transition-colors cursor-pointer ${
                           currentControls.repeat
                             ? "bg-primary/20 text-primary border border-primary/40"
-                            : "bg-[#17212a] text-muted-foreground hover:text-foreground border border-border/40"
+                            : "bg-muted text-muted-foreground hover:text-foreground border border-border/40"
                         }`}
                         title={
                           currentControls.repeat

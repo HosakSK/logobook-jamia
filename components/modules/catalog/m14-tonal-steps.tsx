@@ -251,7 +251,7 @@ export default function M14TonalStepsModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m14:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m14:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -293,7 +293,7 @@ export default function M14TonalStepsModule({
             return (
               <div
                 key={baseColor.id}
-                className="bg-[#0e161d] border border-border/60 shadow-sm p-4 space-y-3"
+                className="bg-card border border-border/60 shadow-sm p-4 space-y-3"
                 style={{ borderRadius: brandRadius }}
               >
                 {/* Column Header */}

@@ -630,18 +630,18 @@ export function BuilderCanvas({
                     className="fixed inset-0 z-30"
                     onClick={() => setIsTemplatesMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1 z-40 w-52 bg-card border border-border/70 rounded-md shadow-xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 top-full mt-1 z-40 w-56 bg-[#0e161d] border border-border/80 rounded-[4px] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 text-foreground overflow-hidden">
                     <button
                       type="button"
                       onClick={() => {
                         setIsTemplatesMenuOpen(false);
                         setIsTemplateBrowserOpen(true);
                       }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted/50 flex items-center gap-2 text-foreground cursor-pointer"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#141f2b] flex items-center gap-2.5 text-foreground cursor-pointer transition-colors"
                     >
-                      <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <Sparkles className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold">Galéria šablón</div>
+                        <div className="font-semibold text-foreground">Galéria šablón</div>
                         <div className="text-[10px] text-muted-foreground">Načítať hotové rozloženie</div>
                       </div>
                     </button>
@@ -653,11 +653,11 @@ export function BuilderCanvas({
                         setIsTemplatesMenuOpen(false);
                         setIsSaveTemplateOpen(true);
                       }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted/50 flex items-center gap-2 text-foreground disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-border/40"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-[#141f2b] flex items-center gap-2.5 text-foreground disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-border/40 transition-colors"
                     >
-                      <BookmarkPlus className="h-3.5 w-3.5 text-primary shrink-0" />
+                      <BookmarkPlus className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold">Uložiť ako šablónu</div>
+                        <div className="font-semibold text-foreground">Uložiť ako šablónu</div>
                         <div className="text-[10px] text-muted-foreground">Uložiť celú túto stránku</div>
                       </div>
                     </button>
@@ -897,7 +897,7 @@ export function BuilderCanvas({
                 {container.columns.map((column, colIdx) => (
                   <div
                     key={column.id}
-                    className="border border-dashed border-border/30 hover:border-border/60 rounded-[3px] p-3 bg-neutral-950/20 flex flex-col justify-between min-h-[140px] space-y-3 transition-colors"
+                    className="border border-dashed border-border/30 hover:border-border/60 rounded-[3px] p-3 bg-muted/20 flex flex-col justify-between min-h-[140px] space-y-3 transition-colors"
                   >
                     {/* Column Modules */}
                     <div className="space-y-3">
@@ -909,19 +909,25 @@ export function BuilderCanvas({
                         column.modules.map((mod, mIdx) => (
                           <div
                             key={mod.id}
-                            className="relative group/module border border-border/40 hover:border-border/80 rounded-[3px] p-3 bg-card/60 shadow-2xs space-y-2 transition-all"
+                            className="relative group/module border border-border/40 hover:border-border/80 rounded-[3px] p-3 shadow-2xs space-y-2 transition-all"
+                            style={{
+                              backgroundColor: mod.config?.styleOverrides?.backgroundColor || "var(--card)",
+                              color: mod.config?.styleOverrides?.textColor || "var(--foreground)",
+                              borderColor: mod.config?.styleOverrides?.borderColor || "var(--border)",
+                              borderRadius: "var(--brand-radius, 3px)",
+                            }}
                           >
-                            {/* Module Hover Toolbar (Prevents Pencil Hell!) */}
-                            <div className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity bg-neutral-950/90 border border-border/70 rounded-[2px] p-0.5 flex items-center gap-1 shadow-md">
+                            {/* Module Hover Toolbar (High Contrast Inverted Toolbar) */}
+                            <div className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity bg-[#070b0f] border border-white/20 rounded-[2px] p-0.5 flex items-center gap-1 shadow-xl">
                               {/* Move Up */}
                               <button
                                 type="button"
                                 disabled={mIdx === 0}
                                 onClick={() => handleMoveModule(mod.id, "up")}
-                                className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
+                                className="p-1 text-white/70 hover:text-white disabled:opacity-20 disabled:hover:text-white/70 transition-colors cursor-pointer"
                                 title="Posunúť modul vyššie"
                               >
-                                <ChevronUp className="h-3 w-3" />
+                                <ChevronUp className="h-3.5 w-3.5" />
                               </button>
 
                               {/* Move Down */}
@@ -929,20 +935,20 @@ export function BuilderCanvas({
                                 type="button"
                                 disabled={mIdx === column.modules.length - 1}
                                 onClick={() => handleMoveModule(mod.id, "down")}
-                                className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
+                                className="p-1 text-white/70 hover:text-white disabled:opacity-20 disabled:hover:text-white/70 transition-colors cursor-pointer"
                                 title="Posunúť modul nižšie"
                               >
-                                <ChevronDown className="h-3 w-3" />
+                                <ChevronDown className="h-3.5 w-3.5" />
                               </button>
 
-                              <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+                              <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
                               {/* Linked Sync indicator / Link button */}
                               {mod.linkGroupId ? (
                                 <button
                                   type="button"
                                   onClick={() => handleUnlinkModule(mod.id)}
-                                  className="px-1.5 py-0.5 text-[10px] font-mono text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-[2px] flex items-center gap-1 transition-colors"
+                                  className="px-1.5 py-0.5 text-[10px] font-mono text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded-[2px] flex items-center gap-1 transition-colors cursor-pointer"
                                   title={`Modul je zrkadlený v skupine "${mod.linkGroupId}". Kliknite pre odpojenie.`}
                                 >
                                   <Link2 className="h-3 w-3 text-amber-300" />
@@ -953,33 +959,33 @@ export function BuilderCanvas({
                                 <button
                                   type="button"
                                   onClick={() => handleOpenLinkModal(mod.id)}
-                                  className="p-1 text-muted-foreground hover:text-amber-400 transition-colors flex items-center gap-1 text-[10px]"
+                                  className="p-1 text-white/70 hover:text-amber-400 transition-colors flex items-center gap-1 text-[10px] cursor-pointer"
                                   title="Zrkadliť tento modul (Linked Sync)"
                                 >
-                                  <Link2 className="h-3 w-3" />
+                                  <Link2 className="h-3.5 w-3.5" />
                                 </button>
                               )}
 
-                              <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+                              <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
                               {/* Settings / Config Modal */}
                               <button
                                 type="button"
                                 onClick={() => handleOpenSettings(mod)}
-                                className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+                                className="p-1 text-white/70 hover:text-primary transition-colors cursor-pointer"
                                 title="Nastavenia a konfigurácia modulu"
                               >
-                                <Settings2 className="h-3 w-3" />
+                                <Settings2 className="h-3.5 w-3.5" />
                               </button>
 
                               {/* Delete Module */}
                               <button
                                 type="button"
                                 onClick={() => handleDeleteModule(mod.id)}
-                                className="p-1 text-muted-foreground hover:text-rose-400 transition-colors"
+                                className="p-1 text-white/70 hover:text-rose-400 transition-colors cursor-pointer"
                                 title="Vymazať modul"
                               >
-                                <Trash2 className="h-3 w-3" />
+                                <Trash2 className="h-3.5 w-3.5" />
                               </button>
                             </div>
 

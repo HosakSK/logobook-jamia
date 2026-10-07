@@ -98,9 +98,9 @@ export default function M01NadpisModule({
     <div className="group/m01 relative w-full py-1">
       {/* Editor Hover Toolbar (Prevents Pencil Hell - only visible on hover) */}
       {isEditor && (
-        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m01:opacity-100 transition-opacity bg-neutral-950/95 border border-border/80 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
+        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m01:opacity-100 transition-opacity bg-[#070b0f] border border-white/20 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
           {/* Level Switcher */}
-          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+          <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5 border border-white/10">
             {(["h1", "h2", "h3", "h4"] as const).map((lvl) => (
               <button
                 key={lvl}
@@ -109,7 +109,7 @@ export default function M01NadpisModule({
                 className={`px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-[1px] uppercase transition-colors ${
                   currentLevel === lvl
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
                 }`}
                 title={`Úroveň nadpisu: ${lvl.toUpperCase()}`}
               >
@@ -118,17 +118,17 @@ export default function M01NadpisModule({
             ))}
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Alignment Switcher */}
-          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+          <div className="flex items-center gap-0.5 bg-white/10 rounded-[2px] p-0.5 border border-white/10">
             <button
               type="button"
               onClick={() => handleUpdateConfig({ align: "left" })}
               className={`p-1 rounded-[1px] transition-colors ${
                 currentAlign === "left"
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
               title="Zarovnať vľavo"
             >
@@ -140,7 +140,7 @@ export default function M01NadpisModule({
               className={`p-1 rounded-[1px] transition-colors ${
                 currentAlign === "center"
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
               title="Zarovnať na stred"
             >
@@ -152,7 +152,7 @@ export default function M01NadpisModule({
               className={`p-1 rounded-[1px] transition-colors ${
                 currentAlign === "right"
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
               title="Zarovnať vpravo"
             >
@@ -160,7 +160,7 @@ export default function M01NadpisModule({
             </button>
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Accent Line Switcher */}
           <button
@@ -168,8 +168,8 @@ export default function M01NadpisModule({
             onClick={() => handleUpdateConfig({ showAccentLine: !showAccentLine })}
             className={`px-1.5 py-0.5 text-[10px] font-medium rounded-[2px] flex items-center gap-1 transition-colors border ${
               showAccentLine
-                ? "bg-primary/10 border-primary text-primary font-bold"
-                : "border-border/40 text-muted-foreground hover:text-foreground hover:bg-neutral-900"
+                ? "bg-primary text-primary-foreground font-bold border-primary"
+                : "border-white/20 text-white/70 hover:text-white hover:bg-white/10"
             }`}
             title="Prepnúť dekoračnú podkladovú linku (Accent Line)"
           >

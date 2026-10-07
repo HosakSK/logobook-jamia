@@ -197,7 +197,7 @@ export default function M18TypografiaModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m18:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m18:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -211,7 +211,7 @@ export default function M18TypografiaModule({
 
       {/* FONT HEADER SPECIMEN CARD */}
       <div
-        className="bg-[#0e161d] border border-border/60 p-6 sm:p-8 space-y-6 shadow-sm"
+        className="bg-card border border-border/60 p-6 sm:p-8 space-y-6 shadow-sm"
         style={{ borderRadius: brandRadius, fontFamily: targetFontFamily }}
       >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/40 pb-5">
@@ -258,7 +258,7 @@ export default function M18TypografiaModule({
                       >
                         {defaultPangram}
                       </p>
-                      <span className="text-[11px] font-mono uppercase text-muted-foreground bg-[#17212a] px-2 py-0.5 rounded-[2px] border border-border/50 shrink-0 self-start md:self-baseline">
+                      <span className="text-[11px] font-mono uppercase text-muted-foreground bg-muted px-2 py-0.5 rounded-[2px] border border-border/50 shrink-0 self-start md:self-baseline">
                         {weightDef?.label || `Weight ${weight}`}
                       </span>
                     </div>
@@ -273,7 +273,7 @@ export default function M18TypografiaModule({
                 Znaková sada (Glyphs):
               </span>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#17212a] p-4 rounded-[3px] border border-border/50 text-foreground">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/50 p-4 rounded-[3px] border border-border/50 text-foreground">
                 <div className="space-y-2">
                   <div className="text-muted-foreground text-[10px] uppercase font-bold">Lowercase:</div>
                   <div className="text-sm tracking-widest break-words leading-relaxed">
@@ -311,7 +311,7 @@ export default function M18TypografiaModule({
               </div>
 
               {/* Controls Toolbar */}
-              <div className="flex flex-wrap items-center gap-3 bg-[#17212a] p-2 rounded-[3px] border border-border/50 text-xs">
+              <div className="flex flex-wrap items-center gap-3 bg-muted/50 p-2 rounded-[3px] border border-border/50 text-xs">
                 {/* Size Slider */}
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono text-muted-foreground uppercase">
@@ -354,7 +354,7 @@ export default function M18TypografiaModule({
                     <select
                       value={testWeight}
                       onChange={(e) => setTestWeight(Number(e.target.value))}
-                      className="bg-[#0e161d] border border-border/60 rounded px-1.5 py-0.5 text-xs text-foreground focus:outline-none focus:border-primary"
+                      className="bg-background border border-border/60 rounded px-1.5 py-0.5 text-xs text-foreground focus:outline-none focus:border-primary"
                     >
                       {cfg.selectedWeights.map((w) => (
                         <option key={w} value={w}>

@@ -298,11 +298,11 @@ export default function M24FiremneTapetyAPozadiaModule({
 
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m24:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#17212a]/95 backdrop-blur-md border border-border/80 px-2.5 py-1.5 rounded-[3px] shadow-md">
+        <div className="absolute top-2 right-2 z-30 opacity-0 group-hover/m24:opacity-100 transition-opacity flex items-center gap-1.5 bg-[#070b0f] border border-white/20 px-2.5 py-1.5 rounded-[3px] shadow-md">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1 text-[11px] font-medium text-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-colors"
             title="Spravovať firemné tapety a rozlíšenia"
           >
             <Settings2 className="w-3.5 h-3.5 text-primary" />
@@ -388,7 +388,7 @@ export default function M24FiremneTapetyAPozadiaModule({
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[3px] text-xs font-semibold whitespace-nowrap transition-all ${
                 activeCategory === tab.id
                   ? "bg-primary text-primary-foreground shadow-xs"
-                  : "bg-[#17212a] border border-border/40 text-muted-foreground hover:text-foreground"
+                  : "bg-muted border border-border/40 text-muted-foreground hover:text-foreground"
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -417,7 +417,7 @@ export default function M24FiremneTapetyAPozadiaModule({
           return (
             <div
               key={item.id}
-              className="flex flex-col bg-[#17212a] border border-border/60 rounded-xl overflow-hidden shadow-xs hover:border-border transition-all duration-200"
+              className="flex flex-col bg-card border border-border/60 rounded-xl overflow-hidden shadow-xs hover:border-border transition-all duration-200"
               style={{ borderRadius: brandRadius }}
             >
               {/* Wallpaper Preview Stage */}

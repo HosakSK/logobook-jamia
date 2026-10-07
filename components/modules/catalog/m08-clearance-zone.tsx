@@ -197,9 +197,9 @@ export default function M08OchrannaZonaLogaModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m08:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m08:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           {/* Quick Mode Buttons */}
-          <div className="flex items-center border-r border-border/50 pr-1 mr-1">
+          <div className="flex items-center border-r border-white/20 pr-1 mr-1">
             <button
               type="button"
               title="Obdĺžniková zóna"
@@ -207,7 +207,7 @@ export default function M08OchrannaZonaLogaModule({
               className={`flex items-center gap-1 px-2 py-1 rounded-[2px] transition-colors ${
                 cfg.zones.rectangular.enabled && !cfg.zones.circular.enabled && !cfg.customDiagramUrl
                   ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <Square className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ export default function M08OchrannaZonaLogaModule({
               className={`flex items-center gap-1 px-2 py-1 rounded-[2px] transition-colors ${
                 cfg.zones.circular.enabled && !cfg.zones.rectangular.enabled && !cfg.customDiagramUrl
                   ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <Circle className="w-3.5 h-3.5" />
@@ -233,7 +233,7 @@ export default function M08OchrannaZonaLogaModule({
               className={`flex items-center gap-1 px-2 py-1 rounded-[2px] transition-colors ${
                 cfg.zones.rectangular.enabled && cfg.zones.circular.enabled && !cfg.customDiagramUrl
                   ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
@@ -246,7 +246,7 @@ export default function M08OchrannaZonaLogaModule({
               className={`flex items-center gap-1 px-2 py-1 rounded-[2px] transition-colors ${
                 cfg.customDiagramUrl
                   ? "bg-primary text-primary-foreground font-bold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-neutral-800/60"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <ImageIcon className="w-3.5 h-3.5" />
@@ -258,7 +258,7 @@ export default function M08OchrannaZonaLogaModule({
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary/20 hover:bg-primary/30 text-primary font-semibold text-xs transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] bg-primary text-primary-foreground font-semibold text-xs transition-colors hover:opacity-90"
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>Nastavenia percent</span>
@@ -268,7 +268,7 @@ export default function M08OchrannaZonaLogaModule({
 
       {/* Main Clearance Zone Card Container */}
       <div
-        className="bg-[#0e161d] border border-border/60 p-6 sm:p-10 shadow-sm overflow-hidden space-y-6"
+        className="bg-card border border-border/60 p-6 sm:p-10 shadow-sm overflow-hidden space-y-6"
         style={{ borderRadius: brandRadius }}
       >
         {/* VISUAL DIAGRAM AREA */}
@@ -350,7 +350,7 @@ export default function M08OchrannaZonaLogaModule({
         </div>
 
         {/* RULE TEXT & EXPLANATION (Direct Inline Editable in Editor) */}
-        <div className="bg-[#17212a] border border-border/50 p-4 rounded-[3px]">
+        <div className="bg-muted/40 border border-border/50 p-4 rounded-[3px]">
           <div className="flex items-center gap-2 mb-2 text-primary font-semibold text-xs uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Pravidlo ochrannej zóny</span>

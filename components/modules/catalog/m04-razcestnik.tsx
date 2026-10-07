@@ -294,18 +294,18 @@ export default function M04RazcestnikModule({
     <div className="group/m04 relative w-full py-1">
       {/* Editor Hover Toolbar */}
       {isEditor && (
-        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m04:opacity-100 transition-opacity bg-neutral-950/95 border border-border/80 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
+        <div className="absolute -top-9 left-0 z-30 opacity-0 group-hover/m04:opacity-100 transition-opacity bg-[#070b0f] border border-white/20 rounded-[3px] p-1 flex items-center gap-1 shadow-xl">
           {/* Columns Selector */}
-          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-border/40">
+          <div className="flex items-center gap-0.5 bg-neutral-900 rounded-[2px] p-0.5 border border-white/10">
             {([1, 2, 3] as const).map((colNum) => (
               <button
                 key={colNum}
                 type="button"
                 onClick={() => handleUpdateConfig({ columns: colNum })}
-                className={`px-1.5 py-0.5 text-[10px] font-mono rounded-[1px] transition-colors ${
+                className={`px-1.5 py-0.5 text-[10px] font-mono rounded-[1px] transition-colors cursor-pointer ${
                   columns === colNum
                     ? "bg-primary text-primary-foreground font-bold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                    : "text-white/70 hover:text-white hover:bg-neutral-800"
                 }`}
                 title={`Počet stĺpcov: ${colNum}`}
               >
@@ -314,16 +314,16 @@ export default function M04RazcestnikModule({
             ))}
           </div>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Clickable entire card toggle */}
           <button
             type="button"
             onClick={() => handleUpdateConfig({ clickableEntireCard: !clickableEntireCard })}
-            className={`px-1.5 py-0.5 text-[10px] font-medium rounded-[2px] border transition-colors flex items-center gap-1 ${
+            className={`px-1.5 py-0.5 text-[10px] font-medium rounded-[2px] border transition-colors flex items-center gap-1 cursor-pointer ${
               clickableEntireCard
-                ? "bg-primary/10 border-primary text-primary font-bold"
-                : "border-border/40 text-muted-foreground hover:text-foreground hover:bg-neutral-900"
+                ? "bg-primary/20 border-primary text-primary font-bold"
+                : "border-white/20 text-white/70 hover:text-white hover:bg-neutral-900"
             }`}
             title="Prepnúť klikateľnosť celej karty (A11y)"
           >
@@ -331,13 +331,13 @@ export default function M04RazcestnikModule({
             <span>Celá karta</span>
           </button>
 
-          <div className="w-[1px] h-3 bg-border/40 my-auto mx-0.5" />
+          <div className="w-[1px] h-3 bg-white/20 my-auto mx-0.5" />
 
           {/* Manage Cards Modal Trigger */}
           <button
             type="button"
             onClick={() => setIsManageModalOpen(true)}
-            className="px-2 py-0.5 text-[10px] font-bold rounded-[2px] bg-neutral-800 hover:bg-neutral-700 text-foreground border border-border/60 transition-colors flex items-center gap-1"
+            className="px-2 py-0.5 text-[10px] font-bold rounded-[2px] bg-neutral-900 hover:bg-neutral-800 text-white border border-white/20 transition-colors flex items-center gap-1 cursor-pointer"
             title="Spravovať karty a prekliky"
           >
             <LayoutGrid className="h-3 w-3 text-primary" />
@@ -345,7 +345,7 @@ export default function M04RazcestnikModule({
           </button>
 
           {/* Active Locale indicator */}
-          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-neutral-900 border border-border/40 text-muted-foreground ml-0.5">
+          <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-neutral-900 border border-white/20 text-white/60 ml-0.5">
             {locale}
           </span>
         </div>

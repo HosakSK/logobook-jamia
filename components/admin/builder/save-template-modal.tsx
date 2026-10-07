@@ -120,7 +120,7 @@ export function SaveTemplateModal({
                 value={nameEn}
                 onChange={(e) => setNameEn(e.target.value)}
                 placeholder="e.g. Minimalist Logo Showcase"
-                className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-background text-foreground focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-[#0c1218] text-foreground focus:ring-1 focus:ring-primary"
               />
             </div>
             <div className="space-y-1">
@@ -131,7 +131,7 @@ export function SaveTemplateModal({
                 value={nameSk}
                 onChange={(e) => setNameSk(e.target.value)}
                 placeholder="napr. Prezentácia loga"
-                className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-background text-foreground focus:ring-1 focus:ring-primary"
+                className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-[#0c1218] text-foreground focus:ring-1 focus:ring-primary"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export function SaveTemplateModal({
                   className={`py-1.5 px-2 text-xs rounded border text-center transition-all cursor-pointer ${
                     category === cat
                       ? "bg-primary text-primary-foreground font-semibold border-primary shadow-xs"
-                      : "bg-muted/40 text-muted-foreground hover:text-foreground border-border/50"
+                      : "bg-[#141f2b] text-muted-foreground hover:text-foreground border-border/50 hover:bg-[#1a2837]"
                   }`}
                 >
                   {cat}
@@ -168,7 +168,7 @@ export function SaveTemplateModal({
               }}
               rows={2}
               placeholder="Krátky popis rozloženia a odporúčaného použitia..."
-              className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-background text-foreground focus:ring-1 focus:ring-primary"
+              className="w-full px-3 py-1.5 text-xs rounded border border-border/60 bg-[#0c1218] text-foreground focus:ring-1 focus:ring-primary"
             />
           </div>
 
@@ -182,7 +182,7 @@ export function SaveTemplateModal({
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
-                className="px-3 py-1.5 text-xs font-medium rounded hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+                className="px-3 py-1.5 text-xs font-medium rounded hover:bg-neutral-800 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
               >
                 Zrušiť
               </button>

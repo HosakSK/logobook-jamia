@@ -281,7 +281,7 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
 
       {/* Editor Floating Hover Toolbar */}
       {isEditor && (
-        <div className="opacity-0 group-hover/m17:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#17212a] border border-border/80 rounded-[3px] p-1 shadow-xl text-xs">
+        <div className="opacity-0 group-hover/m17:opacity-100 transition-opacity duration-150 absolute top-2 right-4 z-30 flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[3px] p-1 shadow-xl text-xs">
           <button
             type="button"
             onClick={() => setIsSettingsModalOpen(true)}
@@ -295,11 +295,11 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
 
       {/* GUIDELINES TABLE CONTAINER */}
       <div
-        className="bg-[#0e161d] border border-border/60 shadow-sm overflow-hidden"
+        className="bg-card border border-border/60 shadow-sm overflow-hidden"
         style={{ borderRadius: brandRadius }}
       >
         {/* Table Header Row */}
-        <div className="hidden sm:grid sm:grid-cols-3 bg-[#17212a] border-b border-border/60 px-5 py-3 text-[11px] font-mono uppercase font-bold tracking-wider text-muted-foreground">
+        <div className="hidden sm:grid sm:grid-cols-3 bg-muted/50 border-b border-border/60 px-5 py-3 text-[11px] font-mono uppercase font-bold tracking-wider text-muted-foreground">
           <div className="col-span-1">Farebný systém</div>
           <div className="col-span-2">Odporúčané použitie & Technická definícia</div>
         </div>
@@ -318,12 +318,12 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
             return (
               <div
                 key={key}
-                className="p-5 sm:grid sm:grid-cols-3 gap-6 items-start hover:bg-neutral-900/30 transition-colors"
+                className="p-5 sm:grid sm:grid-cols-3 gap-6 items-start hover:bg-muted/30 transition-colors"
               >
                 {/* Left Column (1/3): System Name & Icon Badge */}
                 <div className="space-y-1.5 mb-3 sm:mb-0">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-[2px] bg-[#17212a] border border-border/70 flex items-center justify-center text-primary shrink-0 shadow-2xs">
+                    <div className="w-7 h-7 rounded-[2px] bg-muted border border-border/70 flex items-center justify-center text-primary shrink-0 shadow-2xs">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
@@ -361,7 +361,7 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
       {/* OPTIONAL CUSTOM NOTE CALLOUT */}
       {customNoteText && (
         <div
-          className="p-4 rounded-[3px] bg-[#17212a] border border-border/70 flex items-start gap-3 text-xs shadow-xs"
+          className="p-4 rounded-[3px] bg-muted/40 border border-border/70 flex items-start gap-3 text-xs shadow-xs"
           style={{ borderRadius: brandRadius }}
         >
           <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
