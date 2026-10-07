@@ -273,9 +273,53 @@ export function ModuleDispatcher({
   className = "",
 }: ModuleDispatcherProps) {
   const Component = resolveModuleComponent(module.moduleType);
+  const styleOverrides = (module.config as any)?.styleOverrides;
+
+  // Compute container styles from Level 3 styleOverrides
+  const containerStyle: React.CSSProperties = {};
+  if (styleOverrides?.backgroundColor) {
+    containerStyle.backgroundColor = styleOverrides.backgroundColor;
+  }
+  if (styleOverrides?.textColor) {
+    containerStyle.color = styleOverrides.textColor;
+  }
+  if (styleOverrides?.borderColor) {
+    containerStyle.borderColor = styleOverrides.borderColor;
+  }
+  if (styleOverrides?.borderWidthPx !== undefined && styleOverrides.borderWidthPx !== null) {
+    containerStyle.borderWidth = `${styleOverrides.borderWidthPx}px`;
+    containerStyle.borderStyle = "solid";
+    if (!styleOverrides.borderColor) {
+      containerStyle.borderColor = "var(--border)";
+    }
+  }
+
+  // Padding mapping
+  let paddingClass = "";
+  if (styleOverrides?.paddingY === "none") {
+    paddingClass = "p-0";
+  } else if (styleOverrides?.paddingY === "small") {
+    paddingClass = "p-3";
+  } else if (styleOverrides?.paddingY === "large") {
+    paddingClass = "p-8";
+  } else if (
+    styleOverrides?.paddingY === "normal" &&
+    (styleOverrides?.backgroundColor || styleOverrides?.borderWidthPx)
+  ) {
+    paddingClass = "p-5";
+  }
+
+  // Enforce brand radius when container has background or border
+  const roundedClass =
+    styleOverrides?.backgroundColor || styleOverrides?.borderWidthPx
+      ? "rounded-[var(--brand-radius,3px)]"
+      : "";
 
   return (
-    <div className={`module-dispatch-item ${className}`}>
+    <div
+      className={`module-dispatch-item ${paddingClass} ${roundedClass} ${className}`}
+      style={containerStyle}
+    >
       <ModuleErrorBoundary
         moduleType={module.moduleType}
         moduleId={module.id}

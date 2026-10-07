@@ -27,6 +27,9 @@ import {
   BookmarkPlus,
   ArrowRight,
   FileArchive,
+  Palette,
+  RotateCcw,
+  Paintbrush,
 } from "lucide-react";
 import { PageDetail, PageItem, ContainerWithColumns, ColumnWithModules } from "@/lib/types/page";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
@@ -37,6 +40,7 @@ import { SaveTemplateModal } from "./save-template-modal";
 import { PublishBrandButton } from "./publish-brand-button";
 import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
+import { getBrandColorsAction } from "@/actions/colors";
 import {
   updatePageAction,
   createContainerAction,
@@ -120,16 +124,42 @@ export function BuilderCanvas({
   const [existingLinkGroups, setExistingLinkGroups] = useState<Array<{ linkGroupId: string; count: number; moduleType: string }>>([]);
   const [isLoadingLinkGroups, setIsLoadingLinkGroups] = useState(false);
 
-  // Module Config Settings Modal State
+  // Brand Palette for quick 1-click color selection in module settings
+  const [brandPalette, setBrandPalette] = useState<Array<{ hex: string; role: string; name: string }>>([]);
+
+  useEffect(() => {
+    if (brandId) {
+      getBrandColorsAction(brandId).then((res) => {
+        if (res.success && res.colors) {
+          setBrandPalette(
+            res.colors.map((c: any) => ({
+              hex: c.hex,
+              role: c.role,
+              name: (typeof c.name === "object" ? c.name?.sk || c.name?.en : c.name) || c.hex,
+            }))
+          );
+        }
+      });
+    }
+  }, [brandId]);
+
+  // Module Config Settings Modal State (Pure GUI - No raw JSON)
   const [editingModule, setEditingModule] = useState<{
     id: string;
     moduleType: string;
-    configJson: string;
     showH3: boolean;
     h3TitleText: string;
     linkGroupId?: string;
+    // Style overrides (Level 3)
+    backgroundColor: string;
+    textColor: string;
+    borderColor: string;
+    borderWidthPx: number | undefined;
+    paddingY: "none" | "small" | "normal" | "large";
+    // Module specific fields
+    moduleSpecific: Record<string, any>;
+    rawConfig: Record<string, any>;
   } | null>(null);
-  const [configJsonError, setConfigJsonError] = useState<string | null>(null);
   const [isSavingConfig, setIsSavingConfig] = useState(false);
 
   const [activeLocale, setActiveLocale] = useState<string>("en"); // English is primary by default!
@@ -333,17 +363,61 @@ export function BuilderCanvas({
     }
   };
 
-  // Open module settings modal
+  // Open module settings modal (Pure GUI)
   const handleOpenSettings = (mod: any) => {
+    const cfg = (mod.config || {}) as Record<string, any>;
+    const styleOverrides = (cfg.styleOverrides || {}) as Record<string, any>;
+
+    // Extract module-specific config values
+    const moduleSpecific: Record<string, any> = {};
+    if (mod.moduleType.startsWith("M04") || mod.moduleType === "M04_Razcestnik") {
+      moduleSpecific.columns = cfg.columns ?? cfg.gridColumns ?? 2;
+      moduleSpecific.clickableEntireCard = cfg.clickableEntireCard ?? true;
+      moduleSpecific.hoverEffect = cfg.hoverEffect ?? "lift";
+    } else if (mod.moduleType.startsWith("M10") || mod.moduleType === "M10_ObrazokGaleria") {
+      moduleSpecific.columns = cfg.columns ?? 3;
+      moduleSpecific.aspectRatio = cfg.aspectRatio ?? "16/9";
+      moduleSpecific.showCaptions = cfg.showCaptions ?? true;
+    } else if (mod.moduleType.startsWith("M11") || mod.moduleType === "M11_MaticaLogotypov") {
+      moduleSpecific.columns = cfg.columns ?? 3;
+    } else if (mod.moduleType.startsWith("M13") || mod.moduleType === "M13_PaletaFarieb") {
+      moduleSpecific.layout = cfg.layout ?? "tiles";
+    } else if (mod.moduleType.startsWith("M06") || mod.moduleType === "M06_OddelovacMedzera") {
+      moduleSpecific.type = cfg.type ?? "divider";
+      moduleSpecific.height = cfg.height ?? 24;
+      moduleSpecific.style = cfg.style ?? "solid";
+      moduleSpecific.thickness = cfg.thickness ?? 1;
+    } else if (mod.moduleType.startsWith("M01") || mod.moduleType === "M01_Nadpis") {
+      moduleSpecific.level = cfg.level ?? "h2";
+      moduleSpecific.align = cfg.align ?? "left";
+      moduleSpecific.showAccentLine = cfg.showAccentLine ?? false;
+    } else if (mod.moduleType.startsWith("M05") || mod.moduleType === "M05_DownloadTlacidlo") {
+      moduleSpecific.align = cfg.align ?? "left";
+      moduleSpecific.size = cfg.size ?? "medium";
+      moduleSpecific.style = cfg.style ?? "primary";
+    } else if (mod.moduleType.startsWith("M03") || mod.moduleType === "M03_Banner") {
+      moduleSpecific.variant = cfg.variant ?? "accent";
+    } else if (mod.moduleType.startsWith("M09") || mod.moduleType === "M09_MinimalnaVelkostLoga") {
+      moduleSpecific.mediumMode = cfg.mediumMode ?? "both";
+    }
+
     setEditingModule({
       id: mod.id,
       moduleType: mod.moduleType,
-      configJson: JSON.stringify(mod.config || {}, null, 2),
       showH3: Boolean(mod.showH3),
       h3TitleText: mod.h3Title?.sk || mod.h3Title?.en || "",
       linkGroupId: mod.linkGroupId || undefined,
+      backgroundColor: styleOverrides.backgroundColor || "",
+      textColor: styleOverrides.textColor || "",
+      borderColor: styleOverrides.borderColor || "",
+      borderWidthPx:
+        styleOverrides.borderWidthPx !== undefined && styleOverrides.borderWidthPx !== null
+          ? Number(styleOverrides.borderWidthPx)
+          : undefined,
+      paddingY: styleOverrides.paddingY || "normal",
+      moduleSpecific,
+      rawConfig: cfg,
     });
-    setConfigJsonError(null);
   };
 
   // Save module settings
@@ -351,21 +425,62 @@ export function BuilderCanvas({
     e.preventDefault();
     if (!editingModule) return;
 
-    let parsedConfig: Record<string, unknown> = {};
-    try {
-      parsedConfig = JSON.parse(editingModule.configJson);
-    } catch (err) {
-      setConfigJsonError(
-        "Neplatný JSON formát: " + (err instanceof Error ? err.message : "Chyba syntaxe")
-      );
-      return;
+    // Assemble clean styleOverrides (strictly respecting brand radius)
+    const updatedStyleOverrides: Record<string, any> = {
+      ...(editingModule.rawConfig.styleOverrides || {}),
+    };
+
+    // User rule: border radius always comes from brand settings in admin
+    delete updatedStyleOverrides.radiusMode;
+    delete updatedStyleOverrides.customRadiusPx;
+
+    if (editingModule.backgroundColor) {
+      updatedStyleOverrides.backgroundColor = editingModule.backgroundColor;
+    } else {
+      delete updatedStyleOverrides.backgroundColor;
+    }
+
+    if (editingModule.textColor) {
+      updatedStyleOverrides.textColor = editingModule.textColor;
+    } else {
+      delete updatedStyleOverrides.textColor;
+    }
+
+    if (editingModule.borderColor) {
+      updatedStyleOverrides.borderColor = editingModule.borderColor;
+    } else {
+      delete updatedStyleOverrides.borderColor;
+    }
+
+    if (editingModule.borderWidthPx !== undefined) {
+      updatedStyleOverrides.borderWidthPx = editingModule.borderWidthPx;
+    } else {
+      delete updatedStyleOverrides.borderWidthPx;
+    }
+
+    if (editingModule.paddingY && editingModule.paddingY !== "normal") {
+      updatedStyleOverrides.paddingY = editingModule.paddingY;
+    } else {
+      delete updatedStyleOverrides.paddingY;
+    }
+
+    // Merge moduleSpecific and styleOverrides into rawConfig
+    const finalConfig: Record<string, any> = {
+      ...editingModule.rawConfig,
+      ...editingModule.moduleSpecific,
+    };
+
+    if (Object.keys(updatedStyleOverrides).length > 0) {
+      finalConfig.styleOverrides = updatedStyleOverrides;
+    } else {
+      delete finalConfig.styleOverrides;
     }
 
     try {
       setIsSavingConfig(true);
       const res = await updateModuleConfigAction(
         editingModule.id,
-        parsedConfig,
+        finalConfig,
         editingModule.h3TitleText,
         editingModule.showH3
       );
@@ -998,131 +1113,836 @@ export function BuilderCanvas({
         </div>
       )}
 
-      {/* Module Configuration Modal */}
-      {editingModule && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <form
-            onSubmit={handleSaveSettings}
-            className="bg-card border border-border rounded-[3px] w-full max-w-xl p-5 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
-          >
-            <div className="flex items-center justify-between border-b border-border/30 pb-3">
-              <div className="flex items-center gap-2">
-                <Settings2 className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-bold text-foreground">
-                  Nastavenia modulu: {editingModule.moduleType}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingModule(null)}
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Module Configuration Modal (Pure GUI) */}
+      {editingModule && (() => {
+        const moduleOpt = MODULE_OPTIONS.find(
+          (m) =>
+            m.type === editingModule.moduleType ||
+            m.type.replace(/_/g, "").toLowerCase() === editingModule.moduleType.replace(/_/g, "").toLowerCase()
+        );
+        const moduleTitle = moduleOpt?.name || editingModule.moduleType;
+        const moduleCat = moduleOpt?.category || "Modul";
 
-            {/* Linked Sync Warning Banner */}
-            {editingModule.linkGroupId && (
-              <div className="p-3 rounded-[2px] bg-amber-950/40 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
-                <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-semibold">
-                    Tento modul je zrkadlený v skupine &quot;{editingModule.linkGroupId}&quot;
+        return (
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+            <form
+              onSubmit={handleSaveSettings}
+              className="bg-card border border-border rounded-[3px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="p-4 border-b border-border/40 flex items-center justify-between bg-card/80 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-[2px] bg-primary/10 border border-primary/20 text-primary">
+                    <Settings2 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-bold text-foreground">
+                        {moduleTitle}
+                      </h3>
+                      <span className="px-1.5 py-0.5 rounded-[2px] text-[10px] font-medium bg-neutral-800 text-muted-foreground border border-border/40">
+                        {moduleCat}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Vizuálne prispôsobenie a nastavenia tohto stavebného bloku
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingModule(null)}
+                  className="p-1.5 text-muted-foreground hover:text-foreground rounded-[2px] hover:bg-neutral-800 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Scrollable Modal Content */}
+              <div className="p-5 overflow-y-auto space-y-5 flex-1">
+                {/* Linked Sync Warning Banner */}
+                {editingModule.linkGroupId && (
+                  <div className="p-3 rounded-[2px] bg-amber-950/40 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-semibold">
+                        Tento modul je zrkadlený v skupine &quot;{editingModule.linkGroupId}&quot;
+                      </p>
+                      <p className="text-[11px] text-amber-300/80">
+                        Uložením konfigurácie automaticky zmeníte obsah všetkých modulov v tejto
+                        skupine na všetkých podstránkach manuálu.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Sekcia 1: Záhlavie a Nadpis modulu (H3) */}
+                <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                        <Heading2 className="h-3.5 w-3.5 text-primary" />
+                        <span>Zobraziť nadpis modulu (H3)</span>
+                      </Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        Nad modulom sa vykreslí voliteľný sekčný nadpis
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={editingModule.showH3}
+                      onChange={(e) =>
+                        setEditingModule((prev) =>
+                          prev ? { ...prev, showH3: e.target.checked } : null
+                        )
+                      }
+                      className="h-4 w-4 rounded-[2px] border-border text-primary focus:ring-primary cursor-pointer"
+                    />
+                  </div>
+
+                  {editingModule.showH3 && (
+                    <div className="space-y-1 pt-2 border-t border-border/20">
+                      <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                        Text nadpisu (H3)
+                      </Label>
+                      <Input
+                        type="text"
+                        value={editingModule.h3TitleText}
+                        onChange={(e) =>
+                          setEditingModule((prev) =>
+                            prev ? { ...prev, h3TitleText: e.target.value } : null
+                          )
+                        }
+                        placeholder="Napr. Použitie na tmavom pozadí, Formáty..."
+                        className="h-8 text-xs rounded-[2px]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Sekcia 2: Špecifické nastavenia podľa typu modulu */}
+                {/* M04 Rázcestník */}
+                {(editingModule.moduleType.startsWith("M04") || editingModule.moduleType === "M04_Razcestnik") && (
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                    <div className="border-b border-border/30 pb-2">
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Rozloženie a správanie rázcestníka
+                      </h4>
+                    </div>
+
+                    {/* Počet stĺpcov */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Počet stĺpcov mriežky</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[1, 2, 3].map((cols) => (
+                          <button
+                            key={cols}
+                            type="button"
+                            onClick={() =>
+                              setEditingModule((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      moduleSpecific: { ...prev.moduleSpecific, columns: cols },
+                                    }
+                                  : null
+                              )
+                            }
+                            className={`py-1.5 px-3 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                              (editingModule.moduleSpecific.columns ?? 2) === cols
+                                ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {cols} {cols === 1 ? "stĺpec" : cols < 5 ? "stĺpce" : "stĺpcov"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Hover efekt */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Hover efekt kariet</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { id: "none", label: "Žiadny" },
+                          { id: "lift", label: "Nadvihnutie (Lift)" },
+                          { id: "zoom", label: "Jemný zoom" },
+                        ].map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() =>
+                              setEditingModule((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      moduleSpecific: { ...prev.moduleSpecific, hoverEffect: item.id },
+                                    }
+                                  : null
+                              )
+                            }
+                            className={`py-1.5 px-3 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                              (editingModule.moduleSpecific.hoverEffect ?? "lift") === item.id
+                                ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Celá karta klikateľná */}
+                    <div className="flex items-center justify-between pt-1">
+                      <div>
+                        <Label className="text-xs text-foreground font-medium">
+                          Celá karta funguje ako odkaz
+                        </Label>
+                        <p className="text-[10px] text-muted-foreground">
+                          Kliknutie na ľubovoľné miesto karty otvorí cieľovú stránku
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={editingModule.moduleSpecific.clickableEntireCard ?? true}
+                        onChange={(e) =>
+                          setEditingModule((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  moduleSpecific: {
+                                    ...prev.moduleSpecific,
+                                    clickableEntireCard: e.target.checked,
+                                  },
+                                }
+                              : null
+                          )
+                        }
+                        className="h-4 w-4 rounded-[2px] border-border text-primary focus:ring-primary cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* M10 Obrazová Galéria */}
+                {(editingModule.moduleType.startsWith("M10") || editingModule.moduleType === "M10_ObrazokGaleria") && (
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                    <div className="border-b border-border/30 pb-2">
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Rozloženie fotogalérie
+                      </h4>
+                    </div>
+
+                    {/* Počet stĺpcov */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Počet stĺpcov mriežky</Label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[1, 2, 3, 4].map((cols) => (
+                          <button
+                            key={cols}
+                            type="button"
+                            onClick={() =>
+                              setEditingModule((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      moduleSpecific: { ...prev.moduleSpecific, columns: cols },
+                                    }
+                                  : null
+                              )
+                            }
+                            className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                              (editingModule.moduleSpecific.columns ?? 3) === cols
+                                ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {cols} {cols === 1 ? "stĺpec" : "stĺpce"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Pomer strán */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Pomer strán fotografií</Label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { id: "1/1", label: "1:1 (Štvorec)" },
+                          { id: "16/9", label: "16:9" },
+                          { id: "4/3", label: "4:3" },
+                          { id: "original", label: "Pôvodný" },
+                        ].map((ar) => (
+                          <button
+                            key={ar.id}
+                            type="button"
+                            onClick={() =>
+                              setEditingModule((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      moduleSpecific: { ...prev.moduleSpecific, aspectRatio: ar.id },
+                                    }
+                                  : null
+                              )
+                            }
+                            className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                              (editingModule.moduleSpecific.aspectRatio ?? "16/9") === ar.id
+                                ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {ar.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Popisky */}
+                    <div className="flex items-center justify-between pt-1">
+                      <div>
+                        <Label className="text-xs text-foreground font-medium">
+                          Zobraziť popisky pod obrázkami
+                        </Label>
+                        <p className="text-[10px] text-muted-foreground">
+                          Zobrazí textové popisy priradené k fotografiám
+                        </p>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={editingModule.moduleSpecific.showCaptions ?? true}
+                        onChange={(e) =>
+                          setEditingModule((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  moduleSpecific: {
+                                    ...prev.moduleSpecific,
+                                    showCaptions: e.target.checked,
+                                  },
+                                }
+                              : null
+                          )
+                        }
+                        className="h-4 w-4 rounded-[2px] border-border text-primary focus:ring-primary cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* M13 Paleta Farieb */}
+                {(editingModule.moduleType.startsWith("M13") || editingModule.moduleType === "M13_PaletaFarieb") && (
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-3">
+                    <Label className="text-xs font-semibold text-foreground">
+                      Režim zobrazenia palety
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: "tiles", label: "Dlaždice s parametrami" },
+                        { id: "vertical_bars", label: "Kompaktné zvislé prúžky" },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    moduleSpecific: { ...prev.moduleSpecific, layout: item.id },
+                                  }
+                                : null
+                            )
+                          }
+                          className={`py-2 px-3 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                            (editingModule.moduleSpecific.layout ?? "tiles") === item.id
+                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* M06 Oddelovac a medzera */}
+                {(editingModule.moduleType.startsWith("M06") || editingModule.moduleType === "M06_OddelovacMedzera") && (
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                    <div className="border-b border-border/30 pb-2">
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Nastavenie rozostupu a linky
+                      </h4>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { id: "spacer", label: "Čistá medzera (Spacer)" },
+                        { id: "divider", label: "Viditeľná čiara (Divider)" },
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    moduleSpecific: { ...prev.moduleSpecific, type: t.id },
+                                  }
+                                : null
+                            )
+                          }
+                          className={`py-1.5 px-3 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                            (editingModule.moduleSpecific.type ?? "divider") === t.id
+                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Výška medzery */}
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Výška medzery (px)</Label>
+                      <div className="grid grid-cols-6 gap-1.5">
+                        {[8, 16, 24, 32, 48, 64].map((h) => (
+                          <button
+                            key={h}
+                            type="button"
+                            onClick={() =>
+                              setEditingModule((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      moduleSpecific: { ...prev.moduleSpecific, height: h },
+                                    }
+                                  : null
+                              )
+                            }
+                            className={`py-1 rounded-[2px] text-xs font-mono border text-center transition-all ${
+                              (editingModule.moduleSpecific.height ?? 24) === h
+                                ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {h}px
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {editingModule.moduleSpecific.type !== "spacer" && (
+                      <div className="space-y-1.5">
+                        <Label className="text-[11px] text-muted-foreground">Štýl čiary</Label>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {[
+                            { id: "solid", label: "Plná" },
+                            { id: "dashed", label: "Čiarkovaná" },
+                            { id: "dotted", label: "Bodkovaná" },
+                            { id: "none", label: "0px (Neviditeľná)" },
+                          ].map((st) => (
+                            <button
+                              key={st.id}
+                              type="button"
+                              onClick={() =>
+                                setEditingModule((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        moduleSpecific: { ...prev.moduleSpecific, style: st.id },
+                                      }
+                                    : null
+                                )
+                              }
+                              className={`py-1 px-2 rounded-[2px] text-xs font-medium border text-center transition-all ${
+                                (editingModule.moduleSpecific.style ?? "solid") === st.id
+                                  ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                                  : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {st.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Sekcia 3: Vizuálny štýl karty modulu (Kaskáda štýlov) */}
+                <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                  <div className="border-b border-border/30 pb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Paintbrush className="h-4 w-4 text-primary" />
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Vizuálne prispôsobenie karty (Kaskáda štýlov)
+                      </h4>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Lokálne prispôsobenie pozadia, textu a rámika karty tohto modulu. Zaoblenie rohov vždy striktne preberá nastavenie z administrácie značky.
                   </p>
-                  <p className="text-[11px] text-amber-300/80">
-                    Uložením konfigurácie automaticky zmeníte obsah všetkých modulov v tejto
-                    skupine na všetkých podstránkach manuálu.
-                  </p>
+
+                  {/* Farba pozadia karty */}
+                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-medium text-foreground">
+                        Farba pozadia karty modulu
+                      </Label>
+                      {editingModule.backgroundColor && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, backgroundColor: "" } : null
+                            )
+                          }
+                          className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Resetovať farbu pozadia na predvolenú"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          <span>Resetovať na predvolenú</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label className="relative cursor-pointer shrink-0">
+                        <div
+                          className="h-8 w-8 rounded-[2px] border border-white/20 shadow-2xs hover:scale-105 transition-transform flex items-center justify-center"
+                          style={{
+                            backgroundColor: editingModule.backgroundColor || "transparent",
+                          }}
+                        >
+                          {!editingModule.backgroundColor && (
+                            <span className="text-[10px] text-muted-foreground font-mono">auto</span>
+                          )}
+                        </div>
+                        <input
+                          type="color"
+                          value={editingModule.backgroundColor.startsWith("#") ? editingModule.backgroundColor : "#0e161d"}
+                          onChange={(e) =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, backgroundColor: e.target.value.toUpperCase() } : null
+                            )
+                          }
+                          className="sr-only"
+                        />
+                      </label>
+
+                      <Input
+                        type="text"
+                        placeholder="Predvolené (z témy / transparentné)"
+                        value={editingModule.backgroundColor}
+                        onChange={(e) =>
+                          setEditingModule((prev) =>
+                            prev ? { ...prev, backgroundColor: e.target.value } : null
+                          )
+                        }
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1"
+                      />
+                    </div>
+
+                    {/* Brand Palette 1-click chips */}
+                    {brandPalette.length > 0 && (
+                      <div className="pt-2 border-t border-border/20 space-y-1">
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                          Rýchly výber z farieb značky:
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {brandPalette.map((item, idx) => {
+                            const isSelected = editingModule.backgroundColor.toUpperCase() === item.hex.toUpperCase();
+                            return (
+                              <button
+                                key={`${item.hex}-${idx}`}
+                                type="button"
+                                onClick={() =>
+                                  setEditingModule((prev) =>
+                                    prev ? { ...prev, backgroundColor: item.hex } : null
+                                  )
+                                }
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "border-primary bg-primary/10 text-primary font-bold"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                <span
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  style={{ backgroundColor: item.hex }}
+                                />
+                                <span>{item.name || item.hex}</span>
+                                {isSelected && <Check className="h-2.5 w-2.5" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Farba textu modulu */}
+                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-medium text-foreground">
+                        Farba textu modulu
+                      </Label>
+                      {editingModule.textColor && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, textColor: "" } : null
+                            )
+                          }
+                          className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                          title="Resetovať farbu textu na predvolenú"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          <span>Resetovať na predvolenú</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label className="relative cursor-pointer shrink-0">
+                        <div
+                          className="h-8 w-8 rounded-[2px] border border-white/20 shadow-2xs hover:scale-105 transition-transform flex items-center justify-center font-bold text-xs"
+                          style={{
+                            backgroundColor: editingModule.textColor || "transparent",
+                            color: editingModule.textColor ? "#000" : undefined,
+                          }}
+                        >
+                          {!editingModule.textColor ? (
+                            <span className="text-[10px] text-muted-foreground font-mono">auto</span>
+                          ) : (
+                            "A"
+                          )}
+                        </div>
+                        <input
+                          type="color"
+                          value={editingModule.textColor.startsWith("#") ? editingModule.textColor : "#ffffff"}
+                          onChange={(e) =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, textColor: e.target.value.toUpperCase() } : null
+                            )
+                          }
+                          className="sr-only"
+                        />
+                      </label>
+
+                      <Input
+                        type="text"
+                        placeholder="Predvolená (zvolená téma manuálu)"
+                        value={editingModule.textColor}
+                        onChange={(e) =>
+                          setEditingModule((prev) =>
+                            prev ? { ...prev, textColor: e.target.value } : null
+                          )
+                        }
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1"
+                      />
+                    </div>
+
+                    {/* Brand Palette 1-click chips for text */}
+                    {brandPalette.length > 0 && (
+                      <div className="pt-2 border-t border-border/20 space-y-1">
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                          Rýchly výber z farieb značky:
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {brandPalette.map((item, idx) => {
+                            const isSelected = editingModule.textColor.toUpperCase() === item.hex.toUpperCase();
+                            return (
+                              <button
+                                key={`${item.hex}-${idx}`}
+                                type="button"
+                                onClick={() =>
+                                  setEditingModule((prev) =>
+                                    prev ? { ...prev, textColor: item.hex } : null
+                                  )
+                                }
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "border-primary bg-primary/10 text-primary font-bold"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                }`}
+                              >
+                                <span
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  style={{ backgroundColor: item.hex }}
+                                />
+                                <span>{item.name || item.hex}</span>
+                                {isSelected && <Check className="h-2.5 w-2.5" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rámik karty */}
+                  <div className="space-y-2.5 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                    <Label className="text-xs font-medium text-foreground">
+                      Hrúbka rámika karty modulu
+                    </Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[
+                        { val: undefined, label: "Zdediť z brandu" },
+                        { val: 0, label: "0px (Bez rámika)" },
+                        { val: 1, label: "1px (Tenký)" },
+                        { val: 2, label: "2px (Výrazný)" },
+                      ].map((item) => (
+                        <button
+                          key={String(item.val)}
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, borderWidthPx: item.val } : null
+                            )
+                          }
+                          className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
+                            editingModule.borderWidthPx === item.val
+                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Farba rámika (ak je hrúbka zvolená) */}
+                    {editingModule.borderWidthPx !== 0 && (
+                      <div className="pt-2 border-t border-border/20 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[11px] text-muted-foreground">Farba rámika</Label>
+                          {editingModule.borderColor && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditingModule((prev) =>
+                                  prev ? { ...prev, borderColor: "" } : null
+                                )
+                              }
+                              className="text-[10px] text-muted-foreground hover:text-foreground inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <RotateCcw className="h-2.5 w-2.5" />
+                              <span>Predvolená</span>
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="relative cursor-pointer shrink-0">
+                            <div
+                              className="h-7 w-7 rounded-[2px] border border-white/20 shadow-2xs flex items-center justify-center"
+                              style={{
+                                backgroundColor: editingModule.borderColor || "transparent",
+                              }}
+                            >
+                              {!editingModule.borderColor && (
+                                <span className="text-[9px] text-muted-foreground font-mono">auto</span>
+                              )}
+                            </div>
+                            <input
+                              type="color"
+                              value={editingModule.borderColor.startsWith("#") ? editingModule.borderColor : "#ffffff"}
+                              onChange={(e) =>
+                                setEditingModule((prev) =>
+                                  prev ? { ...prev, borderColor: e.target.value.toUpperCase() } : null
+                                )
+                              }
+                              className="sr-only"
+                            />
+                          </label>
+                          <Input
+                            type="text"
+                            placeholder="Predvolená farba rámika"
+                            value={editingModule.borderColor}
+                            onChange={(e) =>
+                              setEditingModule((prev) =>
+                                prev ? { ...prev, borderColor: e.target.value } : null
+                              )
+                            }
+                            className="font-mono text-xs uppercase h-7 rounded-[2px] flex-1"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Vnútorné odsadenie karty (Padding) */}
+                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                    <Label className="text-xs font-medium text-foreground">
+                      Vnútorné odsadenie karty (Padding)
+                    </Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[
+                        { id: "normal", label: "Štandardné" },
+                        { id: "none", label: "Žiadne (0px)" },
+                        { id: "small", label: "Malé (p-3)" },
+                        { id: "large", label: "Veľké (p-8)" },
+                      ].map((pad) => (
+                        <button
+                          key={pad.id}
+                          type="button"
+                          onClick={() =>
+                            setEditingModule((prev) =>
+                              prev ? { ...prev, paddingY: pad.id as any } : null
+                            )
+                          }
+                          className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
+                            (editingModule.paddingY || "normal") === pad.id
+                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {pad.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Module H3 Title Controls */}
-            <div className="space-y-2 border border-border/40 rounded-[2px] p-3 bg-neutral-950/40">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs font-semibold text-foreground">
-                  Zobraziť nadpis modulu (H3)
-                </Label>
-                <input
-                  type="checkbox"
-                  checked={editingModule.showH3}
-                  onChange={(e) =>
-                    setEditingModule((prev) => (prev ? { ...prev, showH3: e.target.checked } : null))
-                  }
-                  className="rounded-[2px] border-border text-primary focus:ring-primary"
-                />
+              {/* Modal Footer */}
+              <div className="p-4 border-t border-border/40 bg-card/80 flex items-center justify-end gap-2.5 shrink-0">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingModule(null)}
+                  className="h-8 text-xs rounded-[2px]"
+                >
+                  Zrušiť
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isSavingConfig}
+                  className="h-8 text-xs font-bold rounded-[2px] bg-primary text-primary-foreground hover:bg-primary/90 px-4 cursor-pointer"
+                >
+                  {isSavingConfig ? (
+                    <span className="flex items-center gap-1.5">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      <span>Ukladám...</span>
+                    </span>
+                  ) : (
+                    "Uložiť nastavenia"
+                  )}
+                </Button>
               </div>
-
-              {editingModule.showH3 && (
-                <div className="space-y-1 pt-1">
-                  <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
-                    Text nadpisu
-                  </Label>
-                  <Input
-                    type="text"
-                    value={editingModule.h3TitleText}
-                    onChange={(e) =>
-                      setEditingModule((prev) =>
-                        prev ? { ...prev, h3TitleText: e.target.value } : null
-                      )
-                    }
-                    placeholder="Sem zadajte názov modulu..."
-                    className="h-8 text-xs rounded-[2px]"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* JSON Config Editor */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
-                  JSON Konfigurácia modulu
-                </Label>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  Pokročilé nastavenia
-                </span>
-              </div>
-
-              <textarea
-                value={editingModule.configJson}
-                onChange={(e) => {
-                  setEditingModule((prev) =>
-                    prev ? { ...prev, configJson: e.target.value } : null
-                  );
-                  setConfigJsonError(null);
-                }}
-                rows={8}
-                className="w-full p-2.5 rounded-[2px] bg-neutral-900 border border-border/50 text-xs font-mono text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary leading-relaxed"
-              />
-
-              {configJsonError && (
-                <p className="text-[11px] text-rose-400 font-mono">{configJsonError}</p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/30">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditingModule(null)}
-                className="h-7 text-xs"
-              >
-                Zrušiť
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isSavingConfig}
-                className="h-7 text-xs font-bold rounded-[2px] bg-primary text-primary-foreground"
-              >
-                {isSavingConfig ? <Loader2 className="h-3 w-3 animate-spin" /> : "Uložiť zmeny"}
-              </Button>
-            </div>
-          </form>
-        </div>
-      )}
+            </form>
+          </div>
+        );
+      })()}
 
       {/* Module Catalogue Modal */}
       {activeColumnForNewModule && (

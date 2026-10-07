@@ -373,13 +373,22 @@ export default function M04RazcestnikModule({
           // Card inner content
           const CardContent = (
             <div
-              className={`group/card relative flex flex-col justify-between overflow-hidden bg-neutral-900/60 hover:bg-neutral-900/90 border border-border/50 hover:border-primary/60 transition-all duration-200 shadow-2xs hover:shadow-lg hover:-translate-y-1 h-full ${
+              className={`group/card relative flex flex-col justify-between overflow-hidden bg-card/60 hover:bg-card/90 border border-border/50 hover:border-primary/60 transition-all duration-200 shadow-2xs hover:shadow-lg hover:-translate-y-1 h-full ${
                 hasValidHref ? "cursor-pointer" : ""
               }`}
               style={{
                 borderRadius: "var(--brand-radius, 3px)",
                 borderWidth: "var(--brand-border-width, 1px)",
                 borderStyle: "solid",
+                ...(typedConfig?.styleOverrides?.backgroundColor
+                  ? { backgroundColor: typedConfig.styleOverrides.backgroundColor }
+                  : {}),
+                ...(typedConfig?.styleOverrides?.borderColor
+                  ? { borderColor: typedConfig.styleOverrides.borderColor }
+                  : {}),
+                ...(typedConfig?.styleOverrides?.textColor
+                  ? { color: typedConfig.styleOverrides.textColor }
+                  : {}),
               }}
             >
               {/* Card Image (16:9 aspect ratio) */}
