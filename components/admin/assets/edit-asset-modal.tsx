@@ -271,9 +271,15 @@ export function EditAssetModal({
               )}
             </div>
 
-            {/* Visual preview box of active / chosen preview */}
+            {/* Visual preview box with exact solid background matching intended background */}
             <div className="flex items-center gap-3 p-2.5 rounded-[3px] bg-neutral-900 border border-border/40">
-              <div className="h-16 w-24 rounded-[2px] shrink-0 flex items-center justify-center p-1.5 border border-border/40 overflow-hidden bg-neutral-950 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:10px_10px] [background-position:0_0,0_5px,5px_-5px,-5px_0px]">
+              <div
+                className={`h-16 w-24 rounded-[2px] shrink-0 flex items-center justify-center p-1.5 border border-border/40 overflow-hidden transition-colors ${
+                  background === "DARK"
+                    ? "bg-[#070b0f] text-white"
+                    : "bg-white text-neutral-900"
+                }`}
+              >
                 {customPreviewUrl ? (
                   <img
                     src={customPreviewUrl}
@@ -303,7 +309,7 @@ export function EditAssetModal({
               <div className="text-[11px] text-muted-foreground min-w-0">
                 <span className="font-semibold text-foreground block">
                   {customPreviewUrl
-                    ? "Nový nahraný obrázok (transparent)"
+                    ? "Nový nahraný obrázok"
                     : selectedSourceSvgContent
                     ? "Prevzatý vektor z iného SVG"
                     : asset.previewUrl
@@ -311,7 +317,7 @@ export function EditAssetModal({
                     : "Pôvodné SVG logo"}
                 </span>
                 <span className="text-[10px] block text-muted-foreground/80 truncate">
-                  Zobrazené na priehľadnej mriežke (transparent)
+                  {background === "DARK" ? "Podklad: Tmavý" : "Podklad: Svetlý"}
                 </span>
               </div>
             </div>

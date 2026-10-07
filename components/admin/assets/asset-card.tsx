@@ -45,8 +45,8 @@ export function AssetCard({
   onEdit,
   onDelete,
 }: AssetCardProps) {
-  // Local background toggle: "auto" (from asset.background), "light", "dark", or "checkered"
-  const [bgMode, setBgMode] = useState<"auto" | "light" | "dark" | "checkered">("auto");
+  // Local background toggle: "auto" (from asset.background), "light", or "dark"
+  const [bgMode, setBgMode] = useState<"auto" | "light" | "dark">("auto");
   const [copied, setCopied] = useState(false);
   const [isDeleting, startDelete] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -61,25 +61,15 @@ export function AssetCard({
   const displayName =
     asset.name[locale] || asset.name.sk || asset.name.en || asset.name.cs || "Nepomenované logo";
 
-  // Compute actual canvas background class
+  // Compute actual canvas background class based on intended color
   let canvasBgClass = "";
   if (bgMode === "light") {
     canvasBgClass = "bg-white text-neutral-900";
   } else if (bgMode === "dark") {
     canvasBgClass = "bg-[#070b0f] text-white";
-  } else if (bgMode === "checkered") {
-    canvasBgClass =
-      "bg-neutral-900 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
   } else {
-    // "auto": subtle checkered pattern matching the asset's intended lighting to make transparency immediately visible
-    if (asset.background === "DARK") {
-      canvasBgClass =
-        "bg-[#070b0f] text-white [background-image:linear-gradient(45deg,#151f28_25%,transparent_25%),linear-gradient(-45deg,#151f28_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#151f28_75%),linear-gradient(-45deg,transparent_75%,#151f28_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
-    } else {
-      // Default LIGHT with soft light checkered pattern
-      canvasBgClass =
-        "bg-neutral-100 text-neutral-900 [background-image:linear-gradient(45deg,#e5e7eb_25%,transparent_25%),linear-gradient(-45deg,#e5e7eb_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#e5e7eb_75%),linear-gradient(-45deg,transparent_75%,#e5e7eb_75%)] [background-size:16px_16px] [background-position:0_0,0_8px,8px_-8px,-8px_0px]";
-    }
+    // "auto": exact solid background intended for this asset
+    canvasBgClass = asset.background === "DARK" ? "bg-[#070b0f] text-white" : "bg-white text-neutral-900";
   }
 
   // Check if asset has a real SVG file or pure SVG code
@@ -220,14 +210,14 @@ export function AssetCard({
 
         {/* Menu & Background controls */}
         <div className="flex items-center gap-1 shrink-0">
-          {/* Background Toggle button */}
+          {/* Background Toggle button (Sun / Moon) */}
           <div className="inline-flex rounded-[3px] bg-neutral-900 border border-border/40 p-0.5">
             <button
               type="button"
               onClick={() => setBgMode(bgMode === "light" ? "auto" : "light")}
               title="Svetlé plátno"
               className={`p-1 rounded-[2px] transition-colors ${
-                bgMode === "light"
+                bgMode === "light" || (bgMode === "auto" && asset.background !== "DARK")
                   ? "bg-white text-black"
                   : "text-muted-foreground hover:text-foreground"
               }`}
@@ -239,24 +229,12 @@ export function AssetCard({
               onClick={() => setBgMode(bgMode === "dark" ? "auto" : "dark")}
               title="Tmavé plátno"
               className={`p-1 rounded-[2px] transition-colors ${
-                bgMode === "dark"
+                bgMode === "dark" || (bgMode === "auto" && asset.background === "DARK")
                   ? "bg-[#070b0f] text-white"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <Moon className="h-3 w-3" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setBgMode(bgMode === "checkered" ? "auto" : "checkered")}
-              title="Priehľadná mriežka"
-              className={`p-1 rounded-[2px] transition-colors ${
-                bgMode === "checkered"
-                  ? "bg-neutral-700 text-white"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Grid className="h-3 w-3" />
             </button>
           </div>
 

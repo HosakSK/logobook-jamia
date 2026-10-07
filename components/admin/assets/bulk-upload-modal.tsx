@@ -733,9 +733,13 @@ export function BulkUploadModal({
                     </div>
 
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4 pt-1">
-                      {/* Thumbnail preview */}
+                      {/* Thumbnail preview with solid color matching intended background */}
                       <div
-                        className="h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden bg-neutral-900 text-white [background-image:linear-gradient(45deg,#1f2937_25%,transparent_25%),linear-gradient(-45deg,#1f2937_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1f2937_75%),linear-gradient(-45deg,transparent_75%,#1f2937_75%)] [background-size:12px_12px] [background-position:0_0,0_6px,6px_-6px,-6px_0px]"
+                        className={`h-22 w-28 rounded-[3px] shrink-0 flex items-center justify-center p-2 border border-border/40 overflow-hidden transition-colors ${
+                          item.background === "DARK"
+                            ? "bg-[#070b0f] text-white"
+                            : "bg-white text-black"
+                        }`}
                       >
                         {item.svgContent ? (
                           <div
