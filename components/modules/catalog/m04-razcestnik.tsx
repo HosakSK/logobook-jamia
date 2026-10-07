@@ -522,37 +522,40 @@ export default function M04RazcestnikModule({
 
       {/* Card Management Modal (Sheet / Dialog) */}
       {isManageModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-[3px] w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+        <div
+          className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 text-[#fafbfc]"
+          data-theme="dark"
+        >
+          <div className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[4px] w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden text-[#fafbfc] animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
-            <div className="p-4 border-b border-border/40 flex items-center justify-between">
+            <div className="p-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-between text-[#fafbfc]">
               <div className="flex items-center gap-2">
                 <LayoutGrid className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-bold text-foreground">
+                <h3 className="text-sm font-bold text-[#fafbfc]">
                   Správa kariet rázcestníka ({items.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsManageModalOpen(false)}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Modal Body: Left Card List / Right Active Card Editor */}
-            <div className="flex-1 overflow-hidden grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-border/40">
+            <div className="flex-1 overflow-hidden grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-[rgba(63,85,102,0.45)] bg-[#0e161d]">
               {/* Left Column: Cards List */}
-              <div className="md:col-span-5 p-3 overflow-y-auto space-y-2 bg-neutral-950/30">
+              <div className="md:col-span-5 p-3 overflow-y-auto space-y-2 bg-[#070b0f]">
                 <div className="flex items-center justify-between pb-1">
-                  <span className="text-[10px] uppercase font-bold text-muted-foreground">
+                  <span className="text-[10px] uppercase font-bold text-[#96abbe]">
                     Zoznam kariet
                   </span>
                   <button
                     type="button"
                     onClick={handleAddCard}
-                    className="h-6 px-2 text-[11px] font-bold rounded-[2px] bg-primary text-primary-foreground flex items-center gap-1"
+                    className="h-6 px-2 text-[11px] font-bold rounded-[2px] bg-primary text-[#070b0f] flex items-center gap-1 hover:brightness-110 cursor-pointer"
                   >
                     <Plus className="h-3 w-3" />
                     <span>Pridať kartu</span>
@@ -571,12 +574,12 @@ export default function M04RazcestnikModule({
                         onClick={() => setEditingCardIndex(i)}
                         className={`p-2.5 rounded-[2px] border text-xs cursor-pointer flex items-center justify-between transition-colors ${
                           isSelected
-                            ? "bg-primary/10 border-primary text-foreground font-bold"
-                            : "bg-neutral-900 border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                            ? "bg-primary/15 border-primary text-[#fafbfc] font-bold"
+                            : "bg-[#17212a] border-[rgba(63,85,102,0.45)] hover:border-primary/50 text-[#96abbe] hover:text-[#fafbfc]"
                         }`}
                       >
                         <div className="flex items-center gap-2 min-w-0 flex-1">
-                          <span className="text-[10px] font-mono text-muted-foreground">
+                          <span className="text-[10px] font-mono text-[#96abbe]">
                             {i + 1}.
                           </span>
                           <span className="truncate">{cTitle}</span>
@@ -590,7 +593,7 @@ export default function M04RazcestnikModule({
                               e.stopPropagation();
                               handleMoveCard(i, "up");
                             }}
-                            className="p-1 hover:text-foreground disabled:opacity-30"
+                            className="p-1 hover:text-[#fafbfc] text-[#96abbe] disabled:opacity-30"
                             title="Posunúť vyššie"
                           >
                             <ChevronUp className="h-3 w-3" />
@@ -602,7 +605,7 @@ export default function M04RazcestnikModule({
                               e.stopPropagation();
                               handleMoveCard(i, "down");
                             }}
-                            className="p-1 hover:text-foreground disabled:opacity-30"
+                            className="p-1 hover:text-[#fafbfc] text-[#96abbe] disabled:opacity-30"
                             title="Posunúť nižšie"
                           >
                             <ChevronDown className="h-3 w-3" />
@@ -613,7 +616,7 @@ export default function M04RazcestnikModule({
                               e.stopPropagation();
                               handleDeleteCard(i);
                             }}
-                            className="p-1 hover:text-rose-400 text-muted-foreground ml-1"
+                            className="p-1 hover:text-rose-400 text-[#96abbe] ml-1"
                             title="Vymazať kartu"
                           >
                             <Trash2 className="h-3 w-3" />
@@ -627,14 +630,14 @@ export default function M04RazcestnikModule({
 
               {/* Right Column: Active Card Detail Editor */}
               {items[editingCardIndex] && (
-                <div className="md:col-span-7 p-4 overflow-y-auto space-y-3.5">
-                  <div className="text-xs font-bold text-foreground border-b border-border/30 pb-2">
+                <div className="md:col-span-7 p-4 overflow-y-auto space-y-3.5 bg-[#0e161d] text-[#fafbfc]">
+                  <div className="text-xs font-bold text-[#fafbfc] border-b border-[rgba(63,85,102,0.45)] pb-2">
                     Nastavenie karty: {editingCardIndex + 1}
                   </div>
 
                   {/* Title (Active Locale) */}
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                       Názov karty ({locale.toUpperCase()})
                     </label>
                     <input
@@ -649,13 +652,13 @@ export default function M04RazcestnikModule({
                           ),
                         })
                       }
-                      className="w-full h-8 px-2.5 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
+                      className="w-full h-8 px-2.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                     />
                   </div>
 
                   {/* Description (Active Locale) */}
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                       Popis karty ({locale.toUpperCase()})
                     </label>
                     <textarea
@@ -676,13 +679,13 @@ export default function M04RazcestnikModule({
                           ),
                         })
                       }
-                      className="w-full p-2 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
+                      className="w-full p-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                     />
                   </div>
 
                   {/* Image URL */}
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                       URL obrázka (pomer 16:9)
                     </label>
                     <input
@@ -690,14 +693,14 @@ export default function M04RazcestnikModule({
                       value={items[editingCardIndex].imageUrl || ""}
                       onChange={(e) => handleUpdateActiveCard({ imageUrl: e.target.value })}
                       placeholder="https://... / mockup.png"
-                      className="w-full h-8 px-2.5 rounded-[2px] bg-neutral-900 border border-border/50 text-xs font-mono text-foreground"
+                      className="w-full h-8 px-2.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs font-mono text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary focus:outline-none"
                     />
                   </div>
 
                   {/* Internal Page Relation Dropdown */}
                   {brandPages.length > 0 && (
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                      <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                         Prepojiť s internou stránkou manuálu
                       </label>
                       <select
@@ -719,11 +722,11 @@ export default function M04RazcestnikModule({
                             targetUrl: pageId ? `/admin/brand/${brandId}/builder/${pageId}` : undefined,
                           });
                         }}
-                        className="w-full h-8 px-2 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
+                        className="w-full h-8 px-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       >
-                        <option value="">— Vyberte stránku (alebo zadajte URL nižšie) —</option>
+                        <option value="" className="bg-[#0e161d] text-[#fafbfc]">— Vyberte stránku (alebo zadajte URL nižšie) —</option>
                         {brandPages.map((p) => (
-                          <option key={p.id} value={p.id}>
+                          <option key={p.id} value={p.id} className="bg-[#0e161d] text-[#fafbfc]">
                             {p.title?.sk || p.title?.en || p.slug} (/{p.slug})
                           </option>
                         ))}
@@ -733,7 +736,7 @@ export default function M04RazcestnikModule({
 
                   {/* Target URL */}
                   <div className="space-y-1">
-                    <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                       Cieľová URL adresa (interná alebo externá)
                     </label>
                     <input
@@ -749,14 +752,14 @@ export default function M04RazcestnikModule({
                         })
                       }
                       placeholder="/admin/brand/.../builder/... alebo /logo/tlac"
-                      className="w-full h-8 px-2.5 rounded-[2px] bg-neutral-900 border border-border/50 text-xs font-mono text-foreground"
+                      className="w-full h-8 px-2.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs font-mono text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary focus:outline-none"
                     />
                   </div>
 
                   {/* Button Settings */}
-                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border/30">
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[rgba(63,85,102,0.45)]">
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                      <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                         Text tlačidla ({locale.toUpperCase()})
                       </label>
                       <input
@@ -780,12 +783,12 @@ export default function M04RazcestnikModule({
                             },
                           })
                         }
-                        className="w-full h-8 px-2 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
+                        className="w-full h-8 px-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                      <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                         Štýl tlačidla
                       </label>
                       <select
@@ -801,12 +804,12 @@ export default function M04RazcestnikModule({
                             },
                           })
                         }
-                        className="w-full h-8 px-2 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground"
+                        className="w-full h-8 px-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       >
-                        <option value="primary">Primary (Značková farba)</option>
-                        <option value="secondary">Secondary (Tmavá)</option>
-                        <option value="outline">Outline (Orámovaná)</option>
-                        <option value="ghost">Ghost (Čistá)</option>
+                        <option value="primary" className="bg-[#0e161d] text-[#fafbfc]">Primary (Značková farba)</option>
+                        <option value="secondary" className="bg-[#0e161d] text-[#fafbfc]">Secondary (Tmavá)</option>
+                        <option value="outline" className="bg-[#0e161d] text-[#fafbfc]">Outline (Orámovaná)</option>
+                        <option value="ghost" className="bg-[#0e161d] text-[#fafbfc]">Ghost (Čistá)</option>
                       </select>
                     </div>
                   </div>
@@ -815,11 +818,11 @@ export default function M04RazcestnikModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 border-t border-border/40 flex items-center justify-end">
+            <div className="p-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setIsManageModalOpen(false)}
-                className="h-7 px-3 text-xs font-bold rounded-[2px] bg-primary text-primary-foreground"
+                className="h-7 px-4 text-xs font-bold rounded-[2px] bg-primary text-[#070b0f] hover:brightness-110 cursor-pointer"
               >
                 Hotovo
               </button>

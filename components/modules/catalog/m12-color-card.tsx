@@ -428,37 +428,36 @@ export default function M12KartaFarbyModule({
 
       {/* SETTINGS MODAL */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+        <div className="dark fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-xs p-4 text-[#fafbfc]" data-theme="dark">
           <div
-            className="bg-card border border-border w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-card-foreground"
-            style={{ borderRadius: brandRadius }}
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc] rounded-xl"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-muted/40">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] text-[#fafbfc]">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="text-sm font-semibold text-[#fafbfc]">
                   Nastavenia karty farby (M12)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground p-1 rounded hover:bg-muted transition-colors cursor-pointer"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/[0.08] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-border bg-muted/20 px-5 pt-2 gap-2">
+            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
               <button
                 type="button"
                 onClick={() => setModalTab("colors")}
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "colors"
                     ? "border-primary text-primary font-bold"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 1. Výber farby z palety
@@ -469,7 +468,7 @@ export default function M12KartaFarbyModule({
                 className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "systems"
                     ? "border-primary text-primary font-bold"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
                 2. Zobrazené systémy
@@ -477,16 +476,16 @@ export default function M12KartaFarbyModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-card">
+            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d] text-[#fafbfc]">
               {/* TAB 1: SELECT COLOR */}
               {modalTab === "colors" && (
                 <div className="space-y-3">
-                  <span className="font-semibold text-foreground text-xs block">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Zvoľte farbu z globálnej palety značky:
                   </span>
 
                   {brandColors.length === 0 ? (
-                    <div className="text-muted-foreground py-6 text-center italic bg-muted/40 p-4 rounded border border-border">
+                    <div className="text-[#96abbe] py-6 text-center italic bg-[#17212a] p-4 rounded border border-[rgba(63,85,102,0.45)]">
                       V projekte zatiaľ nie sú vytvorené žiadne vlastné farby v globálnej palete.
                     </div>
                   ) : (
@@ -508,10 +507,10 @@ export default function M12KartaFarbyModule({
                                 globalColorId: c.id,
                               })
                             }
-                            className={`p-2.5 rounded-[3px] border flex items-center gap-3 text-left transition-all ${
+                            className={`p-2.5 rounded-[4px] border flex items-center gap-3 text-left transition-all ${
                               isSelected
-                                ? "border-primary bg-primary/10 ring-1 ring-primary/30"
-                                : "border-border bg-card hover:bg-muted/30 text-foreground"
+                                ? "border-primary bg-primary/10 ring-1 ring-primary/30 text-[#fafbfc]"
+                                : "border-[rgba(63,85,102,0.45)] bg-[#17212a] hover:bg-[#1e2c38] text-[#fafbfc]"
                             }`}
                           >
                             <div
@@ -519,10 +518,10 @@ export default function M12KartaFarbyModule({
                               style={{ backgroundColor: c.hex }}
                             />
                             <div className="min-w-0">
-                              <span className="font-semibold text-foreground text-xs block truncate">
+                              <span className="font-semibold text-[#fafbfc] text-xs block truncate">
                                 {cName}
                               </span>
-                              <span className="font-mono text-[10px] text-muted-foreground block">
+                              <span className="font-mono text-[10px] text-[#96abbe] block">
                                 {c.hex}
                               </span>
                             </div>
@@ -536,8 +535,8 @@ export default function M12KartaFarbyModule({
 
               {/* TAB 2: DISPLAY SYSTEMS */}
               {modalTab === "systems" && (
-                <div className="space-y-3 bg-muted/30 p-4 rounded-[3px] border border-border">
-                  <span className="font-semibold text-foreground text-xs block">
+                <div className="space-y-3 bg-[#17212a] p-4 rounded-[4px] border border-[rgba(63,85,102,0.45)]">
+                  <span className="font-semibold text-[#fafbfc] text-xs block">
                     Vyberte farebné priestory, ktoré sa majú zobraziť:
                   </span>
                   <div className="space-y-2.5 pt-1">
@@ -568,9 +567,9 @@ export default function M12KartaFarbyModule({
                                 },
                               })
                             }
-                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-background border-border"
+                            className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-[rgba(63,85,102,0.6)]"
                           />
-                          <span className="text-foreground text-[11px]">{sys.label}</span>
+                          <span className="text-[#fafbfc] text-[11px]">{sys.label}</span>
                         </label>
                       );
                     })}
@@ -580,11 +579,11 @@ export default function M12KartaFarbyModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border bg-muted/40">
+            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="px-4 py-1.5 rounded-[3px] bg-primary text-primary-foreground font-semibold text-xs hover:opacity-90 transition-opacity"
+                className="px-4 py-1.5 rounded-[4px] bg-primary text-[#070b0f] font-semibold text-xs hover:brightness-110 transition-all cursor-pointer"
               >
                 Hotovo
               </button>

@@ -26,7 +26,7 @@ export function AdminShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-canvas-dark text-foreground">
+    <div className="flex min-h-screen bg-[#0e161d] text-[#fafbfc]">
       {/* Sidebar (Desktop + Mobile Drawer) */}
       <AdminSidebar
         availableBrands={brands}

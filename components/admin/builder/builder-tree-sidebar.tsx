@@ -552,7 +552,7 @@ export function BuilderTreeSidebar({
               ? "bg-primary/20 ring-2 ring-primary ring-inset"
               : isCurrent
               ? "bg-primary/10 text-primary font-bold border-l-2 border-primary"
-              : "text-foreground hover:bg-neutral-800/40"
+              : "text-[#fafbfc] hover:bg-white/[0.06]"
           }`}
           style={{
             paddingLeft: `${Math.max(6, depth * 12 + 6)}px`,
@@ -562,7 +562,7 @@ export function BuilderTreeSidebar({
             {/* Drag Handle */}
             <div
               title="Uchopiť a presunúť"
-              className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-foreground shrink-0 p-0.5"
+              className="cursor-grab active:cursor-grabbing text-[#96abbe]/40 hover:text-[#fafbfc] shrink-0 p-0.5"
             >
               <GripVertical className="h-3 w-3" />
             </div>
@@ -572,7 +572,7 @@ export function BuilderTreeSidebar({
               <button
                 type="button"
                 onClick={(e) => toggleExpand(node.id, e)}
-                className="p-0.5 text-muted-foreground hover:text-foreground hover:bg-neutral-800/80 rounded-[2px] transition-transform shrink-0"
+                className="p-0.5 text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.06] rounded-[2px] transition-transform shrink-0"
                 title={isExpanded ? "Zbaliť vetvu" : "Rozbaliť vetvu"}
               >
                 <ChevronRight
@@ -583,14 +583,14 @@ export function BuilderTreeSidebar({
               </button>
             ) : (
               <div className="w-4 h-4 flex items-center justify-center shrink-0">
-                <FileText className="h-3 w-3 text-muted-foreground/40 group-hover:text-primary/70 shrink-0" />
+                <FileText className="h-3 w-3 text-[#96abbe]/40 group-hover:text-primary/70 shrink-0" />
               </div>
             )}
 
             {/* Page Link with clean slug */}
             <Link
               href={`/admin/brand/${brandId}/builder/${node.slug || node.id}`}
-              className="flex items-center gap-1.5 flex-1 truncate py-0.5"
+              className="flex items-center gap-1.5 flex-1 truncate py-0.5 text-[#fafbfc]"
               title={getPageTitle(node)}
             >
               <span className="truncate">{getPageTitle(node)}</span>
@@ -601,7 +601,7 @@ export function BuilderTreeSidebar({
           <div className="flex items-center gap-1 shrink-0 ml-1">
             {node.menuStyle === "hidden" && (
               <span title="Skryté vo verejnom menu">
-                <EyeOff className="h-3 w-3 text-muted-foreground/60 mr-0.5" />
+                <EyeOff className="h-3 w-3 text-[#96abbe]/60 mr-0.5" />
               </span>
             )}
 
@@ -615,7 +615,7 @@ export function BuilderTreeSidebar({
                     e.stopPropagation();
                     setActiveMenuId(activeMenuId === node.id ? null : node.id);
                   }}
-                  className="p-1 hover:text-foreground text-muted-foreground/50 hover:bg-neutral-800 rounded-[2px] transition-colors"
+                  className="p-1 hover:text-[#fafbfc] text-[#96abbe]/50 hover:bg-white/[0.06] rounded-[2px] transition-colors"
                   title="Možnosti stránky"
                 >
                   <MoreVertical className="h-3.5 w-3.5" />
@@ -625,12 +625,12 @@ export function BuilderTreeSidebar({
                 {activeMenuId === node.id && (
                   <div
                     ref={menuRef}
-                    className="absolute right-0 top-full mt-1 w-48 bg-popover text-popover-foreground border border-border rounded-[3px] shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
+                    className="absolute right-0 top-full mt-1 w-48 bg-[#0e161d] text-[#fafbfc] border border-[rgba(63,85,102,0.65)] rounded-[3px] shadow-xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100"
                   >
                     <button
                       type="button"
                       onClick={() => handleOpenAddSubpage(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-[#fafbfc] hover:bg-[#17212a] flex items-center gap-2 cursor-pointer"
                     >
                       <FolderPlus className="h-3.5 w-3.5 text-primary" />
                       <span>Pridať podstránku</span>
@@ -639,45 +639,45 @@ export function BuilderTreeSidebar({
                     <button
                       type="button"
                       onClick={() => handleOpenRename(node)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-[#fafbfc] hover:bg-[#17212a] flex items-center gap-2 cursor-pointer"
                     >
-                      <Edit2 className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Edit2 className="h-3.5 w-3.5 text-[#96abbe]" />
                       <span>Premenovať</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleDuplicatePage(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-[#fafbfc] hover:bg-[#17212a] flex items-center gap-2 cursor-pointer"
                     >
-                      <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Copy className="h-3.5 w-3.5 text-[#96abbe]" />
                       <span>Duplikovať</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleToggleVisibility(node.id)}
-                      className="w-full text-left px-3 py-1.5 text-xs text-foreground hover:bg-muted flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-[#fafbfc] hover:bg-[#17212a] flex items-center gap-2 cursor-pointer"
                     >
                       {node.menuStyle === "hidden" ? (
                         <>
-                          <Eye className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <Eye className="h-3.5 w-3.5 text-emerald-400" />
                           <span>Zobraziť v menu</span>
                         </>
                       ) : (
                         <>
-                          <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                          <EyeOff className="h-3.5 w-3.5 text-[#96abbe]" />
                           <span>Skryť v menu</span>
                         </>
                       )}
                     </button>
 
-                    <div className="my-1 border-t border-border/40" />
+                    <div className="my-1 border-t border-[rgba(63,85,102,0.45)]" />
 
                     <button
                       type="button"
                       onClick={() => handleDeletePage(node.id, getPageTitle(node))}
-                      className="w-full text-left px-3 py-1.5 text-xs text-rose-500 hover:bg-rose-500/10 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-500/15 flex items-center gap-2 cursor-pointer"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       <span>Zmazať {hasChildren ? "kapitolu" : "stránku"}</span>
@@ -705,15 +705,15 @@ export function BuilderTreeSidebar({
   };
 
   return (
-    <aside className="w-full md:w-72 bg-card border border-border rounded-[var(--brand-radius,6px)] p-4 flex flex-col gap-4 shadow-sm text-card-foreground">
+    <aside className="w-full md:w-72 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] p-4 flex flex-col gap-4 shadow-sm text-[#fafbfc]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-border">
+      <div className="flex items-center justify-between pb-3 border-b border-[rgba(63,85,102,0.45)]">
         <div className="flex items-center gap-2">
           <FolderTree className="h-4 w-4 text-primary" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[#fafbfc]">
             Strom Stránok
           </h2>
-          <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.2 rounded-full bg-muted border border-border">
+          <span className="text-[10px] font-mono text-[#96abbe] px-1.5 py-0.2 rounded-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)]">
             {pages.length}
           </span>
           {isUpdatingTree && (
@@ -729,7 +729,7 @@ export function BuilderTreeSidebar({
             size="sm"
             variant="outline"
             onClick={() => setIsWizardOpen(true)}
-            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-primary/40 bg-primary/5 hover:bg-primary/15 text-primary cursor-pointer shadow-2xs"
+            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary cursor-pointer shadow-2xs"
             title="Spustiť generátor stromu (Dimension Matrix Wizard)"
           >
             <Sparkles className="h-3 w-3" />
@@ -747,7 +747,7 @@ export function BuilderTreeSidebar({
               setNewMenuStyle("main");
               setIsCreating(true);
             }}
-            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-border/60 hover:border-primary/50 text-foreground cursor-pointer"
+            className="h-7 px-2 text-[11px] gap-1 rounded-[2px] border-[rgba(63,85,102,0.6)] hover:border-primary/50 text-[#fafbfc] hover:bg-white/[0.06] cursor-pointer"
           >
             <Plus className="h-3 w-3" />
             <span>Pridať</span>
@@ -759,16 +759,16 @@ export function BuilderTreeSidebar({
       {isCreating && (
         <form
           onSubmit={handleCreatePage}
-          className="p-3 rounded-[3px] bg-muted/40 border border-primary/40 space-y-3 shadow-md"
+          className="p-3 rounded-[3px] bg-[#070b0f] border border-primary/40 space-y-3 shadow-md text-[#fafbfc]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-foreground">
+            <span className="text-xs font-bold text-[#fafbfc]">
               {newParentId ? "Nová podstránka" : "Nová hlavná kapitola"}
             </span>
             <button
               type="button"
               onClick={() => setIsCreating(false)}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-[#96abbe] hover:text-[#fafbfc]"
             >
               ✕
             </button>
@@ -781,7 +781,7 @@ export function BuilderTreeSidebar({
           )}
 
           <div className="space-y-1">
-            <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+            <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
               Názov stránky
             </Label>
             <Input
@@ -790,13 +790,13 @@ export function BuilderTreeSidebar({
               value={newTitle}
               onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="napr. Ochranná zóna loga"
-              className="h-7 text-xs rounded-[2px]"
+              className="h-7 text-xs rounded-[2px] bg-[#17212a] border-[rgba(63,85,102,0.6)] text-[#fafbfc] focus:border-primary"
               autoFocus
             />
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+            <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
               URL Slug
             </Label>
             <Input
@@ -805,21 +805,21 @@ export function BuilderTreeSidebar({
               value={newSlug}
               onChange={(e) => setNewSlug(e.target.value.toLowerCase())}
               placeholder="ochranna-zona"
-              className="h-7 text-xs font-mono rounded-[2px]"
+              className="h-7 text-xs font-mono rounded-[2px] bg-[#17212a] border-[rgba(63,85,102,0.6)] text-[#fafbfc] focus:border-primary"
             />
           </div>
 
           {localTree.length > 0 && (
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+              <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                 Zanorenie (Rodičovská kapitola)
               </Label>
               <select
                 value={newParentId}
                 onChange={(e) => setNewParentId(e.target.value)}
-                className="w-full h-7 rounded-[2px] bg-background border border-border text-xs px-2 text-foreground font-sans"
+                className="w-full h-7 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.6)] text-xs px-2 text-[#fafbfc] font-sans focus:border-primary"
               >
-                <option value="">— Hlavná úroveň (Kapitola) —</option>
+                <option value="" className="bg-[#0e161d] text-[#fafbfc]">— Hlavná úroveň (Kapitola) —</option>
                 {renderParentOptions(localTree)}
               </select>
             </div>
@@ -831,7 +831,7 @@ export function BuilderTreeSidebar({
               variant="ghost"
               size="sm"
               onClick={() => setIsCreating(false)}
-              className="h-6 px-2 text-xs"
+              className="h-6 px-2 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.06]"
             >
               Zrušiť
             </Button>
@@ -839,7 +839,7 @@ export function BuilderTreeSidebar({
               type="submit"
               size="sm"
               disabled={isSubmitting}
-              className="h-6 px-2.5 text-xs font-bold rounded-[2px] bg-primary text-primary-foreground"
+              className="h-6 px-2.5 text-xs font-bold rounded-[2px] bg-primary text-[#070b0f] hover:brightness-110"
             >
               {isSubmitting ? <Loader2 className="h-3 w-3 animate-spin" /> : "Vytvoriť"}
             </Button>
@@ -851,21 +851,21 @@ export function BuilderTreeSidebar({
       {renameModal && (
         <form
           onSubmit={handleSaveRename}
-          className="p-3 rounded-[3px] bg-neutral-950 border border-amber-500/50 space-y-3 shadow-xl"
+          className="p-3 rounded-[3px] bg-[#070b0f] border border-amber-500/50 space-y-3 shadow-xl text-[#fafbfc]"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-foreground">Premenovať stránku</span>
+            <span className="text-xs font-bold text-[#fafbfc]">Premenovať stránku</span>
             <button
               type="button"
               onClick={() => setRenameModal(null)}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-[#96abbe] hover:text-[#fafbfc]"
             >
               ✕
             </button>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+            <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
               Nový názov
             </Label>
             <Input
@@ -875,13 +875,13 @@ export function BuilderTreeSidebar({
               onChange={(e) =>
                 setRenameModal((prev) => (prev ? { ...prev, title: e.target.value } : null))
               }
-              className="h-7 text-xs rounded-[2px]"
+              className="h-7 text-xs rounded-[2px] bg-[#17212a] border-[rgba(63,85,102,0.6)] text-[#fafbfc] focus:border-primary"
               autoFocus
             />
           </div>
 
           <div className="space-y-1">
-            <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+            <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
               URL Slug
             </Label>
             <Input
@@ -893,7 +893,7 @@ export function BuilderTreeSidebar({
                   prev ? { ...prev, slug: e.target.value.toLowerCase() } : null
                 )
               }
-              className="h-7 text-xs font-mono rounded-[2px]"
+              className="h-7 text-xs font-mono rounded-[2px] bg-[#17212a] border-[rgba(63,85,102,0.6)] text-[#fafbfc] focus:border-primary"
             />
           </div>
 
@@ -903,7 +903,7 @@ export function BuilderTreeSidebar({
               variant="ghost"
               size="sm"
               onClick={() => setRenameModal(null)}
-              className="h-6 px-2 text-xs"
+              className="h-6 px-2 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.06]"
             >
               Zrušiť
             </Button>
@@ -911,7 +911,7 @@ export function BuilderTreeSidebar({
               type="submit"
               size="sm"
               disabled={isRenaming}
-              className="h-6 px-2.5 text-xs font-bold rounded-[2px] bg-primary text-primary-foreground"
+              className="h-6 px-2.5 text-xs font-bold rounded-[2px] bg-primary text-[#070b0f] hover:brightness-110"
             >
               {isRenaming ? <Loader2 className="h-3 w-3 animate-spin" /> : "Uložiť"}
             </Button>

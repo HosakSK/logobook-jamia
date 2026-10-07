@@ -67,12 +67,11 @@ export function OfflineExportModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+      className="dark fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150 text-[#fafbfc]"
+      data-theme="dark"
     >
       <div
-        className="w-full max-w-lg bg-[#0e161d] border border-border/80 rounded-[4px] shadow-2xl p-6 space-y-6 relative animate-in zoom-in-95 duration-150 text-foreground"
-        style={{ backgroundColor: "#0e161d" }}
+        className="w-full max-w-lg bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[4px] shadow-2xl p-6 space-y-6 relative animate-in zoom-in-95 duration-150 text-[#fafbfc]"
         role="dialog"
         aria-modal="true"
       >
@@ -81,7 +80,7 @@ export function OfflineExportModal({
           <button
             type="button"
             onClick={handleClose}
-            className="absolute top-4 right-4 p-1.5 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors cursor-pointer"
+            className="absolute top-4 right-4 p-1.5 rounded-[3px] text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.08] transition-colors cursor-pointer"
             aria-label="Zatvoriť"
           >
             <X className="h-4 w-4" />
@@ -94,11 +93,11 @@ export function OfflineExportModal({
             <FileArchive className="h-6 w-6" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-lg font-bold tracking-tight text-foreground">
+            <h2 className="text-lg font-bold tracking-tight text-[#fafbfc]">
               Offline ZIP Export Manuálu
             </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Zabaľte kompletný brand manuál značky <strong>{brandName}</strong> do jedného statického
+            <p className="text-xs text-[#96abbe] leading-relaxed">
+              Zabaľte kompletný brand manuál značky <strong className="text-[#fafbfc]">{brandName}</strong> do jedného statického
               ZIP archívu. Funguje kdekoľvek bez internetového pripojenia.
             </p>
           </div>
@@ -114,18 +113,18 @@ export function OfflineExportModal({
             </div>
           </div>
         ) : (
-          <div className="p-3.5 rounded-[3px] bg-muted/30 border border-border/50 text-xs space-y-2">
-            <div className="flex items-center justify-between text-muted-foreground font-mono text-[11px]">
+          <div className="p-3.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-xs space-y-2">
+            <div className="flex items-center justify-between text-[#96abbe] font-mono text-[11px]">
               <span>Publikovaná verzia:</span>
-              <span className="text-foreground font-bold">v{activeSnapshot?.version}</span>
+              <span className="text-[#fafbfc] font-bold">v{activeSnapshot?.version}</span>
             </div>
-            <div className="flex items-center justify-between text-muted-foreground font-mono text-[11px]">
+            <div className="flex items-center justify-between text-[#96abbe] font-mono text-[11px]">
               <span>Počet kapitol:</span>
-              <span className="text-foreground font-bold">{activeSnapshot?.pages?.length || 0}</span>
+              <span className="text-[#fafbfc] font-bold">{activeSnapshot?.pages?.length || 0}</span>
             </div>
-            <div className="flex items-center justify-between text-muted-foreground font-mono text-[11px]">
+            <div className="flex items-center justify-between text-[#96abbe] font-mono text-[11px]">
               <span>Dátum snapshotu:</span>
-              <span className="text-foreground">
+              <span className="text-[#fafbfc]">
                 {activeSnapshot?.publishedAt
                   ? new Date(activeSnapshot.publishedAt).toLocaleDateString()
                   : "Dnes"}
@@ -138,7 +137,7 @@ export function OfflineExportModal({
         {isExporting && (
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-foreground flex items-center gap-1.5">
+              <span className="font-semibold text-[#fafbfc] flex items-center gap-1.5">
                 <Loader2 className="h-3.5 w-3.5 text-primary animate-spin" />
                 <span>Prebieha balenie archívu</span>
               </span>
@@ -146,14 +145,14 @@ export function OfflineExportModal({
             </div>
 
             {/* Progress Track */}
-            <div className="w-full h-2 rounded-full bg-neutral-900 border border-border/40 overflow-hidden">
+            <div className="w-full h-2 rounded-full bg-[#070b0f] border border-[rgba(63,85,102,0.45)] overflow-hidden">
               <div
                 className="h-full bg-primary transition-all duration-200 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
 
-            <p className="text-[11px] text-muted-foreground font-mono truncate">{statusText}</p>
+            <p className="text-[11px] text-[#96abbe] font-mono truncate">{statusText}</p>
           </div>
         )}
 
@@ -165,22 +164,22 @@ export function OfflineExportModal({
         )}
 
         {/* Features Checklist */}
-        <div className="border-t border-border/40 pt-4 space-y-2 text-xs text-muted-foreground">
-          <div className="font-semibold text-foreground text-[11px] uppercase tracking-wider">
+        <div className="border-t border-[rgba(63,85,102,0.45)] pt-4 space-y-2 text-xs text-[#96abbe]">
+          <div className="font-semibold text-[#fafbfc] text-[11px] uppercase tracking-wider">
             Obsah ZIP balíčka:
           </div>
           <ul className="space-y-1 text-[11px]">
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
-              <span>Samostatný <code>index.html</code> s interaktívnou navigáciou kapitol</span>
+              <span>Samostatný <code className="text-[#fafbfc]">index.html</code> s interaktívnou navigáciou kapitol</span>
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
-              <span>Lokálne stiahnuté grafické materiály a SVG logá v priečinku <code>assets/</code></span>
+              <span>Lokálne stiahnuté grafické materiály a SVG logá v priečinku <code className="text-[#fafbfc]">assets/</code></span>
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
-              <span>Design tokeny v priečinku <code>tokens/</code> (CSS premenné a W3C JSON)</span>
+              <span>Design tokeny v priečinku <code className="text-[#fafbfc]">tokens/</code> (CSS premenné a W3C JSON)</span>
             </li>
             <li className="flex items-center gap-2">
               <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
@@ -196,7 +195,7 @@ export function OfflineExportModal({
             variant="ghost"
             onClick={handleClose}
             disabled={isExporting}
-            className="text-xs h-9 cursor-pointer"
+            className="text-xs h-9 cursor-pointer text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.08]"
           >
             {isExporting ? "Počkajte..." : "Zatvoriť"}
           </Button>
@@ -206,7 +205,7 @@ export function OfflineExportModal({
               type="button"
               onClick={handleStart}
               disabled={isExporting}
-              className="text-xs h-9 font-bold bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 cursor-pointer shadow-xs"
+              className="text-xs h-9 font-bold bg-primary text-[#070b0f] hover:brightness-110 flex items-center gap-2 cursor-pointer shadow-xs"
             >
               {isExporting ? (
                 <>

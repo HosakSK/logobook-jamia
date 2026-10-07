@@ -168,38 +168,39 @@ export function DimensionMatrixWizardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200 text-[#fafbfc]"
+      data-theme="dark"
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border rounded-[var(--brand-radius,6px)] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-card-foreground"
+        className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-[#fafbfc]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted/40 shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] shrink-0 text-[#fafbfc]">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-lg bg-primary/10 text-primary border border-primary/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">
+              <h3 className="text-base font-bold text-[#fafbfc]">
                 Sprievodca štruktúrou manuálu (Dimension Matrix)
               </h3>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[11px] text-[#96abbe]">
                 Nakonfigurujte zloženie identity a vygenerujte hotový manuál s blueprintmi za 1 sekundu
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-card">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0e161d] text-[#fafbfc]">
           {error && (
             <div className="p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400 text-xs flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 shrink-0" />
@@ -457,8 +458,8 @@ export function DimensionMatrixWizardModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/30 shrink-0">
-          <span className="text-xs text-muted-foreground font-mono">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] shrink-0 text-[#fafbfc]">
+          <span className="text-xs text-[#96abbe] font-mono">
             {brandName} · Generator
           </span>
           <div className="flex items-center gap-2">
@@ -466,7 +467,7 @@ export function DimensionMatrixWizardModal({
               type="button"
               onClick={onClose}
               disabled={isGenerating}
-              className="px-4 py-2 text-xs font-medium rounded-md hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+              className="px-4 py-2 text-xs font-medium rounded-md hover:bg-white/10 text-[#96abbe] hover:text-[#fafbfc] cursor-pointer"
             >
               Zrušiť
             </button>
@@ -474,7 +475,7 @@ export function DimensionMatrixWizardModal({
               type="button"
               onClick={handleStartGeneration}
               disabled={isGenerating}
-              className="px-5 py-2 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground hover:opacity-90 transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="px-5 py-2 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-[#070b0f] hover:brightness-110 transition-all cursor-pointer flex items-center gap-2 shadow-xs"
             >
               {isGenerating ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />

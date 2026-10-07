@@ -536,7 +536,7 @@ export default function M19PatternyModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+        <div className="dark fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150 text-[#fafbfc]" data-theme="dark">
           <div
             className="w-full max-w-2xl bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}

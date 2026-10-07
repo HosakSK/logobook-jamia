@@ -895,7 +895,7 @@ export default function M21FiremnaVizitkaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+        <div className="dark fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150 text-[#fafbfc]" data-theme="dark">
           <div
             className="w-full max-w-3xl bg-[#0e161d] border border-white/15 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
             style={{ borderRadius: brandRadius }}

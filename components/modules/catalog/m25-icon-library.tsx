@@ -668,8 +668,8 @@ function IconDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+      className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200 text-[#fafbfc]"
+      data-theme="dark"
       onClick={onClose}
     >
       <div
@@ -1006,8 +1006,8 @@ function AdminIconLibraryModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+      className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200 text-[#fafbfc]"
+      data-theme="dark"
       onClick={onClose}
     >
       <div

@@ -500,8 +500,8 @@ export default function M18TypografiaModule({
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          className="dark fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150 text-[#fafbfc]"
+          data-theme="dark"
         >
           <div
             className="w-full max-w-xl bg-[#0e161d] border border-[rgba(63,85,102,0.65)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"

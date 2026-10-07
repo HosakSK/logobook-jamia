@@ -88,31 +88,8 @@
     --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
   }
 
-  /* Explicit dark mode class */
-  .dark, [data-theme="dark"] {
-    --background: #0e161d;
-    --foreground: #fafbfc;
-    --card: #17212a;
-    --card-foreground: #fafbfc;
-    --popover: #17212a;
-    --popover-foreground: #fafbfc;
-    --primary: #c8d400;
-    --primary-foreground: #070b0f;
-    --secondary: #17212a;
-    --secondary-foreground: #fafbfc;
-    --muted: #070b0f;
-    --muted-foreground: #96abbe;
-    --accent: #009f80;
-    --accent-foreground: #fafbfc;
-    --destructive: #bb4934;
-    --destructive-foreground: #ffffff;
-    --border: rgba(63, 85, 102, 0.45);
-    --input: #070b0f;
-    --ring: rgba(200, 212, 0, 0.4);
-  }
-
-  /* Context 2: Light UI (Default for Logobook detail presentation) - crisp modern startup tokens */
-  .light, .theme-light, [data-context="logobook"], [data-theme="light"] {
+  /* Light Theme (Default for Logobook detail presentation when brand has light mode) */
+  .light, .theme-light, [data-theme="light"] {
     --background: #fafbfc;
     --foreground: #0e161d;
     --card: #ffffff;
@@ -139,6 +116,37 @@
     --bg-card-hover: #f8fafc;
     --bg-elevated: #ffffff;
     --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Dark Theme (Default Studio UI, Admin Shell, and Dark Brand Manuals) */
+  .dark, [data-theme="dark"] {
+    --background: #0e161d;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #17212a;
+    --popover-foreground: #fafbfc;
+    --primary: #c8d400;
+    --primary-foreground: #070b0f;
+    --secondary: #17212a;
+    --secondary-foreground: #fafbfc;
+    --muted: #070b0f;
+    --muted-foreground: #96abbe;
+    --accent: #009f80;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
+    --destructive-foreground: #ffffff;
+    --border: rgba(63, 85, 102, 0.45);
+    --input: #070b0f;
+    --ring: rgba(200, 212, 0, 0.4);
+
+    --bg-page-start: #0e161d;
+    --bg-page-end: #17212a;
+    --bg-card: #17212a;
+    --bg-card-hover: #1f2c36;
+    --bg-elevated: #1f2c36;
+    --bg-surface: #2b3b48;
+    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
   }
 }
 

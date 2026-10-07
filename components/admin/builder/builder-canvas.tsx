@@ -631,7 +631,7 @@ export function BuilderCanvas({
                     onClick={() => setIsTemplatesMenuOpen(false)}
                   />
                   <div
-                    className="absolute right-0 top-full mt-1.5 z-40 w-56 border border-border rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 bg-popover text-popover-foreground overflow-hidden"
+                    className="absolute right-0 top-full mt-1.5 z-40 w-56 border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 bg-[#17212a] text-[#fafbfc] overflow-hidden"
                   >
                     <button
                       type="button"
@@ -639,12 +639,12 @@ export function BuilderCanvas({
                         setIsTemplatesMenuOpen(false);
                         setIsTemplateBrowserOpen(true);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 hover:bg-muted flex items-center gap-2.5 text-foreground cursor-pointer transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-white/[0.08] flex items-center gap-2.5 text-[#fafbfc] cursor-pointer transition-colors"
                     >
                       <Sparkles className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold text-foreground">Galéria šablón</div>
-                        <div className="text-[10px] text-muted-foreground">Načítať hotové rozloženie</div>
+                        <div className="font-semibold text-[#fafbfc]">Galéria šablón</div>
+                        <div className="text-[10px] text-[#96abbe]">Načítať hotové rozloženie</div>
                       </div>
                     </button>
 
@@ -655,12 +655,12 @@ export function BuilderCanvas({
                         setIsTemplatesMenuOpen(false);
                         setIsSaveTemplateOpen(true);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 hover:bg-muted flex items-center gap-2.5 text-foreground disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-border transition-colors"
+                      className="w-full text-left px-3.5 py-2.5 hover:bg-white/[0.08] flex items-center gap-2.5 text-[#fafbfc] disabled:opacity-40 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed border-t border-[rgba(63,85,102,0.45)] transition-colors"
                     >
                       <BookmarkPlus className="h-4 w-4 text-primary shrink-0" />
                       <div>
-                        <div className="font-semibold text-foreground">Uložiť ako šablónu</div>
-                        <div className="text-[10px] text-muted-foreground">Uložiť celú túto stránku</div>
+                        <div className="font-semibold text-[#fafbfc]">Uložiť ako šablónu</div>
+                        <div className="text-[10px] text-[#96abbe]">Uložiť celú túto stránku</div>
                       </div>
                     </button>
                   </div>
@@ -1080,35 +1080,36 @@ export function BuilderCanvas({
       {/* Linked Sync Modal / Dialog */}
       {linkingModuleId && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 text-[#fafbfc]"
+          data-theme="dark"
         >
           <div
-            className="bg-card border border-border rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-card-foreground"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-[#fafbfc]"
           >
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <div className="flex items-center justify-between border-b border-[rgba(63,85,102,0.45)] pb-3">
               <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-amber-500" />
-                <h3 className="text-sm font-bold text-foreground">
+                <h3 className="text-sm font-bold text-[#fafbfc]">
                   Zrkadlenie modulu (Linked Sync)
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setLinkingModuleId(null)}
-                className="text-xs text-muted-foreground hover:text-foreground p-1 cursor-pointer transition-colors"
+                className="text-xs text-[#96abbe] hover:text-[#fafbfc] p-1 cursor-pointer transition-colors"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs text-[#96abbe] leading-relaxed">
               Moduly so spoločným <strong>linkGroupId</strong> zdieľajú identický obsah. Úprava
               textu, farby alebo nastavenia v jednom module sa okamžite premietne do všetkých
               prepojených modulov v tomto brande.
             </p>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+              <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                 Identifikátor skupiny (linkGroupId)
               </Label>
               <Input
@@ -1117,7 +1118,7 @@ export function BuilderCanvas({
                 value={linkGroupInput}
                 onChange={(e) => setLinkGroupInput(e.target.value.toLowerCase())}
                 placeholder="napr. sync-logo-clearance"
-                className="h-9 text-xs font-mono rounded-[var(--brand-radius,6px)] bg-background border border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
+                className="h-9 text-xs font-mono rounded-[var(--brand-radius,6px)] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary"
                 autoFocus
               />
             </div>
@@ -1125,7 +1126,7 @@ export function BuilderCanvas({
             {/* List of existing brand groups */}
             {existingLinkGroups.length > 0 && (
               <div className="space-y-1.5 pt-1">
-                <Label className="text-[10px] uppercase font-semibold text-muted-foreground">
+                <Label className="text-[10px] uppercase font-semibold text-[#96abbe]">
                   Alebo vyberte existujúcu skupinu:
                 </Label>
                 <div className="max-h-28 overflow-y-auto space-y-1 pr-1">
@@ -1134,10 +1135,10 @@ export function BuilderCanvas({
                       key={g.linkGroupId}
                       type="button"
                       onClick={() => setLinkGroupInput(g.linkGroupId)}
-                      className="w-full text-left px-2.5 py-1.5 rounded-[var(--brand-radius,4px)] bg-muted/50 border border-border hover:border-amber-500/60 text-xs flex items-center justify-between cursor-pointer transition-colors"
+                      className="w-full text-left px-2.5 py-1.5 rounded-[var(--brand-radius,4px)] bg-[#17212a] border border-[rgba(63,85,102,0.45)] hover:border-amber-500/60 text-xs flex items-center justify-between cursor-pointer transition-colors"
                     >
-                      <span className="font-mono text-amber-600 dark:text-amber-300">{g.linkGroupId}</span>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="font-mono text-amber-300">{g.linkGroupId}</span>
+                      <span className="text-[10px] text-[#96abbe]">
                         {g.count} {g.count === 1 ? "modul" : "moduly"}
                       </span>
                     </button>
@@ -1146,13 +1147,13 @@ export function BuilderCanvas({
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/60">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[rgba(63,85,102,0.45)]">
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => setLinkingModuleId(null)}
-                className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-[var(--brand-radius,4px)] cursor-pointer"
+                className="h-8 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/10 rounded-[var(--brand-radius,4px)] cursor-pointer"
               >
                 Zrušiť
               </Button>
@@ -1182,15 +1183,16 @@ export function BuilderCanvas({
 
         return (
           <div
-            className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+            className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 text-[#fafbfc]"
+            data-theme="dark"
           >
             <form
               onSubmit={handleSaveSettings}
-              className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-card-foreground"
+              className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
             >
               {/* Modal Header */}
               <div
-                className="p-4 border-b border-border flex items-center justify-between bg-muted/40 shrink-0 text-foreground"
+                className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0 text-[#fafbfc]"
               >
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-[var(--brand-radius,4px)] bg-primary/10 border border-primary/20 text-primary">
@@ -1198,14 +1200,14 @@ export function BuilderCanvas({
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-foreground">
+                      <h3 className="text-sm font-bold text-[#fafbfc]">
                         {moduleTitle}
                       </h3>
-                      <span className="px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] text-[10px] font-medium bg-muted text-muted-foreground border border-border">
+                      <span className="px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] text-[10px] font-medium bg-[#070b0f] text-[#96abbe] border border-[rgba(63,85,102,0.45)]">
                         {moduleCat}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground">
+                    <p className="text-[11px] text-[#96abbe]">
                       Vizuálne prispôsobenie a nastavenia tohto stavebného bloku
                     </p>
                   </div>
@@ -1213,7 +1215,7 @@ export function BuilderCanvas({
                 <button
                   type="button"
                   onClick={() => setEditingModule(null)}
-                  className="p-1.5 text-muted-foreground hover:text-foreground rounded-[var(--brand-radius,4px)] hover:bg-muted transition-colors cursor-pointer"
+                  className="p-1.5 text-[#96abbe] hover:text-[#fafbfc] rounded-[var(--brand-radius,4px)] hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1221,7 +1223,7 @@ export function BuilderCanvas({
 
               {/* Scrollable Modal Content */}
               <div
-                className="p-5 overflow-y-auto space-y-5 flex-1 bg-card"
+                className="p-5 overflow-y-auto space-y-5 flex-1 bg-[#0e161d] text-[#fafbfc]"
               >
                 {/* Linked Sync Warning Banner */}
                 {editingModule.linkGroupId && (
@@ -2125,14 +2127,14 @@ export function BuilderCanvas({
 
               {/* Modal Footer */}
               <div
-                className="p-4 border-t border-border bg-muted/30 flex items-center justify-end gap-2.5 shrink-0"
+                className="p-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-end gap-2.5 shrink-0 text-[#fafbfc]"
               >
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setEditingModule(null)}
-                  className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-[var(--brand-radius,4px)] cursor-pointer"
+                  className="h-8 text-xs text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/10 rounded-[var(--brand-radius,4px)] cursor-pointer"
                 >
                   Zrušiť
                 </Button>
@@ -2140,7 +2142,7 @@ export function BuilderCanvas({
                   type="submit"
                   size="sm"
                   disabled={isSavingConfig}
-                  className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-primary-foreground hover:bg-primary/90 px-4 cursor-pointer"
+                  className="h-8 text-xs font-bold rounded-[var(--brand-radius,4px)] bg-primary text-[#070b0f] hover:brightness-110 px-4 cursor-pointer"
                 >
                   {isSavingConfig ? (
                     <span className="flex items-center gap-1.5">
@@ -2160,20 +2162,21 @@ export function BuilderCanvas({
       {/* Module Catalogue Modal */}
       {activeColumnForNewModule && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+          className="dark fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 text-[#fafbfc]"
+          data-theme="dark"
         >
           <div
-            className="bg-card border border-border rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-card-foreground"
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
           >
             {/* Modal Header */}
             <div
-              className="p-4 border-b border-border flex items-center justify-between bg-muted/40 shrink-0"
+              className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0 text-[#fafbfc]"
             >
               <div>
-                <h3 className="text-sm font-bold text-foreground">
+                <h3 className="text-sm font-bold text-[#fafbfc]">
                   Katalóg Modulov (M01 – M25)
                 </h3>
-                <p className="text-[11px] text-muted-foreground">
+                <p className="text-[11px] text-[#96abbe]">
                   Zvoľte stavebný blok, ktorý chcete vložiť do vybraného stĺpca.
                 </p>
               </div>
@@ -2183,7 +2186,7 @@ export function BuilderCanvas({
                   setActiveColumnForNewModule(null);
                   setModuleSearch("");
                 }}
-                className="p-1.5 text-muted-foreground hover:text-foreground rounded-[var(--brand-radius,4px)] hover:bg-muted transition-colors cursor-pointer"
+                className="p-1.5 text-[#96abbe] hover:text-[#fafbfc] rounded-[var(--brand-radius,4px)] hover:bg-white/[0.08] transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -2191,7 +2194,7 @@ export function BuilderCanvas({
 
             {/* Modal Category Tabs */}
             <div
-              className="px-4 py-2 border-b border-border bg-muted/20 flex items-center gap-1.5 overflow-x-auto"
+              className="px-4 py-2 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center gap-1.5 overflow-x-auto"
             >
               {categories.map((cat) => (
                 <button
@@ -2200,8 +2203,8 @@ export function BuilderCanvas({
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-2.5 py-1 text-[11px] rounded-[var(--brand-radius,4px)] whitespace-nowrap transition-colors cursor-pointer ${
                     selectedCategory === cat
-                      ? "bg-primary text-primary-foreground font-bold shadow-2xs"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-primary text-[#070b0f] font-bold shadow-2xs"
+                      : "text-[#96abbe] hover:text-[#fafbfc] hover:bg-white/[0.08]"
                   }`}
                 >
                   {cat}
@@ -2211,22 +2214,22 @@ export function BuilderCanvas({
 
             {/* Modal Search */}
             <div
-              className="p-3 border-b border-border bg-card relative"
+              className="p-3 border-b border-[rgba(63,85,102,0.45)] bg-[#0e161d] relative"
             >
-              <Search className="h-4 w-4 text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="h-4 w-4 text-[#96abbe] absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 autoFocus
                 value={moduleSearch}
                 onChange={(e) => setModuleSearch(e.target.value)}
                 placeholder="Hľadať modul podľa názvu, popisu alebo kategórie..."
-                className="w-full h-9 pl-9 pr-3 rounded-[var(--brand-radius,6px)] bg-muted/40 border border-border text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary focus:bg-background"
+                className="w-full h-9 pl-9 pr-3 rounded-[var(--brand-radius,6px)] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] placeholder:text-[#96abbe]/40 outline-hidden focus:border-primary"
               />
             </div>
 
             {/* Modal List */}
             <div
-              className="p-4 overflow-y-auto space-y-2 flex-1 bg-card"
+              className="p-4 overflow-y-auto space-y-2 flex-1 bg-[#0e161d]"
             >
               <div className="grid sm:grid-cols-2 gap-2.5">
                 {filteredModules.map((m) => (
@@ -2234,17 +2237,17 @@ export function BuilderCanvas({
                     key={m.type}
                     type="button"
                     onClick={() => handleAddModule(m.type)}
-                    className="p-3.5 rounded-[var(--brand-radius,6px)] border border-border hover:border-primary bg-card hover:bg-muted/50 text-left transition-all group space-y-1.5 cursor-pointer shadow-xs"
+                    className="p-3.5 rounded-[var(--brand-radius,6px)] border border-[rgba(63,85,102,0.45)] hover:border-primary bg-[#17212a] hover:bg-[#1e2c38] text-left transition-all group space-y-1.5 cursor-pointer shadow-xs"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-xs text-foreground group-hover:text-primary transition-colors">
+                      <span className="font-bold text-xs text-[#fafbfc] group-hover:text-primary transition-colors">
                         {m.name}
                       </span>
-                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] bg-muted border border-border/60 text-muted-foreground">
+                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[var(--brand-radius,2px)] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#96abbe]">
                         {m.category}
                       </span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground line-clamp-1 leading-relaxed">
+                    <p className="text-[11px] text-[#96abbe] line-clamp-1 leading-relaxed">
                       {m.desc}
                     </p>
                   </button>

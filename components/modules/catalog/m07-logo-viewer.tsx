@@ -534,8 +534,8 @@ export default function M07ZobrazenieLogaModule({
       {/* Admin Settings Modal (Tabs: Preview, Formats & Bulk, Meta for M11) */}
       {isSettingsModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          className="dark fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150 text-[#fafbfc]"
+          data-theme="dark"
         >
           <div
             className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
