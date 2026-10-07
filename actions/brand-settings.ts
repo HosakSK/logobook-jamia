@@ -268,6 +268,10 @@ export async function updateGlobalShapesAction(
     revalidatePath(`/admin/brand/${brand.slug}`);
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}/builder`, "layout");
+    revalidatePath(`/admin/brand/${brand.slug}/builder`, "layout");
+    revalidatePath(`/manual/${brand.slug}`, "layout");
+    revalidatePath(`/m/${brand.slug}`, "layout");
     revalidatePath(`/manual/${brand.slug}`);
     revalidatePath(`/m/${brand.slug}`);
 

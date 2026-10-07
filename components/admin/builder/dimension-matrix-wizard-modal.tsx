@@ -168,15 +168,15 @@ export function DimensionMatrixWizardModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border/70 rounded-xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-foreground"
+        className="bg-[#0e161d] border border-border/80 rounded-[4px] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden text-foreground"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-[#131d27] shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-lg bg-primary/10 text-primary border border-primary/20">
               <Sparkles className="w-5 h-5" />
@@ -457,7 +457,7 @@ export function DimensionMatrixWizardModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border/40 bg-muted/10">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border/50 bg-[#131d27] shrink-0">
           <span className="text-xs text-muted-foreground font-mono">
             {brandName} · Generator
           </span>

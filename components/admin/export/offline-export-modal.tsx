@@ -66,9 +66,9 @@ export function OfflineExportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150">
       <div
-        className="w-full max-w-lg bg-card border border-border/80 rounded-lg shadow-2xl p-6 space-y-6 relative animate-in zoom-in-95 duration-150 text-foreground"
+        className="w-full max-w-lg bg-[#0e161d] border border-border/80 rounded-[4px] shadow-2xl p-6 space-y-6 relative animate-in zoom-in-95 duration-150 text-foreground"
         role="dialog"
         aria-modal="true"
       >

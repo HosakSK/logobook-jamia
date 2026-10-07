@@ -149,15 +149,15 @@ export function TemplateBrowserModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border/70 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-foreground"
+        className="bg-[#0e161d] border border-border/80 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-foreground"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-[#131d27]">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <LayoutTemplate className="w-5 h-5" />
@@ -303,7 +303,7 @@ export function TemplateBrowserModal({
                 return (
                   <div
                     key={tpl.id}
-                    className="border border-border/60 rounded-lg p-5 bg-card/50 hover:bg-card hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-2xs group"
+                    className="border border-border/60 rounded-lg p-5 bg-[#141f2b] hover:bg-[#1a2837] hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-2xs group"
                   >
                     <div className="space-y-2.5">
                       {/* Top Badges */}
@@ -397,11 +397,11 @@ export function TemplateBrowserModal({
       {/* Confirmation Modal for Replace vs Append (Option A) */}
       {selectedTemplateForApply && (
         <div
-          className="fixed inset-0 z-60 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-60 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setSelectedTemplateForApply(null)}
         >
           <div
-            className="bg-card border border-border/80 rounded-xl shadow-2xl max-w-md w-full p-6 text-foreground space-y-4"
+            className="bg-[#0e161d] border border-border/80 rounded-xl shadow-2xl max-w-md w-full p-6 text-foreground space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">

@@ -40,6 +40,7 @@ import { SaveTemplateModal } from "./save-template-modal";
 import { PublishBrandButton } from "./publish-brand-button";
 import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
+import { useBrandCascade } from "@/components/modules/cascade";
 import { getBrandColorsAction } from "@/actions/colors";
 import {
   updatePageAction,
@@ -110,6 +111,20 @@ export function BuilderCanvas({
   allPages,
 }: BuilderCanvasProps) {
   const router = useRouter();
+  const { tokens } = useBrandCascade();
+
+  // Active theme colors for quick selection in module settings and preview
+  const themeColors = React.useMemo(() => {
+    if (!tokens?.theme) return [];
+    return [
+      { hex: tokens.theme.surfaceColor, name: "Karta témy", role: "SURFACE" },
+      { hex: tokens.theme.bgColor, name: "Pozadie témy", role: "BACKGROUND" },
+      { hex: tokens.theme.primaryColor, name: "Primárna", role: "PRIMARY" },
+      { hex: tokens.theme.accentColor, name: "Akcent", role: "ACCENT" },
+      { hex: tokens.theme.textColor, name: "Text témy", role: "TEXT" },
+      { hex: tokens.theme.borderColor, name: "Rámik témy", role: "BORDER" },
+    ];
+  }, [tokens?.theme]);
 
   // Dialogs & drawers state
   const [activeColumnForNewModule, setActiveColumnForNewModule] = useState<string | null>(null);
@@ -517,9 +532,23 @@ export function BuilderCanvas({
   });
 
   return (
-    <div className="flex-1 space-y-6 max-w-5xl">
+    <div
+      className="flex-1 space-y-6 max-w-5xl rounded-[6px] p-6 border shadow-sm transition-colors"
+      style={{
+        backgroundColor: "var(--brand-manual-bg, var(--background))",
+        color: "var(--foreground)",
+        borderColor: "var(--border)",
+      }}
+    >
       {/* Page Header Bar */}
-      <div className="border border-border/50 rounded-[3px] p-5 bg-card/60 shadow-2xs space-y-3">
+      <div
+        className="border rounded-[3px] p-5 shadow-2xs space-y-3"
+        style={{
+          backgroundColor: "var(--card)",
+          borderColor: "var(--border)",
+          color: "var(--foreground)",
+        }}
+      >
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1.5">
             {/* Clickable Ancestor Breadcrumb Trail */}
@@ -1026,9 +1055,9 @@ export function BuilderCanvas({
 
       {/* Linked Sync Modal / Dialog */}
       {linkingModuleId && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-neutral-950 border border-border/80 rounded-[3px] w-full max-w-md p-4 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-border/30 pb-2">
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+          <div className="bg-[#0e161d] border border-border/80 rounded-[4px] w-full max-w-md p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-amber-400" />
                 <h3 className="text-sm font-bold text-foreground">
@@ -1124,13 +1153,13 @@ export function BuilderCanvas({
         const moduleCat = moduleOpt?.category || "Modul";
 
         return (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
             <form
               onSubmit={handleSaveSettings}
-              className="bg-card border border-border rounded-[3px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden"
+              className="bg-[#0e161d] border border-border/80 rounded-[4px] w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-foreground"
             >
               {/* Modal Header */}
-              <div className="p-4 border-b border-border/40 flex items-center justify-between bg-card/80 shrink-0">
+              <div className="p-4 border-b border-border/50 flex items-center justify-between bg-[#131d27] shrink-0">
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-[2px] bg-primary/10 border border-primary/20 text-primary">
                     <Settings2 className="h-4 w-4" />
@@ -1159,7 +1188,7 @@ export function BuilderCanvas({
               </div>
 
               {/* Scrollable Modal Content */}
-              <div className="p-5 overflow-y-auto space-y-5 flex-1">
+              <div className="p-5 overflow-y-auto space-y-5 flex-1 bg-[#0e161d]">
                 {/* Linked Sync Warning Banner */}
                 {editingModule.linkGroupId && (
                   <div className="p-3 rounded-[2px] bg-amber-950/40 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
@@ -1177,7 +1206,7 @@ export function BuilderCanvas({
                 )}
 
                 {/* Sekcia 1: Záhlavie a Nadpis modulu (H3) */}
-                <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-3">
+                <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
@@ -1223,7 +1252,7 @@ export function BuilderCanvas({
                 {/* Sekcia 2: Špecifické nastavenia podľa typu modulu */}
                 {/* M04 Rázcestník */}
                 {(editingModule.moduleType.startsWith("M04") || editingModule.moduleType === "M04_Razcestnik") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Rozloženie a správanie rázcestníka
@@ -1328,7 +1357,7 @@ export function BuilderCanvas({
 
                 {/* M10 Obrazová Galéria */}
                 {(editingModule.moduleType.startsWith("M10") || editingModule.moduleType === "M10_ObrazokGaleria") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Rozloženie fotogalérie
@@ -1471,7 +1500,7 @@ export function BuilderCanvas({
 
                 {/* M06 Oddelovac a medzera */}
                 {(editingModule.moduleType.startsWith("M06") || editingModule.moduleType === "M06_OddelovacMedzera") && (
-                  <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                  <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
                     <div className="border-b border-border/30 pb-2">
                       <h4 className="text-xs font-semibold text-foreground">
                         Nastavenie rozostupu a linky
@@ -1576,7 +1605,7 @@ export function BuilderCanvas({
                 )}
 
                 {/* Sekcia 3: Vizuálny štýl karty modulu (Kaskáda štýlov) */}
-                <div className="p-4 rounded-[2px] border border-border/40 bg-neutral-950/40 space-y-4">
+                <div className="p-4 rounded-[2px] border border-border/40 bg-[#141f2b] space-y-4">
                   <div className="border-b border-border/30 pb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Paintbrush className="h-4 w-4 text-primary" />
@@ -1590,7 +1619,7 @@ export function BuilderCanvas({
                   </p>
 
                   {/* Farba pozadia karty */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-medium text-foreground">
                         Farba pozadia karty modulu
@@ -1645,22 +1674,22 @@ export function BuilderCanvas({
                             prev ? { ...prev, backgroundColor: e.target.value } : null
                           )
                         }
-                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1"
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-[#141f2b]"
                       />
                     </div>
 
-                    {/* Brand Palette 1-click chips */}
-                    {brandPalette.length > 0 && (
+                    {/* Theme Colors 1-click chips */}
+                    {themeColors.length > 0 && (
                       <div className="pt-2 border-t border-border/20 space-y-1">
                         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
-                          Rýchly výber z farieb značky:
+                          Farby aktívnej témy manuálu:
                         </span>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {brandPalette.map((item, idx) => {
+                          {themeColors.map((item) => {
                             const isSelected = editingModule.backgroundColor.toUpperCase() === item.hex.toUpperCase();
                             return (
                               <button
-                                key={`${item.hex}-${idx}`}
+                                key={`bg-theme-${item.role}-${item.hex}`}
                                 type="button"
                                 onClick={() =>
                                   setEditingModule((prev) =>
@@ -1669,8 +1698,45 @@ export function BuilderCanvas({
                                 }
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
-                                    ? "border-primary bg-primary/10 text-primary font-bold"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                    ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                }`}
+                              >
+                                <span
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  style={{ backgroundColor: item.hex }}
+                                />
+                                <span>{item.name}</span>
+                                {isSelected && <Check className="h-2.5 w-2.5" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Brand Palette 1-click chips */}
+                    {brandPalette.length > 0 && (
+                      <div className="pt-1.5 space-y-1">
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                          Farby značky (Brand Palette):
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {brandPalette.map((item, idx) => {
+                            const isSelected = editingModule.backgroundColor.toUpperCase() === item.hex.toUpperCase();
+                            return (
+                              <button
+                                key={`bg-brand-${item.hex}-${idx}`}
+                                type="button"
+                                onClick={() =>
+                                  setEditingModule((prev) =>
+                                    prev ? { ...prev, backgroundColor: item.hex } : null
+                                  )
+                                }
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
                                 }`}
                               >
                                 <span
@@ -1688,7 +1754,7 @@ export function BuilderCanvas({
                   </div>
 
                   {/* Farba textu modulu */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-medium text-foreground">
                         Farba textu modulu
@@ -1746,22 +1812,22 @@ export function BuilderCanvas({
                             prev ? { ...prev, textColor: e.target.value } : null
                           )
                         }
-                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1"
+                        className="font-mono text-xs uppercase h-8 rounded-[2px] flex-1 bg-[#141f2b]"
                       />
                     </div>
 
-                    {/* Brand Palette 1-click chips for text */}
-                    {brandPalette.length > 0 && (
+                    {/* Theme Colors 1-click chips for text */}
+                    {themeColors.length > 0 && (
                       <div className="pt-2 border-t border-border/20 space-y-1">
                         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
-                          Rýchly výber z farieb značky:
+                          Farby aktívnej témy manuálu:
                         </span>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {brandPalette.map((item, idx) => {
+                          {themeColors.map((item) => {
                             const isSelected = editingModule.textColor.toUpperCase() === item.hex.toUpperCase();
                             return (
                               <button
-                                key={`${item.hex}-${idx}`}
+                                key={`text-theme-${item.role}-${item.hex}`}
                                 type="button"
                                 onClick={() =>
                                   setEditingModule((prev) =>
@@ -1770,8 +1836,45 @@ export function BuilderCanvas({
                                 }
                                 className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
                                   isSelected
-                                    ? "border-primary bg-primary/10 text-primary font-bold"
-                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                                    ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                }`}
+                              >
+                                <span
+                                  className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                  style={{ backgroundColor: item.hex }}
+                                />
+                                <span>{item.name}</span>
+                                {isSelected && <Check className="h-2.5 w-2.5" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Brand Palette 1-click chips for text */}
+                    {brandPalette.length > 0 && (
+                      <div className="pt-1.5 space-y-1">
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                          Farby značky (Brand Palette):
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {brandPalette.map((item, idx) => {
+                            const isSelected = editingModule.textColor.toUpperCase() === item.hex.toUpperCase();
+                            return (
+                              <button
+                                key={`text-brand-${item.hex}-${idx}`}
+                                type="button"
+                                onClick={() =>
+                                  setEditingModule((prev) =>
+                                    prev ? { ...prev, textColor: item.hex } : null
+                                  )
+                                }
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                    : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
                                 }`}
                               >
                                 <span
@@ -1789,7 +1892,7 @@ export function BuilderCanvas({
                   </div>
 
                   {/* Rámik karty */}
-                  <div className="space-y-2.5 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                  <div className="space-y-2.5 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
                     <Label className="text-xs font-medium text-foreground">
                       Hrúbka rámika karty modulu
                     </Label>
@@ -1810,8 +1913,8 @@ export function BuilderCanvas({
                           }
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             editingModule.borderWidthPx === item.val
-                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                              ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
                           }`}
                         >
                           {item.label}
@@ -1871,15 +1974,89 @@ export function BuilderCanvas({
                                 prev ? { ...prev, borderColor: e.target.value } : null
                               )
                             }
-                            className="font-mono text-xs uppercase h-7 rounded-[2px] flex-1"
+                            className="font-mono text-xs uppercase h-7 rounded-[2px] flex-1 bg-[#141f2b]"
                           />
                         </div>
+
+                        {/* Theme Colors 1-click chips for border */}
+                        {themeColors.length > 0 && (
+                          <div className="pt-2 border-t border-border/20 space-y-1">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                              Farby aktívnej témy:
+                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {themeColors.map((item) => {
+                                const isSelected = editingModule.borderColor.toUpperCase() === item.hex.toUpperCase();
+                                return (
+                                  <button
+                                    key={`border-theme-${item.role}-${item.hex}`}
+                                    type="button"
+                                    onClick={() =>
+                                      setEditingModule((prev) =>
+                                        prev ? { ...prev, borderColor: item.hex } : null
+                                      )
+                                    }
+                                    className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                      isSelected
+                                        ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    }`}
+                                  >
+                                    <span
+                                      className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                      style={{ backgroundColor: item.hex }}
+                                    />
+                                    <span>{item.name}</span>
+                                    {isSelected && <Check className="h-2.5 w-2.5" />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Brand Palette 1-click chips for border */}
+                        {brandPalette.length > 0 && (
+                          <div className="pt-1.5 space-y-1">
+                            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block">
+                              Farby značky (Brand Palette):
+                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {brandPalette.map((item, idx) => {
+                                const isSelected = editingModule.borderColor.toUpperCase() === item.hex.toUpperCase();
+                                return (
+                                  <button
+                                    key={`border-brand-${item.hex}-${idx}`}
+                                    type="button"
+                                    onClick={() =>
+                                      setEditingModule((prev) =>
+                                        prev ? { ...prev, borderColor: item.hex } : null
+                                      )
+                                    }
+                                    className={`flex items-center gap-1 px-2 py-0.5 rounded-[2px] text-[10px] font-mono border transition-all cursor-pointer ${
+                                      isSelected
+                                        ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                                        : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
+                                    }`}
+                                  >
+                                    <span
+                                      className="h-2.5 w-2.5 rounded-[1px] border border-white/20 inline-block shrink-0"
+                                      style={{ backgroundColor: item.hex }}
+                                    />
+                                    <span>{item.name || item.hex}</span>
+                                    {isSelected && <Check className="h-2.5 w-2.5" />}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
 
                   {/* Vnútorné odsadenie karty (Padding) */}
-                  <div className="space-y-2 p-3 rounded-[2px] bg-neutral-900/40 border border-border/30">
+                  <div className="space-y-2 p-3 rounded-[2px] bg-[#0c1218] border border-border/30">
                     <Label className="text-xs font-medium text-foreground">
                       Vnútorné odsadenie karty (Padding)
                     </Label>
@@ -1900,8 +2077,8 @@ export function BuilderCanvas({
                           }
                           className={`py-1.5 px-2 rounded-[2px] text-xs font-medium border text-center transition-all cursor-pointer ${
                             (editingModule.paddingY || "normal") === pad.id
-                              ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
-                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground"
+                              ? "border-primary bg-primary/20 text-primary font-bold shadow-2xs"
+                              : "border-border/40 hover:border-border text-muted-foreground hover:text-foreground bg-[#141f2b]"
                           }`}
                         >
                           {pad.label}
@@ -1913,7 +2090,7 @@ export function BuilderCanvas({
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-border/40 bg-card/80 flex items-center justify-end gap-2.5 shrink-0">
+              <div className="p-4 border-t border-border/40 bg-[#131d27] flex items-center justify-end gap-2.5 shrink-0">
                 <Button
                   type="button"
                   variant="ghost"
@@ -1946,10 +2123,10 @@ export function BuilderCanvas({
 
       {/* Module Catalogue Modal */}
       {activeColumnForNewModule && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-[3px] w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+          <div className="bg-[#0e161d] border border-border/80 rounded-[4px] w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-foreground">
             {/* Modal Header */}
-            <div className="p-4 border-b border-border/40 flex items-center justify-between">
+            <div className="p-4 border-b border-border/50 flex items-center justify-between bg-[#131d27] shrink-0">
               <div>
                 <h3 className="text-sm font-bold text-foreground">
                   Katalóg Modulov (M01 – M25)
@@ -1964,23 +2141,23 @@ export function BuilderCanvas({
                   setActiveColumnForNewModule(null);
                   setModuleSearch("");
                 }}
-                className="p-1 text-muted-foreground hover:text-foreground"
+                className="p-1.5 text-muted-foreground hover:text-foreground rounded-[2px] hover:bg-neutral-800 transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Modal Category Tabs */}
-            <div className="px-4 py-2 border-b border-border/30 bg-neutral-900/30 flex items-center gap-1.5 overflow-x-auto">
+            <div className="px-4 py-2 border-b border-border/30 bg-[#141f2b] flex items-center gap-1.5 overflow-x-auto">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 text-[11px] rounded-[2px] whitespace-nowrap transition-colors ${
+                  className={`px-2.5 py-1 text-[11px] rounded-[2px] whitespace-nowrap transition-colors cursor-pointer ${
                     selectedCategory === cat
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-neutral-800"
+                      ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                      : "text-muted-foreground hover:text-foreground hover:bg-[#1a2837]"
                   }`}
                 >
                   {cat}
@@ -1989,7 +2166,7 @@ export function BuilderCanvas({
             </div>
 
             {/* Modal Search */}
-            <div className="p-3 border-b border-border/30 bg-neutral-900/40 relative">
+            <div className="p-3 border-b border-border/30 bg-[#131d27] relative">
               <Search className="h-3.5 w-3.5 text-muted-foreground absolute left-6 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
@@ -1997,25 +2174,25 @@ export function BuilderCanvas({
                 value={moduleSearch}
                 onChange={(e) => setModuleSearch(e.target.value)}
                 placeholder="Hľadať modul podľa názvu, popisu alebo kategórie..."
-                className="w-full h-8 pl-8 pr-3 rounded-[2px] bg-neutral-900 border border-border/50 text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary"
+                className="w-full h-8 pl-8 pr-3 rounded-[2px] bg-[#0c1218] border border-border/50 text-xs text-foreground placeholder:text-muted-foreground outline-hidden focus:border-primary"
               />
             </div>
 
             {/* Modal List */}
-            <div className="p-4 overflow-y-auto space-y-2 flex-1">
+            <div className="p-4 overflow-y-auto space-y-2 flex-1 bg-[#0e161d]">
               <div className="grid sm:grid-cols-2 gap-2">
                 {filteredModules.map((m) => (
                   <button
                     key={m.type}
                     type="button"
                     onClick={() => handleAddModule(m.type)}
-                    className="p-3 rounded-[2px] border border-border/40 hover:border-primary bg-card/60 hover:bg-neutral-800/40 text-left transition-all group space-y-1"
+                    className="p-3 rounded-[2px] border border-border/40 hover:border-primary bg-[#141f2b] hover:bg-[#1a2837] text-left transition-all group space-y-1 cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-xs text-foreground group-hover:text-primary transition-colors">
                         {m.name}
                       </span>
-                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[1px] bg-neutral-900 border border-border/40 text-muted-foreground">
+                      <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded-[1px] bg-[#0c1218] border border-border/40 text-muted-foreground">
                         {m.category}
                       </span>
                     </div>

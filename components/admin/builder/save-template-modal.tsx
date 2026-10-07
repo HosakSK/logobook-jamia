@@ -74,15 +74,15 @@ export function SaveTemplateModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-card border border-border/70 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden text-foreground space-y-0"
+        className="bg-[#0e161d] border border-border/80 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden text-foreground space-y-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-[#131d27]">
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <BookmarkPlus className="w-5 h-5" />
