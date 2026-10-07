@@ -630,7 +630,10 @@ export function BuilderCanvas({
                     className="fixed inset-0 z-30"
                     onClick={() => setIsTemplatesMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1.5 z-40 w-56 bg-[#0e161d] border border-white/20 rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc] overflow-hidden">
+                  <div
+                    className="absolute right-0 top-full mt-1.5 z-40 w-56 border border-[rgba(63,85,102,0.6)] rounded-[var(--brand-radius,6px)] shadow-2xl py-1 text-xs animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc] overflow-hidden"
+                    style={{ backgroundColor: "#0e161d" }}
+                  >
                     <button
                       type="button"
                       onClick={() => {
@@ -752,7 +755,7 @@ export function BuilderCanvas({
           page.containers.map((container, cIdx) => (
             <div
               key={container.id}
-              className="group/container relative border border-border/50 hover:border-border rounded-[var(--brand-radius,8px)] p-4 bg-card/25 transition-all space-y-3"
+              className="group/container relative border border-border/40 hover:border-border/80 rounded-[var(--brand-radius,8px)] p-4 transition-all space-y-3"
             >
               {/* Container Header & Hover Toolbar (Prevents Pencil Hell!) */}
               <div className="flex items-center justify-between border-b border-border/20 pb-2">
@@ -763,16 +766,19 @@ export function BuilderCanvas({
                 </div>
 
                 {/* Floating Hover Toolbar */}
-                <div className="opacity-0 group-hover/container:opacity-100 transition-opacity flex items-center gap-1 bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 shadow-xl text-white">
+                <div
+                  className="opacity-0 group-hover/container:opacity-100 transition-opacity flex items-center gap-1 border border-white/25 rounded-[var(--brand-radius,6px)] p-1 shadow-xl text-[#fafbfc]"
+                  style={{ backgroundColor: "#070b0f", color: "#fafbfc" }}
+                >
                   {/* Move Up */}
                   <button
                     type="button"
                     disabled={cIdx === 0}
                     onClick={() => handleMoveContainer(container.id, "up")}
-                    className="p-1 text-white/75 hover:text-white disabled:opacity-20 transition-colors cursor-pointer"
+                    className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                     title="Posunúť riadok vyššie"
                   >
-                    <ChevronUp className="h-3.5 w-3.5" />
+                    <ChevronUp className="h-3.5 w-3.5 stroke-[2.2]" />
                   </button>
 
                   {/* Move Down */}
@@ -780,10 +786,10 @@ export function BuilderCanvas({
                     type="button"
                     disabled={cIdx === page.containers.length - 1}
                     onClick={() => handleMoveContainer(container.id, "down")}
-                    className="p-1 text-white/75 hover:text-white disabled:opacity-20 transition-colors cursor-pointer"
+                    className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                     title="Posunúť riadok nižšie"
                   >
-                    <ChevronDown className="h-3.5 w-3.5" />
+                    <ChevronDown className="h-3.5 w-3.5 stroke-[2.2]" />
                   </button>
 
                   <div className="w-[1px] h-3.5 bg-white/20 my-auto mx-0.5" />
@@ -797,16 +803,19 @@ export function BuilderCanvas({
                           activeLayoutMenuContainerId === container.id ? null : container.id
                         )
                       }
-                      className="p-1 text-white/75 hover:text-primary transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
+                      className="p-1 text-[#fafbfc] hover:text-primary hover:bg-white/15 rounded-[2px] transition-colors flex items-center gap-1 text-[11px] cursor-pointer"
                       title="Zmeniť rozloženie stĺpcov"
                     >
-                      <LayoutGrid className="h-3.5 w-3.5" />
+                      <LayoutGrid className="h-3.5 w-3.5 stroke-[2.2]" />
                       <span className="hidden sm:inline">Rozloženie</span>
                     </button>
 
                     {/* Layout Dropdown Menu */}
                     {activeLayoutMenuContainerId === container.id && (
-                      <div className="absolute right-0 top-full mt-1.5 w-56 bg-[#0e161d] border border-white/20 rounded-[var(--brand-radius,6px)] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc]">
+                      <div
+                        className="absolute right-0 top-full mt-1.5 w-56 bg-[#0e161d] border border-white/20 rounded-[var(--brand-radius,6px)] shadow-2xl py-1 z-50 animate-in fade-in zoom-in-95 duration-100 text-[#fafbfc]"
+                        style={{ backgroundColor: "#0e161d" }}
+                      >
                         <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-[#96abbe] border-b border-white/10">
                           Zvoľte mriežku stĺpcov
                         </div>
@@ -909,25 +918,38 @@ export function BuilderCanvas({
                         column.modules.map((mod, mIdx) => (
                           <div
                             key={mod.id}
-                            className="relative group/module border border-border/50 hover:border-border rounded-[var(--brand-radius,8px)] p-3 shadow-2xs space-y-2 transition-all"
+                            className="relative group/module transition-all"
                             style={{
-                              backgroundColor: mod.config?.styleOverrides?.backgroundColor || "var(--card)",
-                              color: mod.config?.styleOverrides?.textColor || "var(--foreground)",
-                              borderColor: mod.config?.styleOverrides?.borderColor || "var(--border)",
+                              ...(mod.config?.styleOverrides?.backgroundColor
+                                ? { backgroundColor: mod.config.styleOverrides.backgroundColor }
+                                : {}),
+                              ...(mod.config?.styleOverrides?.textColor
+                                ? { color: mod.config.styleOverrides.textColor }
+                                : {}),
+                              ...(mod.config?.styleOverrides?.borderColor
+                                ? {
+                                    borderColor: mod.config.styleOverrides.borderColor,
+                                    borderWidth: "1px",
+                                    borderStyle: "solid",
+                                  }
+                                : {}),
                               borderRadius: "var(--brand-radius, 8px)",
                             }}
                           >
                             {/* Module Hover Toolbar (High Contrast Inverted Toolbar) */}
-                            <div className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity bg-[#070b0f] border border-white/20 rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-xl text-white">
+                            <div
+                              className="absolute right-2 top-2 z-30 opacity-0 group-hover/module:opacity-100 transition-opacity border border-white/25 rounded-[var(--brand-radius,6px)] p-1 flex items-center gap-1 shadow-xl text-[#fafbfc]"
+                              style={{ backgroundColor: "#070b0f", color: "#fafbfc" }}
+                            >
                               {/* Move Up */}
                               <button
                                 type="button"
                                 disabled={mIdx === 0}
                                 onClick={() => handleMoveModule(mod.id, "up")}
-                                className="p-1 text-white/75 hover:text-white disabled:opacity-20 transition-colors cursor-pointer"
+                                className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                                 title="Posunúť modul vyššie"
                               >
-                                <ChevronUp className="h-3.5 w-3.5" />
+                                <ChevronUp className="h-3.5 w-3.5 stroke-[2.2]" />
                               </button>
 
                               {/* Move Down */}
@@ -935,10 +957,10 @@ export function BuilderCanvas({
                                 type="button"
                                 disabled={mIdx === column.modules.length - 1}
                                 onClick={() => handleMoveModule(mod.id, "down")}
-                                className="p-1 text-white/75 hover:text-white disabled:opacity-20 transition-colors cursor-pointer"
+                                className="p-1 text-[#fafbfc] hover:text-white hover:bg-white/15 rounded-[2px] disabled:opacity-20 transition-colors cursor-pointer"
                                 title="Posunúť modul nižšie"
                               >
-                                <ChevronDown className="h-3.5 w-3.5" />
+                                <ChevronDown className="h-3.5 w-3.5 stroke-[2.2]" />
                               </button>
 
                               <div className="w-[1px] h-3.5 bg-white/20 my-auto mx-0.5" />
@@ -959,10 +981,10 @@ export function BuilderCanvas({
                                 <button
                                   type="button"
                                   onClick={() => handleOpenLinkModal(mod.id)}
-                                  className="p-1 text-white/70 hover:text-amber-400 transition-colors flex items-center gap-1 text-[10px] cursor-pointer"
+                                  className="p-1 text-[#fafbfc] hover:text-amber-400 hover:bg-white/15 rounded-[2px] transition-colors flex items-center gap-1 text-[10px] cursor-pointer"
                                   title="Zrkadliť tento modul (Linked Sync)"
                                 >
-                                  <Link2 className="h-3.5 w-3.5" />
+                                  <Link2 className="h-3.5 w-3.5 stroke-[2.2]" />
                                 </button>
                               )}
 
@@ -972,20 +994,20 @@ export function BuilderCanvas({
                               <button
                                 type="button"
                                 onClick={() => handleOpenSettings(mod)}
-                                className="p-1 text-white/70 hover:text-primary transition-colors cursor-pointer"
+                                className="p-1 text-[#fafbfc] hover:text-primary hover:bg-white/15 rounded-[2px] transition-colors cursor-pointer"
                                 title="Nastavenia a konfigurácia modulu"
                               >
-                                <Settings2 className="h-3.5 w-3.5" />
+                                <Settings2 className="h-3.5 w-3.5 stroke-[2.2]" />
                               </button>
 
                               {/* Delete Module */}
                               <button
                                 type="button"
                                 onClick={() => handleDeleteModule(mod.id)}
-                                className="p-1 text-white/70 hover:text-rose-400 transition-colors cursor-pointer"
+                                className="p-1 text-[#fafbfc] hover:text-rose-400 hover:bg-white/15 rounded-[2px] transition-colors cursor-pointer"
                                 title="Vymazať modul"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-3.5 w-3.5 stroke-[2.2]" />
                               </button>
                             </div>
 
@@ -1061,8 +1083,14 @@ export function BuilderCanvas({
 
       {/* Linked Sync Modal / Dialog */}
       {linkingModuleId && (
-        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-          <div className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-[#fafbfc]">
+        <div
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
+          <div
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-md p-5 space-y-4 shadow-2xl text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
+          >
             <div className="flex items-center justify-between border-b border-[rgba(63,85,102,0.45)] pb-3">
               <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-amber-400" />
@@ -1159,13 +1187,20 @@ export function BuilderCanvas({
         const moduleCat = moduleOpt?.category || "Modul";
 
         return (
-          <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          >
             <form
               onSubmit={handleSaveSettings}
               className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
+              style={{ backgroundColor: "#0e161d" }}
             >
               {/* Modal Header */}
-              <div className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0 text-[#fafbfc]">
+              <div
+                className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0 text-[#fafbfc]"
+                style={{ backgroundColor: "#17212a" }}
+              >
                 <div className="flex items-center gap-2.5">
                   <div className="p-2 rounded-[var(--brand-radius,4px)] bg-primary/10 border border-primary/20 text-primary">
                     <Settings2 className="h-4 w-4" />
@@ -1194,7 +1229,10 @@ export function BuilderCanvas({
               </div>
 
               {/* Scrollable Modal Content */}
-              <div className="p-5 overflow-y-auto space-y-5 flex-1 bg-[#0e161d]">
+              <div
+                className="p-5 overflow-y-auto space-y-5 flex-1 bg-[#0e161d]"
+                style={{ backgroundColor: "#0e161d" }}
+              >
                 {/* Linked Sync Warning Banner */}
                 {editingModule.linkGroupId && (
                   <div className="p-3 rounded-[2px] bg-amber-950/40 border border-amber-500/40 flex items-start gap-2.5 text-xs text-amber-200">
@@ -2096,7 +2134,10 @@ export function BuilderCanvas({
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-end gap-2.5 shrink-0">
+              <div
+                className="p-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] flex items-center justify-end gap-2.5 shrink-0"
+                style={{ backgroundColor: "#17212a" }}
+              >
                 <Button
                   type="button"
                   variant="ghost"
@@ -2129,10 +2170,19 @@ export function BuilderCanvas({
 
       {/* Module Catalogue Modal */}
       {activeColumnForNewModule && (
-        <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4">
-          <div className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]">
+        <div
+          className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
+          <div
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 duration-150 overflow-hidden text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
+          >
             {/* Modal Header */}
-            <div className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0">
+            <div
+              className="p-4 border-b border-[rgba(63,85,102,0.45)] flex items-center justify-between bg-[#17212a] shrink-0"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div>
                 <h3 className="text-sm font-bold text-[#fafbfc]">
                   Katalóg Modulov (M01 – M25)
@@ -2154,7 +2204,10 @@ export function BuilderCanvas({
             </div>
 
             {/* Modal Category Tabs */}
-            <div className="px-4 py-2 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] flex items-center gap-1.5 overflow-x-auto">
+            <div
+              className="px-4 py-2 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] flex items-center gap-1.5 overflow-x-auto"
+              style={{ backgroundColor: "#17212a" }}
+            >
               {categories.map((cat) => (
                 <button
                   key={cat}
@@ -2172,7 +2225,10 @@ export function BuilderCanvas({
             </div>
 
             {/* Modal Search */}
-            <div className="p-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] relative">
+            <div
+              className="p-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a] relative"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <Search className="h-4 w-4 text-[#96abbe] absolute left-6 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
@@ -2185,7 +2241,10 @@ export function BuilderCanvas({
             </div>
 
             {/* Modal List */}
-            <div className="p-4 overflow-y-auto space-y-2 flex-1 bg-[#0e161d]">
+            <div
+              className="p-4 overflow-y-auto space-y-2 flex-1 bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               <div className="grid sm:grid-cols-2 gap-2.5">
                 {filteredModules.map((m) => (
                   <button

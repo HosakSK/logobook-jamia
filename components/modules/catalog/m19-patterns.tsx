@@ -267,7 +267,7 @@ export default function M19PatternyModule({
               style={{ borderRadius: brandRadius }}
             >
               {/* UPPER PRESENTATION BOX */}
-              <div className="relative border-b border-border/50 bg-[#070b0f] flex flex-col">
+              <div className="relative border-b border-border/50 bg-muted/40 flex flex-col">
                 {/* Top Bar: Tabs & Interactive Tiler Controls */}
                 <div className="px-4 py-2.5 bg-muted/50 border-b border-border/50 flex flex-wrap items-center justify-between gap-3 text-xs">
                   {/* Previews Tabs */}
@@ -290,7 +290,7 @@ export default function M19PatternyModule({
                             className={`px-2.5 py-1 rounded-[2px] font-semibold text-xs transition-colors cursor-pointer ${
                               isTabActive
                                 ? "bg-primary text-primary-foreground shadow-2xs"
-                                : "text-muted-foreground hover:text-foreground bg-neutral-900/40"
+                                : "text-muted-foreground hover:text-foreground bg-muted/60"
                             }`}
                           >
                             {label}

@@ -499,13 +499,19 @@ export default function M18TypografiaModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
-            className="w-full max-w-xl bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
-            style={{ borderRadius: brandRadius }}
+            className="w-full max-w-xl bg-[#0e161d] border border-[rgba(63,85,102,0.65)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Type className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -515,20 +521,23 @@ export default function M18TypografiaModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
+            <div
+              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("font")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "font"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -537,9 +546,9 @@ export default function M18TypografiaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("weights")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "weights"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -548,9 +557,9 @@ export default function M18TypografiaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("hierarchy")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "hierarchy"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -559,7 +568,10 @@ export default function M18TypografiaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div
+              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: FONT SELECTION */}
               {modalTab === "font" && (
                 <div className="space-y-4">
@@ -808,7 +820,10 @@ export default function M18TypografiaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

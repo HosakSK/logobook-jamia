@@ -47,29 +47,29 @@ export default async function BrandBuilderPageDetail({
   const cascadeRes = await getBrandCascadeTokensAction(resolvedBrandId);
 
   return (
-    <BrandCascadeProvider
-      tokens={cascadeRes.tokens}
-      style={cascadeRes.cssVariables as unknown as React.CSSProperties}
-      className="space-y-6"
-    >
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        {/* Left Hierarchical Tree Sidebar */}
-        <BuilderTreeSidebar
-          brandId={brandSlug}
-          currentPageId={pageRes.page.id}
-          currentPageSlug={pageRes.page.slug}
-          pages={pagesRes.pages}
-          tree={pagesRes.tree}
-        />
+    <div className="flex flex-col md:flex-row gap-6 items-start">
+      {/* Left Hierarchical Tree Sidebar (Admin Shell Surface) */}
+      <BuilderTreeSidebar
+        brandId={brandSlug}
+        currentPageId={pageRes.page.id}
+        currentPageSlug={pageRes.page.slug}
+        pages={pagesRes.pages}
+        tree={pagesRes.tree}
+      />
 
-        {/* Center Live Canvas */}
+      {/* Center Live Canvas wrapped in Brand Cascade Provider */}
+      <BrandCascadeProvider
+        tokens={cascadeRes.tokens}
+        style={cascadeRes.cssVariables as unknown as React.CSSProperties}
+        className="flex-1 w-full max-w-5xl"
+      >
         <BuilderCanvas
           brandId={resolvedBrandId}
           brandSlug={brandSlug}
           page={pageRes.page}
           allPages={pagesRes.pages}
         />
-      </div>
-    </BrandCascadeProvider>
+      </BrandCascadeProvider>
+    </div>
   );
 }

@@ -378,13 +378,19 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
 
       {/* ADMIN SETTINGS MODAL (Pencil Hell Free) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
-            className="w-full max-w-lg bg-[#0e161d] border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
-            style={{ borderRadius: brandRadius }}
+            className="w-full max-w-lg bg-[#0e161d] border border-[rgba(63,85,102,0.65)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -394,14 +400,17 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-5 text-xs">
+            <div
+              className="p-5 overflow-y-auto space-y-5 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* Checkboxes for systems */}
               <div className="space-y-2.5">
                 <span className="font-semibold text-[#fafbfc] text-xs block">
@@ -469,7 +478,10 @@ export default function M17UniverzalnaEdukativnaTabulkaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

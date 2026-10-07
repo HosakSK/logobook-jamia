@@ -428,7 +428,7 @@ export default function M25KniznicaIkonModule({
 
           {/* Color Switcher Bar */}
           {parsedConfig.showColorPicker && (
-            <div className="flex items-center gap-2 bg-neutral-900/40 border border-border/40 px-2.5 py-1.5 rounded-md self-start sm:self-auto overflow-x-auto max-w-full">
+            <div className="flex items-center gap-2 bg-muted/50 border border-border/40 px-2.5 py-1.5 rounded-md self-start sm:self-auto overflow-x-auto max-w-full">
               <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap flex items-center gap-1">
                 <Palette className="w-3 h-3 text-primary" />
                 Farba:
@@ -669,14 +669,19 @@ function IconDetailModal({
   return (
     <div
       className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
       onClick={onClose}
     >
       <div
         className="bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,8px)] shadow-2xl max-w-lg w-full overflow-hidden text-[#fafbfc] space-y-0"
+        style={{ backgroundColor: "#0e161d" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+        <div
+          className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <Sparkles className="w-4 h-4" />
@@ -695,7 +700,10 @@ function IconDetailModal({
         </div>
 
         {/* Big Preview Area with Background Selector */}
-        <div className="p-6 space-y-4 bg-[#0e161d]">
+        <div
+          className="p-6 space-y-4 bg-[#0e161d]"
+          style={{ backgroundColor: "#0e161d" }}
+        >
           <div className="relative rounded-lg overflow-hidden border border-[rgba(63,85,102,0.45)] flex items-center justify-center h-48 select-none">
             {/* Background Layer */}
             <div
@@ -999,14 +1007,19 @@ function AdminIconLibraryModal({
   return (
     <div
       className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
       onClick={onClose}
     >
       <div
         className="bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,8px)] shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden text-[#fafbfc]"
+        style={{ backgroundColor: "#0e161d" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <div className="flex items-center gap-2">
             <Settings2 className="w-5 h-5 text-primary" />
             <h3 className="text-base font-bold text-[#fafbfc]">Správa Knižnice ikon (M25)</h3>
@@ -1020,7 +1033,10 @@ function AdminIconLibraryModal({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 px-6 pt-3 border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f]">
+        <div
+          className="flex items-center gap-2 px-6 pt-3 border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f]"
+          style={{ backgroundColor: "#070b0f" }}
+        >
           <button
             onClick={() => setActiveTab("bulk")}
             className={`px-3 py-2 text-xs font-medium border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -1057,7 +1073,10 @@ function AdminIconLibraryModal({
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0e161d]">
+        <div
+          className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#0e161d]"
+          style={{ backgroundColor: "#0e161d" }}
+        >
           {/* TAB 1: BULK DROP */}
           {activeTab === "bulk" && (
             <div className="space-y-6">
@@ -1336,7 +1355,10 @@ function AdminIconLibraryModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <span className="text-xs text-[#96abbe] font-mono">
             {icons.length} {icons.length === 1 ? "ikona" : "ikon"} v knižnici
           </span>

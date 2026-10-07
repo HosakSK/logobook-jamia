@@ -227,7 +227,7 @@ export default function M04RazcestnikModule({
   const getButtonStyle = (style?: "primary" | "secondary" | "outline" | "ghost") => {
     switch (style) {
       case "secondary":
-        return "bg-neutral-800 text-foreground hover:bg-neutral-700 border border-border/80";
+        return "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border";
       case "outline":
         return "bg-transparent text-foreground border border-border hover:border-primary hover:text-primary";
       case "ghost":
@@ -373,7 +373,7 @@ export default function M04RazcestnikModule({
           // Card inner content
           const CardContent = (
             <div
-              className={`group/card relative flex flex-col justify-between overflow-hidden bg-card/60 hover:bg-card/90 border border-border/50 hover:border-primary/60 transition-all duration-200 shadow-2xs hover:shadow-lg hover:-translate-y-1 h-full ${
+              className={`group/card relative flex flex-col justify-between overflow-hidden bg-card border border-border hover:border-primary/60 transition-all duration-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 h-full ${
                 hasValidHref ? "cursor-pointer" : ""
               }`}
               style={{
@@ -393,7 +393,7 @@ export default function M04RazcestnikModule({
             >
               {/* Card Image (16:9 aspect ratio) */}
               {card.imageUrl ? (
-                <div className="aspect-video w-full overflow-hidden bg-neutral-950/60 relative">
+                <div className="aspect-video w-full overflow-hidden bg-muted/40 relative">
                   <img
                     src={card.imageUrl}
                     alt={cardTitle}
@@ -402,7 +402,7 @@ export default function M04RazcestnikModule({
                   />
                 </div>
               ) : (
-                <div className="aspect-video w-full flex items-center justify-center bg-neutral-950/40 text-muted-foreground/40 border-b border-border/20">
+                <div className="aspect-video w-full flex items-center justify-center bg-muted/30 text-muted-foreground/60 border-b border-border/20">
                   <ImageIcon className="h-8 w-8" />
                 </div>
               )}

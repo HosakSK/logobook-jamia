@@ -705,15 +705,15 @@ export function BuilderTreeSidebar({
   };
 
   return (
-    <aside className="w-full md:w-72 bg-card/70 border border-border/50 rounded-[3px] p-4 flex flex-col gap-4 shadow-2xs">
+    <aside className="w-full md:w-72 bg-[#17212a] border border-white/10 rounded-[6px] p-4 flex flex-col gap-4 shadow-sm text-[#fafbfc]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-border/40">
+      <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <div className="flex items-center gap-2">
           <FolderTree className="h-4 w-4 text-primary" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-foreground">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[#fafbfc]">
             Strom Stránok
           </h2>
-          <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.2 rounded-full bg-neutral-900 border border-border/40">
+          <span className="text-[10px] font-mono text-[#96abbe] px-1.5 py-0.2 rounded-full bg-[#070b0f] border border-white/10">
             {pages.length}
           </span>
           {isUpdatingTree && (

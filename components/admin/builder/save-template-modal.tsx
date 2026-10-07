@@ -75,14 +75,19 @@ export function SaveTemplateModal({
   return (
     <div
       className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
       onClick={onClose}
     >
       <div
         className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-lg w-full overflow-hidden text-[#fafbfc] space-y-0"
+        style={{ backgroundColor: "#0e161d" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <div className="flex items-center gap-2">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <BookmarkPlus className="w-5 h-5" />

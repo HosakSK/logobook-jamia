@@ -294,7 +294,7 @@ export default function M08OchrannaZonaLogaModule({
                     height: `${circleDiameterPx}px`,
                   }}
                 >
-                  <span className="text-[10px] font-mono font-bold text-sky-400 bg-[#070b0f] px-1.5 py-0.5 rounded border border-sky-400/50 -translate-y-1/2 shadow-xs">
+                  <span className="text-[10px] font-mono font-bold text-sky-500 dark:text-sky-400 bg-card px-1.5 py-0.5 rounded border border-sky-400/50 -translate-y-1/2 shadow-xs">
                     R = +{circPct}%
                   </span>
                 </div>
@@ -310,16 +310,16 @@ export default function M08OchrannaZonaLogaModule({
                   }}
                 >
                   {/* Top Measurement Callout (Percentage of width/height) */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-[#070b0f] px-2 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
-                    <ArrowLeftRight className="w-3 h-3" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 bg-card px-2 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-foreground shadow-xs">
+                    <ArrowLeftRight className="w-3 h-3 text-primary" />
                     <span>
                       {rectPct}% ({cfg.zones.rectangular.dimension === "width" ? "šírka" : "výška"})
                     </span>
                   </div>
 
                   {/* Right Edge Measurement Callout */}
-                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 flex items-center gap-0.5 bg-[#070b0f] px-1.5 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-primary shadow-xs">
-                    <ArrowUpDown className="w-3 h-3" />
+                  <div className="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 flex items-center gap-0.5 bg-card px-1.5 py-0.5 rounded border border-primary/50 text-[10px] font-mono font-bold text-foreground shadow-xs">
+                    <ArrowUpDown className="w-3 h-3 text-primary" />
                     <span>{rectPct}%</span>
                   </div>
 
@@ -374,13 +374,19 @@ export default function M08OchrannaZonaLogaModule({
 
       {/* Settings Modal (Percentages & Sliders, Logo Source, Custom Diagram) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
             className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
-            style={{ borderRadius: brandRadius }}
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -397,7 +403,10 @@ export default function M08OchrannaZonaLogaModule({
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
+            <div
+              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("zones")}
@@ -434,7 +443,10 @@ export default function M08OchrannaZonaLogaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: PERCENTAGES & SLIDERS */}
               {modalTab === "zones" && (
                 <div className="space-y-4">
@@ -726,7 +738,10 @@ export default function M08OchrannaZonaLogaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

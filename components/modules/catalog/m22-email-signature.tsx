@@ -1041,10 +1041,19 @@ export default function M22EmailPodpisModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
+          <div
+            className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Settings2 className="w-5 h-5 text-primary" />
                 <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
@@ -1054,20 +1063,23 @@ export default function M22EmailPodpisModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
+            <div
+              className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 gap-2 pt-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("templates")}
-                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   modalTab === "templates"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -1103,7 +1115,10 @@ export default function M22EmailPodpisModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: 7 TEMPLATES SELECTOR */}
               {modalTab === "templates" && (
                 <div className="space-y-4">
@@ -1437,7 +1452,10 @@ export default function M22EmailPodpisModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

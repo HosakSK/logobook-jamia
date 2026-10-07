@@ -122,6 +122,7 @@ export function BrandCascadeProvider({
         className={className}
         style={combinedStyle}
         data-theme={tokens.theme?.isDark ? "dark" : "light"}
+        data-context="logobook"
       >
         {children}
       </Component>

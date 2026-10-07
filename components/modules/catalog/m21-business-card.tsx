@@ -169,15 +169,27 @@ function FormatBadge({ format }: { format: M21DownloadFormat }) {
 function BusinessCardMockupFallback({
   side,
   productType,
+  isDark = true,
 }: {
   side: "face" | "back";
   productType: M21ProductType;
+  isDark?: boolean;
 }) {
+  const logoSymbol = isDark ? "/logo/logo-symbol-light.svg" : "/logo/logo-symbol-dark.svg";
+
   if (side === "face") {
     return (
-      <div className="w-full h-full bg-[#111922] p-6 flex flex-col justify-between select-none relative overflow-hidden">
+      <div
+        className={`w-full h-full p-6 flex flex-col justify-between select-none relative overflow-hidden ${
+          isDark ? "bg-[#111922] text-white" : "bg-white text-[#0e161d]"
+        }`}
+      >
         {/* Subtle geometric background line */}
-        <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full border border-white/5 pointer-events-none" />
+        <div
+          className={`absolute -right-10 -bottom-10 w-44 h-44 rounded-full border pointer-events-none ${
+            isDark ? "border-white/5" : "border-black/5"
+          }`}
+        />
         <div className="flex items-center justify-between z-10">
           <span className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
             {productType === "business_card" ? "Corporate Identity" : "Print Collateral"}
@@ -187,12 +199,16 @@ function BusinessCardMockupFallback({
 
         <div className="flex items-center gap-3 z-10">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSymbol}
             alt="Logo Symbol"
-            className="w-10 h-10 object-contain drop-shadow-md"
+            className="w-10 h-10 object-contain drop-shadow-xs"
           />
           <div>
-            <span className="text-base font-bold text-white tracking-tight block">
+            <span
+              className={`text-base font-bold tracking-tight block ${
+                isDark ? "text-white" : "text-[#0e161d]"
+              }`}
+            >
               Logobook
             </span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest block">
@@ -211,39 +227,59 @@ function BusinessCardMockupFallback({
 
   // Back side
   return (
-    <div className="w-full h-full bg-[#0a0f14] p-6 flex flex-col justify-between select-none relative overflow-hidden">
-      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+    <div
+      className={`w-full h-full p-6 flex flex-col justify-between select-none relative overflow-hidden ${
+        isDark ? "bg-[#0a0f14] text-white" : "bg-[#f1f4f7] text-[#0e161d]"
+      }`}
+    >
+      <div
+        className={`flex items-center justify-between border-b pb-3 ${
+          isDark ? "border-white/10" : "border-black/10"
+        }`}
+      >
         <div>
-          <span className="text-xs font-bold text-white tracking-tight block">
+          <span
+            className={`text-xs font-bold tracking-tight block ${
+              isDark ? "text-white" : "text-[#0e161d]"
+            }`}
+          >
             Alexandr Horváth
           </span>
-          <span className="text-[10px] text-primary tracking-wide block">
+          <span className="text-[10px] text-primary tracking-wide block font-semibold">
             Brand Identity Designer
           </span>
         </div>
         <img
-          src="/logo/logo-symbol-light.svg"
+          src={logoSymbol}
           alt="Symbol"
-          className="w-6 h-6 object-contain opacity-70"
+          className="w-6 h-6 object-contain opacity-80"
         />
       </div>
 
-      <div className="space-y-1 text-[11px] text-neutral-300 font-mono">
+      <div
+        className={`space-y-1 text-[11px] font-mono ${
+          isDark ? "text-neutral-300" : "text-neutral-700"
+        }`}
+      >
         <div className="flex items-center justify-between">
-          <span className="text-neutral-500">M:</span>
+          <span className="text-muted-foreground">M:</span>
           <span>+421 900 123 456</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-neutral-500">E:</span>
+          <span className="text-muted-foreground">E:</span>
           <span>alex@logobook.sk</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-neutral-500">W:</span>
+          <span className="text-muted-foreground">W:</span>
           <span>logobook.sk</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[9px] font-mono text-muted-foreground pt-2 border-t border-white/5">
+      <div
+        className={`flex items-center justify-between text-[9px] font-mono pt-2 border-t ${
+          isDark ? "border-white/5 text-muted-foreground" : "border-black/5 text-muted-foreground"
+        }`}
+      >
         <span>Verified Corporate Template</span>
         <span>CMYK 4/4</span>
       </div>
@@ -261,8 +297,9 @@ export default function M21FiremnaVizitkaModule({
   isEditor = false,
   onConfigChange,
 }: ModuleRenderProps<BaseModuleConfig>) {
-  const { resolveRadius, resolveStyles } = useBrandCascade();
+  const { tokens, resolveRadius, resolveStyles } = useBrandCascade();
   const brandRadius = resolveRadius();
+  const isManualDark = tokens.theme?.isDark ?? true;
   const params = useParams();
   const brandId = (params?.brandId as string) || "";
 
@@ -503,13 +540,14 @@ export default function M21FiremnaVizitkaModule({
         {/* ======================================================== */}
         <div className="lg:col-span-7 flex flex-col items-center space-y-5">
           {/* Card Presentation Stage */}
-          <div className="w-full bg-[#0a0f14] border border-border/50 rounded-xl p-6 sm:p-10 flex flex-col items-center justify-center relative overflow-hidden shadow-inner min-h-[320px] sm:min-h-[400px]">
+          <div className="w-full bg-muted/30 border border-border/50 rounded-xl p-6 sm:p-10 flex flex-col items-center justify-center relative overflow-hidden shadow-inner min-h-[320px] sm:min-h-[400px]">
             {/* Stage background grid */}
             <div
-              className="absolute inset-0 opacity-20 pointer-events-none"
+              className="absolute inset-0 opacity-15 pointer-events-none"
               style={{
-                backgroundImage:
-                  "radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px)",
+                backgroundImage: isManualDark
+                  ? "radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px)"
+                  : "radial-gradient(circle, rgba(14, 22, 29, 0.12) 1px, transparent 1px)",
                 backgroundSize: "20px 20px",
               }}
             />
@@ -538,7 +576,7 @@ export default function M21FiremnaVizitkaModule({
               >
                 {/* 1. FRONT FACE */}
                 <div
-                  className="absolute inset-0 w-full h-full overflow-hidden border border-white/10 rounded-md shadow-xl bg-[#17212a]"
+                  className="absolute inset-0 w-full h-full overflow-hidden border border-border/60 rounded-md shadow-xl bg-card"
                   style={{
                     backfaceVisibility: "hidden",
                     borderRadius: brandRadius,
@@ -554,6 +592,7 @@ export default function M21FiremnaVizitkaModule({
                     <BusinessCardMockupFallback
                       side="face"
                       productType={cfg.productType}
+                      isDark={isManualDark}
                     />
                   )}
 
@@ -588,7 +627,7 @@ export default function M21FiremnaVizitkaModule({
 
                 {/* 2. BACK FACE */}
                 <div
-                  className="absolute inset-0 w-full h-full overflow-hidden border border-white/10 rounded-md shadow-xl bg-[#17212a]"
+                  className="absolute inset-0 w-full h-full overflow-hidden border border-border/60 rounded-md shadow-xl bg-card"
                   style={{
                     backfaceVisibility: "hidden",
                     transform: "rotateY(180deg)",
@@ -605,6 +644,7 @@ export default function M21FiremnaVizitkaModule({
                     <BusinessCardMockupFallback
                       side="back"
                       productType={cfg.productType}
+                      isDark={isManualDark}
                     />
                   )}
 

@@ -149,15 +149,20 @@ export function TemplateBrowserModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
       onClick={onClose}
     >
       <div
-        className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-[#fafbfc]"
+        className="border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden text-[#fafbfc]"
+        style={{ backgroundColor: "#0e161d" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] text-[#fafbfc]">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-[rgba(63,85,102,0.45)] text-[#fafbfc]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-md bg-primary/10 text-primary">
               <LayoutTemplate className="w-5 h-5" />
@@ -178,7 +183,10 @@ export function TemplateBrowserModal({
         </div>
 
         {/* Navigation Tabs (System vs Personal) */}
-        <div className="flex items-center justify-between px-6 pt-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a]">
+        <div
+          className="flex items-center justify-between px-6 pt-3 border-b border-[rgba(63,85,102,0.35)] bg-[#17212a]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -224,7 +232,10 @@ export function TemplateBrowserModal({
 
         {/* Category Filter Pills */}
         {availableCategories.length > 0 && (
-          <div className="px-6 py-2.5 border-b border-[rgba(63,85,102,0.35)] flex items-center gap-1.5 overflow-x-auto text-xs bg-[#17212a]">
+          <div
+            className="px-6 py-2.5 border-b border-[rgba(63,85,102,0.35)] flex items-center gap-1.5 overflow-x-auto text-xs bg-[#17212a]"
+            style={{ backgroundColor: "#17212a" }}
+          >
             <button
               onClick={() => setSelectedCategory("all")}
               className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
@@ -252,7 +263,10 @@ export function TemplateBrowserModal({
         )}
 
         {/* Body Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0e161d]">
+        <div
+          className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0e161d]"
+          style={{ backgroundColor: "#0e161d" }}
+        >
           {error && (
             <div className="p-3 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -381,7 +395,10 @@ export function TemplateBrowserModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] text-xs text-[#96abbe]">
+        <div
+          className="flex items-center justify-between px-6 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a] text-xs text-[#96abbe]"
+          style={{ backgroundColor: "#17212a" }}
+        >
           <span>
             Zobrazených <strong className="text-[#fafbfc]">{filteredTemplates.length}</strong> šablón
           </span>
@@ -398,10 +415,12 @@ export function TemplateBrowserModal({
       {selectedTemplateForApply && (
         <div
           className="fixed inset-0 z-60 bg-black/85 flex items-center justify-center p-4 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
           onClick={() => setSelectedTemplateForApply(null)}
         >
           <div
             className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-xl shadow-2xl max-w-md w-full p-6 text-[#fafbfc] space-y-4"
+            style={{ backgroundColor: "#0e161d" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">

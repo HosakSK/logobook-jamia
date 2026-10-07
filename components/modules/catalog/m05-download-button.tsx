@@ -452,13 +452,19 @@ export default function M05DownloadTlacidloModule({
 
       {/* Settings Modal (Link Picker, Icon Picker, Custom Colors) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
             className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
-            style={{ borderRadius: brandRadius }}
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -475,7 +481,10 @@ export default function M05DownloadTlacidloModule({
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
+            <div
+              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("link")}
@@ -514,7 +523,10 @@ export default function M05DownloadTlacidloModule({
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: LINK PICKER */}
               {modalTab === "link" && (
                 <div className="space-y-4">
@@ -982,7 +994,10 @@ export default function M05DownloadTlacidloModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

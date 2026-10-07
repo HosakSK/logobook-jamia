@@ -428,13 +428,19 @@ export default function M12KartaFarbyModule({
 
       {/* SETTINGS MODAL */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
-            className="bg-[#0e161d] border border-white/20 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-            style={{ borderRadius: brandRadius }}
+            className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -444,20 +450,23 @@ export default function M12KartaFarbyModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-white/10 transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-white/10 bg-[#070b0f] px-5 pt-2 gap-2">
+            <div
+              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("colors")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "colors"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -466,9 +475,9 @@ export default function M12KartaFarbyModule({
               <button
                 type="button"
                 onClick={() => setModalTab("systems")}
-                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors ${
+                className={`pb-2 px-3 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
                   modalTab === "systems"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -477,7 +486,10 @@ export default function M12KartaFarbyModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs">
+            <div
+              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: SELECT COLOR */}
               {modalTab === "colors" && (
                 <div className="space-y-3">
@@ -580,7 +592,10 @@ export default function M12KartaFarbyModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-white/10 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

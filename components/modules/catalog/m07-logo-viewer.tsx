@@ -395,7 +395,7 @@ export default function M07ZobrazenieLogaModule({
               <button
                 type="button"
                 onClick={handleCopySvg}
-                className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-1 rounded-[3px] bg-[#070b0f]/85 hover:bg-black text-foreground border border-border/60 text-[11px] font-medium backdrop-blur-xs transition-all shadow-sm"
+                className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-1 rounded-[3px] bg-[#070b0f] hover:bg-[#17212a] text-[#fafbfc] border border-white/20 text-[11px] font-medium transition-all shadow-sm"
                 title="Kopírovať SVG kód do schránky"
               >
                 {copiedSvg ? (
@@ -405,7 +405,7 @@ export default function M07ZobrazenieLogaModule({
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Copy className="w-3.5 h-3.5 text-white/70" />
                     <span>Kopírovať SVG</span>
                   </>
                 )}
@@ -439,7 +439,7 @@ export default function M07ZobrazenieLogaModule({
             {cfg.formats.map((fmt) => {
               const badge = FORMAT_BADGES[fmt.format] || {
                 label: `.${fmt.format}`,
-                colorClass: "bg-neutral-800 text-foreground border-border",
+                colorClass: "bg-muted text-foreground border-border",
               };
               const description =
                 resolveI18nText(fmt.customDescription, locale) ||
@@ -533,13 +533,19 @@ export default function M07ZobrazenieLogaModule({
 
       {/* Admin Settings Modal (Tabs: Preview, Formats & Bulk, Meta for M11) */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
           <div
             className="bg-[#0e161d] border border-[rgba(63,85,102,0.65)] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-[#fafbfc]"
-            style={{ borderRadius: brandRadius }}
+            style={{ backgroundColor: "#0e161d", borderRadius: brandRadius }}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Settings2 className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-[#fafbfc]">
@@ -556,7 +562,10 @@ export default function M07ZobrazenieLogaModule({
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2">
+            <div
+              className="flex border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 pt-2 gap-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("preview")}
@@ -593,7 +602,10 @@ export default function M07ZobrazenieLogaModule({
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-4 text-xs bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: PREVIEW SETTINGS */}
               {modalTab === "preview" && (
                 <div className="space-y-4">
@@ -1003,7 +1015,10 @@ export default function M07ZobrazenieLogaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-border/60 bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

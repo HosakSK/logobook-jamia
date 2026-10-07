@@ -35,6 +35,7 @@ import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandAssetsAction } from "@/actions/assets";
 import { uploadMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
+import { getWcagContrast } from "@/lib/utils/color-calc";
 
 /**
  * High-fidelity fallback SVG graphics for default rules if custom image is not yet uploaded
@@ -42,17 +43,21 @@ import { BrandAsset } from "@/lib/types/asset";
 function DefaultRuleGraphic({
   type,
   ruleId,
+  isDark = true,
 }: {
   type: M20ItemType;
   ruleId: string;
+  isDark?: boolean;
 }) {
+  const logoSrc = isDark ? "/logo/logo-symbol-light.svg" : "/logo/logo-symbol-dark.svg";
+
   if (ruleId === "rule-1" || type === "dont") {
     // Distorted logo representation with stretch guides
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full p-6 select-none">
         {/* Subtle grid lines in background */}
         <div className="absolute inset-4 border border-dashed border-red-500/20 rounded pointer-events-none flex items-center justify-center">
-          <span className="absolute -top-2.5 bg-[#0e161d] px-2 text-[10px] font-mono text-red-400">
+          <span className="absolute -top-2.5 bg-card px-2 text-[10px] font-mono text-red-500 font-bold border border-red-500/30 rounded-xs">
             PROPORTION LOCK BROKEN
           </span>
         </div>
@@ -60,14 +65,14 @@ function DefaultRuleGraphic({
         {/* Distorted symbol */}
         <div className="transform scale-x-[1.65] scale-y-[0.7] transition-transform">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSrc}
             alt="Distorted Mark"
             className="w-20 h-20 object-contain opacity-80"
           />
         </div>
 
         {/* Stretch arrows */}
-        <div className="absolute inset-x-8 flex justify-between items-center text-red-400 text-xs font-mono">
+        <div className="absolute inset-x-8 flex justify-between items-center text-red-500 text-xs font-mono font-bold">
           <span>&larr; stretch</span>
           <span>stretch &rarr;</span>
         </div>
@@ -81,12 +86,12 @@ function DefaultRuleGraphic({
       <div className="relative flex flex-col items-center justify-center w-full h-full p-6 select-none">
         <div className="relative filter hue-rotate-180 contrast-125 saturate-200">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSrc}
             alt="Unapproved Colors"
             className="w-20 h-20 object-contain"
           />
         </div>
-        <div className="absolute bottom-3 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-[10px] font-mono text-red-400">
+        <div className="absolute bottom-3 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-[10px] font-mono text-red-500 font-bold">
           UNAPPROVED PALETTE
         </div>
       </div>
@@ -99,12 +104,12 @@ function DefaultRuleGraphic({
       <div className="relative flex flex-col items-center justify-center w-full h-full p-6 select-none">
         <div className="filter grayscale contrast-200 opacity-90">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSrc}
             alt="Monochrome Mark"
             className="w-20 h-20 object-contain"
           />
         </div>
-        <div className="absolute bottom-3 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-400">
+        <div className="absolute bottom-3 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-500 font-bold">
           1-COLOR RESTRICTED
         </div>
       </div>
@@ -116,12 +121,12 @@ function DefaultRuleGraphic({
     <div className="relative flex flex-col items-center justify-center w-full h-full p-6 select-none">
       <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
         <img
-          src="/logo/logo-symbol-light.svg"
+          src={logoSrc}
           alt="Approved Mark"
           className="w-20 h-20 object-contain"
         />
       </div>
-      <div className="absolute bottom-3 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-400">
+      <div className="absolute bottom-3 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
         APPROVED CLEARSPACE & CONTRAST
       </div>
     </div>
@@ -138,8 +143,9 @@ export default function M20DosAndDontsModule({
   isEditor = false,
   onConfigChange,
 }: ModuleRenderProps<BaseModuleConfig>) {
-  const { resolveRadius, resolveColor, resolveStyles } = useBrandCascade();
+  const { tokens, resolveRadius, resolveColor, resolveStyles } = useBrandCascade();
   const brandRadius = resolveRadius();
+  const isManualDark = tokens.theme?.isDark ?? true;
   const params = useParams();
   const brandId = (params?.brandId as string) || "";
 
@@ -305,27 +311,53 @@ export default function M20DosAndDontsModule({
       case "dark":
         return { backgroundColor: "#0e161d" };
       case "checkerboard":
-        return {
-          backgroundColor: "#0e161d",
-          backgroundImage:
-            "linear-gradient(45deg, #17212a 25%, transparent 25%), linear-gradient(-45deg, #17212a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #17212a 75%), linear-gradient(-45deg, transparent 75%, #17212a 75%)",
-          backgroundSize: "16px 16px",
-          backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
-        };
+        return isManualDark
+          ? {
+              backgroundColor: "#0e161d",
+              backgroundImage:
+                "linear-gradient(45deg, #17212a 25%, transparent 25%), linear-gradient(-45deg, #17212a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #17212a 75%), linear-gradient(-45deg, transparent 75%, #17212a 75%)",
+              backgroundSize: "16px 16px",
+              backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
+            }
+          : {
+              backgroundColor: "#fafbfc",
+              backgroundImage:
+                "linear-gradient(45deg, #eef2f6 25%, transparent 25%), linear-gradient(-45deg, #eef2f6 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eef2f6 75%), linear-gradient(-45deg, transparent 75%, #eef2f6 75%)",
+              backgroundSize: "16px 16px",
+              backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
+            };
       case "custom":
         if (item.customBgHex) {
           return { backgroundColor: `#${item.customBgHex.replace(/^#/, "")}` };
         }
-        return { backgroundColor: "#0e161d" };
+        return isManualDark ? { backgroundColor: "#0e161d" } : { backgroundColor: "var(--muted, #f1f4f7)" };
       case "auto":
       default:
-        return {
-          backgroundColor: "#0e161d",
-          backgroundImage:
-            "radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px)",
-          backgroundSize: "16px 16px",
-        };
+        return isManualDark
+          ? {
+              backgroundColor: "#0e161d",
+              backgroundImage:
+                "radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px)",
+              backgroundSize: "16px 16px",
+            }
+          : {
+              backgroundColor: "var(--muted, #f1f4f7)",
+              backgroundImage:
+                "radial-gradient(circle, rgba(14, 22, 29, 0.08) 1px, transparent 1px)",
+              backgroundSize: "16px 16px",
+            };
     }
+  };
+
+  const isCardDark = (item: M20RuleItem): boolean => {
+    const bgMode = item.background === "auto" ? cfg.defaultBackground : item.background;
+    if (bgMode === "light") return false;
+    if (bgMode === "dark") return true;
+    if (bgMode === "custom" && item.customBgHex) {
+      const contrast = getWcagContrast(item.customBgHex);
+      return contrast.preferredText === "white";
+    }
+    return isManualDark;
   };
 
   // Grouped items for minimalist text view
@@ -499,6 +531,9 @@ export default function M20DosAndDontsModule({
             const badgePositionClass =
               cfg.badgePosition === "top-right" ? "top-3 right-3" : "top-3 left-3";
 
+            const badgeContrast = getWcagContrast(badgeBg);
+            const badgeTextColor = badgeContrast.preferredText === "white" ? "#fafbfc" : "#070b0f";
+
             return (
               <div
                 key={item.id}
@@ -516,13 +551,13 @@ export default function M20DosAndDontsModule({
                   >
                     <div
                       className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ring-2 ring-black/40 transition-transform"
-                      style={{ backgroundColor: badgeBg }}
+                      style={{ backgroundColor: badgeBg, color: badgeTextColor }}
                     >
                       {badgeIcon}
                     </div>
                     <span
-                      className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-[2px] text-white tracking-wider shadow-sm ring-1 ring-black/20"
-                      style={{ backgroundColor: badgeBg }}
+                      className="text-[10px] font-black uppercase px-1.5 py-0.5 rounded-[2px] tracking-wider shadow-sm ring-1 ring-black/20"
+                      style={{ backgroundColor: badgeBg, color: badgeTextColor }}
                     >
                       {badgeLabel}
                     </span>
@@ -536,7 +571,7 @@ export default function M20DosAndDontsModule({
                       className="max-w-[78%] max-h-[75%] object-contain drop-shadow-sm select-none transition-transform duration-300"
                     />
                   ) : (
-                    <DefaultRuleGraphic type={item.type} ruleId={item.id} />
+                    <DefaultRuleGraphic type={item.type} ruleId={item.id} isDark={isCardDark(item)} />
                   )}
                 </div>
 

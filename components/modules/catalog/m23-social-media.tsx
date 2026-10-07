@@ -114,20 +114,31 @@ function FormatBadge({ format }: { format: M23DownloadFormat }) {
  */
 function SocialFormatFallbackMockup({
   item,
+  isDark = true,
 }: {
   item: M23FormatItem;
+  isDark?: boolean;
 }) {
   const { type, platform, dimensions } = item;
+  const logoSymbol = isDark ? "/logo/logo-symbol-light.svg" : "/logo/logo-symbol-dark.svg";
 
   // 1. AVATAR FALLBACK
   if (type === "avatar") {
     return (
-      <div className="w-full h-full bg-[#111922] flex flex-col items-center justify-center p-6 select-none relative overflow-hidden">
-        <div className="w-24 h-24 rounded-full bg-[#17212a] border border-white/10 flex items-center justify-center shadow-lg relative">
+      <div
+        className={`w-full h-full flex flex-col items-center justify-center p-6 select-none relative overflow-hidden ${
+          isDark ? "bg-[#111922] text-white" : "bg-muted/30 text-[#0e161d]"
+        }`}
+      >
+        <div
+          className={`w-24 h-24 rounded-full border flex items-center justify-center shadow-lg relative ${
+            isDark ? "bg-[#17212a] border-white/10" : "bg-card border-border/80"
+          }`}
+        >
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSymbol}
             alt="Brand Avatar"
-            className="w-14 h-14 object-contain drop-shadow-md"
+            className="w-14 h-14 object-contain drop-shadow-xs"
           />
         </div>
         <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mt-3">
@@ -140,24 +151,44 @@ function SocialFormatFallbackMockup({
   // 2. STORY / REEL (9:16)
   if (type === "story") {
     return (
-      <div className="w-full h-full bg-[#0a0f14] p-5 flex flex-col justify-between select-none relative overflow-hidden">
+      <div
+        className={`w-full h-full p-5 flex flex-col justify-between select-none relative overflow-hidden ${
+          isDark ? "bg-[#0a0f14] text-white" : "bg-white text-[#0e161d]"
+        }`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#17212a] p-1 border border-white/10 flex items-center justify-center">
-              <img src="/logo/logo-symbol-light.svg" alt="Icon" className="w-4 h-4 object-contain" />
+            <div
+              className={`w-6 h-6 rounded-full p-1 border flex items-center justify-center ${
+                isDark ? "bg-[#17212a] border-white/10" : "bg-muted border-border/60"
+              }`}
+            >
+              <img src={logoSymbol} alt="Icon" className="w-4 h-4 object-contain" />
             </div>
-            <span className="text-xs font-bold text-white tracking-tight">Logobook</span>
+            <span
+              className={`text-xs font-bold tracking-tight ${
+                isDark ? "text-white" : "text-[#0e161d]"
+              }`}
+            >
+              Logobook
+            </span>
           </div>
           <span className="text-[9px] font-mono text-muted-foreground">9:16</span>
         </div>
 
         <div className="my-auto text-center space-y-2">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSymbol}
             alt="Story Symbol"
             className="w-14 h-14 object-contain mx-auto opacity-80"
           />
-          <span className="text-sm font-bold text-white block">Story & Reel Cover</span>
+          <span
+            className={`text-sm font-bold block ${
+              isDark ? "text-white" : "text-[#0e161d]"
+            }`}
+          >
+            Story & Reel Cover
+          </span>
           <span className="text-[10px] text-muted-foreground block font-mono">
             {dimensions.width} × {dimensions.height} px
           </span>
@@ -175,15 +206,23 @@ function SocialFormatFallbackMockup({
   // 3. COVER / BANNER
   if (type === "cover") {
     return (
-      <div className="w-full h-full bg-[#111922] p-5 flex items-center justify-between select-none relative overflow-hidden">
+      <div
+        className={`w-full h-full p-5 flex items-center justify-between select-none relative overflow-hidden ${
+          isDark ? "bg-[#111922] text-white" : "bg-[#f1f4f7] text-[#0e161d]"
+        }`}
+      >
         <div className="flex items-center gap-3 z-10">
           <img
-            src="/logo/logo-symbol-light.svg"
+            src={logoSymbol}
             alt="Logo"
-            className="w-10 h-10 object-contain drop-shadow-md"
+            className="w-10 h-10 object-contain drop-shadow-xs"
           />
           <div>
-            <span className="text-sm font-bold text-white block tracking-tight">
+            <span
+              className={`text-sm font-bold block tracking-tight ${
+                isDark ? "text-white" : "text-[#0e161d]"
+              }`}
+            >
               Logobook Studio
             </span>
             <span className="text-[10px] font-mono text-muted-foreground block">
@@ -201,7 +240,11 @@ function SocialFormatFallbackMockup({
 
   // 4. POST (Feed)
   return (
-    <div className="w-full h-full bg-[#111922] p-6 flex flex-col justify-between select-none relative overflow-hidden">
+    <div
+      className={`w-full h-full p-6 flex flex-col justify-between select-none relative overflow-hidden ${
+        isDark ? "bg-[#111922] text-white" : "bg-card text-[#0e161d]"
+      }`}
+    >
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-mono text-muted-foreground uppercase">
           {platform} Post
@@ -211,11 +254,15 @@ function SocialFormatFallbackMockup({
 
       <div className="my-auto text-center space-y-2">
         <img
-          src="/logo/logo-symbol-light.svg"
+          src={logoSymbol}
           alt="Symbol"
           className="w-16 h-16 object-contain mx-auto"
         />
-        <span className="text-sm font-bold text-white tracking-tight block">
+        <span
+          className={`text-sm font-bold tracking-tight block ${
+            isDark ? "text-white" : "text-[#0e161d]"
+          }`}
+        >
           Social Feed Template
         </span>
         <span className="text-[10px] font-mono text-muted-foreground block">
@@ -223,7 +270,11 @@ function SocialFormatFallbackMockup({
         </span>
       </div>
 
-      <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground border-t border-white/5 pt-2">
+      <div
+        className={`flex items-center justify-between text-[10px] font-mono text-muted-foreground pt-2 border-t ${
+          isDark ? "border-white/5" : "border-black/5"
+        }`}
+      >
         <span>Brand Identity System</span>
         <span>RGB / 72 DPI</span>
       </div>
@@ -241,8 +292,9 @@ export default function M23SocialMediaModule({
   isEditor = false,
   onConfigChange,
 }: ModuleRenderProps<BaseModuleConfig>) {
-  const { resolveRadius, resolveStyles } = useBrandCascade();
+  const { tokens, resolveRadius, resolveStyles } = useBrandCascade();
   const brandRadius = resolveRadius();
+  const isManualDark = tokens.theme?.isDark ?? true;
   const params = useParams();
   const brandId = (params?.brandId as string) || "";
 
@@ -564,7 +616,7 @@ export default function M23SocialMediaModule({
             >
               {/* Card Preview Container */}
               <div
-                className={`relative w-full ${previewAspect} mx-auto flex items-center justify-center bg-[#0a0f14] overflow-hidden border-b border-border/40 select-none group/preview`}
+                className={`relative w-full ${previewAspect} mx-auto flex items-center justify-center bg-muted/30 overflow-hidden border-b border-border/40 select-none group/preview`}
               >
                 {/* Artwork / Preview Image */}
                 {item.previewUrl ? (
@@ -574,7 +626,7 @@ export default function M23SocialMediaModule({
                     className="w-full h-full object-cover transition-transform duration-300"
                   />
                 ) : (
-                  <SocialFormatFallbackMockup item={item} />
+                  <SocialFormatFallbackMockup item={item} isDark={isManualDark} />
                 )}
 
                 {/* Circular Masking Overlay for Avatars */}
@@ -716,10 +768,19 @@ export default function M23SocialMediaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
+          <div
+            className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-primary" />
                 <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
@@ -729,20 +790,23 @@ export default function M23SocialMediaModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
+            <div
+              className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 gap-2 pt-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("formats")}
-                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   modalTab === "formats"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -753,9 +817,9 @@ export default function M23SocialMediaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("settings")}
-                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   modalTab === "settings"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -765,7 +829,10 @@ export default function M23SocialMediaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: FORMATS MANAGER */}
               {modalTab === "formats" && (
                 <div className="space-y-5">
@@ -1182,7 +1249,10 @@ export default function M23SocialMediaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}

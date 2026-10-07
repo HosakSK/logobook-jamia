@@ -422,7 +422,7 @@ export default function M24FiremneTapetyAPozadiaModule({
             >
               {/* Wallpaper Preview Stage */}
               <div
-                className="w-full bg-[#0a0f14] p-4 sm:p-6 flex items-center justify-center relative overflow-hidden select-none border-b border-border/40 group/preview min-h-[220px]"
+                className="w-full bg-muted/30 p-4 sm:p-6 flex items-center justify-center relative overflow-hidden select-none border-b border-border/40 group/preview min-h-[220px]"
                 onClick={() => setLightboxItem(item)}
               >
                 {/* Background dot pattern */}
@@ -607,14 +607,19 @@ export default function M24FiremneTapetyAPozadiaModule({
       {lightboxItem && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 animate-in fade-in duration-200"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.95)" }}
           onClick={() => setLightboxItem(null)}
         >
           <div
             className="w-full max-w-5xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Lightbox Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div>
                 <h4 className="font-bold text-[#fafbfc] text-sm">
                   {resolveI18nText(lightboxItem.title, locale)}
@@ -721,10 +726,19 @@ export default function M24FiremneTapetyAPozadiaModule({
       {/* ADMIN SETTINGS MODAL / SHEET                             */}
       {/* ======================================================== */}
       {isSettingsModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-in fade-in duration-150">
-          <div className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 animate-in fade-in duration-150"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+        >
+          <div
+            className="w-full max-w-3xl bg-[#0e161d] border border-[rgba(63,85,102,0.45)] rounded-[var(--brand-radius,6px)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-[#fafbfc]"
+            style={{ backgroundColor: "#0e161d" }}
+          >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-between px-5 py-4 border-b border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <div className="flex items-center gap-2">
                 <ImageIcon className="w-5 h-5 text-primary" />
                 <h3 className="font-bold text-[#fafbfc] text-sm tracking-tight">
@@ -734,20 +748,23 @@ export default function M24FiremneTapetyAPozadiaModule({
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
-                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#070b0f] transition-colors"
+                className="text-[#96abbe] hover:text-[#fafbfc] p-1 rounded hover:bg-[#1f2c36] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#070b0f] px-5 gap-2 pt-2">
+            <div
+              className="flex items-center border-b border-[rgba(63,85,102,0.45)] bg-[#17212a] px-5 gap-2 pt-2"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setModalTab("wallpapers")}
-                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   modalTab === "wallpapers"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -758,9 +775,9 @@ export default function M24FiremneTapetyAPozadiaModule({
               <button
                 type="button"
                 onClick={() => setModalTab("settings")}
-                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors ${
+                className={`px-3 py-2 text-xs font-semibold border-b-2 flex items-center gap-1.5 transition-colors cursor-pointer ${
                   modalTab === "settings"
-                    ? "border-primary text-primary"
+                    ? "border-primary text-primary font-bold"
                     : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
                 }`}
               >
@@ -770,7 +787,10 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]">
+            <div
+              className="p-5 overflow-y-auto space-y-6 flex-1 bg-[#0e161d]"
+              style={{ backgroundColor: "#0e161d" }}
+            >
               {/* TAB 1: WALLPAPERS LIST */}
               {modalTab === "wallpapers" && (
                 <div className="space-y-5">
@@ -1166,7 +1186,10 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]">
+            <div
+              className="flex items-center justify-end px-5 py-3 border-t border-[rgba(63,85,102,0.45)] bg-[#17212a]"
+              style={{ backgroundColor: "#17212a" }}
+            >
               <button
                 type="button"
                 onClick={() => setIsSettingsModalOpen(false)}
