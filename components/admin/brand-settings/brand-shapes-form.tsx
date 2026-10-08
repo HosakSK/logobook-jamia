@@ -688,15 +688,15 @@ export function BrandShapesForm({
                 Default
               </span>
             </div>
-            {/* Visual mini-swatch */}
-            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-black/10 bg-[#fbfaf7]">
-              <div className="h-7 w-12 rounded bg-[#ffffff] border border-[#e5e3dc] flex items-center justify-center">
+            {/* Visual mini-swatch: Bledšie pozadie #fafbfc, tmavšie karty #f1f4f7 */}
+            <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-black/10 bg-[#fafbfc]">
+              <div className="h-7 w-12 rounded bg-[#f1f4f7] border border-[#bac8d6] flex items-center justify-center">
                 <div className="h-2 w-4 rounded-full bg-[#c8d400]" />
               </div>
-              <div className="text-[10px] font-mono text-[#17212a] pr-1">#fbfaf7</div>
+              <div className="text-[10px] font-mono text-[#0e161d] pr-1">#fafbfc</div>
             </div>
             <div className="text-[11px] text-muted-foreground leading-snug">
-              Teplý prírodný papier, elegantná svetlá prezentácia.
+              Bledšie pozadie manuálu a tmavšie okenné panely.
             </div>
           </button>
 
@@ -718,15 +718,15 @@ export function BrandShapesForm({
                 Svetlá 2
               </span>
             </div>
-            {/* Visual mini-swatch */}
+            {/* Visual mini-swatch: Tmavšie pozadie #eef2f6, bledšie biele karty #ffffff */}
             <div className="h-10 rounded-lg p-1.5 flex items-center justify-between border border-black/10 bg-[#eef2f6]">
-              <div className="h-7 w-12 rounded bg-[#ffffff] border border-[#d9e2ec] flex items-center justify-center">
+              <div className="h-7 w-12 rounded bg-[#ffffff] border border-[#bac8d6] flex items-center justify-center">
                 <div className="h-2 w-4 rounded-full bg-[#009f80]" />
               </div>
               <div className="text-[10px] font-mono text-[#0e161d] pr-1">#eef2f6</div>
             </div>
             <div className="text-[11px] text-muted-foreground leading-snug">
-              Chladná moderná hmla s kontrastnými bielymi panelmi.
+              Tmavšie hmlisté pozadie a svetlejšie biele okná.
             </div>
           </button>
 
