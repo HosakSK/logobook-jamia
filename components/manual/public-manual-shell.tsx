@@ -122,17 +122,19 @@ export function PublicManualShell({
         <div className="flex items-center gap-3 shrink-0">
           <Link
             href={`/manual/${domain}/${locale}`}
-            className="flex items-center gap-3 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-3 hover:opacity-90 transition-opacity group"
           >
             {brand.headerLogoUrl ? (
-              <img
-                src={brand.headerLogoUrl}
-                alt={brand.name}
-                className="h-9 w-auto max-w-[140px] sm:max-w-[200px] object-contain"
-              />
+              <div className="h-10 flex items-center justify-center">
+                <img
+                  src={brand.headerLogoUrl}
+                  alt={brand.name}
+                  className="max-h-10 w-auto max-w-[160px] sm:max-w-[220px] object-contain object-left transition-transform group-hover:scale-[1.02]"
+                />
+              </div>
             ) : (
               <div
-                className="h-9 w-9 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs rounded-xl"
+                className="h-10 w-10 text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs rounded-xl"
                 style={{
                   backgroundColor: "var(--brand-color-primary, #c8d400)",
                 }}
@@ -142,7 +144,7 @@ export function PublicManualShell({
             )}
 
             <div className="hidden sm:block">
-              <span className="font-bold tracking-tight text-sm sm:text-base uppercase">
+              <span className="font-bold tracking-tight text-sm sm:text-base uppercase text-foreground">
                 {brand.name}
               </span>
               <span className="text-xs text-muted-foreground ml-2.5 border-l border-border/60 pl-2.5 font-medium">

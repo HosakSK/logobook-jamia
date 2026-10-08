@@ -235,6 +235,78 @@ export async function setBrandFaviconAction(
   }
 }
 
+/**
+ * Sets an existing mediaAsset ID or external URL as the brand header logo
+ */
+export async function setBrandHeaderLogoAction(
+  brandId: string,
+  mediaAssetIdOrUrl: string | null
+): Promise<{ success: boolean; error?: string; headerLogoUrl?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Unauthorized session." };
+    }
+
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
+
+    if (!mediaAssetIdOrUrl) {
+      // Remove header logo
+      await pb.collection("brands").update(brand.id, {
+        headerLogo: null,
+      });
+
+      revalidatePath(`/admin/brand/${brand.id}/settings`);
+      revalidatePath(`/admin/brand/${brand.slug}/settings`);
+      revalidatePath(`/manual/${brand.slug}`, "layout");
+      revalidatePath(`/m/${brand.slug}`, "layout");
+      return { success: true, headerLogoUrl: "" };
+    }
+
+    let finalUrl = mediaAssetIdOrUrl;
+    let headerMediaId: string | null = null;
+
+    try {
+      const mediaAsset = await pb.collection("mediaAssets").getOne(mediaAssetIdOrUrl);
+      if (mediaAsset) {
+        headerMediaId = mediaAsset.id;
+        finalUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
+      }
+    } catch {
+      // Not a mediaAsset ID, check if it's an asset in assets collection
+      try {
+        const assetRec = await pb.collection("assets").getOne(mediaAssetIdOrUrl);
+        if (assetRec && assetRec.preview) {
+          finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+        }
+      } catch {
+        // Direct URL or external URL
+      }
+    }
+
+    await pb.collection("brands").update(brand.id, {
+      headerLogo: headerMediaId,
+    });
+
+    revalidatePath(`/admin/brand/${brand.id}/settings`);
+    revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/manual/${brand.slug}`, "layout");
+    revalidatePath(`/m/${brand.slug}`, "layout");
+
+    return {
+      success: true,
+      headerLogoUrl: finalUrl,
+    };
+  } catch (err: unknown) {
+    console.error("Failed to set brand header logo:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to set brand header logo",
+    };
+  }
+}
+
 export async function updateGlobalShapesAction(
   brandId: string,
   _prevState: unknown,

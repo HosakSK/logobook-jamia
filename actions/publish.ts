@@ -59,6 +59,7 @@ export interface PublishedBrandSnapshot {
     defaultLocale?: string;
     enabledLocales?: string[];
     headerLogo?: string;
+    headerLogoUrl?: string;
     favicon?: string;
     hideLogobookBadge?: boolean;
   };
@@ -244,6 +245,44 @@ export async function publishBrandAction(brandId: string): Promise<{
     const nextVersion = currentVersion + 1;
     const publishedAt = new Date().toISOString();
 
+    // Resolve headerLogoUrl for snapshot
+    let snapshotHeaderLogoUrl: string | undefined = undefined;
+    if (brand.headerLogo) {
+      if (typeof brand.headerLogo === "string" && (brand.headerLogo.startsWith("http://") || brand.headerLogo.startsWith("https://") || brand.headerLogo.startsWith("/"))) {
+        snapshotHeaderLogoUrl = brand.headerLogo;
+      } else {
+        try {
+          const mediaRec = await pb.collection("mediaAssets").getOne(brand.headerLogo);
+          if (mediaRec && mediaRec.file) {
+            snapshotHeaderLogoUrl = pb.files.getURL(mediaRec, mediaRec.file);
+          }
+        } catch {
+          try {
+            const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
+            if (assetRec && assetRec.preview) {
+              snapshotHeaderLogoUrl = pb.files.getURL(assetRec, assetRec.preview);
+            }
+          } catch {
+            // not found
+          }
+        }
+      }
+    }
+
+    if (!snapshotHeaderLogoUrl) {
+      try {
+        const firstAsset = await pb.collection("assets").getFirstListItem(
+          `brand = "${brand.id}" && preview != ""`,
+          { sort: "order" }
+        );
+        if (firstAsset && firstAsset.preview) {
+          snapshotHeaderLogoUrl = pb.files.getURL(firstAsset, firstAsset.preview);
+        }
+      } catch {
+        // no assets
+      }
+    }
+
     const snapshot: PublishedBrandSnapshot = {
       brandId: brand.id,
       publishedAt,
@@ -257,6 +296,7 @@ export async function publishBrandAction(brandId: string): Promise<{
         defaultLocale: brand.defaultLocale || "en",
         enabledLocales: brand.enabledLocales || ["en", "sk", "cs"],
         headerLogo: brand.headerLogo || undefined,
+        headerLogoUrl: snapshotHeaderLogoUrl,
         favicon: brand.favicon || undefined,
         hideLogobookBadge: brand.hideLogobookBadge || false,
       },

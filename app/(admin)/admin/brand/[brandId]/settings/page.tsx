@@ -6,6 +6,7 @@ import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n
 import { getFileUrl } from "@/lib/pocketbase";
 import { BrandGeneralForm } from "@/components/admin/brand-settings/brand-general-form";
 import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favicon-form";
+import { BrandHeaderLogoForm } from "@/components/admin/brand-settings/brand-header-logo-form";
 import { BrandShapesForm } from "@/components/admin/brand-settings/brand-shapes-form";
 import { BrandDangerZone } from "@/components/admin/brand-settings/brand-danger-zone";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,10 @@ export default async function BrandSettingsPage({
 
   let brand: any = null;
   try {
-    brand = await pb.collection("brands").getOne(brandId, { expand: "favicon" });
+    brand = await pb.collection("brands").getOne(brandId, { expand: "favicon,headerLogo" });
   } catch {
     try {
-      brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`, { expand: "favicon" });
+      brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`, { expand: "favicon,headerLogo" });
     } catch {
       notFound();
     }
@@ -45,6 +46,27 @@ export default async function BrandSettingsPage({
   if (brand.expand?.favicon) {
     const favAsset = brand.expand.favicon;
     faviconUrl = getFileUrl(favAsset.collectionId || "mediaAssets", favAsset.id, favAsset.file);
+  }
+
+  // Resolve Header Logo URL
+  let headerLogoUrl: string | null = null;
+  if (brand.expand?.headerLogo) {
+    const hlAsset = brand.expand.headerLogo;
+    headerLogoUrl = getFileUrl(hlAsset.collectionId || "mediaAssets", hlAsset.id, hlAsset.file);
+  } else if (brand.headerLogo) {
+    // Check if brand.headerLogo points to an asset in assets collection or is a URL
+    if (typeof brand.headerLogo === "string" && (brand.headerLogo.startsWith("http://") || brand.headerLogo.startsWith("https://") || brand.headerLogo.startsWith("/"))) {
+      headerLogoUrl = brand.headerLogo;
+    } else {
+      try {
+        const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
+        if (assetRec && assetRec.preview) {
+          headerLogoUrl = getFileUrl("assets", assetRec.id, assetRec.preview);
+        }
+      } catch {
+        // fallback
+      }
+    }
   }
 
   // Fetch Global Shapes record
@@ -153,7 +175,10 @@ export default async function BrandSettingsPage({
       {/* 1. General Settings (Name, Slug, SEO, Tier features) */}
       <BrandGeneralForm brand={serializedBrand} userTier={userTier} dict={dict} />
 
-      {/* 2. Favicon Upload */}
+      {/* 2. Header Logo in Top Bar */}
+      <BrandHeaderLogoForm brandId={brand.id} initialHeaderLogoUrl={headerLogoUrl} dict={dict} />
+
+      {/* 3. Favicon Upload */}
       <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />
 
       {/* 3. Global Shapes & Theme (Corner radius, border width, theme & background) */}

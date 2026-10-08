@@ -21,11 +21,14 @@ export default async function ManualLayout({
   let brandRecord: any = null;
   let brandTokens;
   let cssVariables: Record<string, string> = {};
+  let headerLogoUrl: string | undefined = undefined;
 
   try {
     brandRecord = await pb
       .collection("brands")
-      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`);
+      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`, {
+        expand: "headerLogo",
+      });
   } catch {
     // Brand record not matched directly by slug
   }
@@ -33,6 +36,48 @@ export default async function ManualLayout({
   const brandName = brandRecord?.name || domain;
   const brandSlug = brandRecord?.slug || domain;
   const hideLogobookBadge = brandRecord?.hideLogobookBadge || false;
+
+  // Resolve header logo URL from expanded relation, mediaAssets, assets, or publishedConfig
+  if (brandRecord?.expand?.headerLogo) {
+    const hlAsset = brandRecord.expand.headerLogo;
+    headerLogoUrl = pb.files.getURL(hlAsset, hlAsset.file);
+  } else if (brandRecord?.headerLogo) {
+    const hl = brandRecord.headerLogo;
+    if (typeof hl === "string" && (hl.startsWith("http://") || hl.startsWith("https://") || hl.startsWith("/"))) {
+      headerLogoUrl = hl;
+    } else {
+      try {
+        const mediaRec = await pb.collection("mediaAssets").getOne(hl);
+        if (mediaRec && mediaRec.file) {
+          headerLogoUrl = pb.files.getURL(mediaRec, mediaRec.file);
+        }
+      } catch {
+        try {
+          const assetRec = await pb.collection("assets").getOne(hl);
+          if (assetRec && assetRec.preview) {
+            headerLogoUrl = pb.files.getURL(assetRec, assetRec.preview);
+          }
+        } catch {
+          // not found
+        }
+      }
+    }
+  }
+
+  // Fallback: If no header logo set, look for the first brand asset (logo)
+  if (!headerLogoUrl && brandRecord?.id) {
+    try {
+      const firstAsset = await pb.collection("assets").getFirstListItem(
+        `brand = "${brandRecord.id}" && preview != ""`,
+        { sort: "order" }
+      );
+      if (firstAsset && firstAsset.preview) {
+        headerLogoUrl = pb.files.getURL(firstAsset, firstAsset.preview);
+      }
+    } catch {
+      // No assets found
+    }
+  }
 
   if (brandRecord) {
     try {
@@ -64,6 +109,7 @@ export default async function ManualLayout({
           <ManualLockScreen
             brandSlug={brandSlug}
             brandName={brandName}
+            headerLogoUrl={headerLogoUrl}
             locale={currentLocale}
           />
         </BrandCascadeProvider>
@@ -84,6 +130,7 @@ export default async function ManualLayout({
           id: brandRecord?.id || domain,
           name: brandName,
           slug: brandSlug,
+          headerLogoUrl: headerLogoUrl || (publishedConfig?.brand as any)?.headerLogoUrl,
           hideLogobookBadge,
         }}
         snapshot={publishedConfig}
