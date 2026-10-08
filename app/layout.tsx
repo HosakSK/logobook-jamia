@@ -30,11 +30,9 @@ export default function RootLayout({
     <html
       lang="sk"
       suppressHydrationWarning
-      className={`dark ${plusJakartaSans.variable}`}
-      data-theme="dark"
-      style={{ colorScheme: "dark" }}
+      className={plusJakartaSans.variable}
     >
-      <body className="dark min-h-screen font-sans bg-[#0e161d] text-[#fafbfc] antialiased selection:bg-primary selection:text-primary-foreground font-light">
+      <body className="min-h-screen font-sans bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground font-light">
         <Providers>{children}</Providers>
       </body>
     </html>

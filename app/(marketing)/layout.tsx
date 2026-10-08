@@ -13,7 +13,7 @@ export default async function MarketingLayout({
   const currentLocale: Locale = isValidLocale(rawLocale) ? rawLocale : DEFAULT_LOCALE;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+    <div className="dark min-h-screen flex flex-col bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary" data-theme="dark">
       <MarketingNav currentLocale={currentLocale} />
       <main className="flex-1">{children}</main>
       <MarketingFooter currentLocale={currentLocale} />

@@ -116,12 +116,19 @@ export function BrandCascadeProvider({
     ...style,
   };
 
+  const isDark = tokens.theme?.isDark ?? true;
+  const themeClass = isDark ? "dark" : "light";
+
   return (
     <BrandCascadeContext.Provider value={contextValue}>
       <Component
-        className={className}
-        style={combinedStyle}
-        data-theme={tokens.theme?.isDark ? "dark" : "light"}
+        className={`${className || ""} ${themeClass}`}
+        style={{
+          ...(combinedStyle as unknown as React.CSSProperties),
+          colorScheme: isDark ? "dark" : "light",
+        }}
+        data-theme={themeClass}
+        data-preview-theme={themeClass}
         data-context="logobook"
       >
         {children}

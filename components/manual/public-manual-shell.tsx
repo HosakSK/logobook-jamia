@@ -112,8 +112,9 @@ export function PublicManualShell({
       style={{
         backgroundColor: "var(--brand-manual-bg, var(--background))",
         color: "var(--foreground)",
+        colorScheme: isDarkBg ? "dark" : "light",
       }}
-      className="min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors"
+      className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors`}
     >
       {/* Sticky Top Header */}
       <header className="sticky top-0 z-40 h-18 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6">

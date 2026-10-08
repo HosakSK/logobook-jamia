@@ -531,13 +531,19 @@ export function BuilderCanvas({
     return matchesSearch && matchesCategory;
   });
 
+  const isDarkCanvas = tokens?.theme?.isDark ?? true;
+
   return (
     <div
-      className="flex-1 space-y-6 max-w-5xl rounded-[6px] p-6 border shadow-sm transition-colors"
+      className={`flex-1 space-y-6 max-w-5xl rounded-[6px] p-6 border shadow-sm transition-colors ${
+        isDarkCanvas ? "dark" : "light"
+      }`}
+      data-theme={isDarkCanvas ? "dark" : "light"}
       style={{
         backgroundColor: "var(--brand-manual-bg, var(--background))",
         color: "var(--foreground)",
         borderColor: "var(--border)",
+        colorScheme: isDarkCanvas ? "dark" : "light",
       }}
     >
       {/* Page Header Bar */}

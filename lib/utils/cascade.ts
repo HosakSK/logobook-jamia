@@ -134,8 +134,10 @@ export function computeBrandCssVariables(
     "--secondary": secondarySurface,
     "--secondary-foreground": theme.textColor,
     "--border": theme.borderColor,
+    "--input": theme.isDark ? "#070b0f" : "#ffffff",
     "--primary": theme.primaryColor,
     "--primary-foreground": primaryFg,
+    "color-scheme": theme.isDark ? "dark" : "light",
 
     // Brand theme aliases
     "--brand-card-bg": theme.surfaceColor,

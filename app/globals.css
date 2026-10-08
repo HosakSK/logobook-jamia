@@ -88,39 +88,72 @@
     --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
   }
 
-  /* Dark Theme (Default Studio UI, Admin Shell, and Dark Brand Manuals) */
-  .dark, [data-theme="dark"], .admin-studio, [data-admin-root] {
-    --background: #0e161d !important;
-    --foreground: #fafbfc !important;
-    --card: #17212a !important;
-    --card-foreground: #fafbfc !important;
-    --popover: #17212a !important;
-    --popover-foreground: #fafbfc !important;
+  /* Admin Studio Theme: permanently locked for entire admin navigation and panels */
+  [data-admin-ui="true"], [data-admin-root], .admin-studio {
+    --background: #0e161d;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #17212a;
+    --popover-foreground: #fafbfc;
     --primary: #c8d400;
     --primary-foreground: #070b0f;
-    --secondary: #17212a !important;
-    --secondary-foreground: #fafbfc !important;
-    --muted: #070b0f !important;
-    --muted-foreground: #96abbe !important;
+    --secondary: #17212a;
+    --secondary-foreground: #fafbfc;
+    --muted: #070b0f;
+    --muted-foreground: #96abbe;
     --accent: #009f80;
-    --accent-foreground: #fafbfc !important;
+    --accent-foreground: #fafbfc;
     --destructive: #bb4934;
-    --destructive-foreground: #ffffff !important;
-    --border: rgba(63, 85, 102, 0.45) !important;
-    --input: #070b0f !important;
-    --ring: rgba(200, 212, 0, 0.4) !important;
+    --destructive-foreground: #ffffff;
+    --border: rgba(63, 85, 102, 0.45);
+    --input: #070b0f;
+    --ring: rgba(200, 212, 0, 0.4);
 
-    --bg-page-start: #0e161d !important;
-    --bg-page-end: #17212a !important;
-    --bg-card: #17212a !important;
-    --bg-card-hover: #1f2c36 !important;
-    --bg-elevated: #1f2c36 !important;
-    --bg-surface: #2b3b48 !important;
-    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35) !important;
-    color-scheme: dark !important;
+    --bg-page-start: #0e161d;
+    --bg-page-end: #17212a;
+    --bg-card: #17212a;
+    --bg-card-hover: #1f2c36;
+    --bg-elevated: #1f2c36;
+    --bg-surface: #2b3b48;
+    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
   }
 
-  /* Light Theme (STRICTLY ISOLATED to brand manual preview & public presentation only) */
+  /* Dark Theme (Default Studio UI and Dark Brand Manuals) */
+  .dark, [data-theme="dark"] {
+    --background: #0e161d;
+    --foreground: #fafbfc;
+    --card: #17212a;
+    --card-foreground: #fafbfc;
+    --popover: #17212a;
+    --popover-foreground: #fafbfc;
+    --primary: #c8d400;
+    --primary-foreground: #070b0f;
+    --secondary: #17212a;
+    --secondary-foreground: #fafbfc;
+    --muted: #070b0f;
+    --muted-foreground: #96abbe;
+    --accent: #009f80;
+    --accent-foreground: #fafbfc;
+    --destructive: #bb4934;
+    --destructive-foreground: #ffffff;
+    --border: rgba(63, 85, 102, 0.45);
+    --input: #070b0f;
+    --ring: rgba(200, 212, 0, 0.4);
+
+    --bg-page-start: #0e161d;
+    --bg-page-end: #17212a;
+    --bg-card: #17212a;
+    --bg-card-hover: #1f2c36;
+    --bg-elevated: #1f2c36;
+    --bg-surface: #2b3b48;
+    --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  /* Light Theme (Clean Paper / Cool Mist & Light Brand Manuals) */
+  .light, [data-theme="light"],
   [data-context="logobook"][data-theme="light"],
   .public-manual[data-theme="light"],
   [data-preview-theme="light"],
