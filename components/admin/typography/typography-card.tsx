@@ -25,6 +25,7 @@ import {
 interface TypographyCardProps {
   typography: BrandTypography;
   brandId: string;
+  headingColor?: string;
   index: number;
   total: number;
   onEdit: (typography: BrandTypography) => void;
@@ -49,6 +50,7 @@ const SOURCE_LABELS: Record<string, { label: string; icon: any; color: string }>
 export function TypographyCard({
   typography,
   brandId,
+  headingColor,
   index,
   total,
   onEdit,
@@ -57,6 +59,9 @@ export function TypographyCard({
 }: TypographyCardProps) {
   const [isDeleting, startDelete] = useTransition();
   const [copied, setCopied] = useState(false);
+  const [previewWithHeadingColor, setPreviewWithHeadingColor] = useState(
+    typography.role === "HEADING"
+  );
 
   // Preview interactive state
   const defaultSample = typography.sampleText || DEFAULT_PANGRAMS[0];
@@ -164,6 +169,20 @@ export function TypographyCard({
               <SourceIcon className="w-3 h-3" />
               {sourceInfo.label}
             </span>
+
+            {/* Heading Color Badge */}
+            {typography.role === "HEADING" && headingColor && (
+              <span
+                className="text-[10px] font-mono px-2 py-0.5 rounded-[3px] border border-[rgba(63,85,102,0.6)] flex items-center gap-1.5 bg-[#070b0f] text-[#fafbfc]"
+                title="Globálna farba aplikovaná na nadpisy v brand manuáli"
+              >
+                <span
+                  className="w-2.5 h-2.5 rounded-full border border-black/40 shrink-0"
+                  style={{ backgroundColor: headingColor }}
+                />
+                <span>Farba: {headingColor}</span>
+              </span>
+            )}
           </div>
 
           <p className="text-xs text-[#96abbe]">{roleInfo.desc}</p>
@@ -247,6 +266,26 @@ export function TypographyCard({
               onChange={(e) => setFontSize(Number(e.target.value))}
               className="w-20 h-1.5 accent-[#c8d400] cursor-pointer"
             />
+            {/* Heading Color toggle if HEADING role */}
+            {typography.role === "HEADING" && headingColor && (
+              <button
+                type="button"
+                onClick={() => setPreviewWithHeadingColor(!previewWithHeadingColor)}
+                className={`px-2 py-0.5 text-[11px] font-mono rounded-[3px] transition-colors border flex items-center gap-1.5 cursor-pointer ${
+                  previewWithHeadingColor
+                    ? "bg-[#c8d400]/20 text-[#fafbfc] border-[#c8d400]/60 font-semibold"
+                    : "bg-[#17212a] text-[#96abbe] border-[rgba(63,85,102,0.6)] hover:text-[#fafbfc]"
+                }`}
+                title="Prepnúť náhľad vo farbe nadpisov"
+              >
+                <span
+                  className="w-2 h-2 rounded-full border border-black/40 shrink-0"
+                  style={{ backgroundColor: headingColor }}
+                />
+                <span>Farba nadpisu</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => {
@@ -267,13 +306,14 @@ export function TypographyCard({
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => setSampleText(e.currentTarget.textContent || "")}
-          className="focus:outline-hidden focus:ring-1 focus:ring-[#c8d400]/40 rounded-[2px] p-1 transition-all text-[#fafbfc] select-text"
+          className="focus:outline-hidden focus:ring-1 focus:ring-[#c8d400]/40 rounded-[2px] p-1 transition-all select-text"
           style={{
             fontFamily: cssFamily,
             fontSize: `${fontSize}px`,
             fontWeight: selectedWeight,
             lineHeight: 1.25,
             wordBreak: "break-word",
+            color: previewWithHeadingColor && headingColor ? headingColor : "#fafbfc",
           }}
         >
           {sampleText}

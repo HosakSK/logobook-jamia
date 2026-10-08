@@ -49,6 +49,7 @@ export interface BrandCascadeTokens {
     secondary: string;
     accent: string;
     neutral: string;
+    heading: string;
     success?: string;
     warning?: string;
     danger?: string;

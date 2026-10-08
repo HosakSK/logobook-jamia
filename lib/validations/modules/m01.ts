@@ -7,6 +7,7 @@ export const m01HeadingSchema = z.object({
   align: z.enum(["left", "center", "right"]).default("left"),
   showAccentLine: z.boolean().default(false),
   accentColor: z.string().optional(),
+  headingColor: z.string().optional(),
   text: i18nTextSchema.default({
     en: "Section Heading",
     sk: "Názov sekcie",

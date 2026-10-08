@@ -9,6 +9,7 @@ interface InlineEditableTextProps {
   placeholder?: string;
   as?: "h1" | "h2" | "h3" | "h4" | "p" | "span";
   className?: string;
+  style?: React.CSSProperties;
   multiline?: boolean;
   disabled?: boolean;
 }
@@ -23,6 +24,7 @@ export function InlineEditableText({
   placeholder = "Kliknite pre zadanie textu...",
   as: Component = "span",
   className = "",
+  style,
   multiline = false,
   disabled = false,
 }: InlineEditableTextProps) {
@@ -68,7 +70,11 @@ export function InlineEditableText({
   };
 
   if (disabled) {
-    return <Component className={className}>{value || placeholder}</Component>;
+    return (
+      <Component className={className} style={style}>
+        {value || placeholder}
+      </Component>
+    );
   }
 
   return (
@@ -80,6 +86,7 @@ export function InlineEditableText({
         onFocus={() => setIsEditing(true)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
+        style={style}
         className={`outline-hidden transition-all duration-150 cursor-text select-text ${className} ${
           isEditing
             ? "ring-1 ring-primary/60 bg-neutral-900/60 px-1 rounded-[2px]"

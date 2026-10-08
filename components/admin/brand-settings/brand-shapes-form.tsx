@@ -18,6 +18,7 @@ import {
   Sparkles,
   Sun,
   Moon,
+  Type,
 } from "lucide-react";
 import {
   ManualThemeId,
@@ -109,20 +110,69 @@ export function BrandShapesForm({
     initialCustom.accentColor || "#009f80"
   );
 
+  // Heading color state
+  const rawInitialHeading =
+    initialShapes?.themeConfig?.headingColor ||
+    initialCustom.headingColor ||
+    "";
+
+  const primaryBrandColor = useMemo(() => {
+    return brandColors.find((c) => c.role?.toUpperCase() === "PRIMARY")?.hex || "#c8d400";
+  }, [brandColors]);
+
+  const secondaryBrandColor = useMemo(() => {
+    return brandColors.find((c) => c.role?.toUpperCase() === "SECONDARY")?.hex || "#17212a";
+  }, [brandColors]);
+
+  const accentBrandColor = useMemo(() => {
+    return brandColors.find((c) => c.role?.toUpperCase() === "ACCENT")?.hex || "#009f80";
+  }, [brandColors]);
+
+  const [headingColorMode, setHeadingColorMode] = useState<
+    "inherit" | "primary" | "secondary" | "accent" | "custom"
+  >(() => {
+    if (!rawInitialHeading) return "inherit";
+    const norm = rawInitialHeading.toLowerCase().trim();
+    const p = (brandColors.find((c) => c.role?.toUpperCase() === "PRIMARY")?.hex || "").toLowerCase().trim();
+    const s = (brandColors.find((c) => c.role?.toUpperCase() === "SECONDARY")?.hex || "").toLowerCase().trim();
+    const a = (brandColors.find((c) => c.role?.toUpperCase() === "ACCENT")?.hex || "").toLowerCase().trim();
+    if (p && norm === p) return "primary";
+    if (s && norm === s) return "secondary";
+    if (a && norm === a) return "accent";
+    return "custom";
+  });
+
+  const [customHeadingColor, setCustomHeadingColor] = useState<string>(
+    rawInitialHeading || "#fafbfc"
+  );
+
   // Effective preview radius
   const previewRadiusPx =
     radiusMode === "sharp" ? 0 : radiusMode === "pill" ? 9999 : customRadius;
 
   // Resolved current active theme for live preview & submit
   const currentTheme = useMemo(() => {
+    const resolvedHeading =
+      headingColorMode === "inherit"
+        ? undefined
+        : headingColorMode === "primary"
+        ? primaryBrandColor
+        : headingColorMode === "secondary"
+        ? secondaryBrandColor
+        : headingColorMode === "accent"
+        ? accentBrandColor
+        : customHeadingColor;
+
     const config: ManualThemeConfig = {
       themeId,
+      headingColor: resolvedHeading,
       custom:
         themeId === "custom"
           ? {
               bgColor: customBg,
               surfaceColor: customSurface,
               textColor: customText,
+              headingColor: resolvedHeading,
               mutedColor: customMuted,
               borderColor: customBorder,
               primaryColor: customPrimary,
@@ -133,6 +183,11 @@ export function BrandShapesForm({
     return resolveManualTheme(config, customBg, brandColors);
   }, [
     themeId,
+    headingColorMode,
+    primaryBrandColor,
+    secondaryBrandColor,
+    accentBrandColor,
+    customHeadingColor,
     customBg,
     customSurface,
     customText,
@@ -141,6 +196,21 @@ export function BrandShapesForm({
     customPrimary,
     customAccent,
     brandColors,
+  ]);
+
+  const effectivePreviewHeadingColor = useMemo(() => {
+    if (headingColorMode === "inherit") return currentTheme.textColor;
+    if (headingColorMode === "primary") return primaryBrandColor;
+    if (headingColorMode === "secondary") return secondaryBrandColor;
+    if (headingColorMode === "accent") return accentBrandColor;
+    return customHeadingColor || currentTheme.textColor;
+  }, [
+    headingColorMode,
+    currentTheme.textColor,
+    primaryBrandColor,
+    secondaryBrandColor,
+    accentBrandColor,
+    customHeadingColor,
   ]);
 
   // Pre-populate custom theme from brand colors
@@ -182,14 +252,27 @@ export function BrandShapesForm({
     setError(null);
     setSuccess(false);
 
+    const resolvedHeading =
+      headingColorMode === "inherit"
+        ? undefined
+        : headingColorMode === "primary"
+        ? primaryBrandColor
+        : headingColorMode === "secondary"
+        ? secondaryBrandColor
+        : headingColorMode === "accent"
+        ? accentBrandColor
+        : customHeadingColor;
+
     const themeConfigPayload: ManualThemeConfig = {
       themeId,
+      headingColor: resolvedHeading,
       custom:
         themeId === "custom"
           ? {
               bgColor: customBg,
               surfaceColor: customSurface,
               textColor: customText,
+              headingColor: resolvedHeading,
               mutedColor: customMuted,
               borderColor: customBorder,
               primaryColor: customPrimary,
@@ -279,8 +362,19 @@ export function BrandShapesForm({
             className="p-6 transition-all flex flex-col md:flex-row items-center justify-between gap-6 shadow-md"
           >
             <div className="space-y-1.5 text-center md:text-left">
-              <h4 className="text-base font-bold tracking-tight">
-                Ukážkový kontajner logomanuálu
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-muted-foreground border border-white/10">
+                  Náhľad nadpisu
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  Farba: {effectivePreviewHeadingColor}
+                </span>
+              </div>
+              <h4
+                style={{ color: effectivePreviewHeadingColor }}
+                className="text-lg font-black tracking-tight"
+              >
+                Ukážkový nadpis kapitoly (H1/H2)
               </h4>
               <p
                 style={{ color: currentTheme.mutedColor }}
@@ -713,6 +807,182 @@ export function BrandShapesForm({
           </div>
         </div>
       )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* FARBA NADPISOV (HEADING COLOR)                                */}
+      {/* ------------------------------------------------------------- */}
+      <div className="space-y-4 pt-4 border-t border-[rgba(63,85,102,0.4)]">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Type className="h-3.5 w-3.5 text-primary" />
+              Farba nadpisov v manuáli (H1 – H6)
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Určite farbu hlavných a sekčných nadpisov vo verejnom brand manuáli.
+              Môžete použiť predvolenú farbu podľa témy, niektorú z farieb značky, alebo zadať vlastný odtieň.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <span className="text-muted-foreground">Aktívna farba:</span>
+            <span
+              className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
+              style={{ backgroundColor: effectivePreviewHeadingColor }}
+            />
+            <span className="font-bold text-foreground">{effectivePreviewHeadingColor}</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {/* Option 1: Inherit from theme */}
+          <button
+            type="button"
+            onClick={() => setHeadingColorMode("inherit")}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+              headingColorMode === "inherit"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground">Podľa témy</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">Auto</span>
+            </div>
+            <div className="h-6 rounded flex items-center gap-2 px-2 border border-white/10 bg-[#070b0f]">
+              <div
+                className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                style={{ backgroundColor: currentTheme.textColor }}
+              />
+              <span className="text-[10px] font-mono text-muted-foreground truncate">{currentTheme.textColor}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Zdedená farba textu aktívnej témy</span>
+          </button>
+
+          {/* Option 2: Primary brand color */}
+          <button
+            type="button"
+            onClick={() => setHeadingColorMode("primary")}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+              headingColorMode === "primary"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground">Primárna</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">Brand</span>
+            </div>
+            <div className="h-6 rounded flex items-center gap-2 px-2 border border-white/10 bg-[#070b0f]">
+              <div
+                className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                style={{ backgroundColor: primaryBrandColor }}
+              />
+              <span className="text-[10px] font-mono text-foreground font-semibold truncate">{primaryBrandColor}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Hlavná primárna farba značky</span>
+          </button>
+
+          {/* Option 3: Secondary brand color */}
+          <button
+            type="button"
+            onClick={() => setHeadingColorMode("secondary")}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+              headingColorMode === "secondary"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground">Sekundárna</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">Brand</span>
+            </div>
+            <div className="h-6 rounded flex items-center gap-2 px-2 border border-white/10 bg-[#070b0f]">
+              <div
+                className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                style={{ backgroundColor: secondaryBrandColor }}
+              />
+              <span className="text-[10px] font-mono text-foreground font-semibold truncate">{secondaryBrandColor}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Sekundárna doplnková farba</span>
+          </button>
+
+          {/* Option 4: Accent brand color */}
+          <button
+            type="button"
+            onClick={() => setHeadingColorMode("accent")}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+              headingColorMode === "accent"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground">Akcent</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">Brand</span>
+            </div>
+            <div className="h-6 rounded flex items-center gap-2 px-2 border border-white/10 bg-[#070b0f]">
+              <div
+                className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                style={{ backgroundColor: accentBrandColor }}
+              />
+              <span className="text-[10px] font-mono text-foreground font-semibold truncate">{accentBrandColor}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Akcentná farba značky</span>
+          </button>
+
+          {/* Option 5: Custom color */}
+          <button
+            type="button"
+            onClick={() => setHeadingColorMode("custom")}
+            className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
+              headingColorMode === "custom"
+                ? "border-[#c8d400] bg-[#c8d400]/10 shadow-[0_0_18px_rgba(200,212,0,0.15)] ring-1 ring-[#c8d400]"
+                : "border-border/60 hover:border-border hover:bg-neutral-800/40"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-foreground">Vlastná farba</span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono">Custom</span>
+            </div>
+            <div className="h-6 rounded flex items-center gap-2 px-2 border border-white/10 bg-[#070b0f]">
+              <div
+                className="w-3 h-3 rounded-full border border-black/40 shrink-0"
+                style={{ backgroundColor: customHeadingColor }}
+              />
+              <span className="text-[10px] font-mono text-foreground font-semibold truncate">{customHeadingColor}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">Zadajte vlastný HEX kód</span>
+          </button>
+        </div>
+
+        {/* Custom Heading Color input if 'custom' is active */}
+        {headingColorMode === "custom" && (
+          <div className="p-4 rounded-xl border border-border/50 bg-[#070b0f] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in">
+            <div className="space-y-0.5">
+              <Label className="text-xs font-semibold text-foreground">
+                Zadajte vlastnú farbu pre nadpisy
+              </Label>
+              <p className="text-[11px] text-muted-foreground">
+                Vyberte farbu pomocou palety alebo vložte presný HEX kód.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={customHeadingColor.startsWith("#") ? customHeadingColor : "#fafbfc"}
+                onChange={(e) => setCustomHeadingColor(e.target.value)}
+                className="h-9 w-9 rounded-lg border border-border/60 p-0.5 bg-transparent cursor-pointer shrink-0"
+              />
+              <Input
+                value={customHeadingColor}
+                onChange={(e) => setCustomHeadingColor(e.target.value)}
+                placeholder="#fafbfc"
+                className="w-32 h-9 text-xs rounded-lg bg-background/60 border-border/60 font-mono text-center"
+              />
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* ------------------------------------------------------------- */}
       {/* RADIUS MODE SELECTOR                                          */}

@@ -39,6 +39,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-heading: var(--heading-color);
 }
 
 @layer base {
@@ -77,6 +78,8 @@
     --border: rgba(63, 85, 102, 0.45);
     --input: #070b0f;
     --ring: rgba(200, 212, 0, 0.4);
+    --brand-heading-color: var(--foreground);
+    --heading-color: var(--brand-heading-color, var(--foreground));
 
     /* Layered Surfaces */
     --bg-page-start: #0e161d;
@@ -109,6 +112,8 @@
     --border: rgba(63, 85, 102, 0.45);
     --input: #070b0f;
     --ring: rgba(200, 212, 0, 0.4);
+    --brand-heading-color: #fafbfc;
+    --heading-color: #fafbfc;
 
     /* Tailwind v4 theme color tokens */
     --color-background: #0e161d;
@@ -130,6 +135,7 @@
     --color-border: rgba(63, 85, 102, 0.45);
     --color-input: #070b0f;
     --color-ring: rgba(200, 212, 0, 0.4);
+    --color-heading: #fafbfc;
 
     --bg-page-start: #0e161d;
     --bg-page-end: #17212a;
@@ -240,6 +246,8 @@
     --color-border: #e2e8f0;
     --color-input: #ffffff;
     --color-ring: rgba(200, 212, 0, 0.4);
+    --heading-color: var(--brand-heading-color, var(--foreground));
+    --color-heading: var(--brand-heading-color, var(--foreground));
 
     --bg-page-start: #fafbfc;
     --bg-page-end: #f8fafc;
@@ -286,9 +294,10 @@ div[class*="absolute"][class*="z-50"] {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Clean heading spacing */
+/* Clean heading spacing & brand heading color */
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
+  color: var(--brand-heading-color, inherit);
 }
 
 /* ============================================================================== */

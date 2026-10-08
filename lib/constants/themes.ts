@@ -6,6 +6,7 @@ export interface ManualCustomColors {
   bgColor?: string;
   surfaceColor?: string;
   textColor?: string;
+  headingColor?: string;
   mutedColor?: string;
   borderColor?: string;
   primaryColor?: string;
@@ -14,6 +15,7 @@ export interface ManualCustomColors {
 
 export interface ManualThemeConfig {
   themeId: ManualThemeId;
+  headingColor?: string;
   custom?: ManualCustomColors;
 }
 
@@ -96,6 +98,7 @@ export interface ResolvedTheme {
   bgColor: string;
   surfaceColor: string;
   textColor: string;
+  headingColor: string;
   mutedColor: string;
   borderColor: string;
   primaryColor: string;
@@ -149,6 +152,7 @@ export function resolveManualTheme(
     }
 
     const textColor = custom.textColor || (isDark ? "#fafbfc" : "#0e161d");
+    const headingColor = themeConfig?.headingColor || custom.headingColor || textColor;
     const surfaceColor = custom.surfaceColor || (isDark ? "#17212a" : "#ffffff");
     const mutedColor = custom.mutedColor || (isDark ? "#96abbe" : "#64748b");
     const borderColor = custom.borderColor || (isDark ? "rgba(63, 85, 102, 0.45)" : "#e2e8f0");
@@ -161,6 +165,7 @@ export function resolveManualTheme(
       bgColor,
       surfaceColor,
       textColor,
+      headingColor,
       mutedColor,
       borderColor,
       primaryColor,
@@ -169,6 +174,7 @@ export function resolveManualTheme(
   }
 
   const preset = PRESET_THEMES[themeId] || PRESET_THEMES.paper;
+  const headingColor = themeConfig?.headingColor || preset.textColor;
 
   // For presets, if brand colors exist, prioritize brand primary / accent if requested, or keep preset accents
   return {
@@ -177,6 +183,7 @@ export function resolveManualTheme(
     bgColor: preset.bgColor,
     surfaceColor: preset.surfaceColor,
     textColor: preset.textColor,
+    headingColor,
     mutedColor: preset.mutedColor,
     borderColor: preset.borderColor,
     primaryColor: brandPrimary || preset.primaryColor,

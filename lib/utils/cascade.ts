@@ -160,6 +160,9 @@ export function computeBrandCssVariables(
     "color-scheme": theme.isDark ? "dark" : "light",
 
     // Brand theme aliases
+    "--brand-heading-color": theme.headingColor,
+    "--color-heading": theme.headingColor,
+    "--heading-color": theme.headingColor,
     "--brand-card-bg": theme.surfaceColor,
     "--brand-text-main": theme.textColor,
     "--brand-text-muted": theme.mutedColor,
@@ -224,6 +227,7 @@ export function buildBrandCascadeTokens(
       secondary,
       accent: theme.accentColor,
       neutral,
+      heading: theme.headingColor,
       success: shapes?.semanticSuccess || "#10b981",
       warning: shapes?.semanticWarning || "#f59e0b",
       danger: shapes?.semanticDanger || "#bb4934",

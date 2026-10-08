@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useMemo } from "react";
+import Link from "next/link";
 import { BrandTypography } from "@/lib/types/typography";
 import { FontRole, FontSource } from "@/lib/validations/typography";
 import {
@@ -28,12 +29,14 @@ interface TypographyGalleryViewProps {
   brandId: string;
   initialTypography: BrandTypography[];
   brandName: string;
+  headingColor?: string;
 }
 
 export function TypographyGalleryView({
   brandId,
   initialTypography,
   brandName,
+  headingColor,
 }: TypographyGalleryViewProps) {
   const [typographyList, setTypographyList] = useState<BrandTypography[]>(initialTypography);
   const [searchQuery, setSearchQuery] = useState("");
@@ -195,6 +198,35 @@ export function TypographyGalleryView({
         </div>
       </div>
 
+      {/* Brand Heading Color Quick Info Bar */}
+      {headingColor && (
+        <div className="bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-7 h-7 rounded-[3px] border border-black/40 flex items-center justify-center shrink-0 shadow-xs"
+              style={{ backgroundColor: headingColor }}
+            >
+              <Type className="w-3.5 h-3.5 text-black mix-blend-difference" />
+            </div>
+            <div>
+              <div className="text-[11px] font-bold text-[#fafbfc] flex items-center gap-2">
+                <span>Globálna farba nadpisov v manuáli:</span>
+                <span className="font-mono text-primary font-semibold">{headingColor}</span>
+              </div>
+              <p className="text-[10px] text-[#96abbe]">
+                Všetky nadpisy v brand manuáli automaticky dedia túto farbu z vizuálneho štýlu značky.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/admin/brand/${brandId}/settings`}
+            className="text-[11px] font-medium text-primary hover:underline shrink-0 flex items-center gap-1"
+          >
+            Upraviť vo Vizuálnom štýle →
+          </Link>
+        </div>
+      )}
+
       {/* Filter and Search Bar */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-[#17212a] border border-[rgba(63,85,102,0.45)] rounded-[3px] p-3">
         {/* Search */}
@@ -252,6 +284,7 @@ export function TypographyGalleryView({
               key={item.id}
               typography={item}
               brandId={brandId}
+              headingColor={headingColor}
               index={index}
               total={filteredList.length}
               onEdit={handleOpenEdit}

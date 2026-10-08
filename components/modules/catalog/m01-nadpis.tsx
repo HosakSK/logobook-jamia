@@ -8,6 +8,7 @@ import {
   Minus,
   Palette,
   Check,
+  Type,
 } from "lucide-react";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import { M01HeadingConfig } from "@/lib/validations/modules/m01";
@@ -23,7 +24,7 @@ export default function M01NadpisModule({
   isEditor = false,
   onConfigChange,
 }: ModuleRenderProps<BaseModuleConfig>) {
-  const { resolveColor } = useBrandCascade();
+  const { resolveColor, tokens } = useBrandCascade();
   const defaultBrandAccent = resolveColor(undefined, "primary");
 
   const typedConfig = config as unknown as Partial<M01HeadingConfig> | undefined;
@@ -32,9 +33,15 @@ export default function M01NadpisModule({
   const currentAlign = typedConfig?.align || "left";
   const showAccentLine = Boolean(typedConfig?.showAccentLine);
   const accentColor = typedConfig?.accentColor || defaultBrandAccent || "#FFC62C";
+  const customHeadingColor = typedConfig?.headingColor;
+  const effectiveHeadingColor =
+    customHeadingColor ||
+    typedConfig?.styleOverrides?.textColor ||
+    "var(--brand-heading-color, var(--foreground))";
   const fontFamily = typedConfig?.fontFamily || "var(--font-heading)";
 
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
+  const [isTextColorPickerOpen, setIsTextColorPickerOpen] = useState(false);
 
   // Multilingual text resolution: active locale first, with strict English fallback
   const resolvedHeading =
@@ -49,6 +56,7 @@ export default function M01NadpisModule({
       align: currentAlign,
       showAccentLine,
       accentColor,
+      headingColor: customHeadingColor,
       text: typedConfig?.text || { en: "Heading", sk: "Nadpis" },
       styleOverrides: typedConfig?.styleOverrides,
       ...patch,
@@ -239,6 +247,100 @@ export default function M01NadpisModule({
             </div>
           )}
 
+          {/* Local Heading Text Color Picker (Level 3 Override) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsTextColorPickerOpen(!isTextColorPickerOpen)}
+              className={`p-1 rounded-[2px] border flex items-center gap-1 transition-colors ${
+                customHeadingColor
+                  ? "border-primary bg-primary/20 text-white font-bold"
+                  : "border-white/20 hover:border-primary/60 text-white/70 hover:text-white"
+              }`}
+              title="Farba textu nadpisu (Level 3 lokálne prebitie)"
+            >
+              <Type className="h-3 w-3" />
+              {customHeadingColor && (
+                <div
+                  className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-xs"
+                  style={{ backgroundColor: customHeadingColor }}
+                />
+              )}
+            </button>
+
+            {isTextColorPickerOpen && (
+              <div className="absolute left-0 top-full mt-1 bg-[#0e161d] border border-[rgba(63,85,102,0.65)] rounded-[var(--brand-radius,6px)] p-2.5 shadow-2xl z-50 w-52 space-y-2.5 animate-in fade-in zoom-in-95 text-[#fafbfc]">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-[#96abbe]">
+                    Farba textu nadpisu
+                  </span>
+                  {customHeadingColor && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleUpdateConfig({ headingColor: undefined });
+                        setIsTextColorPickerOpen(false);
+                      }}
+                      className="text-[10px] text-red-400 hover:underline"
+                    >
+                      Resetovať
+                    </button>
+                  )}
+                </div>
+
+                {/* Swatches */}
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {[
+                    tokens?.colors?.primary,
+                    tokens?.colors?.secondary,
+                    tokens?.colors?.accent,
+                    tokens?.colors?.neutral,
+                    "#fafbfc",
+                    "#0e161d",
+                    "#3B82F6",
+                    "#10B981",
+                    "#BB4934",
+                  ]
+                    .filter((c, idx, arr): c is string => Boolean(c) && arr.indexOf(c) === idx)
+                    .map((col) => (
+                      <button
+                        key={col}
+                        type="button"
+                        onClick={() => {
+                          handleUpdateConfig({ headingColor: col });
+                          setIsTextColorPickerOpen(false);
+                        }}
+                        className="w-5 h-5 rounded-full border border-border/60 flex items-center justify-center transition-transform hover:scale-110"
+                        style={{ backgroundColor: col }}
+                        title={col}
+                      >
+                        {customHeadingColor?.toLowerCase() === col.toLowerCase() && (
+                          <Check className="h-2.5 w-2.5 text-black drop-shadow-xs mix-blend-difference" />
+                        )}
+                      </button>
+                    ))}
+                </div>
+
+                {/* Custom Hex input + color picker */}
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="color"
+                    value={customHeadingColor?.startsWith("#") ? customHeadingColor : "#fafbfc"}
+                    onChange={(e) => handleUpdateConfig({ headingColor: e.target.value })}
+                    className="w-6 h-6 rounded border border-[rgba(63,85,102,0.45)] p-0 bg-transparent cursor-pointer shrink-0"
+                  />
+                  <input
+                    type="text"
+                    value={customHeadingColor || ""}
+                    onChange={(e) => handleUpdateConfig({ headingColor: e.target.value })}
+                    className="flex-1 h-6 px-1.5 text-[10px] font-mono rounded-[var(--brand-radius,4px)] bg-[#070b0f] border border-[rgba(63,85,102,0.45)] text-[#fafbfc] focus:border-primary focus:outline-none"
+                    placeholder="Globálna (alebo #HEX)"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Active Locale indicator */}
           <span className="text-[9px] uppercase font-mono px-1 py-0.2 rounded-[1px] bg-white/10 border border-white/20 text-white/70">
             {locale}
@@ -253,13 +355,14 @@ export default function M01NadpisModule({
             as={Tag}
             value={resolvedHeading}
             onSave={handleSaveText}
-            className={`w-full text-foreground ${levelClass}`}
+            className={`w-full ${levelClass}`}
+            style={{ color: effectiveHeadingColor, fontFamily }}
             placeholder={locale === "sk" ? "Sem napíšte nadpis..." : "Type heading here..."}
           />
         ) : (
           <Tag
-            className={`w-full text-foreground ${levelClass}`}
-            style={{ fontFamily }}
+            className={`w-full ${levelClass}`}
+            style={{ color: effectiveHeadingColor, fontFamily }}
           >
             {resolvedHeading}
           </Tag>

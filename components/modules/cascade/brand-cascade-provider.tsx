@@ -43,6 +43,7 @@ const defaultTokens: BrandCascadeTokens = {
     secondary: "#17212a",
     accent: "#009f80",
     neutral: "#fafbfc",
+    heading: "#fafbfc",
     success: "#10b981",
     warning: "#f59e0b",
     danger: "#bb4934",

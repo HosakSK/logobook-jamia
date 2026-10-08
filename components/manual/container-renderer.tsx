@@ -91,7 +91,10 @@ export function ContainerRenderer({
       {/* Optional H2 Section Heading */}
       {container.showH2 && h2TitleText && (
         <div className="pb-3 border-b border-border/40 mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+          <h2
+            style={{ color: "var(--brand-heading-color, var(--foreground))" }}
+            className="text-xl sm:text-2xl font-bold tracking-tight"
+          >
             {h2TitleText}
           </h2>
         </div>
