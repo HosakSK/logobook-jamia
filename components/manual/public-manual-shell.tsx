@@ -284,9 +284,9 @@ export function PublicManualShell({
         </div>
       </header>
 
-      {/* Main Body Layout (Left static column removed for full-width content) */}
+      {/* Main Body Layout (Left static column removed for full-width content, max-w-7xl = 1280px) */}
       <div className="flex-1 flex w-full">
-        <main className="flex-1 min-w-0 p-6 sm:p-10 md:p-14 max-w-6xl mx-auto w-full">
+        <main className="flex-1 min-w-0 p-6 sm:p-10 md:p-14 max-w-7xl mx-auto w-full">
           {children}
         </main>
       </div>
