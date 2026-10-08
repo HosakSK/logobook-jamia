@@ -50,8 +50,8 @@ export function MarketingNav({ currentLocale, isAuthenticated }: MarketingNavPro
           ))}
         </nav>
 
-        {/* Desktop Right Controls: Language & Register/Admin CTA */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Right Controls: Language & Login (Primary) / Register (Secondary) / Admin CTA */}
+        <div className="hidden md:flex items-center gap-3">
           <LanguageSwitcher currentLocale={currentLocale} />
           {isAuthenticated ? (
             <Link
@@ -62,13 +62,21 @@ export function MarketingNav({ currentLocale, isAuthenticated }: MarketingNavPro
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           ) : (
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)]"
-            >
-              <span>{dict.marketing.navRegister}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <>
+              <Link
+                href="/register"
+                className="text-xs font-medium text-muted-foreground hover:text-white px-2 py-1.5 transition-colors"
+              >
+                {dict.marketing.navRegister}
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)]"
+              >
+                <span>{dict.nav.signIn}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </>
           )}
         </div>
 
@@ -101,7 +109,7 @@ export function MarketingNav({ currentLocale, isAuthenticated }: MarketingNavPro
               </a>
             ))}
           </div>
-          <div className="pt-3 border-t border-white/[0.08]">
+          <div className="pt-3 border-t border-white/[0.08] space-y-2">
             {isAuthenticated ? (
               <Link
                 href="/admin"
@@ -112,14 +120,25 @@ export function MarketingNav({ currentLocale, isAuthenticated }: MarketingNavPro
                 <ArrowRight className="w-4 h-4" />
               </Link>
             ) : (
-              <Link
-                href="/register"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-black text-xs font-semibold shadow-[0_0_20px_rgba(200,212,0,0.2)]"
-              >
-                <span>{dict.marketing.navRegister}</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-black text-xs font-semibold shadow-[0_0_20px_rgba(200,212,0,0.2)]"
+                >
+                  <span>{dict.nav.signIn}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <div className="text-center pt-1">
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-xs text-muted-foreground hover:text-white transition-colors"
+                  >
+                    {dict.marketing.navRegister}
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         </div>
