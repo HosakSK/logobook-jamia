@@ -191,7 +191,7 @@ export async function uploadBrandFaviconAction(
  */
 export async function setBrandFaviconAction(
   brandId: string,
-  mediaAssetIdOrUrl: string
+  mediaAssetIdOrUrl: string | null
 ): Promise<{ success: boolean; error?: string; faviconUrl?: string }> {
   try {
     const pb = await getServerPocketBase();
@@ -206,6 +206,18 @@ export async function setBrandFaviconAction(
     let finalUrl = mediaAssetIdOrUrl;
     let favAssetId: string | null = null;
 
+    if (!mediaAssetIdOrUrl) {
+      // Remove favicon
+      await pb.collection("brands").update(brand.id, {
+        favicon: null,
+      });
+      revalidatePath(`/admin/brand/${brand.id}/settings`);
+      revalidatePath(`/admin/brand/${brand.slug}/settings`);
+      revalidatePath(`/manual/${brand.slug}`, "layout");
+      revalidatePath(`/m/${brand.slug}`, "layout");
+      return { success: true, faviconUrl: "" };
+    }
+
     try {
       const mediaAsset = await pb.collection("mediaAssets").getOne(mediaAssetIdOrUrl);
       if (mediaAsset) {
@@ -213,7 +225,15 @@ export async function setBrandFaviconAction(
         finalUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
       }
     } catch {
-      // Not a mediaAsset ID, might be a direct URL or asset ID
+      // Not a mediaAsset ID, check if it's an asset in assets collection
+      try {
+        const assetRec = await pb.collection("assets").getOne(mediaAssetIdOrUrl);
+        if (assetRec && assetRec.preview) {
+          finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+        }
+      } catch {
+        // Direct URL or external URL
+      }
     }
 
     await pb.collection("brands").update(brand.id, {
@@ -222,9 +242,11 @@ export async function setBrandFaviconAction(
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/manual/${brand.slug}`, "layout");
+    revalidatePath(`/m/${brand.slug}`, "layout");
     return {
       success: true,
-      faviconUrl: finalUrl,
+      faviconUrl: finalUrl || undefined,
     };
   } catch (err: unknown) {
     console.error("Failed to set brand favicon:", err);

@@ -22,12 +22,13 @@ export default async function ManualLayout({
   let brandTokens;
   let cssVariables: Record<string, string> = {};
   let headerLogoUrl: string | undefined = undefined;
+  let faviconUrl: string | undefined = undefined;
 
   try {
     brandRecord = await pb
       .collection("brands")
       .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`, {
-        expand: "headerLogo",
+        expand: "headerLogo,favicon",
       });
   } catch {
     // Brand record not matched directly by slug
@@ -36,6 +37,33 @@ export default async function ManualLayout({
   const brandName = brandRecord?.name || domain;
   const brandSlug = brandRecord?.slug || domain;
   const hideLogobookBadge = brandRecord?.hideLogobookBadge || false;
+
+  // Resolve favicon URL
+  if (brandRecord?.expand?.favicon) {
+    const fAsset = brandRecord.expand.favicon;
+    faviconUrl = pb.files.getURL(fAsset, fAsset.file);
+  } else if (brandRecord?.favicon) {
+    const fav = brandRecord.favicon;
+    if (typeof fav === "string" && (fav.startsWith("http://") || fav.startsWith("https://") || fav.startsWith("/"))) {
+      faviconUrl = fav;
+    } else {
+      try {
+        const mediaRec = await pb.collection("mediaAssets").getOne(fav);
+        if (mediaRec && mediaRec.file) {
+          faviconUrl = pb.files.getURL(mediaRec, mediaRec.file);
+        }
+      } catch {
+        try {
+          const assetRec = await pb.collection("assets").getOne(fav);
+          if (assetRec && assetRec.preview) {
+            faviconUrl = pb.files.getURL(assetRec, assetRec.preview);
+          }
+        } catch {
+          // not found
+        }
+      }
+    }
+  }
 
   // Resolve header logo URL from expanded relation, mediaAssets, assets, or publishedConfig
   if (brandRecord?.expand?.headerLogo) {
@@ -118,6 +146,7 @@ export default async function ManualLayout({
   }
 
   const publishedConfig = (brandRecord?.publishedConfig || null) as PublishedBrandSnapshot | null;
+  const activeFavicon = faviconUrl || (publishedConfig?.brand as any)?.faviconUrl || "/logo/logo-symbol-dark.svg";
 
   return (
     <BrandCascadeProvider
@@ -125,6 +154,12 @@ export default async function ManualLayout({
       style={cssVariables as unknown as React.CSSProperties}
       className="min-h-screen bg-background"
     >
+      {activeFavicon && (
+        <head>
+          <link rel="icon" href={activeFavicon} />
+          <link rel="apple-touch-icon" href={activeFavicon} />
+        </head>
+      )}
       <PublicManualShell
         brand={{
           id: brandRecord?.id || domain,

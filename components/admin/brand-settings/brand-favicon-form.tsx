@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { uploadBrandFaviconAction, setBrandFaviconAction } from "@/actions/brand-settings";
+import { setBrandFaviconAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dictionary } from "@/lib/i18n";
-import { Upload, Check, AlertCircle, Loader2, Sparkles, FolderOpen } from "lucide-react";
+import { Check, AlertCircle, Loader2, Sparkles, FolderOpen, Trash2 } from "lucide-react";
 import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 interface BrandFaviconFormProps {
@@ -18,26 +18,54 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [savedFaviconUrl, setSavedFaviconUrl] = useState<string | null>(initialFaviconUrl || null);
+  const [selectedItem, setSelectedItem] = useState<SelectedMediaItem | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialFaviconUrl || null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
+  // When media is picked from modal, update preview and mark as pending save
   const handleMediaSelect = (item: SelectedMediaItem) => {
     setError(null);
+    setSelectedItem(item);
     setPreviewUrl(item.url);
+  };
 
+  const handleSaveFavicon = () => {
+    if (!selectedItem && previewUrl === savedFaviconUrl) return;
+
+    setError(null);
     startTransition(async () => {
-      const res = await setBrandFaviconAction(brandId, item.id || item.url);
+      const res = await setBrandFaviconAction(brandId, selectedItem ? (selectedItem.id || selectedItem.url) : previewUrl);
       if (res.success) {
         setSuccess(true);
-        if (res.faviconUrl) {
-          setPreviewUrl(res.faviconUrl);
-        }
+        const newUrl = res.faviconUrl || (selectedItem ? selectedItem.url : previewUrl);
+        setSavedFaviconUrl(newUrl);
+        setPreviewUrl(newUrl);
+        setSelectedItem(null);
         setTimeout(() => setSuccess(false), 4000);
       } else {
-        setError(res.error || "Nepodarilo sa nastaviť favicon");
+        setError(res.error || "Nepodarilo sa uložiť favicon");
       }
     });
   };
+
+  const handleRemoveFavicon = () => {
+    setError(null);
+    startTransition(async () => {
+      const res = await setBrandFaviconAction(brandId, "");
+      if (res.success) {
+        setSavedFaviconUrl(null);
+        setPreviewUrl(null);
+        setSelectedItem(null);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 4000);
+      } else {
+        setError(res.error || "Nepodarilo sa odstrániť favicon");
+      }
+    });
+  };
+
+  const hasUnsavedChanges = selectedItem !== null || (previewUrl !== savedFaviconUrl);
 
   return (
     <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-6">
@@ -58,7 +86,7 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
       {success && (
         <div className="flex items-center gap-2.5 p-4 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-xl">
           <Check className="h-4 w-4 shrink-0" />
-          <span>Favicon bol úspešne nahraný!</span>
+          <span>Favicon bol úspešne uložený!</span>
         </div>
       )}
 
@@ -72,32 +100,69 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
           )}
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2.5 flex-1">
           <Label className="text-xs font-semibold text-muted-foreground">Favicon a ikona záložky</Label>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Vyberte z už nahraných médií a symbolov značky alebo nahrajte nový .ico, .png, .svg súbor.
           </p>
-          <Button
-            type="button"
-            variant="outline"
-            size="default"
-            disabled={isPending}
-            onClick={() => setIsPickerOpen(true)}
-            className="mt-1 shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                <span>Ukladám favicon...</span>
-              </>
-            ) : (
-              <>
-                <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
-                <span>Vybrať alebo nahrať favicon</span>
-              </>
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              disabled={isPending}
+              onClick={() => setIsPickerOpen(true)}
+              className="shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
+            >
+              <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
+              <span>{previewUrl ? "Zmeniť favicon" : "Vybrať alebo nahrať favicon"}</span>
+            </Button>
+
+            {previewUrl && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="default"
+                disabled={isPending}
+                onClick={handleRemoveFavicon}
+                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-950/30"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                <span>Odstrániť</span>
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
+      </div>
+
+      {/* Save Button Bar */}
+      <div className="flex items-center justify-between pt-4 border-t border-[rgba(63,85,102,0.3)]">
+        <span className="text-xs text-muted-foreground">
+          {hasUnsavedChanges ? (
+            <span className="text-amber-400 font-medium">Máte neuložený výber favicony</span>
+          ) : (
+            "Zmeny sa aplikujú na záložku prehliadača manuálu"
+          )}
+        </span>
+        <Button
+          type="button"
+          onClick={handleSaveFavicon}
+          disabled={isPending || !hasUnsavedChanges}
+          size="default"
+          className="bg-[#c8d400] hover:bg-[#b0bc00] text-[#070b0f] font-bold shadow-md cursor-pointer disabled:opacity-50"
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <span>Ukladám...</span>
+            </>
+          ) : (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              <span>Uložiť favicon</span>
+            </>
+          )}
+        </Button>
       </div>
 
       <UniversalMediaPickerModal

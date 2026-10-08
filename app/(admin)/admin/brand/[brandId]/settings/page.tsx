@@ -46,6 +46,19 @@ export default async function BrandSettingsPage({
   if (brand.expand?.favicon) {
     const favAsset = brand.expand.favicon;
     faviconUrl = getFileUrl(favAsset.collectionId || "mediaAssets", favAsset.id, favAsset.file);
+  } else if (brand.favicon) {
+    if (typeof brand.favicon === "string" && (brand.favicon.startsWith("http://") || brand.favicon.startsWith("https://") || brand.favicon.startsWith("/"))) {
+      faviconUrl = brand.favicon;
+    } else {
+      try {
+        const assetRec = await pb.collection("assets").getOne(brand.favicon);
+        if (assetRec && assetRec.preview) {
+          faviconUrl = getFileUrl("assets", assetRec.id, assetRec.preview);
+        }
+      } catch {
+        // fallback
+      }
+    }
   }
 
   // Resolve Header Logo URL

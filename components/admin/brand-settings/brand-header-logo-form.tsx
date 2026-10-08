@@ -22,23 +22,33 @@ export function BrandHeaderLogoForm({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [savedLogoUrl, setSavedLogoUrl] = useState<string | null>(initialHeaderLogoUrl || null);
+  const [selectedItem, setSelectedItem] = useState<SelectedMediaItem | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialHeaderLogoUrl || null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
+  // When media is picked from modal, update preview and mark as pending save
   const handleMediaSelect = (item: SelectedMediaItem) => {
     setError(null);
+    setSelectedItem(item);
     setPreviewUrl(item.url);
+  };
 
+  const handleSaveLogo = () => {
+    if (!selectedItem && previewUrl === savedLogoUrl) return;
+
+    setError(null);
     startTransition(async () => {
-      const res = await setBrandHeaderLogoAction(brandId, item.id || item.url);
+      const res = await setBrandHeaderLogoAction(brandId, selectedItem ? (selectedItem.id || selectedItem.url) : previewUrl);
       if (res.success) {
         setSuccess(true);
-        if (res.headerLogoUrl) {
-          setPreviewUrl(res.headerLogoUrl);
-        }
+        const newUrl = res.headerLogoUrl || (selectedItem ? selectedItem.url : previewUrl);
+        setSavedLogoUrl(newUrl);
+        setPreviewUrl(newUrl);
+        setSelectedItem(null);
         setTimeout(() => setSuccess(false), 4000);
       } else {
-        setError(res.error || "Nepodarilo sa nastaviť logo v hlavičke");
+        setError(res.error || "Nepodarilo sa uložiť logo v hlavičke");
       }
     });
   };
@@ -48,7 +58,9 @@ export function BrandHeaderLogoForm({
     startTransition(async () => {
       const res = await setBrandHeaderLogoAction(brandId, null);
       if (res.success) {
+        setSavedLogoUrl(null);
         setPreviewUrl(null);
+        setSelectedItem(null);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 4000);
       } else {
@@ -56,6 +68,8 @@ export function BrandHeaderLogoForm({
       }
     });
   };
+
+  const hasUnsavedChanges = selectedItem !== null || (previewUrl !== savedLogoUrl);
 
   return (
     <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-6">
@@ -76,7 +90,7 @@ export function BrandHeaderLogoForm({
       {success && (
         <div className="flex items-center gap-2.5 p-4 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-xl">
           <Check className="h-4 w-4 shrink-0" />
-          <span>Logo v hlavičke bolo úspešne aktualizované!</span>
+          <span>Logo v hlavičke bolo úspešne uložené!</span>
         </div>
       )}
 
@@ -113,17 +127,8 @@ export function BrandHeaderLogoForm({
               onClick={() => setIsPickerOpen(true)}
               className="shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
             >
-              {isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  <span>Ukladám...</span>
-                </>
-              ) : (
-                <>
-                  <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
-                  <span>{previewUrl ? "Zmeniť logo v hlavičke" : "Vybrať logo v hlavičke"}</span>
-                </>
-              )}
+              <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
+              <span>{previewUrl ? "Zmeniť logo v hlavičke" : "Vybrať logo v hlavičke"}</span>
             </Button>
 
             {previewUrl && (
@@ -141,6 +146,36 @@ export function BrandHeaderLogoForm({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Save Button Bar */}
+      <div className="flex items-center justify-between pt-4 border-t border-[rgba(63,85,102,0.3)]">
+        <span className="text-xs text-muted-foreground">
+          {hasUnsavedChanges ? (
+            <span className="text-amber-400 font-medium">Máte neuložený výber loga</span>
+          ) : (
+            "Zmeny sa aplikujú na verejný manuál"
+          )}
+        </span>
+        <Button
+          type="button"
+          onClick={handleSaveLogo}
+          disabled={isPending || !hasUnsavedChanges}
+          size="default"
+          className="bg-[#c8d400] hover:bg-[#b0bc00] text-[#070b0f] font-bold shadow-md cursor-pointer disabled:opacity-50"
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              <span>Ukladám...</span>
+            </>
+          ) : (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              <span>Uložiť logo</span>
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Universal Media Picker Modal */}
