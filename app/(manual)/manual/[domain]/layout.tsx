@@ -65,6 +65,11 @@ export default async function ManualLayout({
     }
   }
 
+  // Fallback to description.faviconUrl
+  if (!faviconUrl && typeof brandRecord?.description === "object" && brandRecord.description?.faviconUrl) {
+    faviconUrl = brandRecord.description.faviconUrl;
+  }
+
   // Resolve header logo URL from expanded relation, mediaAssets, assets, or publishedConfig
   if (brandRecord?.expand?.headerLogo) {
     const hlAsset = brandRecord.expand.headerLogo;
@@ -90,6 +95,11 @@ export default async function ManualLayout({
         }
       }
     }
+  }
+
+  // Fallback to description.headerLogoUrl
+  if (!headerLogoUrl && typeof brandRecord?.description === "object" && brandRecord.description?.headerLogoUrl) {
+    headerLogoUrl = brandRecord.description.headerLogoUrl;
   }
 
   // Fallback: If no header logo set, look for the first brand asset (logo)

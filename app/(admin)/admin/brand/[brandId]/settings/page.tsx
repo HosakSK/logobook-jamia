@@ -61,6 +61,11 @@ export default async function BrandSettingsPage({
     }
   }
 
+  // Fallback to description.faviconUrl
+  if (!faviconUrl && typeof brand.description === "object" && brand.description?.faviconUrl) {
+    faviconUrl = brand.description.faviconUrl;
+  }
+
   // Resolve Header Logo URL
   let headerLogoUrl: string | null = null;
   if (brand.expand?.headerLogo) {
@@ -80,6 +85,11 @@ export default async function BrandSettingsPage({
         // fallback
       }
     }
+  }
+
+  // Fallback to description.headerLogoUrl
+  if (!headerLogoUrl && typeof brand.description === "object" && brand.description?.headerLogoUrl) {
+    headerLogoUrl = brand.description.headerLogoUrl;
   }
 
   // Fetch Global Shapes record

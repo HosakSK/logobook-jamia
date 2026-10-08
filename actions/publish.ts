@@ -271,6 +271,10 @@ export async function publishBrandAction(brandId: string): Promise<{
       }
     }
 
+    if (!snapshotHeaderLogoUrl && typeof brand.description === "object" && brand.description?.headerLogoUrl) {
+      snapshotHeaderLogoUrl = brand.description.headerLogoUrl;
+    }
+
     if (!snapshotHeaderLogoUrl) {
       try {
         const firstAsset = await pb.collection("assets").getFirstListItem(

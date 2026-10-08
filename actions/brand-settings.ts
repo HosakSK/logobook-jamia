@@ -206,10 +206,16 @@ export async function setBrandFaviconAction(
     let finalUrl = mediaAssetIdOrUrl;
     let favAssetId: string | null = null;
 
+    const existingDesc = (typeof brand.description === "object" && brand.description !== null)
+      ? { ...brand.description }
+      : {};
+
     if (!mediaAssetIdOrUrl) {
       // Remove favicon
+      delete existingDesc.faviconUrl;
       await pb.collection("brands").update(brand.id, {
         favicon: null,
+        description: existingDesc,
       });
       revalidatePath(`/admin/brand/${brand.id}/settings`);
       revalidatePath(`/admin/brand/${brand.slug}/settings`);
@@ -236,9 +242,21 @@ export async function setBrandFaviconAction(
       }
     }
 
-    await pb.collection("brands").update(brand.id, {
-      favicon: favAssetId,
-    });
+    const updatedDesc = {
+      ...existingDesc,
+      faviconUrl: finalUrl || "",
+    };
+
+    const updatePayload: Record<string, any> = {
+      description: updatedDesc,
+    };
+    if (favAssetId) {
+      updatePayload.favicon = favAssetId;
+    } else {
+      updatePayload.favicon = null;
+    }
+
+    await pb.collection("brands").update(brand.id, updatePayload);
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
@@ -295,6 +313,7 @@ export async function setBrandHeaderLogoAction(
 
     if (!mediaAssetIdOrUrl) {
       // Remove header logo
+      delete updatedDesc.headerLogoUrl;
       await pb.collection("brands").update(brand.id, {
         headerLogo: null,
         description: updatedDesc,
@@ -333,10 +352,18 @@ export async function setBrandHeaderLogoAction(
       }
     }
 
-    await pb.collection("brands").update(brand.id, {
-      headerLogo: headerMediaId,
+    updatedDesc.headerLogoUrl = finalUrl || "";
+
+    const updatePayload: Record<string, any> = {
       description: updatedDesc,
-    });
+    };
+    if (headerMediaId) {
+      updatePayload.headerLogo = headerMediaId;
+    } else {
+      updatePayload.headerLogo = null;
+    }
+
+    await pb.collection("brands").update(brand.id, updatePayload);
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
