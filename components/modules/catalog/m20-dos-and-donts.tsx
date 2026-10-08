@@ -542,7 +542,7 @@ export default function M20DosAndDontsModule({
               >
                 {/* Visual Preview Box */}
                 <div
-                  className="relative w-full aspect-[16/10] sm:aspect-[4/3] flex items-center justify-center overflow-hidden border-b border-border/40"
+                  className="relative w-full aspect-square flex items-center justify-center overflow-hidden border-b border-border/40"
                   style={getCardBackgroundStyle(item)}
                 >
                   {/* Visual Status Badge */}

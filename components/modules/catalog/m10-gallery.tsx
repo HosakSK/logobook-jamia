@@ -727,7 +727,7 @@ export default function M10ObrazokGaleriaModule({
                                   : [...prev, m.id]
                               );
                             }}
-                            className={`relative aspect-4/3 rounded-[3px] border overflow-hidden cursor-pointer group/media transition-all ${
+                            className={`relative aspect-square rounded-[3px] border overflow-hidden cursor-pointer group/media transition-all ${
                               isSelected
                                 ? "border-primary ring-2 ring-primary/40"
                                 : "border-white/10 hover:border-white/30"
