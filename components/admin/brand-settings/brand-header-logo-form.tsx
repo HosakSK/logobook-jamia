@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { setBrandHeaderLogoAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -41,6 +41,14 @@ export function BrandHeaderLogoForm({
   // Show brand name next to logo in header
   const [showHeaderBrandName, setShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
   const [savedShowHeaderBrandName, setSavedShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
+
+  // Synchronize when initialHeaderLogoUrl prop changes (e.g. after revalidation or page load)
+  useEffect(() => {
+    if (!selectedItem) {
+      setPreviewUrl(initialHeaderLogoUrl || null);
+      setSavedLogoUrl(initialHeaderLogoUrl || null);
+    }
+  }, [initialHeaderLogoUrl, selectedItem]);
 
   // When media is picked from modal, update preview and mark as pending save
   const handleMediaSelect = (item: SelectedMediaItem) => {

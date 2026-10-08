@@ -72,17 +72,24 @@ export default async function BrandSettingsPage({
     const hlAsset = brand.expand.headerLogo;
     headerLogoUrl = getFileUrl(hlAsset.collectionId || "mediaAssets", hlAsset.id, hlAsset.file);
   } else if (brand.headerLogo) {
-    // Check if brand.headerLogo points to an asset in assets collection or is a URL
+    // Check if brand.headerLogo points to an asset in assets/mediaAssets collection or is a URL
     if (typeof brand.headerLogo === "string" && (brand.headerLogo.startsWith("http://") || brand.headerLogo.startsWith("https://") || brand.headerLogo.startsWith("/"))) {
       headerLogoUrl = brand.headerLogo;
     } else {
       try {
-        const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
-        if (assetRec) {
-          headerLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? getFileUrl("assets", assetRec.id, assetRec.preview) : null);
+        const mediaRec = await pb.collection("mediaAssets").getOne(brand.headerLogo);
+        if (mediaRec && mediaRec.file) {
+          headerLogoUrl = getFileUrl("mediaAssets", mediaRec.id, mediaRec.file);
         }
       } catch {
-        // fallback
+        try {
+          const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
+          if (assetRec) {
+            headerLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? getFileUrl("assets", assetRec.id, assetRec.preview) : null);
+          }
+        } catch {
+          // fallback
+        }
       }
     }
   }
@@ -90,6 +97,21 @@ export default async function BrandSettingsPage({
   // Fallback to description.headerLogoUrl
   if (!headerLogoUrl && typeof brand.description === "object" && brand.description?.headerLogoUrl) {
     headerLogoUrl = brand.description.headerLogoUrl;
+  }
+
+  // Fallback: If no header logo set explicitly, look for the first brand asset (logo)
+  if (!headerLogoUrl && brand.id) {
+    try {
+      const firstAsset = await pb.collection("assets").getFirstListItem(
+        `brand = "${brand.id}"`,
+        { sort: "order" }
+      );
+      if (firstAsset) {
+        headerLogoUrl = firstAsset.svgContent ? `/api/assets/${firstAsset.id}/svg` : (firstAsset.preview ? getFileUrl("assets", firstAsset.id, firstAsset.preview) : null);
+      }
+    } catch {
+      // No assets found
+    }
   }
 
   // Fetch Global Shapes record

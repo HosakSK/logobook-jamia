@@ -327,6 +327,26 @@ export function BrandShapesForm({
     });
   };
 
+  // Helper for live preview gradient overlay CSS
+  const previewGradientCss = useMemo(() => {
+    if (!gradientEnabled) return "";
+    const dir = gradientDirection || "to-bottom";
+    const bg = currentTheme.bgColor;
+    if (dir === "radial") {
+      return `radial-gradient(circle at center, transparent 0%, ${bg} 100%)`;
+    }
+    const dirMap: Record<string, string> = {
+      "to-bottom": "to bottom",
+      "to-top": "to top",
+      "to-right": "to right",
+      "to-left": "to left",
+      "to-bottom-right": "to bottom right",
+      "to-bottom-left": "to bottom left",
+    };
+    const cssDir = dirMap[dir] || "to bottom";
+    return `linear-gradient(${cssDir}, ${bg} 0%, transparent 100%)`;
+  }, [gradientEnabled, gradientDirection, currentTheme.bgColor]);
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -367,6 +387,12 @@ export function BrandShapesForm({
             <span>Téma: {themeId.toUpperCase()}</span>
             <span>•</span>
             <span>Pozadie: {currentTheme.bgColor}</span>
+            {patternEnabled && patternUrl && (
+              <>
+                <span>•</span>
+                <span className="text-[#c8d400]">Pattern: aktívny</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -376,8 +402,39 @@ export function BrandShapesForm({
             backgroundColor: currentTheme.bgColor,
             color: currentTheme.textColor,
           }}
-          className="p-6 sm:p-8 rounded-xl border border-border/40 transition-colors shadow-inner space-y-4"
+          className="relative overflow-hidden p-6 sm:p-8 rounded-xl border border-border/40 transition-colors shadow-inner space-y-4"
         >
+          {/* Pattern Layer inside Canvas Preview */}
+          {patternEnabled && patternUrl && (
+            <div
+              className="absolute inset-0 pointer-events-none z-0"
+              style={{
+                backgroundImage: `url(${patternUrl})`,
+                backgroundRepeat: patternType === "repeat" ? "repeat" : "no-repeat",
+                backgroundSize:
+                  patternType === "cover"
+                    ? "cover"
+                    : patternType === "contain"
+                    ? "contain"
+                    : patternType === "zoom" || zoomPercent
+                    ? `${zoomPercent || 100}%`
+                    : "auto",
+                backgroundPosition: "center",
+                opacity: patternOpacity,
+              }}
+            />
+          )}
+
+          {/* Fade-out Overlay inside Canvas Preview */}
+          {patternEnabled && previewGradientCss && (
+            <div
+              className="absolute inset-0 pointer-events-none z-0"
+              style={{
+                background: previewGradientCss,
+              }}
+            />
+          )}
+
           {/* Sample Card Surface */}
           <div
             style={{
@@ -387,7 +444,7 @@ export function BrandShapesForm({
               backgroundColor: currentTheme.surfaceColor,
               color: currentTheme.textColor,
             }}
-            className="p-6 transition-all flex flex-col md:flex-row items-center justify-between gap-6 shadow-md"
+            className="relative z-10 p-6 transition-all flex flex-col md:flex-row items-center justify-between gap-6 shadow-md"
           >
             <div className="space-y-1.5 text-center md:text-left">
               <div className="flex items-center gap-2 justify-center md:justify-start">
