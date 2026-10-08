@@ -159,9 +159,11 @@ export function PublicManualShell({
     if (!patternConfig?.overlayGradient?.enabled) return "";
     const dir = patternConfig.overlayGradient.direction || "to-bottom";
     const bg = tokens?.manualBgColor || "var(--background)";
-    const spread = patternConfig.overlayGradient.spreadPercent ?? 70; // default 70%
+    const spread = patternConfig.overlayGradient.spreadPercent ?? 60; // 0% - 100% (kde 100% = úplne prekryté)
     if (dir === "radial") {
-      return `radial-gradient(circle at center, transparent 0%, ${bg} ${spread}%)`;
+      // spread 100% znamená že pozadie prekryje takmer celú plochu
+      const centerTransparent = Math.max(0, 100 - spread);
+      return `radial-gradient(circle at center, transparent 0%, transparent ${centerTransparent * 0.4}%, ${bg} ${100 - (centerTransparent * 0.2)}%)`;
     }
     const dirMap: Record<string, string> = {
       "to-bottom": "to bottom",
@@ -172,7 +174,11 @@ export function PublicManualShell({
       "to-bottom-left": "to bottom left",
     };
     const cssDir = dirMap[dir] || "to bottom";
-    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${Math.max(0, spread - 40)}%, transparent ${spread}%)`;
+    // spread = percento obrazovky, ktoré je prekryté plnou farbou pozadia (fade-in z transparent do plnej farby alebo opačne)
+    // 0% spread = pattern plne viditeľný; 100% spread = celé pozadie je prekryté farbou pozadia
+    const solidStop = Math.min(100, Math.max(0, spread));
+    const transStop = Math.max(0, 100 - solidStop);
+    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${solidStop * 0.75}%, transparent ${Math.min(100, solidStop + transStop * 0.6)}%, transparent 100%)`;
   }, [patternConfig, tokens?.manualBgColor]);
 
   return (
@@ -200,10 +206,8 @@ export function PublicManualShell({
                 ? "cover"
                 : patternConfig.patternType === "contain"
                 ? "contain"
-                : patternConfig.patternType === "zoom" || patternConfig.zoomPercent
-                ? `${patternConfig.zoomPercent || 100}%`
-                : patternConfig.patternType === "single"
-                ? `${patternConfig.zoomPercent || 100}%`
+                : patternConfig.patternType === "zoom" || patternConfig.patternType === "single" || patternConfig.patternType === "repeat"
+                ? `${patternConfig.zoomPercent ?? 100}%`
                 : "auto",
             backgroundPosition: bgPositionCss,
             opacity: patternConfig.opacity ?? 0.15,

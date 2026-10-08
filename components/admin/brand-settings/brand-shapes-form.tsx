@@ -382,9 +382,10 @@ export function BrandShapesForm({
     if (!gradientEnabled) return "";
     const dir = gradientDirection || "to-bottom";
     const bg = currentTheme.bgColor;
-    const spread = gradientSpreadPercent ?? 70;
+    const spread = gradientSpreadPercent ?? 60; // 0% - 100%
     if (dir === "radial") {
-      return `radial-gradient(circle at center, transparent 0%, ${bg} ${spread}%)`;
+      const centerTransparent = Math.max(0, 100 - spread);
+      return `radial-gradient(circle at center, transparent 0%, transparent ${centerTransparent * 0.4}%, ${bg} ${100 - (centerTransparent * 0.2)}%)`;
     }
     const dirMap: Record<string, string> = {
       "to-bottom": "to bottom",
@@ -395,7 +396,9 @@ export function BrandShapesForm({
       "to-bottom-left": "to bottom left",
     };
     const cssDir = dirMap[dir] || "to bottom";
-    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${Math.max(0, spread - 40)}%, transparent ${spread}%)`;
+    const solidStop = Math.min(100, Math.max(0, spread));
+    const transStop = Math.max(0, 100 - solidStop);
+    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${solidStop * 0.75}%, transparent ${Math.min(100, solidStop + transStop * 0.6)}%, transparent 100%)`;
   }, [gradientEnabled, gradientDirection, gradientSpreadPercent, currentTheme.bgColor]);
 
   return (
@@ -467,7 +470,7 @@ export function BrandShapesForm({
                     ? "cover"
                     : patternType === "contain"
                     ? "contain"
-                    : patternType === "zoom" || zoomPercent
+                    : patternType === "zoom" || patternType === "single" || patternType === "repeat"
                     ? `${zoomPercent || 100}%`
                     : "auto",
                 backgroundPosition: previewBgPositionCss,
@@ -1325,16 +1328,16 @@ export function BrandShapesForm({
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
-                    min="10"
+                    min="1"
                     max="300"
-                    step="5"
+                    step="1"
                     value={zoomPercent}
                     onChange={(e) => setZoomPercent(Number(e.target.value))}
                     className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
                   />
                   <Input
                     type="number"
-                    min="10"
+                    min="1"
                     max="300"
                     value={zoomPercent}
                     onChange={(e) => setZoomPercent(Number(e.target.value))}
@@ -1343,31 +1346,33 @@ export function BrandShapesForm({
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs font-medium">
-                  <Label>Odsadenie od okraja</Label>
-                  <span className="font-mono text-muted-foreground">{marginPx}px</span>
+              {patternType !== "repeat" && patternType !== "cover" && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <Label>Odsadenie od okraja obrazovky</Label>
+                    <span className="font-mono text-muted-foreground">{marginPx}px</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min="0"
+                      max="240"
+                      step="4"
+                      value={marginPx}
+                      onChange={(e) => setMarginPx(Number(e.target.value))}
+                      className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                    />
+                    <Input
+                      type="number"
+                      min="0"
+                      max="240"
+                      value={marginPx}
+                      onChange={(e) => setMarginPx(Number(e.target.value))}
+                      className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min="0"
-                    max="160"
-                    step="4"
-                    value={marginPx}
-                    onChange={(e) => setMarginPx(Number(e.target.value))}
-                    className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
-                  />
-                  <Input
-                    type="number"
-                    min="0"
-                    max="160"
-                    value={marginPx}
-                    onChange={(e) => setMarginPx(Number(e.target.value))}
-                    className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
-                  />
-                </div>
-              </div>
+              )}
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium">
@@ -1433,13 +1438,13 @@ export function BrandShapesForm({
 
                   <div className="space-y-1.5 max-w-sm">
                     <div className="flex items-center justify-between text-xs font-medium">
-                      <Label className="text-muted-foreground">Dĺžka / rozsah prechodu (Spread)</Label>
+                      <Label className="text-muted-foreground">Miera prekrytia / rozsah (Spread)</Label>
                       <span className="font-mono text-muted-foreground">{gradientSpreadPercent}%</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <input
                         type="range"
-                        min="20"
+                        min="10"
                         max="100"
                         step="5"
                         value={gradientSpreadPercent}
@@ -1448,13 +1453,16 @@ export function BrandShapesForm({
                       />
                       <Input
                         type="number"
-                        min="20"
+                        min="10"
                         max="100"
                         value={gradientSpreadPercent}
                         onChange={(e) => setGradientSpreadPercent(Number(e.target.value))}
                         className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
                       />
                     </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Pri 100% prechod prekryje celú plochu jednoliatej farbou pozadia; pri nižších hodnotách odhaľuje vzor.
+                    </p>
                   </div>
                 </div>
               )}
@@ -1490,7 +1498,7 @@ export function BrandShapesForm({
                           ? "cover"
                           : patternType === "contain"
                           ? "contain"
-                          : patternType === "zoom" || zoomPercent
+                          : patternType === "zoom" || patternType === "single" || patternType === "repeat"
                           ? `${zoomPercent || 100}%`
                           : "auto",
                       backgroundPosition: previewBgPositionCss,
