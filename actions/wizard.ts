@@ -11,6 +11,9 @@ import { seedSystemTemplatesAction } from "@/actions/templates";
 import { DEFAULT_SYSTEM_TEMPLATES } from "@/lib/constants/default-templates";
 import { PageTemplateStructure } from "@/lib/types/template";
 import { ContainerLayoutType } from "@/types/pocketbase-types";
+import { getBrandAssetsAction } from "@/actions/assets";
+import { BrandAsset } from "@/lib/types/asset";
+import { M07FormatItem } from "@/lib/validations/modules/m07";
 
 // Helper: verify user permissions for a brand
 async function verifyBrandAccess(pb: any, brandId: string, userId: string) {
@@ -105,6 +108,17 @@ export async function generateBrandTreeAction(
 
     const existingSlugMap = new Map<string, any>(existingPages.map((p: any) => [p.slug, p]));
 
+    // 4. Fetch existing brand assets to auto-populate logo modules
+    let brandAssets: BrandAsset[] = [];
+    try {
+      const assetsRes = await getBrandAssetsAction(brandId);
+      if (assetsRes.success && assetsRes.assets) {
+        brandAssets = assetsRes.assets;
+      }
+    } catch (assetsErr) {
+      console.warn("Failed to fetch brand assets for auto-populating wizard pages:", assetsErr);
+    }
+
     let createdPagesCount = 0;
     let createdModulesCount = 0;
     let skippedPagesCount = 0;
@@ -145,7 +159,8 @@ export async function generateBrandTreeAction(
     const applyStructure = async (
       pageId: string,
       structure: PageTemplateStructure,
-      overrideLinkGroupId?: string
+      overrideLinkGroupId?: string,
+      matchedAsset?: BrandAsset | null
     ) => {
       if (!structure || !Array.isArray(structure.containers)) return;
 
@@ -177,13 +192,88 @@ export async function generateBrandTreeAction(
               const processedH3Title = tModule.h3Title
                 ? replaceBrandTokens(tModule.h3Title, brandName)
                 : null;
-              const processedConfig = tModule.config
+              let processedConfig = tModule.config
                 ? replaceBrandTokens(tModule.config, brandName)
                 : {};
 
               let activeLinkGroupId = tModule.linkGroupId || "";
               if (overrideLinkGroupId && tModule.moduleType === "M08_OchrannaZonaLoga") {
                 activeLinkGroupId = overrideLinkGroupId;
+              }
+
+              // Auto-populate M07 (Logo Viewer) if a matched brand asset was found
+              if (matchedAsset && tModule.moduleType === "M07_ZobrazenieLoga") {
+                const medMap: Record<string, "cmyk" | "rgb" | "universal"> = {
+                  DIGITAL_RGB: "rgb",
+                  PRINT_CMYK: "cmyk",
+                  UNIVERSAL: "universal",
+                };
+                const oriMap: Record<string, "horizontal" | "vertical" | "symbol"> = {
+                  HORIZONTAL: "horizontal",
+                  VERTICAL: "vertical",
+                  SYMBOL: "symbol",
+                };
+                const bgMap: Record<string, "light" | "dark" | "brand" | "monochrome"> = {
+                  LIGHT: "light",
+                  DARK: "dark",
+                  BRAND: "brand",
+                  MONOCHROME: "monochrome",
+                };
+
+                const mappedFormats: M07FormatItem[] = matchedAsset.files.map((file, idx) => ({
+                  id: `asset-file-${file.id || idx}`,
+                  format: (file.fileFormat as any) || "SVG",
+                  storageType: "LOGOBOOK_R2",
+                  url: file.fileUrl || "",
+                  fileName: file.file || `logo_${file.fileFormat?.toLowerCase()}`,
+                }));
+
+                const primarySvgUrl =
+                  matchedAsset.previewUrl ||
+                  matchedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl ||
+                  "";
+
+                processedConfig = {
+                  ...processedConfig,
+                  sourceMode: "library",
+                  assetId: matchedAsset.id,
+                  meta: {
+                    medium: medMap[matchedAsset.medium] || "universal",
+                    orientation: oriMap[matchedAsset.orientation] || "horizontal",
+                    hasClaim: matchedAsset.hasClaim ?? false,
+                    backgroundType: bgMap[matchedAsset.background] || "light",
+                  },
+                  directPreview: {
+                    svgUrl: primarySvgUrl,
+                    mockupImageUrl: "",
+                    backgroundColor: "transparent",
+                    showCopySvg: true,
+                  },
+                  formats: mappedFormats,
+                  downloadAll: {
+                    enabled: true,
+                    mode: "zip_client",
+                    url: "",
+                  },
+                };
+              }
+
+              // Auto-populate M08 (Clearance Zone) with matched asset
+              if (matchedAsset && tModule.moduleType === "M08_OchrannaZonaLoga") {
+                processedConfig = {
+                  ...processedConfig,
+                  svgSource: "library",
+                  assetId: matchedAsset.id,
+                };
+              }
+
+              // Auto-populate M09 (Min Size) with matched asset
+              if (matchedAsset && tModule.moduleType === "M09_MinimalnaVelkostLoga") {
+                processedConfig = {
+                  ...processedConfig,
+                  svgSource: "library",
+                  assetId: matchedAsset.id,
+                };
               }
 
               await pb.collection("modules").create({
@@ -460,7 +550,53 @@ export async function generateBrandTreeAction(
           const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, compPage.id, "submenu", isLight ? 0 : 1);
           leavesDirect.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
           if (isNew) {
-            await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
+            // Find best matching asset from brandAssets
+            const targetMediums: string[] =
+              medKey === "cmyk"
+                ? ["PRINT_CMYK"]
+                : medKey === "rgb"
+                ? ["DIGITAL_RGB"]
+                : ["PRINT_PANTONE", "PRINT_MONOCHROME", "PRINT_WB"];
+
+            const targetOrientation =
+              compKey === "symbol"
+                ? "SYMBOL"
+                : compKey.startsWith("vertical")
+                ? "VERTICAL"
+                : "HORIZONTAL";
+
+            const targetHasClaim = compKey.includes("claim");
+            const targetBackground = isLight ? "LIGHT" : "DARK";
+
+            // 1. Exact match (medium, orientation, claim, background)
+            let matched = brandAssets.find(
+              (a) =>
+                targetMediums.includes(a.medium) &&
+                a.orientation === targetOrientation &&
+                Boolean(a.hasClaim) === targetHasClaim &&
+                a.background === targetBackground
+            );
+
+            // 2. Fallback: match without background restriction
+            if (!matched) {
+              matched = brandAssets.find(
+                (a) =>
+                  targetMediums.includes(a.medium) &&
+                  a.orientation === targetOrientation &&
+                  Boolean(a.hasClaim) === targetHasClaim
+              );
+            }
+
+            // 3. Fallback: match orientation & claim only
+            if (!matched) {
+              matched = brandAssets.find(
+                (a) =>
+                  a.orientation === targetOrientation &&
+                  Boolean(a.hasClaim) === targetHasClaim
+              );
+            }
+
+            await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId, matched || null);
           }
         }
 
