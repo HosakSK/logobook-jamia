@@ -262,13 +262,38 @@ export default function M04RazcestnikModule({
     return skTitle.includes(q) || enTitle.includes(q) || csTitle.includes(q) || slug.includes(q);
   });
 
-  // Grid columns styling
-  const gridColsClass =
-    columns === 1
-      ? "grid-cols-1"
-      : columns === 3
-      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-      : "grid-cols-1 sm:grid-cols-2";
+  // Layout calculation for M04 cards:
+  // Rules:
+  // - 1 card: 100% full width (col-span-6)
+  // - 2 cards: 50% : 50% (col-span-3 each)
+  // - 3 cards: 33.3% : 33.3% : 33.3% (col-span-2 each)
+  // - 4 cards: 2 rows of 50% : 50% (col-span-3 each)
+  // - 5 cards: 1st row 50% : 50% (first 2 col-span-3), 2nd row 33.3% : 33.3% : 33.3% (last 3 col-span-2)
+  // - default/fallback: standard 6-column grid proportion based on columns config
+  const totalCards = items.length;
+
+  const getCardColSpanClass = (cardIndex: number) => {
+    if (totalCards === 1) {
+      return "col-span-1 sm:col-span-6";
+    }
+    if (totalCards === 2) {
+      return "col-span-1 sm:col-span-3";
+    }
+    if (totalCards === 3) {
+      return "col-span-1 sm:col-span-2";
+    }
+    if (totalCards === 4) {
+      return "col-span-1 sm:col-span-3";
+    }
+    if (totalCards === 5) {
+      return cardIndex < 2 ? "col-span-1 sm:col-span-3" : "col-span-1 sm:col-span-2";
+    }
+
+    // Fallback for > 5 cards: respect config columns
+    if (columns === 1) return "col-span-1 sm:col-span-6";
+    if (columns === 2) return "col-span-1 sm:col-span-3";
+    return "col-span-1 sm:col-span-2";
+  };
 
   // Button styles mapping
   const getButtonStyle = (style?: "primary" | "secondary" | "outline" | "ghost") => {
@@ -398,9 +423,10 @@ export default function M04RazcestnikModule({
         </div>
       )}
 
-      {/* Grid of Navigation Cards */}
-      <div className={`grid gap-4 sm:gap-6 ${gridColsClass}`}>
+      {/* Grid of Navigation Cards (6-column base grid supporting 100%, 50:50 and 33:33:33 layout combinations) */}
+      <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 sm:gap-6">
         {items.map((rawCard, idx) => {
+          const cardColSpanClass = getCardColSpanClass(idx);
           const card = rawCard as M04CardItem & { url?: string; subtitle?: any };
           const cardTitle =
             resolveI18nText(card.title, locale, "en") ||
@@ -556,14 +582,18 @@ export default function M04RazcestnikModule({
               <Link
                 key={card.id || idx}
                 href={resolvedHref}
-                className="block h-full outline-hidden"
+                className={`block h-full outline-hidden ${cardColSpanClass}`}
               >
                 {CardContent}
               </Link>
             );
           }
 
-          return <div key={card.id || idx}>{CardContent}</div>;
+          return (
+            <div key={card.id || idx} className={cardColSpanClass}>
+              {CardContent}
+            </div>
+          );
         })}
       </div>
 
