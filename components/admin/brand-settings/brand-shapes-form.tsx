@@ -154,13 +154,18 @@ export function BrandShapesForm({
   const initialPattern = initialShapes?.themeConfig?.pattern;
   const [patternEnabled, setPatternEnabled] = useState<boolean>(Boolean(initialPattern?.enabled));
   const [patternUrl, setPatternUrl] = useState<string>(initialPattern?.patternUrl || "");
-  const [patternType, setPatternType] = useState<"repeat" | "cover" | "contain" | "zoom">(initialPattern?.patternType || "repeat");
+  const [patternType, setPatternType] = useState<"repeat" | "cover" | "contain" | "zoom" | "single">(initialPattern?.patternType || "repeat");
+  const [patternPosition, setPatternPosition] = useState<
+    "center" | "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"
+  >(initialPattern?.position || "center");
+  const [marginPx, setMarginPx] = useState<number>(initialPattern?.marginPx ?? 0);
   const [zoomPercent, setZoomPercent] = useState<number>(initialPattern?.zoomPercent ?? 100);
   const [patternOpacity, setPatternOpacity] = useState<number>(initialPattern?.opacity ?? 0.15);
   const [gradientEnabled, setGradientEnabled] = useState<boolean>(Boolean(initialPattern?.overlayGradient?.enabled));
   const [gradientDirection, setGradientDirection] = useState<
     "to-bottom" | "to-top" | "to-right" | "to-left" | "to-bottom-right" | "to-bottom-left" | "radial"
   >(initialPattern?.overlayGradient?.direction || "to-bottom");
+  const [gradientSpreadPercent, setGradientSpreadPercent] = useState<number>(initialPattern?.overlayGradient?.spreadPercent ?? 70);
   const [isPatternPickerOpen, setIsPatternPickerOpen] = useState(false);
 
   // Effective preview radius
@@ -301,10 +306,13 @@ export function BrandShapesForm({
         patternUrl,
         patternType,
         zoomPercent,
+        position: patternPosition,
+        marginPx,
         opacity: patternOpacity,
         overlayGradient: {
           enabled: gradientEnabled,
           direction: gradientDirection,
+          spreadPercent: gradientSpreadPercent,
         },
       },
     };
@@ -327,13 +335,56 @@ export function BrandShapesForm({
     });
   };
 
+  // Helper for live preview background position CSS
+  const previewBgPositionCss = useMemo(() => {
+    const pos = patternPosition || "center";
+    const margin = marginPx ?? 0;
+    if (margin === 0) {
+      switch (pos) {
+        case "top-left":
+          return "left top";
+        case "top-center":
+          return "center top";
+        case "top-right":
+          return "right top";
+        case "bottom-left":
+          return "left bottom";
+        case "bottom-center":
+          return "center bottom";
+        case "bottom-right":
+          return "right bottom";
+        case "center":
+        default:
+          return "center center";
+      }
+    }
+    switch (pos) {
+      case "top-left":
+        return `left ${margin}px top ${margin}px`;
+      case "top-center":
+        return `center top ${margin}px`;
+      case "top-right":
+        return `right ${margin}px top ${margin}px`;
+      case "bottom-left":
+        return `left ${margin}px bottom ${margin}px`;
+      case "bottom-center":
+        return `center bottom ${margin}px`;
+      case "bottom-right":
+        return `right ${margin}px bottom ${margin}px`;
+      case "center":
+      default:
+        return "center center";
+    }
+  }, [patternPosition, marginPx]);
+
   // Helper for live preview gradient overlay CSS
   const previewGradientCss = useMemo(() => {
     if (!gradientEnabled) return "";
     const dir = gradientDirection || "to-bottom";
     const bg = currentTheme.bgColor;
+    const spread = gradientSpreadPercent ?? 70;
     if (dir === "radial") {
-      return `radial-gradient(circle at center, transparent 0%, ${bg} 100%)`;
+      return `radial-gradient(circle at center, transparent 0%, ${bg} ${spread}%)`;
     }
     const dirMap: Record<string, string> = {
       "to-bottom": "to bottom",
@@ -344,8 +395,8 @@ export function BrandShapesForm({
       "to-bottom-left": "to bottom left",
     };
     const cssDir = dirMap[dir] || "to bottom";
-    return `linear-gradient(${cssDir}, ${bg} 0%, transparent 100%)`;
-  }, [gradientEnabled, gradientDirection, currentTheme.bgColor]);
+    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${Math.max(0, spread - 40)}%, transparent ${spread}%)`;
+  }, [gradientEnabled, gradientDirection, gradientSpreadPercent, currentTheme.bgColor]);
 
   return (
     <form
@@ -419,7 +470,7 @@ export function BrandShapesForm({
                     : patternType === "zoom" || zoomPercent
                     ? `${zoomPercent || 100}%`
                     : "auto",
-                backgroundPosition: "center",
+                backgroundPosition: previewBgPositionCss,
                 opacity: patternOpacity,
               }}
             />
@@ -1231,8 +1282,8 @@ export function BrandShapesForm({
               </div>
             </div>
 
-            {/* Pattern Type & Zoom Controls */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Pattern Type, Position & Zoom Controls */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium">Režim zobrazenia</Label>
                 <select
@@ -1244,6 +1295,25 @@ export function BrandShapesForm({
                   <option value="cover">Vyplniť plochu (Cover 100%)</option>
                   <option value="contain">Prispôsobiť (Contain / Fit)</option>
                   <option value="zoom">Vlastný Zoom / Mierka</option>
+                  <option value="single">Jedno umiestnenie (Single / Vodoznak)</option>
+                </select>
+              </div>
+
+              {/* Position selector */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Umiestnenie na obrazovke</Label>
+                <select
+                  value={patternPosition}
+                  onChange={(e) => setPatternPosition(e.target.value as any)}
+                  className="w-full h-9 px-3 rounded-lg border border-input bg-[#070b0f] text-xs focus:outline-hidden focus:ring-1 focus:ring-primary"
+                >
+                  <option value="center">Stred (Center)</option>
+                  <option value="top-left">Vľavo hore (Top Left)</option>
+                  <option value="top-center">Hore na stred (Top Center)</option>
+                  <option value="top-right">Vpravo hore (Top Right)</option>
+                  <option value="bottom-left">Vľavo dole (Bottom Left)</option>
+                  <option value="bottom-center">Dole na stred (Bottom Center)</option>
+                  <option value="bottom-right">Vpravo dole (Bottom Right)</option>
                 </select>
               </div>
 
@@ -1268,6 +1338,32 @@ export function BrandShapesForm({
                     max="300"
                     value={zoomPercent}
                     onChange={(e) => setZoomPercent(Number(e.target.value))}
+                    className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-medium">
+                  <Label>Odsadenie od okraja</Label>
+                  <span className="font-mono text-muted-foreground">{marginPx}px</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="0"
+                    max="160"
+                    step="4"
+                    value={marginPx}
+                    onChange={(e) => setMarginPx(Number(e.target.value))}
+                    className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                  />
+                  <Input
+                    type="number"
+                    min="0"
+                    max="160"
+                    value={marginPx}
+                    onChange={(e) => setMarginPx(Number(e.target.value))}
                     className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
                   />
                 </div>
@@ -1306,31 +1402,59 @@ export function BrandShapesForm({
               </div>
 
               {gradientEnabled && (
-                <div className="space-y-1.5 animate-in fade-in duration-100">
-                  <Label className="text-xs font-medium text-muted-foreground">Smer miznutia / vynárania</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {[
-                      { id: "to-bottom", label: "Zhora nadol" },
-                      { id: "to-top", label: "Zdola nahor" },
-                      { id: "to-right", label: "Zľava doprava" },
-                      { id: "to-left", label: "Zprava doľava" },
-                      { id: "to-bottom-right", label: "Z ľavého horného rohu" },
-                      { id: "to-bottom-left", label: "Z pravého horného rohu" },
-                      { id: "radial", label: "Kruhový (Radiálny zo stredu)" },
-                    ].map((dir) => (
-                      <button
-                        key={dir.id}
-                        type="button"
-                        onClick={() => setGradientDirection(dir.id as any)}
-                        className={`px-2.5 py-1.5 text-xs rounded-md border text-center transition-colors cursor-pointer ${
-                          gradientDirection === dir.id
-                            ? "bg-primary text-black font-bold border-primary shadow-xs"
-                            : "bg-[#070b0f] text-muted-foreground hover:text-foreground border-border/60"
-                        }`}
-                      >
-                        {dir.label}
-                      </button>
-                    ))}
+                <div className="space-y-3 animate-in fade-in duration-100">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Smer miznutia / vynárania</Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { id: "to-bottom", label: "Zhora nadol" },
+                        { id: "to-top", label: "Zdola nahor" },
+                        { id: "to-right", label: "Zľava doprava" },
+                        { id: "to-left", label: "Zprava doľava" },
+                        { id: "to-bottom-right", label: "Z ľavého horného rohu" },
+                        { id: "to-bottom-left", label: "Z pravého horného rohu" },
+                        { id: "radial", label: "Kruhový (Radiálny zo stredu)" },
+                      ].map((dir) => (
+                        <button
+                          key={dir.id}
+                          type="button"
+                          onClick={() => setGradientDirection(dir.id as any)}
+                          className={`px-2.5 py-1.5 text-xs rounded-md border text-center transition-colors cursor-pointer ${
+                            gradientDirection === dir.id
+                              ? "bg-primary text-black font-bold border-primary shadow-xs"
+                              : "bg-[#070b0f] text-muted-foreground hover:text-foreground border-border/60"
+                          }`}
+                        >
+                          {dir.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 max-w-sm">
+                    <div className="flex items-center justify-between text-xs font-medium">
+                      <Label className="text-muted-foreground">Dĺžka / rozsah prechodu (Spread)</Label>
+                      <span className="font-mono text-muted-foreground">{gradientSpreadPercent}%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min="20"
+                        max="100"
+                        step="5"
+                        value={gradientSpreadPercent}
+                        onChange={(e) => setGradientSpreadPercent(Number(e.target.value))}
+                        className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                      />
+                      <Input
+                        type="number"
+                        min="20"
+                        max="100"
+                        value={gradientSpreadPercent}
+                        onChange={(e) => setGradientSpreadPercent(Number(e.target.value))}
+                        className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
@@ -1369,7 +1493,7 @@ export function BrandShapesForm({
                           : patternType === "zoom" || zoomPercent
                           ? `${zoomPercent || 100}%`
                           : "auto",
-                      backgroundPosition: "center",
+                      backgroundPosition: previewBgPositionCss,
                       opacity: patternOpacity,
                     }}
                   />

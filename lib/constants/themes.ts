@@ -16,8 +16,10 @@ export interface ManualCustomColors {
 export interface ManualPatternConfig {
   enabled: boolean;
   patternUrl?: string;
-  patternType?: "repeat" | "cover" | "contain" | "zoom";
+  patternType?: "repeat" | "cover" | "contain" | "zoom" | "single";
   zoomPercent?: number; // e.g. 10 to 300, default 100
+  position?: "center" | "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
+  marginPx?: number; // offset margin in px, e.g. 0 to 160
   colorMode?: "original" | "primary" | "secondary" | "accent" | "custom";
   customColorHex?: string;
   opacity?: number; // 0 to 1, default 0.15
@@ -25,6 +27,7 @@ export interface ManualPatternConfig {
     enabled: boolean;
     direction: "to-bottom" | "to-top" | "to-right" | "to-left" | "to-bottom-right" | "to-bottom-left" | "radial";
     intensity?: number; // 0 to 1, default 1.0 (fade from 100% bg color to 0% transparent)
+    spreadPercent?: number; // e.g. 20 to 100%, how far the transition stretches across the screen
   };
 }
 

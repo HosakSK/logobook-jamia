@@ -5,6 +5,7 @@ import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { getFileUrl } from "@/lib/pocketbase";
 import { getBrandAssetsAction } from "@/actions/assets";
+import { resolveManualTheme } from "@/lib/constants/themes";
 import { BrandGeneralForm } from "@/components/admin/brand-settings/brand-general-form";
 import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favicon-form";
 import { BrandHeaderLogoForm } from "@/components/admin/brand-settings/brand-header-logo-form";
@@ -179,6 +180,10 @@ export default async function BrandSettingsPage({
       }
     : null;
 
+  // Resolve active theme for BrandHeaderLogoForm top bar preview
+  const activeThemeConfig = globalShapes?.themeConfig || { themeId: "abyss" };
+  const resolvedManualTheme = resolveManualTheme(activeThemeConfig, globalShapes?.manualBgColor, brandColors);
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 py-2">
       {/* Header */}
@@ -243,6 +248,12 @@ export default async function BrandSettingsPage({
         initialHeaderLogoHeight={typeof brand.description === "object" && typeof brand.description?.headerLogoHeight === "number" ? brand.description.headerLogoHeight : 40}
         initialShowHeaderBrandName={typeof brand.description === "object" && typeof brand.description?.showHeaderBrandName === "boolean" ? brand.description.showHeaderBrandName : true}
         brandName={brand.name}
+        themeSurfaceColor={resolvedManualTheme.surfaceColor}
+        themeBgColor={resolvedManualTheme.bgColor}
+        themeTextColor={resolvedManualTheme.textColor}
+        themeBorderColor={resolvedManualTheme.borderColor}
+        themePrimaryColor={resolvedManualTheme.primaryColor}
+        isDarkTheme={resolvedManualTheme.isDark}
         dict={dict}
       />
 

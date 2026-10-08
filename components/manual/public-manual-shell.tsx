@@ -111,13 +111,57 @@ export function PublicManualShell({
   const patternConfig = tokens?.themeConfig?.pattern;
   const isPatternActive = Boolean(patternConfig?.enabled && patternConfig.patternUrl);
 
-  // Helper for gradient overlay CSS
+  // Helper for background position CSS
+  const bgPositionCss = useMemo(() => {
+    const pos = patternConfig?.position || "center";
+    const margin = patternConfig?.marginPx ?? 0;
+    if (margin === 0) {
+      switch (pos) {
+        case "top-left":
+          return "left top";
+        case "top-center":
+          return "center top";
+        case "top-right":
+          return "right top";
+        case "bottom-left":
+          return "left bottom";
+        case "bottom-center":
+          return "center bottom";
+        case "bottom-right":
+          return "right bottom";
+        case "center":
+        default:
+          return "center center";
+      }
+    }
+    // With margin offset:
+    switch (pos) {
+      case "top-left":
+        return `left ${margin}px top ${margin}px`;
+      case "top-center":
+        return `center top ${margin}px`;
+      case "top-right":
+        return `right ${margin}px top ${margin}px`;
+      case "bottom-left":
+        return `left ${margin}px bottom ${margin}px`;
+      case "bottom-center":
+        return `center bottom ${margin}px`;
+      case "bottom-right":
+        return `right ${margin}px bottom ${margin}px`;
+      case "center":
+      default:
+        return "center center";
+    }
+  }, [patternConfig?.position, patternConfig?.marginPx]);
+
+  // Helper for gradient overlay CSS with customizable spread
   const gradientCss = useMemo(() => {
     if (!patternConfig?.overlayGradient?.enabled) return "";
     const dir = patternConfig.overlayGradient.direction || "to-bottom";
     const bg = tokens?.manualBgColor || "var(--background)";
+    const spread = patternConfig.overlayGradient.spreadPercent ?? 70; // default 70%
     if (dir === "radial") {
-      return `radial-gradient(circle at center, transparent 0%, ${bg} 100%)`;
+      return `radial-gradient(circle at center, transparent 0%, ${bg} ${spread}%)`;
     }
     const dirMap: Record<string, string> = {
       "to-bottom": "to bottom",
@@ -128,7 +172,7 @@ export function PublicManualShell({
       "to-bottom-left": "to bottom left",
     };
     const cssDir = dirMap[dir] || "to bottom";
-    return `linear-gradient(${cssDir}, ${bg} 0%, transparent 100%)`;
+    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${Math.max(0, spread - 40)}%, transparent ${spread}%)`;
   }, [patternConfig, tokens?.manualBgColor]);
 
   return (
@@ -141,13 +185,16 @@ export function PublicManualShell({
       }}
       className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors relative`}
     >
-      {/* Background Pattern Layer */}
+      {/* Background Pattern Layer (Strictly behind all content with negative z-index) */}
       {isPatternActive && patternConfig?.patternUrl && (
         <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage: `url(${patternConfig.patternUrl})`,
-            backgroundRepeat: patternConfig.patternType === "repeat" ? "repeat" : "no-repeat",
+            backgroundRepeat:
+              patternConfig.patternType === "repeat"
+                ? "repeat"
+                : "no-repeat",
             backgroundSize:
               patternConfig.patternType === "cover"
                 ? "cover"
@@ -155,14 +202,16 @@ export function PublicManualShell({
                 ? "contain"
                 : patternConfig.patternType === "zoom" || patternConfig.zoomPercent
                 ? `${patternConfig.zoomPercent || 100}%`
+                : patternConfig.patternType === "single"
+                ? `${patternConfig.zoomPercent || 100}%`
                 : "auto",
-            backgroundPosition: "center",
+            backgroundPosition: bgPositionCss,
             opacity: patternConfig.opacity ?? 0.15,
           }}
         />
       )}
 
-      {/* Background Gradient Fade-out Overlay */}
+      {/* Background Gradient Fade-out Overlay (Strictly behind all content) */}
       {isPatternActive && gradientCss && (
         <div
           className="fixed inset-0 pointer-events-none z-0"
@@ -172,7 +221,7 @@ export function PublicManualShell({
         />
       )}
 
-      {/* Sticky Top Header */}
+      {/* Sticky Top Header (Elevated layer relative z-20) */}
       <header className="sticky top-0 z-40 min-h-18 py-2 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6 relative">
         {/* Left: Brand Title / Logo */}
         <div className="flex items-center gap-3 shrink-0">
@@ -348,8 +397,8 @@ export function PublicManualShell({
         </div>
       </header>
 
-      {/* Main Body Layout (Left static column removed for full-width content) */}
-      <div className="flex-1 flex w-full">
+      {/* Main Body Layout (Elevated above background pattern layer with relative z-10) */}
+      <div className="flex-1 flex w-full relative z-10">
         <main className="flex-1 min-w-0 w-full">
           {children}
         </main>

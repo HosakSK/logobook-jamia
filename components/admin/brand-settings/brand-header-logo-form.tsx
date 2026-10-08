@@ -15,6 +15,12 @@ interface BrandHeaderLogoFormProps {
   initialHeaderLogoHeight?: number;
   initialShowHeaderBrandName?: boolean;
   brandName?: string;
+  themeSurfaceColor?: string;
+  themeBgColor?: string;
+  themeTextColor?: string;
+  themeBorderColor?: string;
+  themePrimaryColor?: string;
+  isDarkTheme?: boolean;
   dict: Dictionary;
 }
 
@@ -24,6 +30,12 @@ export function BrandHeaderLogoForm({
   initialHeaderLogoHeight = 40,
   initialShowHeaderBrandName = true,
   brandName = "Brand",
+  themeSurfaceColor = "#0e161d",
+  themeBgColor = "#070b0f",
+  themeTextColor = "#fafbfc",
+  themeBorderColor = "rgba(63,85,102,0.6)",
+  themePrimaryColor = "#c8d400",
+  isDarkTheme = true,
   dict,
 }: BrandHeaderLogoFormProps) {
   const [isPending, startTransition] = useTransition();
@@ -143,7 +155,17 @@ export function BrandHeaderLogoForm({
           </span>
           <span className="text-[11px] text-[#96abbe]/80">Výška loga: {logoHeight}px</span>
         </div>
-        <div className="rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] px-5 py-4 shadow-inner flex items-center justify-between overflow-hidden min-h-[72px]">
+        {/* Top Bar Box styled strictly by the active manual theme */}
+        <div
+          className="rounded-xl px-5 py-4 shadow-inner flex items-center justify-between overflow-hidden min-h-[72px] transition-colors"
+          style={{
+            backgroundColor: themeSurfaceColor,
+            borderColor: themeBorderColor,
+            borderWidth: "1px",
+            borderStyle: "solid",
+            color: themeTextColor,
+          }}
+        >
           <div className="flex items-center gap-3">
             {previewUrl && !imgLoadError ? (
               <div
@@ -159,24 +181,42 @@ export function BrandHeaderLogoForm({
                 />
               </div>
             ) : (
-              <div className="h-10 w-10 text-[#070b0f] bg-[#c8d400] flex items-center justify-center font-bold text-xs shadow-xs rounded-xl shrink-0">
+              <div
+                className="h-10 w-10 flex items-center justify-center font-bold text-xs shadow-xs rounded-xl shrink-0"
+                style={{
+                  backgroundColor: themePrimaryColor,
+                  color: isDarkTheme ? "#070b0f" : "#fafbfc",
+                }}
+              >
                 {brandName.slice(0, 2).toUpperCase()}
               </div>
             )}
 
             {showHeaderBrandName && (
               <div className="flex items-center">
-                <span className="font-bold tracking-tight text-sm uppercase text-[#fafbfc]">
+                <span
+                  className="font-bold tracking-tight text-sm uppercase"
+                  style={{ color: themeTextColor }}
+                >
                   {brandName}
                 </span>
-                <span className="text-xs text-[#96abbe] ml-2.5 border-l border-[rgba(63,85,102,0.6)] pl-2.5 font-medium">
+                <span
+                  className="text-xs ml-2.5 pl-2.5 font-medium border-l"
+                  style={{
+                    color: isDarkTheme ? "#96abbe" : "#587489",
+                    borderColor: themeBorderColor,
+                  }}
+                >
                   Brand Manual
                 </span>
               </div>
             )}
           </div>
 
-          <div className="text-[11px] font-mono text-[#96abbe]/50 hidden sm:block">
+          <div
+            className="text-[11px] font-mono hidden sm:block"
+            style={{ color: isDarkTheme ? "rgba(150,171,190,0.6)" : "rgba(88,116,137,0.7)" }}
+          >
             Top Bar Preview
           </div>
         </div>
