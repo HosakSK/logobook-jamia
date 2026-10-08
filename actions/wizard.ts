@@ -228,9 +228,11 @@ export async function generateBrandTreeAction(
                   fileName: file.file || `logo_${file.fileFormat?.toLowerCase()}`,
                 }));
 
+                const physicalSvgUrl = matchedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl;
                 const primarySvgUrl =
+                  physicalSvgUrl ||
+                  (matchedAsset.svgContent ? `/api/assets/${matchedAsset.id}/svg` : "") ||
                   matchedAsset.previewUrl ||
-                  matchedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl ||
                   "";
 
                 processedConfig = {

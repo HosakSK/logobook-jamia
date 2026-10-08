@@ -260,9 +260,11 @@ export default function M11MaticaLogotypovModule({
 
     return brandAssets.map((asset) => {
       const bg = bgMap[asset.background] || "light";
+      const physicalSvg = asset.files.find((f) => f.fileFormat === "SVG");
       const svgUrl =
+        physicalSvg?.fileUrl ||
+        (asset.svgContent ? `/api/assets/${asset.id}/svg` : "") ||
         asset.previewUrl ||
-        asset.files.find((f) => f.fileFormat === "SVG")?.fileUrl ||
         "/logo/Logobook_symbol_RGB_D.svg";
 
       const formats: MatrixLogoItem["formats"] = asset.files.map((f) => ({

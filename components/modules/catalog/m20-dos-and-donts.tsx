@@ -1258,13 +1258,13 @@ export default function M20DosAndDontsModule({
                             </span>
                             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-36 overflow-y-auto p-1">
                               {brandAssets.map((asset) => {
+                                const physicalSvg = asset.files?.find((f) => f.fileFormat === "SVG");
                                 const logoUrl =
+                                  physicalSvg?.fileUrl ||
+                                  (asset.svgContent ? `/api/assets/${asset.id}/svg` : "") ||
                                   asset.previewUrl ||
-                                  asset.files?.find((f) => f.fileFormat === "SVG")?.fileUrl ||
                                   asset.files?.[0]?.fileUrl ||
-                                  (asset.svgContent
-                                    ? `data:image/svg+xml;utf8,${encodeURIComponent(asset.svgContent)}`
-                                    : "");
+                                  "";
                                 const assetName =
                                   resolveI18nText(asset.name, locale) ||
                                   asset.name?.en ||

@@ -251,9 +251,10 @@ export default function M15NeutralneASystemovePodkladyModule({
       if (match) {
         const svgFile = match.files?.find((f) => f.fileFormat === "SVG");
         const pngFile = match.files?.find((f) => f.fileFormat === "PNG");
+        const cleanVector = svgFile?.fileUrl || (match.svgContent ? `/api/assets/${match.id}/svg` : "");
         return {
           title: resolveI18nText(match.name, locale) || "Brand Logo",
-          url: svgFile?.fileUrl || pngFile?.fileUrl || match.previewUrl || "",
+          url: cleanVector || pngFile?.fileUrl || match.previewUrl || "",
           svgContent: match.svgContent || null,
         };
       }
@@ -269,9 +270,10 @@ export default function M15NeutralneASystemovePodkladyModule({
     if (brandAssets.length > 0) {
       const first = brandAssets[0];
       const svgFile = first.files?.find((f) => f.fileFormat === "SVG");
+      const cleanVector = svgFile?.fileUrl || (first.svgContent ? `/api/assets/${first.id}/svg` : "");
       return {
         title: resolveI18nText(first.name, locale) || "Brand Logo",
-        url: svgFile?.fileUrl || first.previewUrl || "",
+        url: cleanVector || first.previewUrl || "",
         svgContent: first.svgContent || null,
       };
     }

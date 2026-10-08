@@ -180,9 +180,9 @@ export default function M07ZobrazenieLogaModule({
 
   // Copy SVG to clipboard
   const handleCopySvg = async () => {
-    if (!cfg.directPreview.svgUrl) return;
+    if (!activeSvgUrl) return;
     try {
-      const res = await fetch(cfg.directPreview.svgUrl);
+      const res = await fetch(activeSvgUrl);
       if (res.ok) {
         const svgContent = await res.text();
         await navigator.clipboard.writeText(svgContent);
@@ -270,6 +270,13 @@ export default function M07ZobrazenieLogaModule({
       fileName: file.file || `logo_${file.fileFormat?.toLowerCase()}`,
     }));
 
+    const physicalSvg = selectedAsset.files.find((f) => f.fileFormat === "SVG");
+    const cleanSvgUrl =
+      physicalSvg?.fileUrl ||
+      (selectedAsset.svgContent ? `/api/assets/${selectedAsset.id}/svg` : "") ||
+      selectedAsset.previewUrl ||
+      cfg.directPreview.svgUrl;
+
     const newConfig: M07AssetViewerConfig = {
       ...cfg,
       sourceMode: "library",
@@ -282,7 +289,7 @@ export default function M07ZobrazenieLogaModule({
       },
       directPreview: {
         ...cfg.directPreview,
-        svgUrl: selectedAsset.previewUrl || selectedAsset.files.find((f) => f.fileFormat === "SVG")?.fileUrl || cfg.directPreview.svgUrl,
+        svgUrl: cleanSvgUrl,
       },
       formats: mappedFormats.length > 0 ? mappedFormats : cfg.formats,
     };
@@ -333,6 +340,23 @@ export default function M07ZobrazenieLogaModule({
     });
   };
 
+  // Dynamically resolve clean vector SVG if stored svgUrl is rasterized PNG or empty
+  const activeSvgUrl = useMemo(() => {
+    const rawUrl = cfg.directPreview.svgUrl || "";
+    // If we have an assetId linked, prioritize clean SVG endpoint or vector file
+    if (cfg.assetId) {
+      if (rawUrl.includes("/api/files/assets/") || rawUrl.endsWith(".png") || !rawUrl) {
+        return `/api/assets/${cfg.assetId}/svg`;
+      }
+    }
+    // Check if rawUrl points to an asset file that is a PNG
+    const assetMatch = rawUrl.match(/\/api\/files\/assets\/([a-zA-Z0-9_-]+)\//);
+    if (assetMatch && assetMatch[1] && (rawUrl.endsWith(".png") || rawUrl.includes("thumb") || rawUrl.includes("preview"))) {
+      return `/api/assets/${assetMatch[1]}/svg`;
+    }
+    return rawUrl;
+  }, [cfg.directPreview.svgUrl, cfg.assetId]);
+
   return (
     <div className="relative group/m07 py-4">
       {/* Optional H3 header if configured */}
@@ -368,9 +392,9 @@ export default function M07ZobrazenieLogaModule({
             style={{ backgroundColor: cfg.directPreview.backgroundColor || "transparent" }}
           >
             {/* SVG Vector Layer (Base) */}
-            {cfg.directPreview.svgUrl ? (
+            {activeSvgUrl ? (
               <img
-                src={cfg.directPreview.svgUrl}
+                src={activeSvgUrl}
                 alt="Logo Vector"
                 className="max-w-[70%] max-h-[70%] object-contain transition-transform duration-300 group-hover/preview:scale-105"
               />
@@ -391,7 +415,7 @@ export default function M07ZobrazenieLogaModule({
             )}
 
             {/* Copy SVG Action Button */}
-            {cfg.directPreview.showCopySvg && cfg.directPreview.svgUrl && (
+            {cfg.directPreview.showCopySvg && activeSvgUrl && (
               <button
                 type="button"
                 onClick={handleCopySvg}
