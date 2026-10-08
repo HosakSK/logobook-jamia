@@ -1,10 +1,18 @@
 /**
  * Configuration for the Dimension Matrix Engine (Tree Wizard)
  */
+export type LogoCompositionKey =
+  | "horizontal"
+  | "vertical"
+  | "symbol"
+  | "horizontal_claim"
+  | "vertical_claim";
+
 export interface DimensionMatrixConfig {
   media: Array<"cmyk" | "rgb" | "special">;
-  orientations: Array<"horizontal" | "vertical" | "symbol">;
-  hasClaimOption: boolean;
+  compositions?: Array<LogoCompositionKey>;
+  orientations?: Array<"horizontal" | "vertical" | "symbol">;
+  hasClaimOption?: boolean;
   backgrounds?: Array<"light" | "dark">;
   includeIntroPage?: boolean;
   includeColorsPage?: boolean;

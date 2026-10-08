@@ -254,6 +254,9 @@ export async function generateBrandTreeAction(
         };
       });
 
+      // Layout rule: 1 to 3 items -> 1 row (columns = items count), 4 to 5 items -> 2 rows (columns = 3)
+      const m04Cols = children.length >= 4 ? 3 : Math.min(3, Math.max(1, children.length));
+
       await pb.collection("modules").create({
         column: createdColumn.id,
         order: 1,
@@ -261,7 +264,7 @@ export async function generateBrandTreeAction(
         showH3: true,
         h3Title: { en: "Select Variant", sk: "Vyberte variant", cs: "Vyberte variant" },
         config: {
-          columns: children.length > 2 ? 3 : 2,
+          columns: m04Cols,
           clickableEntireCard: true,
           items: m04Items,
         },
@@ -348,11 +351,61 @@ export async function generateBrandTreeAction(
       special: { en: "Special & Monochrome", sk: "Špeciálne & Monochróm", cs: "Speciální & Monochrom", slug: "logo-special" },
     };
 
-    const orientationLabels: Record<string, { en: string; sk: string; cs: string; slugSuffix: string }> = {
-      horizontal: { en: "Horizontal", sk: "Na šírku", cs: "Na šířku", slugSuffix: "sirka" },
-      vertical: { en: "Vertical", sk: "Na výšku", cs: "Na výšku", slugSuffix: "vyska" },
-      symbol: { en: "Symbol & Monogram", sk: "Symbol a monogram", cs: "Symbol a monogram", slugSuffix: "symbol" },
+    const compositionLabels: Record<
+      string,
+      { en: string; sk: string; cs: string; slugSuffix: string; syncBase: string }
+    > = {
+      horizontal: {
+        en: "Horizontal",
+        sk: "Na šírku",
+        cs: "Na šířku",
+        slugSuffix: "sirka",
+        syncBase: "horizontal",
+      },
+      vertical: {
+        en: "Vertical",
+        sk: "Na výšku",
+        cs: "Na výšku",
+        slugSuffix: "vyska",
+        syncBase: "vertical",
+      },
+      symbol: {
+        en: "Symbol & Monogram",
+        sk: "Symbol a monogram",
+        cs: "Symbol a monogram",
+        slugSuffix: "symbol",
+        syncBase: "symbol",
+      },
+      horizontal_claim: {
+        en: "Horizontal with Claim",
+        sk: "Na šírku s claimom",
+        cs: "Na šířku s claimem",
+        slugSuffix: "sirka-claim",
+        syncBase: "horizontal_claim",
+      },
+      vertical_claim: {
+        en: "Vertical with Claim",
+        sk: "Na výšku s claimom",
+        cs: "Na výšku s claimem",
+        slugSuffix: "vyska-claim",
+        syncBase: "vertical_claim",
+      },
     };
+
+    // Determine normalized compositions list (supports new compositions or legacy orientations + hasClaimOption)
+    let activeCompositions: string[] = [];
+    if (config.compositions && config.compositions.length > 0) {
+      activeCompositions = config.compositions;
+    } else if (config.orientations && config.orientations.length > 0) {
+      for (const ori of config.orientations) {
+        activeCompositions.push(ori);
+        if (ori !== "symbol" && config.hasClaimOption) {
+          activeCompositions.push(`${ori}_claim`);
+        }
+      }
+    } else {
+      activeCompositions = ["horizontal", "vertical", "symbol"];
+    }
 
     for (let mIdx = 0; mIdx < config.media.length; mIdx++) {
       const medKey = config.media[mIdx];
@@ -368,123 +421,58 @@ export async function generateBrandTreeAction(
       );
       mediaNodesForRootM04.push({ id: medPage.id, slug: medMeta.slug, title: { en: medMeta.en, sk: medMeta.sk, cs: medMeta.cs } });
 
-      const orientationNodesForMedM04: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
+      const compositionNodesForMedM04: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
 
-      for (let oIdx = 0; oIdx < config.orientations.length; oIdx++) {
-        const oriKey = config.orientations[oIdx];
-        const oriMeta = orientationLabels[oriKey];
-        const oriSlug = `${medMeta.slug}-${oriMeta.slugSuffix}`;
+      for (let cIdx = 0; cIdx < activeCompositions.length; cIdx++) {
+        const compKey = activeCompositions[cIdx];
+        const compMeta = compositionLabels[compKey] || {
+          en: compKey,
+          sk: compKey,
+          cs: compKey,
+          slugSuffix: compKey,
+          syncBase: compKey,
+        };
+        const compSlug = `${medMeta.slug}-${compMeta.slugSuffix}`;
 
-        // 2. Orientation Category Page (e.g. /logo-tlac-sirka)
-        const { page: oriPage } = await ensurePage(
-          { en: `${oriMeta.en} (${medMeta.en})`, sk: `${oriMeta.sk} (${medMeta.sk})`, cs: `${oriMeta.cs} (${medMeta.cs})` },
-          oriSlug,
+        // 2. Composition Page (e.g. /logo-tlac-sirka, /logo-tlac-sirka-claim, /logo-tlac-symbol)
+        const { page: compPage } = await ensurePage(
+          { en: `${compMeta.en} (${medMeta.en})`, sk: `${compMeta.sk} (${medMeta.sk})`, cs: `${compMeta.cs} (${medMeta.cs})` },
+          compSlug,
           medPage.id,
           "submenu",
-          oIdx
+          cIdx
         );
-        orientationNodesForMedM04.push({ id: oriPage.id, slug: oriSlug, title: { en: oriMeta.en, sk: oriMeta.sk, cs: oriMeta.cs } });
+        compositionNodesForMedM04.push({ id: compPage.id, slug: compSlug, title: { en: compMeta.en, sk: compMeta.sk, cs: compMeta.cs } });
 
-        // Linked Sync ID for this orientation & media
-        const syncGroupId = `linkGroup-m08-${oriKey}-${medKey}`;
+        // Linked Sync ID for this composition & media
+        const syncGroupId = `linkGroup-m08-${compMeta.syncBase}-${medKey}`;
 
-        // CRITICAL INTEGRITY RULE 2: Symbol Exclusion Rule
-        // A symbol NEVER has a claim/slogan option!
-        const canHaveClaim = oriKey !== "symbol" && config.hasClaimOption;
-
-        if (canHaveClaim) {
-          // Branch 1: Standard (Bez claimu)
-          const baseBranchSlug = `${oriSlug}-zaklad`;
-          const { page: baseBranchPage } = await ensurePage(
-            { en: "Standard Version (No Claim)", sk: "Základná verzia (Bez claimu)", cs: "Základní verze (Bez claimu)" },
-            baseBranchSlug,
-            oriPage.id,
-            "submenu",
-            0
-          );
-
-          // Branch 2: With Claim (S claimom)
-          const claimBranchSlug = `${oriSlug}-claim`;
-          const { page: claimBranchPage } = await ensurePage(
-            { en: "With Claim / Slogan", sk: "Verzia s claimom / sloganom", cs: "Verze s claimem / sloganem" },
-            claimBranchSlug,
-            oriPage.id,
-            "submenu",
-            1
-          );
-
-          // M04 for orientation page pointing to both claim branches
-          await injectCategoryM04(
-            oriPage.id,
-            { en: `${brandName} - ${oriMeta.en}`, sk: `${brandName} - ${oriMeta.sk}`, cs: `${brandName} - ${oriMeta.cs}` },
-            [
-              { id: baseBranchPage.id, slug: baseBranchSlug, title: { en: "Standard (No Claim)", sk: "Základná verzia", cs: "Základní verze" } },
-              { id: claimBranchPage.id, slug: claimBranchSlug, title: { en: "With Claim / Slogan", sk: "S claimom / sloganom", cs: "S claimem" } },
-            ]
-          );
-
-          // Leaves for Branch 1 (Standard)
-          const leavesBranch1: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
-          for (const bg of ["light", "dark"] as const) {
-            const isLight = bg === "light";
-            const bgSlug = `${baseBranchSlug}-${isLight ? "svetle" : "tmave"}`;
-            const bgTitle = {
-              en: `${oriMeta.en} - ${isLight ? "Light Canvas" : "Dark Canvas"}`,
-              sk: `${oriMeta.sk} - ${isLight ? "Svetlý podklad" : "Tmavý podklad"}`,
-              cs: `${oriMeta.cs} - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
-            };
-            const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, baseBranchPage.id, "submenu", isLight ? 0 : 1);
-            leavesBranch1.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
-            if (isNew) {
-              await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
-            }
+        // 3. Direct 2 background leaves under each composition (Light Canvas, Dark Canvas)
+        const leavesDirect: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
+        for (const bg of ["light", "dark"] as const) {
+          const isLight = bg === "light";
+          const bgSlug = `${compSlug}-${isLight ? "svetle" : "tmave"}`;
+          const bgTitle = {
+            en: `${compMeta.en} - ${isLight ? "Light Canvas" : "Dark Canvas"}`,
+            sk: `${compMeta.sk} - ${isLight ? "Svetlý podklad" : "Tmavý podklad"}`,
+            cs: `${compMeta.cs} - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
+          };
+          const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, compPage.id, "submenu", isLight ? 0 : 1);
+          leavesDirect.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
+          if (isNew) {
+            await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
           }
-          await injectCategoryM04(baseBranchPage.id, { en: "Background Canvas", sk: "Výber podkladu", cs: "Výběr podkladu" }, leavesBranch1);
-
-          // Leaves for Branch 2 (With Claim)
-          const leavesBranch2: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
-          for (const bg of ["light", "dark"] as const) {
-            const isLight = bg === "light";
-            const bgSlug = `${claimBranchSlug}-${isLight ? "svetle" : "tmave"}`;
-            const bgTitle = {
-              en: `${oriMeta.en} (Claim) - ${isLight ? "Light Canvas" : "Dark Canvas"}`,
-              sk: `${oriMeta.sk} (S claimom) - ${isLight ? "Svetlý podklad" : "Tmavý podklad"}`,
-              cs: `${oriMeta.cs} (S claimem) - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
-            };
-            const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, claimBranchPage.id, "submenu", isLight ? 0 : 1);
-            leavesBranch2.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
-            if (isNew) {
-              await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
-            }
-          }
-          await injectCategoryM04(claimBranchPage.id, { en: "Background Canvas", sk: "Výber podkladu", cs: "Výběr podkladu" }, leavesBranch2);
-
-        } else {
-          // Direct 2 background leaves under orientation (Symbol or No Claim Mode)
-          const leavesDirect: Array<{ id: string; slug?: string; title: Record<string, string> }> = [];
-          for (const bg of ["light", "dark"] as const) {
-            const isLight = bg === "light";
-            const bgSlug = `${oriSlug}-${isLight ? "svetle" : "tmave"}`;
-            const bgTitle = {
-              en: `${oriMeta.en} - ${isLight ? "Light Canvas" : "Dark Canvas"}`,
-              sk: `${oriMeta.sk} - ${isLight ? "Svetlý podklad" : "Tmavý podklad"}`,
-              cs: `${oriMeta.cs} - ${isLight ? "Světlý podklad" : "Tmavý podklad"}`,
-            };
-            const { page: leafPage, isNew } = await ensurePage(bgTitle, bgSlug, oriPage.id, "submenu", isLight ? 0 : 1);
-            leavesDirect.push({ id: leafPage.id, slug: bgSlug, title: bgTitle });
-            if (isNew) {
-              await applyStructure(leafPage.id, logoBlueprintStructure, syncGroupId);
-            }
-          }
-          await injectCategoryM04(oriPage.id, { en: "Background Canvas", sk: "Výber podkladu", cs: "Výběr podkladu" }, leavesDirect);
         }
+
+        // Inject M04 on the composition page pointing to light/dark backgrounds
+        await injectCategoryM04(compPage.id, { en: "Background Canvas", sk: "Výber podkladu", cs: "Výběr podkladu" }, leavesDirect);
       }
 
-      // Inject M04 for medium category page (linking to orientations)
+      // Inject M04 for medium category page (linking to compositions)
       await injectCategoryM04(
         medPage.id,
         { en: `${brandName} - ${medMeta.en}`, sk: `${brandName} - ${medMeta.sk}`, cs: `${brandName} - ${medMeta.cs}` },
-        orientationNodesForMedM04
+        compositionNodesForMedM04
       );
     }
 

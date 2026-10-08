@@ -19,7 +19,7 @@ import {
   CheckCircle2,
   Info,
 } from "lucide-react";
-import { DimensionMatrixConfig } from "@/lib/types/wizard";
+import { DimensionMatrixConfig, LogoCompositionKey } from "@/lib/types/wizard";
 import { generateBrandTreeAction } from "@/actions/wizard";
 
 interface DimensionMatrixWizardModalProps {
@@ -42,12 +42,11 @@ export function DimensionMatrixWizardModal({
     "cmyk",
     "rgb",
   ]);
-  const [selectedOrientations, setSelectedOrientations] = useState<Array<"horizontal" | "vertical" | "symbol">>([
+  const [selectedCompositions, setSelectedCompositions] = useState<Array<LogoCompositionKey>>([
     "horizontal",
     "vertical",
     "symbol",
   ]);
-  const [hasClaimOption, setHasClaimOption] = useState<boolean>(true);
   const [includeColorsPage, setIncludeColorsPage] = useState<boolean>(true);
   const [includeTypographyPage, setIncludeTypographyPage] = useState<boolean>(true);
   const [includeIntroPage, setIncludeIntroPage] = useState<boolean>(true);
@@ -70,29 +69,20 @@ export function DimensionMatrixWizardModal({
     pagesCount += 1;
     modulesCount += 2;
 
-    // Media & Orientations loop
+    // Media & Compositions loop
     selectedMedia.forEach(() => {
-      // Medium category page
+      // Medium category page (with M01 + M04)
       pagesCount += 1;
       modulesCount += 2;
 
-      selectedOrientations.forEach((ori) => {
-        // Orientation category page
+      selectedCompositions.forEach(() => {
+        // Composition page (with M01 + M04 pointing to light/dark)
         pagesCount += 1;
         modulesCount += 2;
 
-        if (ori === "symbol" || !hasClaimOption) {
-          // 2 direct leaves (light, dark)
-          pagesCount += 2;
-          modulesCount += 2 * 6;
-        } else {
-          // 2 branch subcategories (Standard, With Claim)
-          pagesCount += 2;
-          modulesCount += 2 * 2;
-          // 4 leaves (2 light, 2 dark)
-          pagesCount += 4;
-          modulesCount += 4 * 6;
-        }
+        // 2 background leaves (light, dark) each having blueprints
+        pagesCount += 2;
+        modulesCount += 2 * 6;
       });
     });
 
@@ -111,8 +101,7 @@ export function DimensionMatrixWizardModal({
     return { pagesCount, modulesCount };
   }, [
     selectedMedia,
-    selectedOrientations,
-    hasClaimOption,
+    selectedCompositions,
     includeIntroPage,
     includeColorsPage,
     includeTypographyPage,
@@ -124,9 +113,9 @@ export function DimensionMatrixWizardModal({
     );
   };
 
-  const toggleOrientation = (o: "horizontal" | "vertical" | "symbol") => {
-    setSelectedOrientations((prev) =>
-      prev.includes(o) ? (prev.length > 1 ? prev.filter((item) => item !== o) : prev) : [...prev, o]
+  const toggleComposition = (c: LogoCompositionKey) => {
+    setSelectedCompositions((prev) =>
+      prev.includes(c) ? (prev.length > 1 ? prev.filter((item) => item !== c) : prev) : [...prev, c]
     );
   };
 
@@ -137,8 +126,7 @@ export function DimensionMatrixWizardModal({
 
       const config: DimensionMatrixConfig = {
         media: selectedMedia,
-        orientations: selectedOrientations,
-        hasClaimOption,
+        compositions: selectedCompositions,
         includeIntroPage,
         includeColorsPage,
         includeTypographyPage,
@@ -272,39 +260,51 @@ export function DimensionMatrixWizardModal({
             </div>
           </div>
 
-          {/* Section 2: Logo Orientations */}
+          {/* Section 2: Logo Compositions (5 selectable composition cards) */}
           <div className="space-y-2.5">
             <label className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
               <span>2. Orientácie a kompozície loga</span>
               <span className="text-[10px] text-primary font-mono">*</span>
             </label>
-            <div className="grid sm:grid-cols-3 gap-2.5">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
               {[
                 {
                   id: "horizontal" as const,
-                  label: "Horizontálne",
-                  sub: "Na šírku",
-                  desc: "Štandardná horizontálna kompozícia pre hlavičky",
+                  label: "Na šírku",
+                  sub: "Horizontálne bez claimu",
+                  desc: "Základná horizontálna kompozícia pre hlavičky a navigáciu.",
                 },
                 {
                   id: "vertical" as const,
-                  label: "Vertikálne",
-                  sub: "Na výšku",
-                  desc: "Centrovaná vertikálna kompozícia",
+                  label: "Na výšku",
+                  sub: "Vertikálne bez claimu",
+                  desc: "Centrovaná vertikálna kompozícia pre plagáty a štítky.",
                 },
                 {
                   id: "symbol" as const,
                   label: "Symbol / Monogram",
-                  sub: "Bez písma",
-                  desc: "Samostatný grafický znak alebo favicon",
+                  sub: "Znak bez písma",
+                  desc: "Samostatný grafický prvok, monogram, favicon alebo ikona.",
+                },
+                {
+                  id: "horizontal_claim" as const,
+                  label: "Na šírku s claimom",
+                  sub: "Horizontálne so sloganom",
+                  desc: "Horizontálne logo doplnené o primárny claim alebo podtitul.",
+                },
+                {
+                  id: "vertical_claim" as const,
+                  label: "Na výšku s claimom",
+                  sub: "Vertikálne so sloganom",
+                  desc: "Vertikálna kompozícia loga so sloganom v spodnej časti.",
                 },
               ].map((item) => {
-                const isSelected = selectedOrientations.includes(item.id);
+                const isSelected = selectedCompositions.includes(item.id);
                 return (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => toggleOrientation(item.id)}
+                    onClick={() => toggleComposition(item.id)}
                     className={`p-3.5 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between space-y-1.5 ${
                       isSelected
                         ? "border-primary bg-primary/10 shadow-2xs"
@@ -333,38 +333,10 @@ export function DimensionMatrixWizardModal({
             </div>
           </div>
 
-          {/* Section 3: Claim Option with Symbol Exclusion Notice */}
-          <div className="p-3.5 rounded-lg border border-border bg-muted/20 space-y-2">
-            <label className="flex items-center justify-between cursor-pointer">
-              <div className="space-y-0.5">
-                <span className="text-xs font-bold text-foreground">
-                  3. Verzia s claimom / sloganom (Claim Option)
-                </span>
-                <p className="text-[11px] text-muted-foreground">
-                  Rozdelí horizontálne a vertikálne varianty na vetvy Základná a S claimom.
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={hasClaimOption}
-                onChange={(e) => setHasClaimOption(e.target.checked)}
-                className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-0 cursor-pointer"
-              />
-            </label>
-
-            {/* Symbol Exclusion Rule Badge */}
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-muted/50 p-2 rounded border border-border/60 font-mono">
-              <Info className="w-3 h-3 text-primary shrink-0" />
-              <span>
-                Pravidlo integrity: Samostatný symbol sa z princípu generuje výhradne bez claimu.
-              </span>
-            </div>
-          </div>
-
-          {/* Section 4: Additional Core Chapters */}
+          {/* Section 3: Additional Core Chapters */}
           <div className="space-y-2.5">
             <label className="text-xs font-bold uppercase tracking-wider text-foreground">
-              4. Doplnkové základné kapitoly identity
+              3. Doplnkové základné kapitoly identity
             </label>
             <div className="grid sm:grid-cols-3 gap-2.5">
               <label
