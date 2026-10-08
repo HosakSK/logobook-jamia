@@ -1335,6 +1335,88 @@ export function BrandShapesForm({
                 </div>
               )}
             </div>
+
+            {/* Dedicated Pattern Live Preview Box */}
+            <div className="space-y-1.5 pt-3 border-t border-border/40">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground flex items-center gap-1.5">
+                  <Grid className="w-3.5 h-3.5 text-primary" />
+                  <span>Živý náhľad vzoru na pozadí manuálu:</span>
+                </span>
+                <span className="font-mono text-[11px] text-muted-foreground">
+                  Farba podkladu: {currentTheme.bgColor}
+                </span>
+              </div>
+
+              <div
+                className="relative overflow-hidden rounded-xl border border-border/70 p-6 min-h-[160px] flex items-center justify-center shadow-inner"
+                style={{
+                  backgroundColor: currentTheme.bgColor,
+                }}
+              >
+                {/* Pattern Canvas */}
+                {patternUrl ? (
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      backgroundImage: `url(${patternUrl})`,
+                      backgroundRepeat: patternType === "repeat" ? "repeat" : "no-repeat",
+                      backgroundSize:
+                        patternType === "cover"
+                          ? "cover"
+                          : patternType === "contain"
+                          ? "contain"
+                          : patternType === "zoom" || zoomPercent
+                          ? `${zoomPercent || 100}%`
+                          : "auto",
+                      backgroundPosition: "center",
+                      opacity: patternOpacity,
+                    }}
+                  />
+                ) : (
+                  <div className="text-xs text-muted-foreground italic text-center z-10">
+                    Zvoľte SVG vzor alebo obrázok vyššie pre zobrazenie náhľadu.
+                  </div>
+                )}
+
+                {/* Gradient Fade Overlay */}
+                {patternUrl && previewGradientCss && (
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: previewGradientCss,
+                    }}
+                  />
+                )}
+
+                {/* Foreground Demo Content Card */}
+                {patternUrl && (
+                  <div
+                    className="relative z-10 px-5 py-3.5 rounded-lg border border-border/60 shadow-lg flex items-center gap-3 max-w-sm w-full"
+                    style={{
+                      backgroundColor: currentTheme.surfaceColor,
+                      color: currentTheme.textColor,
+                    }}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-md flex items-center justify-center font-bold text-xs shrink-0"
+                      style={{
+                        backgroundColor: currentTheme.primaryColor,
+                        color: currentTheme.isDark ? "#070b0f" : "#0e161d",
+                      }}
+                    >
+                      Aa
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="text-xs font-bold truncate">Obsah verejného manuálu</div>
+                      <div className="text-[10px] text-muted-foreground truncate">
+                        Vzor a prechod presvitajú cez podklad za týmto obsahom
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

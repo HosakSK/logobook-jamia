@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { getFileUrl } from "@/lib/pocketbase";
+import { getBrandAssetsAction } from "@/actions/assets";
 import { BrandGeneralForm } from "@/components/admin/brand-settings/brand-general-form";
 import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favicon-form";
 import { BrandHeaderLogoForm } from "@/components/admin/brand-settings/brand-header-logo-form";
@@ -99,15 +100,30 @@ export default async function BrandSettingsPage({
     headerLogoUrl = brand.description.headerLogoUrl;
   }
 
+  // Fallback to publishedConfig headerLogoUrl
+  if (!headerLogoUrl && brand.publishedConfig && typeof brand.publishedConfig === "object") {
+    const pubBrand = (brand.publishedConfig as any).brand;
+    if (pubBrand?.headerLogoUrl) {
+      headerLogoUrl = pubBrand.headerLogoUrl;
+    }
+  }
+
   // Fallback: If no header logo set explicitly, look for the first brand asset (logo)
   if (!headerLogoUrl && brand.id) {
     try {
-      const firstAsset = await pb.collection("assets").getFirstListItem(
-        `brand = "${brand.id}"`,
-        { sort: "order" }
-      );
-      if (firstAsset) {
-        headerLogoUrl = firstAsset.svgContent ? `/api/assets/${firstAsset.id}/svg` : (firstAsset.preview ? getFileUrl("assets", firstAsset.id, firstAsset.preview) : null);
+      const assetsRes = await getBrandAssetsAction(brand.id);
+      if (assetsRes.success && assetsRes.assets && assetsRes.assets.length > 0) {
+        const firstAsset = assetsRes.assets[0];
+        const svgFile = firstAsset.files.find((f) => f.fileFormat === "SVG");
+        if (svgFile?.fileUrl) {
+          headerLogoUrl = svgFile.fileUrl;
+        } else if (firstAsset.svgContent) {
+          headerLogoUrl = `/api/assets/${firstAsset.id}/svg`;
+        } else if (firstAsset.previewUrl) {
+          headerLogoUrl = firstAsset.previewUrl;
+        } else if (firstAsset.files.length > 0) {
+          headerLogoUrl = firstAsset.files[0].fileUrl;
+        }
       }
     } catch {
       // No assets found

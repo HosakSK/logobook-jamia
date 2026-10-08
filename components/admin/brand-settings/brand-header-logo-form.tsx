@@ -41,18 +41,21 @@ export function BrandHeaderLogoForm({
   // Show brand name next to logo in header
   const [showHeaderBrandName, setShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
   const [savedShowHeaderBrandName, setSavedShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
+  const [imgLoadError, setImgLoadError] = useState<boolean>(false);
 
   // Synchronize when initialHeaderLogoUrl prop changes (e.g. after revalidation or page load)
   useEffect(() => {
     if (!selectedItem) {
       setPreviewUrl(initialHeaderLogoUrl || null);
       setSavedLogoUrl(initialHeaderLogoUrl || null);
+      setImgLoadError(false);
     }
   }, [initialHeaderLogoUrl, selectedItem]);
 
   // When media is picked from modal, update preview and mark as pending save
   const handleMediaSelect = (item: SelectedMediaItem) => {
     setError(null);
+    setImgLoadError(false);
     setSelectedItem(item);
     setPreviewUrl(item.url);
   };
@@ -140,9 +143,9 @@ export function BrandHeaderLogoForm({
           </span>
           <span className="text-[11px] text-[#96abbe]/80">Výška loga: {logoHeight}px</span>
         </div>
-        <div className="rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] px-5 py-4 shadow-inner flex items-center justify-between overflow-hidden">
+        <div className="rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] px-5 py-4 shadow-inner flex items-center justify-between overflow-hidden min-h-[72px]">
           <div className="flex items-center gap-3">
-            {previewUrl ? (
+            {previewUrl && !imgLoadError ? (
               <div
                 className="flex items-center justify-center transition-all duration-200"
                 style={{ height: `${logoHeight}px` }}
@@ -151,11 +154,12 @@ export function BrandHeaderLogoForm({
                   src={previewUrl}
                   alt="Logo v hlavičke"
                   style={{ maxHeight: `${logoHeight}px` }}
-                  className="w-auto max-w-[200px] object-contain object-left"
+                  className="w-auto max-w-[240px] sm:max-w-[320px] object-contain object-left"
+                  onError={() => setImgLoadError(true)}
                 />
               </div>
             ) : (
-              <div className="h-10 w-10 text-[#070b0f] bg-[#c8d400] flex items-center justify-center font-bold text-xs shadow-xs rounded-xl">
+              <div className="h-10 w-10 text-[#070b0f] bg-[#c8d400] flex items-center justify-center font-bold text-xs shadow-xs rounded-xl shrink-0">
                 {brandName.slice(0, 2).toUpperCase()}
               </div>
             )}
