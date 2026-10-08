@@ -19,7 +19,7 @@ export const m10LightboxSchema = z.object({
 
 export const m10ImageGallerySchema = z.object({
   columns: z.coerce.number().min(1).max(4).default(3),
-  aspectRatio: z.enum(["original", "16/9", "4/3", "1/1"]).default("16/9"),
+  aspectRatio: z.enum(["original", "16/9", "4/3", "1/1"]).default("1/1"),
   showCaptions: z.boolean().default(true),
   lightbox: m10LightboxSchema.default({
     enabled: true,

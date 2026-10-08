@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -15,6 +15,10 @@ import {
   MousePointerClick,
   Link as LinkIcon,
   Check,
+  Upload,
+  Loader2,
+  Search,
+  X,
 } from "lucide-react";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import { M04RazcestnikConfig, M04CardItem } from "@/lib/validations/modules/m04";
@@ -22,6 +26,7 @@ import { resolveI18nText, setI18nText } from "@/lib/validations/module";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction, getBrandPagesAction } from "@/actions/pages";
+import { uploadMediaAction } from "@/actions/media";
 import { PageItem } from "@/lib/types/page";
 
 const SAMPLE_CARDS: M04CardItem[] = [
@@ -83,6 +88,10 @@ export default function M04RazcestnikModule({
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [brandPages, setBrandPages] = useState<PageItem[]>([]);
   const [editingCardIndex, setEditingCardIndex] = useState<number>(0);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [pageSearchQuery, setPageSearchQuery] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load brand pages for linking
   const brandIdentifier =
@@ -214,6 +223,44 @@ export default function M04RazcestnikModule({
     };
     handleUpdateConfig({ items: newItems });
   };
+
+  // Upload card image to Cloudflare R2 / PocketBase mediaAssets (enforces storage quota)
+  const handleUploadCardImage = async (file: File) => {
+    setIsUploadingImage(true);
+    setUploadError(null);
+    try {
+      const activeCard = items[editingCardIndex];
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("fileName", file.name);
+      formData.append("fileType", "IMAGE");
+      const alt = resolveI18nText(activeCard?.title, locale, "en") || file.name;
+      formData.append("altText", alt);
+
+      const res = await uploadMediaAction(brandIdentifier, formData);
+      if (res.success && res.asset?.fileUrl) {
+        handleUpdateActiveCard({ imageUrl: res.asset.fileUrl });
+      } else {
+        setUploadError(res.message || "Nepodarilo sa nahrať obrázok.");
+      }
+    } catch (err: any) {
+      console.error("Failed to upload card image:", err);
+      setUploadError(err.message || "Chyba pri nahrávaní obrázka.");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
+  // Filtered internal pages for search autocomplete
+  const filteredPages = brandPages.filter((p) => {
+    if (!pageSearchQuery.trim()) return true;
+    const q = pageSearchQuery.toLowerCase().trim();
+    const skTitle = p.title?.sk?.toLowerCase() || "";
+    const enTitle = p.title?.en?.toLowerCase() || "";
+    const csTitle = p.title?.cs?.toLowerCase() || "";
+    const slug = p.slug?.toLowerCase() || "";
+    return skTitle.includes(q) || enTitle.includes(q) || csTitle.includes(q) || slug.includes(q);
+  });
 
   // Grid columns styling
   const gridColsClass =
@@ -391,9 +438,9 @@ export default function M04RazcestnikModule({
                   : {}),
               }}
             >
-              {/* Card Image (16:9 aspect ratio) */}
+              {/* Card Image (1:1 aspect ratio) */}
               {card.imageUrl ? (
-                <div className="aspect-video w-full overflow-hidden bg-muted/40 relative">
+                <div className="aspect-square w-full overflow-hidden bg-muted/40 relative">
                   <img
                     src={card.imageUrl}
                     alt={cardTitle}
@@ -402,7 +449,7 @@ export default function M04RazcestnikModule({
                   />
                 </div>
               ) : (
-                <div className="aspect-video w-full flex items-center justify-center bg-muted/30 text-muted-foreground/60 border-b border-border/20">
+                <div className="aspect-square w-full flex items-center justify-center bg-muted/30 text-muted-foreground/60 border-b border-border/20">
                   <ImageIcon className="h-8 w-8" />
                 </div>
               )}
@@ -683,26 +730,137 @@ export default function M04RazcestnikModule({
                     />
                   </div>
 
-                  {/* Image URL */}
-                  <div className="space-y-1">
-                    <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
-                      URL obrázka (pomer 16:9)
-                    </label>
+                  {/* Image Upload & URL (1:1 aspect ratio) */}
+                  <div className="space-y-2 p-3 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.45)]">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] uppercase font-semibold text-[#96abbe] flex items-center gap-1.5">
+                        <ImageIcon className="h-3 w-3 text-primary" />
+                        <span>Obrázok karty (pomer 1:1)</span>
+                      </label>
+                      {items[editingCardIndex].imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateActiveCard({ imageUrl: "" })}
+                          className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Odstrániť obrázok karty"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          <span>Zmazať</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Hidden file input */}
                     <input
-                      type="text"
-                      value={items[editingCardIndex].imageUrl || ""}
-                      onChange={(e) => handleUpdateActiveCard({ imageUrl: e.target.value })}
-                      placeholder="https://... / mockup.png"
-                      className="w-full h-8 px-2.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs font-mono text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary focus:outline-none"
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml,image/avif"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          await handleUploadCardImage(file);
+                        }
+                        e.target.value = "";
+                      }}
                     />
+
+                    <div className="flex items-start gap-3">
+                      {/* Square 1:1 Preview Box */}
+                      <div className="relative w-16 h-16 rounded-[2px] border border-[rgba(63,85,102,0.6)] bg-[#17212a] overflow-hidden shrink-0 flex items-center justify-center group/thumb">
+                        {items[editingCardIndex].imageUrl ? (
+                          <>
+                            <img
+                              src={items[editingCardIndex].imageUrl}
+                              alt="Náhľad karty"
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="p-1 rounded bg-white/20 hover:bg-white/40 text-white cursor-pointer"
+                                title="Nahrať iný obrázok"
+                              >
+                                <Upload className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <ImageIcon className="h-6 w-6 text-[#96abbe]/30" />
+                        )}
+                      </div>
+
+                      {/* Upload button & external URL */}
+                      <div className="flex-1 space-y-2">
+                        <button
+                          type="button"
+                          disabled={isUploadingImage}
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full h-7 px-3 rounded-[2px] bg-[#17212a] hover:bg-[#1f2c36] border border-[rgba(63,85,102,0.6)] hover:border-primary text-xs font-medium text-[#fafbfc] flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          {isUploadingImage ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                              <span className="text-[11px]">Nahrávam na Cloudflare R2...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-3.5 w-3.5 text-primary" />
+                              <span className="text-[11px] font-semibold">Nahrať obrázok (1:1 do kvóty)</span>
+                            </>
+                          )}
+                        </button>
+
+                        <input
+                          type="text"
+                          value={items[editingCardIndex].imageUrl || ""}
+                          onChange={(e) => handleUpdateActiveCard({ imageUrl: e.target.value })}
+                          placeholder="Alebo zadajte priamu URL (https://...)"
+                          className="w-full h-7 px-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.4)] text-[11px] font-mono text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {uploadError && (
+                      <div className="text-[10px] text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded-[2px]">
+                        {uploadError}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Internal Page Relation Dropdown */}
+                  {/* Internal Page Relation Dropdown with Search Filter */}
                   {brandPages.length > 0 && (
-                    <div className="space-y-1">
-                      <label className="text-[10px] uppercase font-semibold text-[#96abbe]">
-                        Prepojiť s internou stránkou manuálu
-                      </label>
+                    <div className="space-y-1.5 p-3 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.45)]">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] uppercase font-semibold text-[#96abbe] flex items-center gap-1.5">
+                          <LinkIcon className="h-3 w-3 text-primary" />
+                          <span>Prepojiť s internou stránkou manuálu</span>
+                        </label>
+                        {pageSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setPageSearchQuery("")}
+                            className="text-[10px] text-[#96abbe] hover:text-[#fafbfc] flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <X className="h-2.5 w-2.5" />
+                            <span>Zrušiť filter</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Search Filter Input */}
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1.5 h-3.5 w-3.5 text-[#96abbe]/60 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={pageSearchQuery}
+                          onChange={(e) => setPageSearchQuery(e.target.value)}
+                          placeholder="Filtrovať podstránku podľa názvu..."
+                          className="w-full h-7 pl-8 pr-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] text-[11px] text-[#fafbfc] placeholder:text-[#96abbe]/40 focus:border-primary focus:outline-none"
+                        />
+                      </div>
+
                       <select
                         value={
                           items[editingCardIndex].targetPageId ||
@@ -719,13 +877,15 @@ export default function M04RazcestnikModule({
                           const selectedPage = brandPages.find((p) => p.id === pageId);
                           handleUpdateActiveCard({
                             targetPageId: pageId || undefined,
-                            targetUrl: pageId ? `/admin/brand/${brandId}/builder/${pageId}` : undefined,
+                            targetUrl: pageId ? `/admin/brand/${brandIdentifier}/builder/${pageId}` : undefined,
                           });
                         }}
                         className="w-full h-8 px-2 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-primary focus:outline-none"
                       >
-                        <option value="" className="bg-[#0e161d] text-[#fafbfc]">— Vyberte stránku (alebo zadajte URL nižšie) —</option>
-                        {brandPages.map((p) => (
+                        <option value="" className="bg-[#0e161d] text-[#fafbfc]">
+                          — {filteredPages.length === 0 ? "Žiadna stránka nevyhovuje filtru" : "Vyberte stránku (alebo zadajte URL nižšie)"} —
+                        </option>
+                        {filteredPages.map((p) => (
                           <option key={p.id} value={p.id} className="bg-[#0e161d] text-[#fafbfc]">
                             {p.title?.sk || p.title?.en || p.slug} (/{p.slug})
                           </option>

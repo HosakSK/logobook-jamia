@@ -89,16 +89,25 @@ export async function uploadMediaAction(
     const fileType = customType || detectMediaType(rawFileName, file.type);
     const altText = ((formData.get("altText") as string) || "").trim();
 
+    // Resolve brand ID if a slug was passed
+    let targetBrandId = brandId;
+    try {
+      const brandRec = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+      if (brandRec?.id) {
+        targetBrandId = brandRec.id;
+      }
+    } catch (_) {}
+
     // Query highest order
     const existing = await pb.collection("mediaAssets").getFullList({
-      filter: `brand = "${brandId}"`,
+      filter: `brand = "${targetBrandId}"`,
       sort: "-order",
       perPage: 1,
     });
     const nextOrder = existing.length > 0 ? (existing[0].order || 0) + 1 : 0;
 
     const pbFormData = new FormData();
-    pbFormData.append("brand", brandId);
+    pbFormData.append("brand", targetBrandId);
     pbFormData.append("file", file);
     pbFormData.append("fileName", rawFileName);
     pbFormData.append("fileType", fileType);

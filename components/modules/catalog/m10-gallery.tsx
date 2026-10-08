@@ -55,7 +55,7 @@ export default function M10ObrazokGaleriaModule({
     if (res.success) return res.data;
     return {
       columns: 3,
-      aspectRatio: "16/9" as const,
+      aspectRatio: "1/1" as const,
       showCaptions: true,
       lightbox: {
         enabled: true,
@@ -251,15 +251,15 @@ export default function M10ObrazokGaleriaModule({
   // Aspect ratio class resolver
   const aspectRatioClass = useMemo(() => {
     switch (cfg.aspectRatio) {
-      case "1/1":
-        return "aspect-square";
+      case "16/9":
+        return "aspect-16/9";
       case "4/3":
         return "aspect-4/3";
       case "original":
         return "aspect-auto";
-      case "16/9":
+      case "1/1":
       default:
-        return "aspect-16/9";
+        return "aspect-square";
     }
   }, [cfg.aspectRatio]);
 
