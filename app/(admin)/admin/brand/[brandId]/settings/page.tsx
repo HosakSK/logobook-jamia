@@ -115,7 +115,7 @@ export default async function BrandSettingsPage({
       const assetsRes = await getBrandAssetsAction(brand.id);
       if (assetsRes.success && assetsRes.assets && assetsRes.assets.length > 0) {
         const firstAsset = assetsRes.assets[0];
-        const svgFile = firstAsset.files.find((f) => f.fileFormat === "SVG");
+        const svgFile = firstAsset.files.find((f) => f.fileFormat?.toUpperCase() === "SVG");
         if (svgFile?.fileUrl) {
           headerLogoUrl = svgFile.fileUrl;
         } else if (firstAsset.svgContent) {
@@ -127,7 +127,48 @@ export default async function BrandSettingsPage({
         }
       }
     } catch {
-      // No assets found
+      // Ignore
+    }
+
+    // Direct fallback from assets collection if action returned empty
+    if (!headerLogoUrl) {
+      try {
+        const directAsset = await pb.collection("assets").getFirstListItem(
+          `brand = "${brand.id}"`,
+          { sort: "order" }
+        );
+        if (directAsset) {
+          if (directAsset.svgContent) {
+            headerLogoUrl = `/api/assets/${directAsset.id}/svg`;
+          } else if (directAsset.preview) {
+            headerLogoUrl = getFileUrl("assets", directAsset.id, directAsset.preview);
+          } else {
+            // Check assetFiles
+            try {
+              const fRec = await pb.collection("assetFiles").getFirstListItem(
+                `asset = "${directAsset.id}"`,
+                { sort: "order" }
+              );
+              if (fRec && fRec.file) {
+                headerLogoUrl = getFileUrl("assetFiles", fRec.id, fRec.file);
+              }
+            } catch {}
+          }
+        }
+      } catch {}
+    }
+
+    // Direct fallback from mediaAssets collection
+    if (!headerLogoUrl) {
+      try {
+        const directMedia = await pb.collection("mediaAssets").getFirstListItem(
+          `brand = "${brand.id}" && (fileType = "IMAGE" || fileType = "ICON")`,
+          { sort: "order" }
+        );
+        if (directMedia && directMedia.file) {
+          headerLogoUrl = getFileUrl("mediaAssets", directMedia.id, directMedia.file);
+        }
+      } catch {}
     }
   }
 

@@ -175,9 +175,16 @@ export function BrandHeaderLogoForm({
                 <img
                   src={previewUrl}
                   alt="Logo v hlavičke"
-                  style={{ maxHeight: `${logoHeight}px` }}
-                  className="w-auto max-w-[240px] sm:max-w-[320px] object-contain object-left"
-                  onError={() => setImgLoadError(true)}
+                  style={{
+                    height: `${logoHeight}px`,
+                    maxHeight: `${logoHeight}px`,
+                    maxWidth: "320px",
+                  }}
+                  className="w-auto object-contain object-left block"
+                  onError={() => {
+                    console.warn("Header logo preview failed to load image:", previewUrl);
+                    setImgLoadError(true);
+                  }}
                 />
               </div>
             ) : (
