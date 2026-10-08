@@ -38,9 +38,9 @@ import { resolveI18nText, setI18nText } from "@/lib/validations/module";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction } from "@/actions/pages";
-import { getBrandAssetsAction } from "@/actions/assets";
 import { uploadMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
+import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 /**
  * Standard dimension presets (in mm)
@@ -351,8 +351,9 @@ export default function M21FiremnaVizitkaModule({
   );
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [modalTab, setModalTab] = useState<"previews" | "dimensions" | "downloads">("previews");
-  const [brandAssets, setBrandAssets] = useState<BrandAsset[]>([]);
   const [uploadingTarget, setUploadingTarget] = useState<"face" | "back" | "custom_svg" | null>(null);
+  const [isUniversalPickerOpen, setIsUniversalPickerOpen] = useState(false);
+  const [pickerTarget, setPickerTarget] = useState<"face" | "back" | "custom_svg" | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const uploadModeRef = useRef<"face" | "back" | "custom_svg" | null>(null);
@@ -361,19 +362,6 @@ export default function M21FiremnaVizitkaModule({
     setCfg(parsedConfig);
     setShowTechnicalGuides(parsedConfig.technicalOverlay.showByDefault);
   }, [parsedConfig]);
-
-  // Load brand assets for image picker
-  useEffect(() => {
-    if (brandId && isEditor) {
-      getBrandAssetsAction(brandId)
-        .then((res) => {
-          if (res?.success && res.assets) {
-            setBrandAssets(res.assets);
-          }
-        })
-        .catch((err) => console.error("Failed to load brand assets in M21:", err));
-    }
-  }, [brandId, isEditor]);
 
   // Save config handler
   const handleSaveConfig = async (newConfig: M21BusinessCardConfig) => {
@@ -981,17 +969,13 @@ export default function M21FiremnaVizitkaModule({
                           <button
                             type="button"
                             onClick={() => {
-                              uploadModeRef.current = "face";
-                              fileInputRef.current?.click();
+                              setPickerTarget("face");
+                              setIsUniversalPickerOpen(true);
                             }}
-                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold"
+                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            {uploadingTarget === "face" ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <Upload className="w-3 h-3" />
-                            )}
-                            <span>Nahrať JPG/PNG</span>
+                            <Upload className="w-3 h-3" />
+                            <span>Vybrať z médií / Nahrať</span>
                           </button>
                         </div>
 
@@ -1018,17 +1002,13 @@ export default function M21FiremnaVizitkaModule({
                           <button
                             type="button"
                             onClick={() => {
-                              uploadModeRef.current = "back";
-                              fileInputRef.current?.click();
+                              setPickerTarget("back");
+                              setIsUniversalPickerOpen(true);
                             }}
-                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold"
+                            className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                           >
-                            {uploadingTarget === "back" ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <Upload className="w-3 h-3" />
-                            )}
-                            <span>Nahrať JPG/PNG</span>
+                            <Upload className="w-3 h-3" />
+                            <span>Vybrať z médií / Nahrať</span>
                           </button>
                         </div>
 
@@ -1631,6 +1611,56 @@ export default function M21FiremnaVizitkaModule({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Universal Media Picker Modal */}
+      {isUniversalPickerOpen && pickerTarget !== null && (
+        <UniversalMediaPickerModal
+          isOpen={isUniversalPickerOpen}
+          onClose={() => {
+            setIsUniversalPickerOpen(false);
+            setPickerTarget(null);
+          }}
+          brandId={brandId}
+          title={
+            pickerTarget === "face"
+              ? "Vybrať obrázok prednej strany vizitky"
+              : pickerTarget === "back"
+              ? "Vybrať obrázok zadnej strany vizitky"
+              : "Vybrať technické SVG"
+          }
+          description="Vyberte existujúci obrázok, logo alebo nahrajte nový súbor."
+          currentUrl={
+            pickerTarget === "face"
+              ? cfg.previews.face
+              : pickerTarget === "back"
+              ? cfg.previews.back
+              : cfg.technicalOverlay.customSvgUrl
+          }
+          onSelect={(selected) => {
+            if (pickerTarget === "face" || pickerTarget === "back") {
+              handleSaveConfig({
+                ...cfg,
+                previews: {
+                  ...cfg.previews,
+                  [pickerTarget]: selected.url,
+                },
+              });
+            } else if (pickerTarget === "custom_svg") {
+              handleSaveConfig({
+                ...cfg,
+                technicalOverlay: {
+                  ...cfg.technicalOverlay,
+                  mode: "custom_svg",
+                  customSvgUrl: selected.url,
+                },
+              });
+            }
+          }}
+          acceptedFileTypes="image/*,.png,.jpg,.jpeg,.webp,.svg,.pdf"
+          allowDirectUrl={true}
+          includeBrandLogos={true}
+        />
       )}
     </div>
   );

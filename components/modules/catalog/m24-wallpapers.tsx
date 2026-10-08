@@ -40,6 +40,7 @@ import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandAssetsAction } from "@/actions/assets";
 import { uploadMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
+import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 /**
  * Category metadata
@@ -123,6 +124,8 @@ export default function M24FiremneTapetyAPozadiaModule({
   const [modalTab, setModalTab] = useState<"wallpapers" | "settings">("wallpapers");
   const [brandAssets, setBrandAssets] = useState<BrandAsset[]>([]);
   const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
+  const [isUniversalPickerOpen, setIsUniversalPickerOpen] = useState(false);
+  const [wallpaperPickerIndex, setWallpaperPickerIndex] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const uploadCallbackRef = useRef<((fileUrl: string) => void) | null>(null);
@@ -940,17 +943,13 @@ export default function M24FiremneTapetyAPozadiaModule({
                             <button
                               type="button"
                               onClick={() => {
-                                uploadCallbackRef.current = (url) => {
-                                  const updated = [...cfg.wallpapers];
-                                  updated[index].previewUrl = url;
-                                  handleSaveConfig({ ...cfg, wallpapers: updated });
-                                };
-                                fileInputRef.current?.click();
+                                setWallpaperPickerIndex(index);
+                                setIsUniversalPickerOpen(true);
                               }}
                               className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                             >
                               <Upload className="w-3 h-3" />
-                              <span>Nahrať JPG/PNG</span>
+                              <span>Vybrať z médií / Nahrať</span>
                             </button>
                           </div>
                           <input
@@ -1182,6 +1181,32 @@ export default function M24FiremneTapetyAPozadiaModule({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Universal Media Picker Modal */}
+      {isUniversalPickerOpen && wallpaperPickerIndex !== null && (
+        <UniversalMediaPickerModal
+          isOpen={isUniversalPickerOpen}
+          onClose={() => {
+            setIsUniversalPickerOpen(false);
+            setWallpaperPickerIndex(null);
+          }}
+          brandId={brandId}
+          title="Vybrať náhľadový obrázok tapety"
+          description="Zvoľte existujúci obrázok, grafiku alebo nahrajte nový súbor."
+          currentUrl={cfg.wallpapers[wallpaperPickerIndex]?.previewUrl}
+          onSelect={(selected) => {
+            const updated = [...cfg.wallpapers];
+            updated[wallpaperPickerIndex] = {
+              ...updated[wallpaperPickerIndex],
+              previewUrl: selected.url,
+            };
+            handleSaveConfig({ ...cfg, wallpapers: updated });
+          }}
+          acceptedFileTypes="image/*,.png,.jpg,.jpeg,.webp,.svg,.avif"
+          allowDirectUrl={true}
+          includeBrandLogos={true}
+        />
       )}
     </div>
   );

@@ -186,6 +186,55 @@ export async function uploadBrandFaviconAction(
   }
 }
 
+/**
+ * Sets an existing mediaAsset ID or external URL as the brand favicon
+ */
+export async function setBrandFaviconAction(
+  brandId: string,
+  mediaAssetIdOrUrl: string
+): Promise<{ success: boolean; error?: string; faviconUrl?: string }> {
+  try {
+    const pb = await getServerPocketBase();
+    const user = pb.authStore.record;
+    if (!user || !pb.authStore.isValid) {
+      return { success: false, error: "Unauthorized session." };
+    }
+
+    const { brand } = await verifyBrandAccess(pb, brandId, user.id);
+
+    // Check if mediaAssetIdOrUrl is an existing mediaAsset record
+    let finalUrl = mediaAssetIdOrUrl;
+    let favAssetId: string | null = null;
+
+    try {
+      const mediaAsset = await pb.collection("mediaAssets").getOne(mediaAssetIdOrUrl);
+      if (mediaAsset) {
+        favAssetId = mediaAsset.id;
+        finalUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
+      }
+    } catch {
+      // Not a mediaAsset ID, might be a direct URL or asset ID
+    }
+
+    await pb.collection("brands").update(brand.id, {
+      favicon: favAssetId,
+    });
+
+    revalidatePath(`/admin/brand/${brand.id}/settings`);
+    revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    return {
+      success: true,
+      faviconUrl: finalUrl,
+    };
+  } catch (err: unknown) {
+    console.error("Failed to set brand favicon:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to set brand favicon",
+    };
+  }
+}
+
 export async function updateGlobalShapesAction(
   brandId: string,
   _prevState: unknown,

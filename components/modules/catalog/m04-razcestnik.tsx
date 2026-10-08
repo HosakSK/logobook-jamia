@@ -28,6 +28,7 @@ import { InlineEditableText } from "@/components/admin/builder/inline-editable-t
 import { updateModuleConfigAction, getBrandPagesAction } from "@/actions/pages";
 import { uploadMediaAction } from "@/actions/media";
 import { PageItem } from "@/lib/types/page";
+import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 const SAMPLE_CARDS: M04CardItem[] = [
   {
@@ -91,6 +92,7 @@ export default function M04RazcestnikModule({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [pageSearchQuery, setPageSearchQuery] = useState("");
+  const [isCardImagePickerOpen, setIsCardImagePickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load brand pages for linking
@@ -808,9 +810,9 @@ export default function M04RazcestnikModule({
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
                               <button
                                 type="button"
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={() => setIsCardImagePickerOpen(true)}
                                 className="p-1 rounded bg-white/20 hover:bg-white/40 text-white cursor-pointer"
-                                title="Nahrať iný obrázok"
+                                title="Zmeniť obrázok"
                               >
                                 <Upload className="h-3 w-3" />
                               </button>
@@ -821,25 +823,15 @@ export default function M04RazcestnikModule({
                         )}
                       </div>
 
-                      {/* Upload button & external URL */}
+                      {/* Open Universal Media Picker Modal & direct URL input */}
                       <div className="flex-1 space-y-2">
                         <button
                           type="button"
-                          disabled={isUploadingImage}
-                          onClick={() => fileInputRef.current?.click()}
-                          className="w-full h-7 px-3 rounded-[2px] bg-[#17212a] hover:bg-[#1f2c36] border border-[rgba(63,85,102,0.6)] hover:border-primary text-xs font-medium text-[#fafbfc] flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                          onClick={() => setIsCardImagePickerOpen(true)}
+                          className="w-full h-7 px-3 rounded-[2px] bg-[#17212a] hover:bg-[#1f2c36] border border-[rgba(63,85,102,0.6)] hover:border-primary text-xs font-medium text-[#fafbfc] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          {isUploadingImage ? (
-                            <>
-                              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                              <span className="text-[11px]">Nahrávam na Cloudflare R2...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="h-3.5 w-3.5 text-primary" />
-                              <span className="text-[11px] font-semibold">Nahrať obrázok (1:1 do kvóty)</span>
-                            </>
-                          )}
+                          <Upload className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-[11px] font-semibold">Vybrať z médií alebo nahrať</span>
                         </button>
 
                         <input
@@ -1020,6 +1012,22 @@ export default function M04RazcestnikModule({
           </div>
         </div>
       )}
+
+      {/* Universal Media Picker Modal for Card Images */}
+      <UniversalMediaPickerModal
+        isOpen={isCardImagePickerOpen}
+        onClose={() => setIsCardImagePickerOpen(false)}
+        brandId={brandIdentifier}
+        title="Vybrať obrázok karty rázcestníka (1:1)"
+        description="Vyberte z nahraných médií a grafík značky alebo nahrajte nový obrázok (započíta sa do kvóty konta)."
+        currentUrl={items[editingCardIndex]?.imageUrl}
+        onSelect={(selected) => {
+          handleUpdateActiveCard({ imageUrl: selected.url });
+        }}
+        acceptedFileTypes="image/*,.png,.jpg,.jpeg,.webp,.svg,.avif"
+        allowDirectUrl={true}
+        includeBrandLogos={true}
+      />
     </div>
   );
 }

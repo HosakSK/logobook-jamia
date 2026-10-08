@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
-import { uploadBrandFaviconAction } from "@/actions/brand-settings";
+import { useState, useTransition } from "react";
+import { uploadBrandFaviconAction, setBrandFaviconAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dictionary } from "@/lib/i18n";
-import { Upload, Check, AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { Upload, Check, AlertCircle, Loader2, Sparkles, FolderOpen } from "lucide-react";
+import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 interface BrandFaviconFormProps {
   brandId: string;
@@ -18,35 +19,24 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialFaviconUrl || null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        setError(dict.admin.faviconHint);
-        return;
-      }
-      setError(null);
-      setPreviewUrl(URL.createObjectURL(file));
+  const handleMediaSelect = (item: SelectedMediaItem) => {
+    setError(null);
+    setPreviewUrl(item.url);
 
-      // Auto submit on file selection
-      const formData = new FormData();
-      formData.set("favicon", file);
-
-      startTransition(async () => {
-        const res = await uploadBrandFaviconAction(brandId, formData);
-        if (res.success) {
-          setSuccess(true);
-          if (res.faviconUrl) {
-            setPreviewUrl(res.faviconUrl);
-          }
-          setTimeout(() => setSuccess(false), 4000);
-        } else {
-          setError(res.error || "Failed to upload favicon");
+    startTransition(async () => {
+      const res = await setBrandFaviconAction(brandId, item.id || item.url);
+      if (res.success) {
+        setSuccess(true);
+        if (res.faviconUrl) {
+          setPreviewUrl(res.faviconUrl);
         }
-      });
-    }
+        setTimeout(() => setSuccess(false), 4000);
+      } else {
+        setError(res.error || "Nepodarilo sa nastaviť favicon");
+      }
+    });
   };
 
   return (
@@ -83,40 +73,45 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
         </div>
 
         <div className="space-y-2.5">
-          <Label className="text-xs font-semibold text-muted-foreground">Nahrať novú ikonu</Label>
+          <Label className="text-xs font-semibold text-muted-foreground">Favicon a ikona záložky</Label>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Podporované formáty: .ico, .png, .svg (odporúčaný rozmer: 32x32 alebo 64x64 px).
+            Vyberte z už nahraných médií a symbolov značky alebo nahrajte nový .ico, .png, .svg súbor.
           </p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            name="favicon"
-            accept=".ico,image/png,image/svg+xml"
-            className="hidden"
-            onChange={handleFileChange}
-          />
           <Button
             type="button"
             variant="outline"
             size="default"
             disabled={isPending}
-            onClick={() => fileInputRef.current?.click()}
-            className="mt-1 shadow-xs"
+            onClick={() => setIsPickerOpen(true)}
+            className="mt-1 shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
           >
             {isPending ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                <span>Nahrávam...</span>
+                <span>Ukladám favicon...</span>
               </>
             ) : (
               <>
-                <Upload className="h-4 w-4 mr-2" />
-                <span>Vybrať favicon</span>
+                <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
+                <span>Vybrať alebo nahrať favicon</span>
               </>
             )}
           </Button>
         </div>
       </div>
+
+      <UniversalMediaPickerModal
+        isOpen={isPickerOpen}
+        onClose={() => setIsPickerOpen(false)}
+        brandId={brandId}
+        title="Vybrať favicon značky"
+        description="Zvoľte existujúci symbol, ikonu z knižnice médií alebo nahrajte nový súbor (.ico, .png, .svg)."
+        currentUrl={previewUrl}
+        onSelect={handleMediaSelect}
+        acceptedFileTypes=".ico,image/png,image/svg+xml,.png,.ico,.svg"
+        allowDirectUrl={true}
+        includeBrandLogos={true}
+      />
     </div>
   );
 }

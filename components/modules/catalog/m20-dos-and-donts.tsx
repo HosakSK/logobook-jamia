@@ -36,6 +36,7 @@ import { getBrandAssetsAction } from "@/actions/assets";
 import { uploadMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
 import { getWcagContrast } from "@/lib/utils/color-calc";
+import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 /**
  * High-fidelity fallback SVG graphics for default rules if custom image is not yet uploaded
@@ -178,6 +179,8 @@ export default function M20DosAndDontsModule({
   const [brandAssets, setBrandAssets] = useState<BrandAsset[]>([]);
   const [assetPickerRuleIndex, setAssetPickerRuleIndex] = useState<number | null>(null);
   const [uploadingRuleIndex, setUploadingRuleIndex] = useState<number | null>(null);
+  const [isUniversalPickerOpen, setIsUniversalPickerOpen] = useState(false);
+  const [pickerTargetRuleIndex, setPickerTargetRuleIndex] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const targetUploadIndexRef = useRef<number | null>(null);
@@ -1154,24 +1157,14 @@ export default function M20DosAndDontsModule({
                                 {/* Direct File Upload Button */}
                                 <button
                                   type="button"
-                                  disabled={uploadingRuleIndex === index}
                                   onClick={() => {
-                                    targetUploadIndexRef.current = index;
-                                    fileInputRef.current?.click();
+                                    setPickerTargetRuleIndex(index);
+                                    setIsUniversalPickerOpen(true);
                                   }}
-                                  className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold"
+                                  className="text-[10px] text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
                                 >
-                                  {uploadingRuleIndex === index ? (
-                                    <>
-                                      <Loader2 className="w-3 h-3 animate-spin" />
-                                      <span>Nahrávam...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Upload className="w-3 h-3" />
-                                      <span>Nahrať JPG/PNG</span>
-                                    </>
-                                  )}
+                                  <Upload className="w-3 h-3" />
+                                  <span>Vybrať z médií / Nahrať</span>
                                 </button>
 
                                 {/* Select from Brand Assets */}
@@ -1658,6 +1651,32 @@ export default function M20DosAndDontsModule({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Universal Media Picker Modal */}
+      {isUniversalPickerOpen && pickerTargetRuleIndex !== null && (
+        <UniversalMediaPickerModal
+          isOpen={isUniversalPickerOpen}
+          onClose={() => {
+            setIsUniversalPickerOpen(false);
+            setPickerTargetRuleIndex(null);
+          }}
+          brandId={brandId}
+          title="Vybrať obrázok pre pravidlo Do's & Don'ts"
+          description="Zvoľte existujúci obrázok, logo alebo nahrajte nový súbor."
+          currentUrl={cfg.items[pickerTargetRuleIndex]?.imageUrl}
+          onSelect={(selected) => {
+            const updated = [...cfg.items];
+            updated[pickerTargetRuleIndex] = {
+              ...updated[pickerTargetRuleIndex],
+              imageUrl: selected.url,
+            };
+            handleSaveConfig({ ...cfg, items: updated });
+          }}
+          acceptedFileTypes="image/*,.png,.jpg,.jpeg,.webp,.svg"
+          allowDirectUrl={true}
+          includeBrandLogos={true}
+        />
       )}
     </div>
   );
