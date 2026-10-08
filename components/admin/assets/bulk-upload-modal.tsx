@@ -104,6 +104,25 @@ export function BulkUploadModal({
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Filters for previewing/inspecting queued items before upload
+  const [filterMedium, setFilterMedium] = useState<string>("ALL");
+  const [filterOrientation, setFilterOrientation] = useState<string>("ALL");
+  const [filterBackground, setFilterBackground] = useState<string>("ALL");
+  const [filterSearch, setFilterSearch] = useState<string>("");
+
+  const filteredQueue = queue.filter((item) => {
+    if (filterMedium !== "ALL" && item.medium !== filterMedium) return false;
+    if (filterOrientation !== "ALL" && item.orientation !== filterOrientation) return false;
+    if (filterBackground !== "ALL" && item.background !== filterBackground) return false;
+    if (filterSearch.trim()) {
+      const q = filterSearch.toLowerCase().trim();
+      const matchName = item.name.toLowerCase().includes(q);
+      const matchFile = item.originalFileName.toLowerCase().includes(q);
+      if (!matchName && !matchFile) return false;
+    }
+    return true;
+  });
+
   if (!isOpen) return null;
 
   // Process dropped or selected files (supports SVG, PNG, PDF, EPS, AI, ZIP)
@@ -642,9 +661,14 @@ export function BulkUploadModal({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground pb-1">
                 <span className="font-semibold uppercase tracking-wider font-mono">
                   Pripravené na nahratie ({queue.length})
+                  {filteredQueue.length !== queue.length && (
+                    <span className="text-[#c8d400] normal-case font-normal ml-1">
+                      (zobrazených {filteredQueue.length})
+                    </span>
+                  )}
                 </span>
 
-                {/* Bulk filter & cleanup actions */}
+                {/* Bulk cleanup actions */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   <Button
                     type="button"
@@ -678,8 +702,118 @@ export function BulkUploadModal({
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {queue.map((item) => (
+              {/* Filter controls toolbar */}
+              <div className="p-2.5 rounded-[3px] bg-neutral-950/70 border border-border/50 flex flex-wrap items-center gap-2.5 text-xs">
+                {/* Search input */}
+                <div className="flex-1 min-w-[140px]">
+                  <Input
+                    type="text"
+                    value={filterSearch}
+                    onChange={(e) => setFilterSearch(e.target.value)}
+                    placeholder="Filtrovať podľa názvu súboru..."
+                    className="h-7 text-xs bg-neutral-900 border-border/60"
+                  />
+                </div>
+
+                {/* Medium Filter Pills */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">Médium:</span>
+                  {[
+                    { id: "ALL", label: "Všetky" },
+                    { id: "CMYK", label: "CMYK" },
+                    { id: "RGB", label: "RGB" },
+                    { id: "PANTONE", label: "Pantone" },
+                    { id: "MONO_BLACK", label: "Čiernobiele" },
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      type="button"
+                      onClick={() => setFilterMedium(btn.id)}
+                      className={`px-2 py-0.5 text-[10px] font-mono rounded-[2px] transition-colors cursor-pointer border ${
+                        filterMedium === btn.id
+                          ? "bg-primary text-black font-bold border-primary"
+                          : "bg-neutral-900 text-neutral-300 hover:text-white border-border/40 hover:border-border"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Orientation Filter Pills */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">Orientácia:</span>
+                  {[
+                    { id: "ALL", label: "Všetky" },
+                    { id: "HORIZONTAL", label: "Šírka" },
+                    { id: "VERTICAL", label: "Výška" },
+                    { id: "SYMBOL", label: "Symbol" },
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      type="button"
+                      onClick={() => setFilterOrientation(btn.id)}
+                      className={`px-2 py-0.5 text-[10px] font-mono rounded-[2px] transition-colors cursor-pointer border ${
+                        filterOrientation === btn.id
+                          ? "bg-primary text-black font-bold border-primary"
+                          : "bg-neutral-900 text-neutral-300 hover:text-white border-border/40 hover:border-border"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Background Filter Pills */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">Podklad:</span>
+                  {[
+                    { id: "ALL", label: "Všetky" },
+                    { id: "LIGHT", label: "Svetlý" },
+                    { id: "DARK", label: "Tmavý" },
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      type="button"
+                      onClick={() => setFilterBackground(btn.id)}
+                      className={`px-2 py-0.5 text-[10px] font-mono rounded-[2px] transition-colors cursor-pointer border ${
+                        filterBackground === btn.id
+                          ? "bg-primary text-black font-bold border-primary"
+                          : "bg-neutral-900 text-neutral-300 hover:text-white border-border/40 hover:border-border"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Clear all filters */}
+                {(filterMedium !== "ALL" ||
+                  filterOrientation !== "ALL" ||
+                  filterBackground !== "ALL" ||
+                  filterSearch.trim() !== "") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilterMedium("ALL");
+                      setFilterOrientation("ALL");
+                      setFilterBackground("ALL");
+                      setFilterSearch("");
+                    }}
+                    className="text-[10px] text-muted-foreground hover:text-white underline cursor-pointer ml-auto"
+                  >
+                    Zrušiť filtre
+                  </button>
+                )}
+              </div>
+
+              {filteredQueue.length === 0 ? (
+                <div className="p-8 text-center text-xs text-muted-foreground bg-neutral-900/50 rounded-[3px] border border-border/30">
+                  Žiadne položky nezodpovedajú zvoleným filtrom.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredQueue.map((item) => (
                   <div
                     key={item.id}
                     className="p-4 rounded-[3px] bg-neutral-900 border border-border/40 flex flex-col gap-3 text-xs shadow-xs"
@@ -870,8 +1004,9 @@ export function BulkUploadModal({
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
 
           {/* Upload Progress Bar */}
           {uploadProgress && (
