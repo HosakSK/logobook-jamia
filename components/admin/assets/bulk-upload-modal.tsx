@@ -107,12 +107,23 @@ export function BulkUploadModal({
   // Filters for previewing/inspecting queued items before upload
   const [filterMedium, setFilterMedium] = useState<string>("ALL");
   const [filterOrientation, setFilterOrientation] = useState<string>("ALL");
+  const [filterClaim, setFilterClaim] = useState<string>("ALL");
   const [filterBackground, setFilterBackground] = useState<string>("ALL");
   const [filterSearch, setFilterSearch] = useState<string>("");
 
   const filteredQueue = queue.filter((item) => {
-    if (filterMedium !== "ALL" && item.medium !== filterMedium) return false;
+    if (filterMedium !== "ALL") {
+      if (filterMedium === "CMYK" && item.medium !== "PRINT_CMYK") return false;
+      if (filterMedium === "RGB" && item.medium !== "DIGITAL_RGB") return false;
+      if (filterMedium === "PANTONE" && item.medium !== "PRINT_PANTONE") return false;
+      if (filterMedium === "MONO" && item.medium !== "PRINT_MONOCHROME" && item.medium !== "PRINT_WB") return false;
+      if (filterMedium === "UNIVERSAL" && item.medium !== "UNIVERSAL") return false;
+    }
     if (filterOrientation !== "ALL" && item.orientation !== filterOrientation) return false;
+    if (filterClaim !== "ALL") {
+      if (filterClaim === "WITH_CLAIM" && !item.hasClaim) return false;
+      if (filterClaim === "NO_CLAIM" && item.hasClaim) return false;
+    }
     if (filterBackground !== "ALL" && item.background !== filterBackground) return false;
     if (filterSearch.trim()) {
       const q = filterSearch.toLowerCase().trim();
@@ -723,7 +734,7 @@ export function BulkUploadModal({
                     { id: "CMYK", label: "CMYK" },
                     { id: "RGB", label: "RGB" },
                     { id: "PANTONE", label: "Pantone" },
-                    { id: "MONO_BLACK", label: "Čiernobiele" },
+                    { id: "MONO", label: "Čiernobiele" },
                   ].map((btn) => (
                     <button
                       key={btn.id}
@@ -764,6 +775,29 @@ export function BulkUploadModal({
                   ))}
                 </div>
 
+                {/* Claim Filter Pills */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">Claim:</span>
+                  {[
+                    { id: "ALL", label: "Všetky" },
+                    { id: "WITH_CLAIM", label: "S claimom" },
+                    { id: "NO_CLAIM", label: "Bez claimu" },
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      type="button"
+                      onClick={() => setFilterClaim(btn.id)}
+                      className={`px-2 py-0.5 text-[10px] font-mono rounded-[2px] transition-colors cursor-pointer border ${
+                        filterClaim === btn.id
+                          ? "bg-primary text-black font-bold border-primary"
+                          : "bg-neutral-900 text-neutral-300 hover:text-white border-border/40 hover:border-border"
+                      }`}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Background Filter Pills */}
                 <div className="flex items-center gap-1">
                   <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">Podklad:</span>
@@ -790,6 +824,7 @@ export function BulkUploadModal({
                 {/* Clear all filters */}
                 {(filterMedium !== "ALL" ||
                   filterOrientation !== "ALL" ||
+                  filterClaim !== "ALL" ||
                   filterBackground !== "ALL" ||
                   filterSearch.trim() !== "") && (
                   <button
@@ -797,6 +832,7 @@ export function BulkUploadModal({
                     onClick={() => {
                       setFilterMedium("ALL");
                       setFilterOrientation("ALL");
+                      setFilterClaim("ALL");
                       setFilterBackground("ALL");
                       setFilterSearch("");
                     }}
