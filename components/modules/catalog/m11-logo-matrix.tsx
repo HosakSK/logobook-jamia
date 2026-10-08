@@ -594,7 +594,7 @@ export default function M11MaticaLogotypovModule({
               >
                 {/* Visual Preview Box with Hover Reveal */}
                 <div
-                  className="relative w-full aspect-4/3 rounded-[3px] border border-border/40 overflow-hidden flex items-center justify-center select-none group/box transition-all"
+                  className="relative w-full aspect-square rounded-[3px] border border-border/40 overflow-hidden flex items-center justify-center select-none group/box transition-all"
                   style={{ backgroundColor: item.backgroundColor }}
                 >
                   {/* Base SVG Vector */}

@@ -364,7 +364,7 @@ export default function M07ZobrazenieLogaModule({
         {/* LEFT COLUMN: Logo Preview & Interactive Mockup Reveal (40% / 5 cols) */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
           <div
-            className="relative w-full aspect-4/3 rounded-[3px] border border-border/40 overflow-hidden group/preview select-none flex items-center justify-center transition-all duration-200"
+            className="relative w-full aspect-square rounded-[3px] border border-border/40 overflow-hidden group/preview select-none flex items-center justify-center transition-all duration-200"
             style={{ backgroundColor: cfg.directPreview.backgroundColor || "transparent" }}
           >
             {/* SVG Vector Layer (Base) */}
