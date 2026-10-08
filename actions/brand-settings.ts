@@ -234,8 +234,25 @@ export async function setBrandFaviconAction(
       // Not a mediaAsset ID, check if it's an asset in assets collection
       try {
         const assetRec = await pb.collection("assets").getOne(mediaAssetIdOrUrl);
-        if (assetRec && assetRec.preview) {
-          finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+        if (assetRec) {
+          try {
+            const svgFileRec = await pb.collection("assetFiles").getFirstListItem(
+              `asset = "${assetRec.id}" && fileFormat = "SVG"`
+            );
+            if (svgFileRec && svgFileRec.file) {
+              finalUrl = pb.files.getURL(svgFileRec, svgFileRec.file);
+            }
+          } catch {
+            // No physical SVG in assetFiles
+          }
+
+          if (!finalUrl || finalUrl === mediaAssetIdOrUrl) {
+            if (assetRec.svgContent) {
+              finalUrl = `/api/assets/${assetRec.id}/svg`;
+            } else if (assetRec.preview) {
+              finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+            }
+          }
         }
       } catch {
         // Direct URL or external URL
@@ -344,8 +361,25 @@ export async function setBrandHeaderLogoAction(
       // Not a mediaAsset ID, check if it's an asset in assets collection
       try {
         const assetRec = await pb.collection("assets").getOne(mediaAssetIdOrUrl);
-        if (assetRec && assetRec.preview) {
-          finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+        if (assetRec) {
+          try {
+            const svgFileRec = await pb.collection("assetFiles").getFirstListItem(
+              `asset = "${assetRec.id}" && fileFormat = "SVG"`
+            );
+            if (svgFileRec && svgFileRec.file) {
+              finalUrl = pb.files.getURL(svgFileRec, svgFileRec.file);
+            }
+          } catch {
+            // No physical SVG in assetFiles
+          }
+
+          if (!finalUrl || finalUrl === mediaAssetIdOrUrl) {
+            if (assetRec.svgContent) {
+              finalUrl = `/api/assets/${assetRec.id}/svg`;
+            } else if (assetRec.preview) {
+              finalUrl = pb.files.getURL(assetRec, assetRec.preview);
+            }
+          }
         }
       } catch {
         // Direct URL or external URL

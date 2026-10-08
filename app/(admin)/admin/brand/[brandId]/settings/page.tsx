@@ -52,8 +52,8 @@ export default async function BrandSettingsPage({
     } else {
       try {
         const assetRec = await pb.collection("assets").getOne(brand.favicon);
-        if (assetRec && assetRec.preview) {
-          faviconUrl = getFileUrl("assets", assetRec.id, assetRec.preview);
+        if (assetRec) {
+          faviconUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? getFileUrl("assets", assetRec.id, assetRec.preview) : null);
         }
       } catch {
         // fallback
@@ -78,8 +78,8 @@ export default async function BrandSettingsPage({
     } else {
       try {
         const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
-        if (assetRec && assetRec.preview) {
-          headerLogoUrl = getFileUrl("assets", assetRec.id, assetRec.preview);
+        if (assetRec) {
+          headerLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? getFileUrl("assets", assetRec.id, assetRec.preview) : null);
         }
       } catch {
         // fallback

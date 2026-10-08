@@ -261,8 +261,8 @@ export async function publishBrandAction(brandId: string): Promise<{
         } catch {
           try {
             const assetRec = await pb.collection("assets").getOne(brand.headerLogo);
-            if (assetRec && assetRec.preview) {
-              snapshotHeaderLogoUrl = pb.files.getURL(assetRec, assetRec.preview);
+            if (assetRec) {
+              snapshotHeaderLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? pb.files.getURL(assetRec, assetRec.preview) : undefined);
             }
           } catch {
             // not found
@@ -278,11 +278,11 @@ export async function publishBrandAction(brandId: string): Promise<{
     if (!snapshotHeaderLogoUrl) {
       try {
         const firstAsset = await pb.collection("assets").getFirstListItem(
-          `brand = "${brand.id}" && preview != ""`,
+          `brand = "${brand.id}"`,
           { sort: "order" }
         );
-        if (firstAsset && firstAsset.preview) {
-          snapshotHeaderLogoUrl = pb.files.getURL(firstAsset, firstAsset.preview);
+        if (firstAsset) {
+          snapshotHeaderLogoUrl = firstAsset.svgContent ? `/api/assets/${firstAsset.id}/svg` : (firstAsset.preview ? pb.files.getURL(firstAsset, firstAsset.preview) : undefined);
         }
       } catch {
         // no assets

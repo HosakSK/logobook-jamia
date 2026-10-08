@@ -101,8 +101,8 @@ export default async function ManualLayout({
       } catch {
         try {
           const assetRec = await pb.collection("assets").getOne(fav);
-          if (assetRec && assetRec.preview) {
-            faviconUrl = pb.files.getURL(assetRec, assetRec.preview);
+          if (assetRec) {
+            faviconUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? pb.files.getURL(assetRec, assetRec.preview) : "");
           }
         } catch {
           // not found
@@ -133,8 +133,8 @@ export default async function ManualLayout({
       } catch {
         try {
           const assetRec = await pb.collection("assets").getOne(hl);
-          if (assetRec && assetRec.preview) {
-            headerLogoUrl = pb.files.getURL(assetRec, assetRec.preview);
+          if (assetRec) {
+            headerLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? pb.files.getURL(assetRec, assetRec.preview) : "");
           }
         } catch {
           // not found
@@ -152,11 +152,11 @@ export default async function ManualLayout({
   if (!headerLogoUrl && brandRecord?.id) {
     try {
       const firstAsset = await pb.collection("assets").getFirstListItem(
-        `brand = "${brandRecord.id}" && preview != ""`,
+        `brand = "${brandRecord.id}"`,
         { sort: "order" }
       );
-      if (firstAsset && firstAsset.preview) {
-        headerLogoUrl = pb.files.getURL(firstAsset, firstAsset.preview);
+      if (firstAsset) {
+        headerLogoUrl = firstAsset.svgContent ? `/api/assets/${firstAsset.id}/svg` : (firstAsset.preview ? pb.files.getURL(firstAsset, firstAsset.preview) : "");
       }
     } catch {
       // No assets found

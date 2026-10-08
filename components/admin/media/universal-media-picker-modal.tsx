@@ -369,8 +369,10 @@ export function UniversalMediaPickerModal({
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {filteredLogos.map((l) => {
-                    const previewSrc = l.previewUrl || l.files.find((f) => f.fileFormat === "SVG")?.fileUrl || "";
-                    const isSelected = currentUrl === previewSrc;
+                    const physicalSvgUrl = l.files.find((f) => f.fileFormat === "SVG")?.fileUrl;
+                    const vectorUrl = physicalSvgUrl || (l.svgContent ? `/api/assets/${l.id}/svg` : "") || l.previewUrl || "";
+                    const previewSrc = vectorUrl || l.previewUrl || "";
+                    const isSelected = currentUrl === previewSrc || (currentUrl && currentUrl.includes(l.id));
                     const displayName = typeof l.name === "object" ? Object.values(l.name)[0] : l.name;
 
                     return (
@@ -380,7 +382,7 @@ export function UniversalMediaPickerModal({
                         onClick={() => {
                           onSelect({
                             id: l.id,
-                            url: previewSrc,
+                            url: vectorUrl || previewSrc,
                             fileName: displayName || `Logo ${l.orientation}`,
                             sourceType: "brandAsset",
                           });
