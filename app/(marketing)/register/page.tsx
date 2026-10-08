@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/brand/logo";
 import { registerAction, resendVerificationAction } from "@/actions/auth";
+import { pb } from "@/lib/pocketbase";
 import { getDictionary, Locale, DEFAULT_LOCALE, isValidLocale } from "@/lib/i18n";
 import { AlertCircle, ArrowLeft, MailCheck, Loader2, CheckCircle2 } from "lucide-react";
 
@@ -16,6 +17,13 @@ export default function RegisterPage() {
   const queryLocale = searchParams.get("locale");
   const currentLocale: Locale = queryLocale && isValidLocale(queryLocale) ? queryLocale : DEFAULT_LOCALE;
   const dict = getDictionary(currentLocale);
+
+  // Immediate redirect if user is already logged in
+  useEffect(() => {
+    if (pb.authStore.isValid && pb.authStore.token) {
+      window.location.href = "/admin";
+    }
+  }, []);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

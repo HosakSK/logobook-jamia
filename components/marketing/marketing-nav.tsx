@@ -9,11 +9,19 @@ import { Menu, X, ArrowRight } from "lucide-react";
 
 interface MarketingNavProps {
   currentLocale: Locale;
+  isAuthenticated?: boolean;
 }
 
-export function MarketingNav({ currentLocale }: MarketingNavProps) {
+export function MarketingNav({ currentLocale, isAuthenticated }: MarketingNavProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dict = getDictionary(currentLocale);
+
+  const adminButtonLabel =
+    currentLocale === "sk"
+      ? "Do administrácie"
+      : currentLocale === "cs"
+      ? "Do administrace"
+      : "Go to Studio";
 
   const navLinks = [
     { href: "#funkcie", label: dict.marketing.navFeatures },
@@ -42,16 +50,26 @@ export function MarketingNav({ currentLocale }: MarketingNavProps) {
           ))}
         </nav>
 
-        {/* Desktop Right Controls: Language & Register CTA (STRICTLY NO LOGIN BUTTON) */}
+        {/* Desktop Right Controls: Language & Register/Admin CTA */}
         <div className="hidden md:flex items-center gap-4">
           <LanguageSwitcher currentLocale={currentLocale} />
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)]"
-          >
-            <span>{dict.marketing.navRegister}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              href="/admin"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)]"
+            >
+              <span>{adminButtonLabel}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black text-xs font-semibold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_0_20px_rgba(200,212,0,0.18)]"
+            >
+              <span>{dict.marketing.navRegister}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
         </div>
 
         {/* Mobile Hamburger Button */}
@@ -84,14 +102,25 @@ export function MarketingNav({ currentLocale }: MarketingNavProps) {
             ))}
           </div>
           <div className="pt-3 border-t border-white/[0.08]">
-            <Link
-              href="/register"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-black text-xs font-semibold shadow-[0_0_20px_rgba(200,212,0,0.2)]"
-            >
-              <span>{dict.marketing.navRegister}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-black text-xs font-semibold shadow-[0_0_20px_rgba(200,212,0,0.2)]"
+              >
+                <span>{adminButtonLabel}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-black text-xs font-semibold shadow-[0_0_20px_rgba(200,212,0,0.2)]"
+              >
+                <span>{dict.marketing.navRegister}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
       )}

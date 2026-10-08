@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,13 @@ export default function LoginPage() {
   const dict = getDictionary(currentLocale);
 
   const redirectPath = searchParams.get("redirect") || "/admin";
+
+  // Immediate redirect if user is already logged in
+  useEffect(() => {
+    if (pb.authStore.isValid && pb.authStore.token) {
+      window.location.href = redirectPath;
+    }
+  }, [redirectPath]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

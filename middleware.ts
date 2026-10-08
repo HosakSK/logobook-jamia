@@ -48,32 +48,34 @@ export function middleware(req: NextRequest) {
   // ---------------------------------------------------------------------------
   // 1. Fast Edge Session Check for /admin
   // ---------------------------------------------------------------------------
-  if (pathname.startsWith("/admin")) {
-    const pbAuthCookie = req.cookies.get("pb_auth")?.value;
-    
-    // Check if cookie exists and has non-empty token
-    let isAuthenticated = false;
-    if (pbAuthCookie && pbAuthCookie.trim() !== "" && pbAuthCookie !== "{}") {
-      try {
-        let cookieVal = pbAuthCookie;
-        if (cookieVal.startsWith("%")) {
-          cookieVal = decodeURIComponent(cookieVal);
-        }
-        if (cookieVal.startsWith("%")) {
-          cookieVal = decodeURIComponent(cookieVal);
-        }
-        const parsed = JSON.parse(cookieVal);
-        if (parsed.token && typeof parsed.token === "string" && parsed.token.length > 10) {
-          isAuthenticated = true;
-        }
-      } catch {
-        // Raw token string fallback
-        if (pbAuthCookie.length > 20) {
-          isAuthenticated = true;
-        }
+  // Helper to test if pb_auth cookie represents an authenticated user
+  const pbAuthCookie = req.cookies.get("pb_auth")?.value;
+  let isAuthenticated = false;
+  if (pbAuthCookie && pbAuthCookie.trim() !== "" && pbAuthCookie !== "{}") {
+    try {
+      let cookieVal = pbAuthCookie;
+      if (cookieVal.startsWith("%")) {
+        cookieVal = decodeURIComponent(cookieVal);
+      }
+      if (cookieVal.startsWith("%")) {
+        cookieVal = decodeURIComponent(cookieVal);
+      }
+      const parsed = JSON.parse(cookieVal);
+      if (parsed.token && typeof parsed.token === "string" && parsed.token.length > 10) {
+        isAuthenticated = true;
+      }
+    } catch {
+      // Raw token string fallback
+      if (pbAuthCookie.length > 20) {
+        isAuthenticated = true;
       }
     }
+  }
 
+  // ---------------------------------------------------------------------------
+  // 1. Fast Edge Session Check for /admin
+  // ---------------------------------------------------------------------------
+  if (pathname.startsWith("/admin")) {
     if (!isAuthenticated) {
       const redirectUrl = new URL("/login", req.url);
       redirectUrl.searchParams.set("redirect", pathname + (url.search || ""));
@@ -90,16 +92,23 @@ export function middleware(req: NextRequest) {
 
   // ---------------------------------------------------------------------------
   // 2. Public auth routes: /login, /register, /reset-password, /auth/*
+  //    If user is already authenticated, redirect them directly to /admin
   // ---------------------------------------------------------------------------
   if (
     pathname === "/login" ||
     pathname.startsWith("/login/") ||
     pathname === "/register" ||
     pathname.startsWith("/register/") ||
-    pathname === "/reset-password" ||
-    pathname.startsWith("/reset-password/") ||
     pathname.startsWith("/auth/")
   ) {
+    if (isAuthenticated) {
+      const targetRedirect = url.searchParams.get("redirect") || "/admin";
+      return NextResponse.redirect(new URL(targetRedirect, req.url));
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname === "/reset-password" || pathname.startsWith("/reset-password/")) {
     return NextResponse.next();
   }
 
