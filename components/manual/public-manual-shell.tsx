@@ -108,6 +108,29 @@ export function PublicManualShell({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const patternConfig = tokens?.themeConfig?.pattern;
+  const isPatternActive = Boolean(patternConfig?.enabled && patternConfig.patternUrl);
+
+  // Helper for gradient overlay CSS
+  const gradientCss = useMemo(() => {
+    if (!patternConfig?.overlayGradient?.enabled) return "";
+    const dir = patternConfig.overlayGradient.direction || "to-bottom";
+    const bg = tokens?.manualBgColor || "var(--background)";
+    if (dir === "radial") {
+      return `radial-gradient(circle at center, transparent 0%, ${bg} 100%)`;
+    }
+    const dirMap: Record<string, string> = {
+      "to-bottom": "to bottom",
+      "to-top": "to top",
+      "to-right": "to right",
+      "to-left": "to left",
+      "to-bottom-right": "to bottom right",
+      "to-bottom-left": "to bottom left",
+    };
+    const cssDir = dirMap[dir] || "to bottom";
+    return `linear-gradient(${cssDir}, ${bg} 0%, transparent 100%)`;
+  }, [patternConfig, tokens?.manualBgColor]);
+
   return (
     <div
       data-theme={isDarkBg ? "dark" : "light"}
@@ -116,10 +139,41 @@ export function PublicManualShell({
         color: "var(--foreground)",
         colorScheme: isDarkBg ? "dark" : "light",
       }}
-      className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors`}
+      className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors relative`}
     >
+      {/* Background Pattern Layer */}
+      {isPatternActive && patternConfig?.patternUrl && (
+        <div
+          className="fixed inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: `url(${patternConfig.patternUrl})`,
+            backgroundRepeat: patternConfig.patternType === "repeat" ? "repeat" : "no-repeat",
+            backgroundSize:
+              patternConfig.patternType === "cover"
+                ? "cover"
+                : patternConfig.patternType === "contain"
+                ? "contain"
+                : patternConfig.patternType === "zoom" || patternConfig.zoomPercent
+                ? `${patternConfig.zoomPercent || 100}%`
+                : "auto",
+            backgroundPosition: "center",
+            opacity: patternConfig.opacity ?? 0.15,
+          }}
+        />
+      )}
+
+      {/* Background Gradient Fade-out Overlay */}
+      {isPatternActive && gradientCss && (
+        <div
+          className="fixed inset-0 pointer-events-none z-0"
+          style={{
+            background: gradientCss,
+          }}
+        />
+      )}
+
       {/* Sticky Top Header */}
-      <header className="sticky top-0 z-40 min-h-18 py-2 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6">
+      <header className="sticky top-0 z-40 min-h-18 py-2 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6 relative">
         {/* Left: Brand Title / Logo */}
         <div className="flex items-center gap-3 shrink-0">
           <Link

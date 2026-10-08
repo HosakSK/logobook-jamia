@@ -37,6 +37,21 @@ export async function getBrandMediaAction(
         }
       }
 
+      let semanticRole: any = "NONE";
+      let isMulticolor = false;
+      let category = "";
+      let plainAltText = rec.altText || "";
+
+      if (rec.altText && rec.altText.startsWith("{") && rec.altText.endsWith("}")) {
+        try {
+          const parsedMeta = JSON.parse(rec.altText);
+          if (parsedMeta.role) semanticRole = parsedMeta.role;
+          if (parsedMeta.isMulticolor !== undefined) isMulticolor = parsedMeta.isMulticolor;
+          if (parsedMeta.category) category = parsedMeta.category;
+          if (parsedMeta.alt) plainAltText = parsedMeta.alt;
+        } catch (_) {}
+      }
+
       return {
         id: rec.id,
         brand: rec.brand,
@@ -45,11 +60,14 @@ export async function getBrandMediaAction(
         thumbnailUrl: thumbnailUrl || fileUrl || "",
         fileName: rec.fileName || "Bez názvu",
         fileType: (rec.fileType as MediaType) || "DOCUMENT",
-        altText: rec.altText || "",
+        altText: plainAltText,
         externalUrl: rec.externalUrl || "",
         fileSize: typeof rec.fileSize === "number" ? rec.fileSize : undefined,
         mimeType: rec.mimeType || "",
         order: typeof rec.order === "number" ? rec.order : idx,
+        semanticRole,
+        isMulticolor,
+        category,
         created: rec.created || "",
         updated: rec.updated || "",
       };
@@ -106,6 +124,20 @@ export async function uploadMediaAction(
     });
     const nextOrder = existing.length > 0 ? (existing[0].order || 0) + 1 : 0;
 
+    const rawSemanticRole = ((formData.get("semanticRole") as string) || "NONE").toUpperCase();
+    const isMulticolor = formData.get("isMulticolor") === "true";
+    const category = ((formData.get("category") as string) || "").trim();
+
+    let finalAltText = altText;
+    if (fileType === "ICON" || fileType === "PATTERN" || rawSemanticRole !== "NONE" || isMulticolor || category) {
+      finalAltText = JSON.stringify({
+        alt: altText,
+        role: rawSemanticRole,
+        isMulticolor,
+        category,
+      });
+    }
+
     const pbFormData = new FormData();
     pbFormData.append("brand", targetBrandId);
     pbFormData.append("file", file);
@@ -113,7 +145,7 @@ export async function uploadMediaAction(
     pbFormData.append("fileType", fileType);
     pbFormData.append("fileSize", String(file.size));
     pbFormData.append("mimeType", file.type || "application/octet-stream");
-    pbFormData.append("altText", altText);
+    pbFormData.append("altText", finalAltText);
     pbFormData.append("order", String(nextOrder));
 
     const created = await pb.collection("mediaAssets").create(pbFormData);
@@ -132,7 +164,10 @@ export async function uploadMediaAction(
       thumbnailUrl,
       fileName: created.fileName,
       fileType: created.fileType as MediaType,
-      altText: created.altText || "",
+      altText,
+      semanticRole: rawSemanticRole as any,
+      isMulticolor,
+      category,
       fileSize: created.fileSize,
       mimeType: created.mimeType,
       order: created.order,
@@ -141,6 +176,8 @@ export async function uploadMediaAction(
     };
 
     revalidatePath(`/admin/brand/${brandId}/media`);
+    revalidatePath(`/admin/brand/${brandId}/icons`);
+    revalidatePath(`/admin/brand/${brandId}/patterns`);
     return {
       success: true,
       message: `Súbor "${rawFileName}" bol úspešne nahraný.`,
@@ -250,10 +287,42 @@ export async function updateMediaMetadataAction(
       return { success: false, message: firstError };
     }
 
+    const semanticRole = ((formData.get("semanticRole") as string) || "NONE").toUpperCase();
+    const isMulticolor = formData.get("isMulticolor") === "true";
+    const category = ((formData.get("category") as string) || "").trim();
+
+    // If semanticRole is not NONE, ensure uniqueness for this brand (singleton role)
+    if (semanticRole && semanticRole !== "NONE") {
+      const allBrandAssets = await pb.collection("mediaAssets").getFullList({
+        filter: `brand = "${brandId}" && id != "${assetId}"`,
+      });
+      for (const other of allBrandAssets) {
+        if (other.altText && other.altText.startsWith("{") && other.altText.endsWith("}")) {
+          try {
+            const meta = JSON.parse(other.altText);
+            if (meta.role === semanticRole) {
+              meta.role = "NONE";
+              await pb.collection("mediaAssets").update(other.id, {
+                altText: JSON.stringify(meta),
+              });
+            }
+          } catch (_) {}
+        }
+      }
+    }
+
+    // Build serialized altText metadata
+    const metaPayload = {
+      alt: altText,
+      role: semanticRole,
+      isMulticolor,
+      category,
+    };
+
     const payload: Record<string, any> = {
       fileName,
       fileType,
-      altText,
+      altText: JSON.stringify(metaPayload),
     };
     if (externalUrl) {
       payload.externalUrl = externalUrl;
@@ -262,6 +331,8 @@ export async function updateMediaMetadataAction(
     await pb.collection("mediaAssets").update(assetId, payload);
 
     revalidatePath(`/admin/brand/${brandId}/media`);
+    revalidatePath(`/admin/brand/${brandId}/icons`);
+    revalidatePath(`/admin/brand/${brandId}/patterns`);
     return { success: true, message: "Metadáta súboru boli úspešne aktualizované." };
   } catch (err: any) {
     console.error("Failed to update media metadata:", err);

@@ -33,8 +33,9 @@ import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandAssetsAction } from "@/actions/assets";
-import { uploadMediaAction } from "@/actions/media";
+import { uploadMediaAction, getBrandMediaAction } from "@/actions/media";
 import { BrandAsset } from "@/lib/types/asset";
+import { MediaAsset } from "@/lib/types/media";
 import { getWcagContrast } from "@/lib/utils/color-calc";
 import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
@@ -189,18 +190,46 @@ export default function M20DosAndDontsModule({
     setCfg(parsedConfig);
   }, [parsedConfig]);
 
-  // Fetch brand assets for quick selection in editor
+  const [brandMedia, setBrandMedia] = useState<MediaAsset[]>([]);
+
+  // Fetch brand assets and media (for semantic role icons)
   useEffect(() => {
-    if (brandId && isEditor) {
-      getBrandAssetsAction(brandId)
+    if (brandId) {
+      getBrandMediaAction(brandId)
         .then((res) => {
-          if (res?.success && res.assets) {
-            setBrandAssets(res.assets);
+          if (res?.success && res.media) {
+            setBrandMedia(res.media);
           }
         })
-        .catch((err) => console.error("Failed to load brand assets in M20:", err));
+        .catch((err) => console.error("Failed to load brand media in M20:", err));
+
+      if (isEditor) {
+        getBrandAssetsAction(brandId)
+          .then((res) => {
+            if (res?.success && res.assets) {
+              setBrandAssets(res.assets);
+            }
+          })
+          .catch((err) => console.error("Failed to load brand assets in M20:", err));
+      }
     }
   }, [brandId, isEditor]);
+
+  // Resolve custom brand semantic icons
+  const semanticSuccessIconUrl = useMemo(() => {
+    const found = brandMedia.find((m) => m.semanticRole === "SUCCESS");
+    return found?.fileUrl || null;
+  }, [brandMedia]);
+
+  const semanticErrorIconUrl = useMemo(() => {
+    const found = brandMedia.find((m) => m.semanticRole === "ERROR");
+    return found?.fileUrl || null;
+  }, [brandMedia]);
+
+  const semanticWarningIconUrl = useMemo(() => {
+    const found = brandMedia.find((m) => m.semanticRole === "WARNING");
+    return found?.fileUrl || null;
+  }, [brandMedia]);
 
   // Save config handler
   const handleSaveConfig = async (newConfig: M20DosAndDontsConfig) => {
@@ -518,16 +547,28 @@ export default function M20DosAndDontsModule({
 
             // Badge properties
             let badgeBg = resolvedDontColor;
-            let badgeIcon = <X className="w-4 h-4 text-white stroke-[2.5]" />;
+            let badgeIcon = semanticErrorIconUrl ? (
+              <img src={semanticErrorIconUrl} alt="Don't" className="w-4 h-4 object-contain brightness-0 invert" />
+            ) : (
+              <X className="w-4 h-4 text-white stroke-[2.5]" />
+            );
             let badgeLabel = "DON'T";
 
             if (item.type === "do") {
               badgeBg = resolvedDoColor;
-              badgeIcon = <Check className="w-4 h-4 text-white stroke-[2.5]" />;
+              badgeIcon = semanticSuccessIconUrl ? (
+                <img src={semanticSuccessIconUrl} alt="Do" className="w-4 h-4 object-contain brightness-0 invert" />
+              ) : (
+                <Check className="w-4 h-4 text-white stroke-[2.5]" />
+              );
               badgeLabel = "DO";
             } else if (item.type === "warning") {
               badgeBg = resolvedWarningColor;
-              badgeIcon = <AlertTriangle className="w-4 h-4 text-white stroke-[2.5]" />;
+              badgeIcon = semanticWarningIconUrl ? (
+                <img src={semanticWarningIconUrl} alt="Warning" className="w-4 h-4 object-contain brightness-0 invert" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-white stroke-[2.5]" />
+              );
               badgeLabel = "POZOR";
             }
 
@@ -687,7 +728,11 @@ export default function M20DosAndDontsModule({
                   className="w-6 h-6 rounded-full flex items-center justify-center text-white"
                   style={{ backgroundColor: resolvedDoColor }}
                 >
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  {semanticSuccessIconUrl ? (
+                    <img src={semanticSuccessIconUrl} alt="Do" className="w-3.5 h-3.5 object-contain brightness-0 invert" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  )}
                 </div>
                 <div>
                   <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight">
@@ -747,7 +792,11 @@ export default function M20DosAndDontsModule({
                   className="w-6 h-6 rounded-full flex items-center justify-center text-white"
                   style={{ backgroundColor: resolvedDontColor }}
                 >
-                  <X className="w-3.5 h-3.5 stroke-[3]" />
+                  {semanticErrorIconUrl ? (
+                    <img src={semanticErrorIconUrl} alt="Don't" className="w-3.5 h-3.5 object-contain brightness-0 invert" />
+                  ) : (
+                    <X className="w-3.5 h-3.5 stroke-[3]" />
+                  )}
                 </div>
                 <div>
                   <h4 className="font-bold text-sm sm:text-base text-foreground tracking-tight">

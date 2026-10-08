@@ -36,6 +36,9 @@ export function MediaEditModal({
 }: MediaEditModalProps) {
   const [fileName, setFileName] = useState(asset?.fileName || "");
   const [fileType, setFileType] = useState<MediaType>(asset?.fileType || "IMAGE");
+  const [semanticRole, setSemanticRole] = useState<string>(asset?.semanticRole || "NONE");
+  const [isMulticolor, setIsMulticolor] = useState<boolean>(asset?.isMulticolor || false);
+  const [category, setCategory] = useState<string>(asset?.category || "");
   const [altText, setAltText] = useState(asset?.altText || "");
   const [externalUrl, setExternalUrl] = useState(asset?.externalUrl || "");
   const [copied, setCopied] = useState(false);
@@ -47,6 +50,9 @@ export function MediaEditModal({
     if (asset) {
       setFileName(asset.fileName);
       setFileType(asset.fileType);
+      setSemanticRole(asset.semanticRole || "NONE");
+      setIsMulticolor(Boolean(asset.isMulticolor));
+      setCategory(asset.category || "");
       setAltText(asset.altText || "");
       setExternalUrl(asset.externalUrl || "");
     }
@@ -81,6 +87,9 @@ export function MediaEditModal({
       const formData = new FormData();
       formData.append("fileName", fileName.trim());
       formData.append("fileType", fileType);
+      formData.append("semanticRole", semanticRole);
+      formData.append("isMulticolor", String(isMulticolor));
+      formData.append("category", category.trim());
       formData.append("altText", altText.trim());
       if (externalUrl.trim()) {
         formData.append("externalUrl", externalUrl.trim());
@@ -200,6 +209,87 @@ export function MediaEditModal({
               <option value="EXTERNAL">Externý odkaz (Google Drive, Dropbox)</option>
             </select>
           </div>
+
+          {/* Icon Specific Controls */}
+          {fileType === "ICON" && (
+            <div className="p-3 rounded-[3px] bg-[#070b0f] border border-primary/30 space-y-3">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="semanticRole" className="text-xs font-semibold text-primary flex items-center gap-1.5">
+                    <span>Sémantická rola (Systémová funkcia)</span>
+                  </Label>
+                  <span className="text-[10px] text-muted-foreground">Len 1 ikona pre každú rolu</span>
+                </div>
+                <select
+                  id="semanticRole"
+                  value={semanticRole}
+                  onChange={(e) => setSemanticRole(e.target.value)}
+                  className="w-full h-9 px-3 rounded-[3px] border border-primary/40 bg-[#17212a] text-xs focus:outline-hidden focus:ring-1 focus:ring-primary text-foreground font-medium"
+                >
+                  <option value="NONE">Žiadna (Bežná ikona v knižnici)</option>
+                  <option value="SUCCESS">SUCCESS — Schválené / Odporúčané / Do's</option>
+                  <option value="ERROR">ERROR — Zakázané / Chyba / Don'ts</option>
+                  <option value="WARNING">WARNING — Výstraha / Upozornenie</option>
+                  <option value="INFO">INFO — Informácia / Nápoveda / Tip</option>
+                  <option value="DOWNLOAD">DOWNLOAD — Stiahnutie súboru / Balíka</option>
+                </select>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  Priradením roly sa táto ikona automaticky použije v príslušných moduloch (napr. v Do's & Don'ts, banneroch alebo download tlačidlách). Ak rolu priradíte tejto ikone, z predošlej ikony sa automaticky odoberie.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-1 border-t border-border/30">
+                <label className="text-xs text-foreground cursor-pointer flex items-center gap-2 select-none">
+                  <input
+                    type="checkbox"
+                    checked={isMulticolor}
+                    onChange={(e) => setIsMulticolor(e.target.checked)}
+                    className="rounded text-primary focus:ring-primary h-3.5 w-3.5 bg-[#17212a] border-border/70"
+                  />
+                  <span>Ponechať pôvodné farby (Pestrofarebná ikona)</span>
+                </label>
+                <span className="text-[10px] text-muted-foreground">
+                  {isMulticolor ? "Neprefarbuje sa témou" : "Dynamicky prefarbiteľná"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Pattern Specific Controls */}
+          {fileType === "PATTERN" && (
+            <div className="p-3 rounded-[3px] bg-[#070b0f] border border-primary/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-foreground cursor-pointer flex items-center gap-2 select-none">
+                  <input
+                    type="checkbox"
+                    checked={isMulticolor}
+                    onChange={(e) => setIsMulticolor(e.target.checked)}
+                    className="rounded text-primary focus:ring-primary h-3.5 w-3.5 bg-[#17212a] border-border/70"
+                  />
+                  <span>Ponechať pôvodné farby vzoru (Viacfarebný pattern)</span>
+                </label>
+                <span className="text-[10px] text-muted-foreground">
+                  {isMulticolor ? "Pôvodné farby" : "Prefarbiteľný linkami"}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Optional Category */}
+          {(fileType === "ICON" || fileType === "PATTERN") && (
+            <div className="space-y-1.5">
+              <Label htmlFor="editCategory" className="text-xs font-medium">
+                Kategória (napr. Navigácia, Rozhranie, Piktogramy, Geometria)
+              </Label>
+              <Input
+                id="editCategory"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Všeobecné"
+                className="h-9 text-xs rounded-[3px]"
+              />
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">

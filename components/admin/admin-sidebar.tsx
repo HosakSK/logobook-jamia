@@ -22,6 +22,7 @@ import {
   Sparkles,
   Code2,
   X,
+  Grid,
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -96,6 +97,16 @@ export function AdminSidebar({
       label: dict.admin.brandTypography,
       href: `/admin/brand/${brandId}/typography`,
       icon: Type,
+    },
+    {
+      label: "Ikony značky",
+      href: `/admin/brand/${brandId}/icons`,
+      icon: Sparkles,
+    },
+    {
+      label: "Vzory & Textúry",
+      href: `/admin/brand/${brandId}/patterns`,
+      icon: Grid,
     },
     {
       label: dict.admin.brandMedia,

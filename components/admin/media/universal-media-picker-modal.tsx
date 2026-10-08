@@ -13,6 +13,7 @@ import {
   Sparkles,
   Link as LinkIcon,
   Layers,
+  Grid,
 } from "lucide-react";
 import { getBrandMediaAction, uploadMediaAction } from "@/actions/media";
 import { getBrandAssetsAction } from "@/actions/assets";
@@ -51,7 +52,7 @@ export function UniversalMediaPickerModal({
   allowDirectUrl = true,
   includeBrandLogos = true,
 }: UniversalMediaPickerModalProps) {
-  const [activeTab, setActiveTab] = useState<"library" | "upload" | "logos" | "url">("library");
+  const [activeTab, setActiveTab] = useState<"library" | "icons" | "patterns" | "logos" | "upload" | "url">("library");
   const [mediaList, setMediaList] = useState<MediaAsset[]>([]);
   const [logoList, setLogoList] = useState<BrandAsset[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +102,29 @@ export function UniversalMediaPickerModal({
     return (
       (m.fileName && m.fileName.toLowerCase().includes(q)) ||
       (m.altText && m.altText.toLowerCase().includes(q))
+    );
+  });
+
+  // Filtered icons
+  const filteredIcons = mediaList.filter((m) => {
+    if (m.fileType !== "ICON") return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (m.fileName && m.fileName.toLowerCase().includes(q)) ||
+      (m.category && m.category.toLowerCase().includes(q)) ||
+      (m.semanticRole && m.semanticRole.toLowerCase().includes(q))
+    );
+  });
+
+  // Filtered patterns
+  const filteredPatterns = mediaList.filter((m) => {
+    if (m.fileType !== "PATTERN") return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (m.fileName && m.fileName.toLowerCase().includes(q)) ||
+      (m.category && m.category.toLowerCase().includes(q))
     );
   });
 
@@ -187,25 +211,51 @@ export function UniversalMediaPickerModal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 border-b border-[rgba(63,85,102,0.4)] bg-[#17212a] px-5 pt-2 shrink-0">
+        <div className="flex items-center gap-1 border-b border-[rgba(63,85,102,0.4)] bg-[#17212a] px-5 pt-2 shrink-0 overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab("library")}
-            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "library"
                 ? "border-[#c8d400] text-[#c8d400]"
                 : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
             }`}
           >
             <ImageIcon className="h-3.5 w-3.5" />
-            <span>Nahrané médiá ({mediaList.length})</span>
+            <span>Všetky médiá ({mediaList.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("icons")}
+            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === "icons"
+                ? "border-[#c8d400] text-[#c8d400]"
+                : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
+            }`}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Ikony značky ({mediaList.filter((m) => m.fileType === "ICON").length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("patterns")}
+            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === "patterns"
+                ? "border-[#c8d400] text-[#c8d400]"
+                : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
+            }`}
+          >
+            <Grid className="h-3.5 w-3.5" />
+            <span>Vzory & Textúry ({mediaList.filter((m) => m.fileType === "PATTERN").length})</span>
           </button>
 
           {includeBrandLogos && (
             <button
               type="button"
               onClick={() => setActiveTab("logos")}
-              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "logos"
                   ? "border-[#c8d400] text-[#c8d400]"
                   : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
@@ -219,7 +269,7 @@ export function UniversalMediaPickerModal({
           <button
             type="button"
             onClick={() => setActiveTab("upload")}
-            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "upload"
                 ? "border-[#c8d400] text-[#c8d400]"
                 : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
@@ -233,7 +283,7 @@ export function UniversalMediaPickerModal({
             <button
               type="button"
               onClick={() => setActiveTab("url")}
-              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
+              className={`pb-2.5 px-3 text-xs font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === "url"
                   ? "border-[#c8d400] text-[#c8d400]"
                   : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
@@ -246,7 +296,7 @@ export function UniversalMediaPickerModal({
         </div>
 
         {/* Search bar when viewing lists */}
-        {(activeTab === "library" || activeTab === "logos") && (
+        {(activeTab === "library" || activeTab === "icons" || activeTab === "patterns" || activeTab === "logos") && (
           <div className="p-3 bg-[#17212a]/50 border-b border-[rgba(63,85,102,0.3)] shrink-0">
             <div className="relative">
               <Search className="h-3.5 w-3.5 text-[#96abbe] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -338,6 +388,159 @@ export function UniversalMediaPickerModal({
                           </span>
                           <span className="text-[9px] font-mono text-[#96abbe] block uppercase">
                             {m.fileType || "Súbor"}
+                          </span>
+                        </div>
+
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 p-1 rounded-full bg-[#c8d400] text-[#070b0f]">
+                            <Check className="h-3 w-3 stroke-[3]" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: ICONS */}
+          {activeTab === "icons" && (
+            <div>
+              {isLoading ? (
+                <div className="py-16 text-center text-xs text-[#96abbe] flex flex-col items-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#c8d400]" />
+                  <span>Načítavam ikony značky...</span>
+                </div>
+              ) : filteredIcons.length === 0 ? (
+                <div className="py-16 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-full bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-center mx-auto text-[#96abbe]">
+                    <Sparkles className="h-6 w-6 text-[#c8d400]" />
+                  </div>
+                  <p className="text-xs text-[#96abbe]">
+                    {searchQuery ? "Nenašli sa žiadne ikony zodpovedajúce filtru." : "V Knižnici ikon zatiaľ nie sú nahrané žiadne ikony."}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {filteredIcons.map((m) => {
+                    const isSelected = currentUrl === m.fileUrl;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          onSelect({
+                            id: m.id,
+                            url: m.fileUrl || "",
+                            fileName: m.fileName,
+                            sourceType: "mediaAsset",
+                          });
+                          onClose();
+                        }}
+                        className={`group relative p-2.5 rounded-xl border text-left flex flex-col transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#c8d400]/10 border-[#c8d400] shadow-sm ring-1 ring-[#c8d400]"
+                            : "bg-[#17212a] border-[rgba(63,85,102,0.45)] hover:border-[#c8d400]/80 hover:bg-[#1f2c36]"
+                        }`}
+                      >
+                        <div className="w-full aspect-square rounded-lg bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-center overflow-hidden p-3 relative">
+                          {m.fileUrl ? (
+                            <img
+                              src={m.fileUrl}
+                              alt={m.altText || m.fileName}
+                              className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-200"
+                            />
+                          ) : (
+                            <Sparkles className="h-6 w-6 text-[#96abbe]" />
+                          )}
+                          {m.semanticRole && m.semanticRole !== "NONE" && (
+                            <span className="absolute top-1.5 left-1.5 text-[8px] font-mono uppercase px-1 py-0.5 rounded bg-primary text-black font-bold shadow-xs">
+                              {m.semanticRole}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-2 min-w-0">
+                          <span className="text-[11px] font-semibold text-[#fafbfc] block truncate" title={m.fileName}>
+                            {m.fileName}
+                          </span>
+                          <span className="text-[9px] font-mono text-[#96abbe] block">
+                            {m.category || "Ikona"}
+                          </span>
+                        </div>
+
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 p-1 rounded-full bg-[#c8d400] text-[#070b0f]">
+                            <Check className="h-3 w-3 stroke-[3]" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: PATTERNS */}
+          {activeTab === "patterns" && (
+            <div>
+              {isLoading ? (
+                <div className="py-16 text-center text-xs text-[#96abbe] flex flex-col items-center gap-2">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#c8d400]" />
+                  <span>Načítavam vzory a textúry...</span>
+                </div>
+              ) : filteredPatterns.length === 0 ? (
+                <div className="py-16 text-center space-y-3">
+                  <div className="h-12 w-12 rounded-full bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-center mx-auto text-[#96abbe]">
+                    <Grid className="h-6 w-6 text-[#c8d400]" />
+                  </div>
+                  <p className="text-xs text-[#96abbe]">
+                    {searchQuery ? "Nenašli sa žiadne vzory zodpovedajúce filtru." : "V Knižnici vzorov zatiaľ nie sú nahrané žiadne patterny."}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {filteredPatterns.map((m) => {
+                    const isSelected = currentUrl === m.fileUrl;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => {
+                          onSelect({
+                            id: m.id,
+                            url: m.fileUrl || "",
+                            fileName: m.fileName,
+                            sourceType: "mediaAsset",
+                          });
+                          onClose();
+                        }}
+                        className={`group relative p-2 rounded-xl border text-left flex flex-col transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#c8d400]/10 border-[#c8d400] shadow-sm ring-1 ring-[#c8d400]"
+                            : "bg-[#17212a] border-[rgba(63,85,102,0.45)] hover:border-[#c8d400]/80 hover:bg-[#1f2c36]"
+                        }`}
+                      >
+                        <div className="w-full aspect-square rounded-lg bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-center overflow-hidden p-2 relative">
+                          {m.fileUrl ? (
+                            <img
+                              src={m.fileUrl}
+                              alt={m.altText || m.fileName}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            />
+                          ) : (
+                            <Grid className="h-6 w-6 text-[#96abbe]" />
+                          )}
+                        </div>
+
+                        <div className="mt-2 min-w-0">
+                          <span className="text-[11px] font-semibold text-[#fafbfc] block truncate" title={m.fileName}>
+                            {m.fileName}
+                          </span>
+                          <span className="text-[9px] font-mono text-[#96abbe] block">
+                            {m.category || "Vzor"}
                           </span>
                         </div>
 

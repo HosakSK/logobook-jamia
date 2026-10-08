@@ -9,6 +9,32 @@ export const MEDIA_TYPES = [
 
 export type MediaType = (typeof MEDIA_TYPES)[number];
 
+export const ICON_SEMANTIC_ROLES = [
+  "NONE",
+  "SUCCESS",
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DOWNLOAD",
+] as const;
+
+export type IconSemanticRole = (typeof ICON_SEMANTIC_ROLES)[number];
+
+export interface IconMetadata {
+  semanticRole?: IconSemanticRole;
+  isMulticolor?: boolean;
+  category?: string;
+  tags?: string[];
+  svgCode?: string;
+}
+
+export interface PatternMetadata {
+  isMulticolor?: boolean;
+  category?: string;
+  tags?: string[];
+  svgCode?: string;
+}
+
 export interface MediaAsset {
   id: string;
   brand: string;
@@ -22,6 +48,9 @@ export interface MediaAsset {
   fileSize?: number;
   mimeType?: string;
   order: number;
+  semanticRole?: IconSemanticRole;
+  isMulticolor?: boolean;
+  category?: string;
   created: string;
   updated: string;
 }

@@ -30,17 +30,21 @@ interface MediaGalleryViewProps {
   brandId: string;
   initialMedia: MediaAsset[];
   brandName: string;
+  pageMode?: "all" | "icons" | "patterns";
 }
 
 export function MediaGalleryView({
   brandId,
   initialMedia,
   brandName,
+  pageMode = "all",
 }: MediaGalleryViewProps) {
   const [mediaList, setMediaList] = useState<MediaAsset[]>(initialMedia);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState<MediaFilterType>("ALL");
+  const [typeFilter, setTypeFilter] = useState<MediaFilterType>(
+    pageMode === "icons" ? "ICON" : pageMode === "patterns" ? "PATTERN" : "ALL"
+  );
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<MediaAsset | null>(null);
@@ -148,14 +152,23 @@ export function MediaGalleryView({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Mediálna knižnica</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              {pageMode === "icons"
+                ? "Knižnica ikon a piktogramov"
+                : pageMode === "patterns"
+                ? "Knižnica vzorov a textúr"
+                : "Mediálna knižnica"}
+            </h1>
             <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-[3px] bg-primary/10 text-primary border border-primary/20">
-              {stats.total} {stats.total === 1 ? "položka" : stats.total >= 2 && stats.total <= 4 ? "položky" : "položiek"}
+              {filteredMedia.length} {filteredMedia.length === 1 ? "položka" : filteredMedia.length >= 2 && filteredMedia.length <= 4 ? "položky" : "položiek"}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            Centrálny správca súborov, fotografií, vzorov a dokumentov pre brand{" "}
-            <span className="font-semibold text-foreground">{brandName}</span>.
+            {pageMode === "icons"
+              ? `Centrálny register vektorových SVG ikon, piktogramov a systémových sémantických rolí pre ${brandName}.`
+              : pageMode === "patterns"
+              ? `Vektorové SVG patterny, plynulé opakovacie textúry a motívy značky ${brandName}.`
+              : `Centrálny správca súborov, fotografií, vzorov a dokumentov pre brand ${brandName}.`}
           </p>
         </div>
 
@@ -218,7 +231,13 @@ export function MediaGalleryView({
       </div>
 
       {/* Bulk Drag & Drop & External Link Zone */}
-      <MediaDropzone brandId={brandId} onUploadComplete={handleRefresh} />
+      <MediaDropzone
+        brandId={brandId}
+        onUploadComplete={handleRefresh}
+        targetFileType={pageMode === "icons" ? "ICON" : pageMode === "patterns" ? "PATTERN" : undefined}
+        designerGuideType={pageMode === "icons" ? "icons" : pageMode === "patterns" ? "patterns" : "general"}
+        acceptedExtensions={pageMode === "icons" ? ".svg,image/svg+xml" : pageMode === "patterns" ? ".svg,.png,.jpg,.jpeg,image/*" : undefined}
+      />
 
       {/* Search, Category Filters & Bulk Action Toolbar */}
       <div className="space-y-3">

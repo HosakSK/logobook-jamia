@@ -20,6 +20,9 @@ import {
 interface MediaDropzoneProps {
   brandId: string;
   onUploadComplete: () => void;
+  targetFileType?: MediaType;
+  acceptedExtensions?: string;
+  designerGuideType?: "icons" | "patterns" | "general";
 }
 
 interface UploadQueueItem {
@@ -31,7 +34,13 @@ interface UploadQueueItem {
   errorMessage?: string;
 }
 
-export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps) {
+export function MediaDropzone({
+  brandId,
+  onUploadComplete,
+  targetFileType,
+  acceptedExtensions,
+  designerGuideType = "general",
+}: MediaDropzoneProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "external">("upload");
   const [isDragOver, setIsDragOver] = useState(false);
   const [queue, setQueue] = useState<UploadQueueItem[]>([]);
@@ -40,7 +49,7 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
   // External link form state
   const [extName, setExtName] = useState("");
   const [extUrl, setExtUrl] = useState("");
-  const [extType, setExtType] = useState<MediaType>("EXTERNAL");
+  const [extType, setExtType] = useState<MediaType>(targetFileType || "EXTERNAL");
   const [extAlt, setExtAlt] = useState("");
   const [extError, setExtError] = useState<string | null>(null);
   const [isSubmittingExt, startExtTransition] = useTransition();
@@ -80,6 +89,9 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
       const formData = new FormData();
       formData.append("file", item.file);
       formData.append("fileName", item.name);
+      if (targetFileType) {
+        formData.append("fileType", targetFileType);
+      }
 
       const res = await uploadMediaAction(brandId, formData);
 
@@ -208,6 +220,7 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
               ref={fileInputRef}
               type="file"
               multiple
+              accept={acceptedExtensions || "image/*,.ico,.svg,.png,.jpg,.jpeg,.webp,.pdf,.ai,.eps,.zip"}
               onChange={(e) => {
                 if (e.target.files) {
                   handleFiles(e.target.files);
@@ -224,11 +237,56 @@ export function MediaDropzone({ brandId, onUploadComplete }: MediaDropzoneProps)
                 Presuňte súbory sem alebo kliknite pre výber
               </h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Podporuje JPG, PNG, WebP, SVG, MP4, PDF, PSD, AI, ZIP do 50 MB na súbor.
-                Súbory sa ukladajú priamo do Cloudflare R2 úložiska.
+                {targetFileType === "ICON"
+                  ? "Odporúčame čisté vektorové .SVG ikony (24×24 px). Nahraté ikony sa zaradia do knižnice ikon."
+                  : targetFileType === "PATTERN"
+                  ? "Podporuje vektorové .SVG vzory aj rastrové PNG/JPG textúry do 50 MB."
+                  : "Podporuje JPG, PNG, WebP, SVG, MP4, PDF, PSD, AI, ZIP do 50 MB na súbor."}
               </p>
             </div>
           </div>
+
+          {/* Designer Guide Banner */}
+          {designerGuideType === "icons" && (
+            <div className="p-4 rounded-[3px] bg-[#070b0f] border border-primary/30 text-xs space-y-2">
+              <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                <span>💡 Návod pre dizajnérov (Figma / Adobe Illustrator):</span>
+              </div>
+              <ul className="space-y-1.5 text-muted-foreground text-[11px] list-disc list-inside leading-relaxed">
+                <li>
+                  <strong className="text-foreground">Jednofarebná ikona (automaticky prefarbiteľná):</strong> Nakreslite ju čiernou farbou (<code className="text-primary font-mono font-bold">#000000</code>). Nepoužívajte žiadne iné odtiene ani šedú. Logobook ju v celom manuáli automaticky prefarbí podľa brandových farieb.
+                </li>
+                <li>
+                  <strong className="text-foreground">Dvojfarebná ikona (Duotone efekt):</strong> Hlavné línie nakreslite čiernou (<code className="text-primary font-mono font-bold">#000000</code>) so 100% krytím. Jemné výplne nakreslite tiež čiernou, ale s priehľadnosťou (napr. <code className="text-primary font-mono">Opacity 20%</code>).
+                </li>
+                <li>
+                  <strong className="text-foreground">Pestrofarebné / Viacfarebné ikony:</strong> Ak má ikona viacero vlastných farieb (napr. modrá, žltá, červená), po nahratí označte v detaile možnosť <em>„Ponechať pôvodné farby“</em>. Ikona si zachová vaše originálne farby.
+                </li>
+                <li>
+                  <strong className="text-foreground">Plátno a krivky:</strong> Exportujte na štvorcové plátno (odporúčané <code className="text-foreground font-mono">24×24 px</code>) a všetky texty preveďte na krivky (<em>Create Outlines</em>).
+                </li>
+              </ul>
+            </div>
+          )}
+
+          {designerGuideType === "patterns" && (
+            <div className="p-4 rounded-[3px] bg-[#070b0f] border border-primary/30 text-xs space-y-2">
+              <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider">
+                <span>💡 Návod pre dizajnérov na vzory a textúry (Seamless Patterns):</span>
+              </div>
+              <ul className="space-y-1.5 text-muted-foreground text-[11px] list-disc list-inside leading-relaxed">
+                <li>
+                  <strong className="text-foreground">Dynamicky prefarbiteľný vzor (SVG):</strong> Nakreslite línie alebo geometrické tvary čiernou farbou (<code className="text-primary font-mono font-bold">#000000</code>). V nastaveniach pozadia si budete môcť zvoliť, či má mať vzor Primárnu, Sekundárnu alebo akúkoľvek inú farbu.
+                </li>
+                <li>
+                  <strong className="text-foreground">Opakovateľnosť (Seamless Tile):</strong> Vzor by mal na seba plynule nadväzovať pri opakovaní zľava doprava aj zhora nadol.
+                </li>
+                <li>
+                  <strong className="text-foreground">Priehľadné pozadie:</strong> Vzor exportujte s priehľadným pozadím (Transparent), aby cez neho mohla presvitať brandová farba a voliteľný prechodový gradient.
+                </li>
+              </ul>
+            </div>
+          )}
 
           {/* Active Queue Progress List */}
           {queue.length > 0 && (

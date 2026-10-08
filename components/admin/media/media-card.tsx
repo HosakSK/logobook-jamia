@@ -96,6 +96,22 @@ export function MediaCard({
         >
           {typeInfo.label}
         </span>
+        {asset.semanticRole && asset.semanticRole !== "NONE" && (
+          <span
+            className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-[2px] border backdrop-blur-xs font-bold bg-primary/20 text-primary border-primary/40 shadow-xs"
+            title={`Systémová rola: ${asset.semanticRole}`}
+          >
+            ★ {asset.semanticRole}
+          </span>
+        )}
+        {asset.isMulticolor && (
+          <span
+            className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-[2px] border backdrop-blur-xs font-semibold bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+            title="Pôvodné farby (neprefarbuje sa)"
+          >
+            MULTI
+          </span>
+        )}
       </div>
 
       {/* Media Preview Box */}

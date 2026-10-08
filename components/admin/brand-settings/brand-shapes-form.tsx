@@ -19,7 +19,11 @@ import {
   Sun,
   Moon,
   Type,
+  Grid,
+  Sliders,
+  Upload,
 } from "lucide-react";
+import { UniversalMediaPickerModal } from "@/components/admin/media/universal-media-picker-modal";
 import {
   ManualThemeId,
   ManualThemeConfig,
@@ -145,6 +149,19 @@ export function BrandShapesForm({
   const [customHeadingColor, setCustomHeadingColor] = useState<string>(
     rawInitialHeading || "#fafbfc"
   );
+
+  // Background Pattern states
+  const initialPattern = initialShapes?.themeConfig?.pattern;
+  const [patternEnabled, setPatternEnabled] = useState<boolean>(Boolean(initialPattern?.enabled));
+  const [patternUrl, setPatternUrl] = useState<string>(initialPattern?.patternUrl || "");
+  const [patternType, setPatternType] = useState<"repeat" | "cover" | "contain" | "zoom">(initialPattern?.patternType || "repeat");
+  const [zoomPercent, setZoomPercent] = useState<number>(initialPattern?.zoomPercent ?? 100);
+  const [patternOpacity, setPatternOpacity] = useState<number>(initialPattern?.opacity ?? 0.15);
+  const [gradientEnabled, setGradientEnabled] = useState<boolean>(Boolean(initialPattern?.overlayGradient?.enabled));
+  const [gradientDirection, setGradientDirection] = useState<
+    "to-bottom" | "to-top" | "to-right" | "to-left" | "to-bottom-right" | "to-bottom-left" | "radial"
+  >(initialPattern?.overlayGradient?.direction || "to-bottom");
+  const [isPatternPickerOpen, setIsPatternPickerOpen] = useState(false);
 
   // Effective preview radius
   const previewRadiusPx =
@@ -279,6 +296,17 @@ export function BrandShapesForm({
               accentColor: customAccent,
             }
           : undefined,
+      pattern: {
+        enabled: patternEnabled,
+        patternUrl,
+        patternType,
+        zoomPercent,
+        opacity: patternOpacity,
+        overlayGradient: {
+          enabled: gradientEnabled,
+          direction: gradientDirection,
+        },
+      },
     };
 
     const formData = new FormData(e.currentTarget);
@@ -1095,6 +1123,179 @@ export function BrandShapesForm({
           </div>
         </div>
       </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* VZOR & TEXTÚRA POZADIA (Pattern, Zoom, Overlay Gradient)       */}
+      {/* ------------------------------------------------------------- */}
+      <div className="pt-4 border-t border-border/30 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Grid className="w-3.5 h-3.5 text-primary" />
+              <span>Vzor a textúra pozadia manuálu</span>
+            </h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              Pridajte do pozadia manuálu opakujúci sa SVG pattern alebo textúru s možnosťou zoomu a miznúceho prechodu.
+            </p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-foreground">
+            <input
+              type="checkbox"
+              checked={patternEnabled}
+              onChange={(e) => setPatternEnabled(e.target.checked)}
+              className="rounded text-primary focus:ring-primary h-4 w-4 bg-[#070b0f] border-border/70"
+            />
+            <span>Zapnúť pattern</span>
+          </label>
+        </div>
+
+        {patternEnabled && (
+          <div className="p-4 rounded-xl bg-background/50 border border-border/60 space-y-4 animate-in fade-in duration-150">
+            {/* Pattern Source URL & Universal Picker Button */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Zdroj vzoru (SVG alebo obrázok)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  value={patternUrl}
+                  onChange={(e) => setPatternUrl(e.target.value)}
+                  placeholder="https://... alebo /patterns/tile.svg"
+                  className="h-9 text-xs rounded-lg font-mono flex-1 bg-[#070b0f]"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsPatternPickerOpen(true)}
+                  className="h-9 text-xs gap-1.5 shrink-0"
+                >
+                  <Grid className="w-3.5 h-3.5 text-primary" />
+                  <span>Vybrať z knižnice</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Pattern Type & Zoom Controls */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Režim zobrazenia</Label>
+                <select
+                  value={patternType}
+                  onChange={(e) => setPatternType(e.target.value as any)}
+                  className="w-full h-9 px-3 rounded-lg border border-input bg-[#070b0f] text-xs focus:outline-hidden focus:ring-1 focus:ring-primary"
+                >
+                  <option value="repeat">Opakovanie (Repeat — kachličky)</option>
+                  <option value="cover">Vyplniť plochu (Cover 100%)</option>
+                  <option value="contain">Prispôsobiť (Contain / Fit)</option>
+                  <option value="zoom">Vlastný Zoom / Mierka</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-medium">
+                  <Label>Mierka / Zoom</Label>
+                  <span className="font-mono text-muted-foreground">{zoomPercent}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="10"
+                    max="300"
+                    step="5"
+                    value={zoomPercent}
+                    onChange={(e) => setZoomPercent(Number(e.target.value))}
+                    className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
+                  />
+                  <Input
+                    type="number"
+                    min="10"
+                    max="300"
+                    value={zoomPercent}
+                    onChange={(e) => setZoomPercent(Number(e.target.value))}
+                    className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-medium">
+                  <Label>Priehľadnosť vzoru</Label>
+                  <span className="font-mono text-muted-foreground">{Math.round(patternOpacity * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.02"
+                  max="0.8"
+                  step="0.02"
+                  value={patternOpacity}
+                  onChange={(e) => setPatternOpacity(Number(e.target.value))}
+                  className="w-full accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer mt-2"
+                />
+              </div>
+            </div>
+
+            {/* Gradient Fade Overlay Section */}
+            <div className="pt-3 border-t border-border/40 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-xs font-medium text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={gradientEnabled}
+                    onChange={(e) => setGradientEnabled(e.target.checked)}
+                    className="rounded text-primary focus:ring-primary h-3.5 w-3.5 bg-[#070b0f] border-border/70"
+                  />
+                  <span>Miznúci prechod do pozadia (Gradient Overlay)</span>
+                </label>
+                <span className="text-[10px] text-muted-foreground">Plynulé vynáranie z farby pozadia</span>
+              </div>
+
+              {gradientEnabled && (
+                <div className="space-y-1.5 animate-in fade-in duration-100">
+                  <Label className="text-xs font-medium text-muted-foreground">Smer miznutia / vynárania</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {[
+                      { id: "to-bottom", label: "Zhora nadol" },
+                      { id: "to-top", label: "Zdola nahor" },
+                      { id: "to-right", label: "Zľava doprava" },
+                      { id: "to-left", label: "Zprava doľava" },
+                      { id: "to-bottom-right", label: "Z ľavého horného rohu" },
+                      { id: "to-bottom-left", label: "Z pravého horného rohu" },
+                      { id: "radial", label: "Kruhový (Radiálny zo stredu)" },
+                    ].map((dir) => (
+                      <button
+                        key={dir.id}
+                        type="button"
+                        onClick={() => setGradientDirection(dir.id as any)}
+                        className={`px-2.5 py-1.5 text-xs rounded-md border text-center transition-colors cursor-pointer ${
+                          gradientDirection === dir.id
+                            ? "bg-primary text-black font-bold border-primary shadow-xs"
+                            : "bg-[#070b0f] text-muted-foreground hover:text-foreground border-border/60"
+                        }`}
+                      >
+                        {dir.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Universal Media Picker Modal for Pattern selection */}
+      <UniversalMediaPickerModal
+        isOpen={isPatternPickerOpen}
+        onClose={() => setIsPatternPickerOpen(false)}
+        brandId={brandId}
+        title="Vybrať vzor alebo textúru"
+        description="Vyberte vzor z knižnice vzorov značky alebo z nahraných médií."
+        currentUrl={patternUrl}
+        acceptedFileTypes="image/*,.svg,.png,.jpg,.jpeg,.webp"
+        onSelect={(item) => {
+          setPatternUrl(item.url);
+          setPatternEnabled(true);
+        }}
+      />
 
       {/* ------------------------------------------------------------- */}
       {/* SEMANTIC COLORS (Do's & Don'ts)                               */}

@@ -119,32 +119,32 @@ export default function M05DownloadTlacidloModule({
     setCfg(parsedConfig);
   }, [parsedConfig]);
 
-  // Load pages and media when modal opens
+  // Load pages and media
   useEffect(() => {
-    if (isSettingsModalOpen && brandId) {
-      if (brandPages.length === 0) {
-        setIsLoadingPages(true);
-        getBrandPagesAction(brandId)
-          .then((res) => {
-            if (res.success && res.pages) {
-              setBrandPages(res.pages);
-            }
-          })
-          .catch((err) => console.error("Error fetching pages:", err))
-          .finally(() => setIsLoadingPages(false));
-      }
+    if (!brandId) return;
 
-      if (brandMedia.length === 0) {
-        setIsLoadingMedia(true);
-        getBrandMediaAction(brandId)
-          .then((res) => {
-            if (res.success && res.media) {
-              setBrandMedia(res.media);
-            }
-          })
-          .catch((err) => console.error("Error fetching media:", err))
-          .finally(() => setIsLoadingMedia(false));
-      }
+    if (brandMedia.length === 0) {
+      setIsLoadingMedia(true);
+      getBrandMediaAction(brandId)
+        .then((res) => {
+          if (res.success && res.media) {
+            setBrandMedia(res.media);
+          }
+        })
+        .catch((err) => console.error("Error fetching media:", err))
+        .finally(() => setIsLoadingMedia(false));
+    }
+
+    if (isSettingsModalOpen && brandPages.length === 0) {
+      setIsLoadingPages(true);
+      getBrandPagesAction(brandId)
+        .then((res) => {
+          if (res.success && res.pages) {
+            setBrandPages(res.pages);
+          }
+        })
+        .catch((err) => console.error("Error fetching pages:", err))
+        .finally(() => setIsLoadingPages(false));
     }
   }, [isSettingsModalOpen, brandId, brandPages.length, brandMedia.length]);
 
@@ -270,6 +270,16 @@ export default function M05DownloadTlacidloModule({
     }
   }, [cfg.style, cfg.customColors, tokens, brandRadius]);
 
+  // Find semantic DOWNLOAD icon from brand media if available
+  const brandDownloadIcon = useMemo(() => {
+    return brandMedia.find(
+      (m) =>
+        m.fileType === "ICON" &&
+        m.semanticRole === "DOWNLOAD" &&
+        m.fileUrl
+    );
+  }, [brandMedia]);
+
   // Render Icon component
   const renderIcon = () => {
     if (cfg.icon.source === "none") return null;
@@ -279,6 +289,17 @@ export default function M05DownloadTlacidloModule({
         <img
           src={cfg.icon.customIconUrl}
           alt=""
+          className={`${iconSizeClass} object-contain shrink-0`}
+        />
+      );
+    }
+
+    // If default system download icon is requested and a semantic DOWNLOAD brand icon exists, prioritize brand icon
+    if (cfg.icon.iconId === "download" && brandDownloadIcon?.fileUrl) {
+      return (
+        <img
+          src={brandDownloadIcon.fileUrl}
+          alt="Download"
           className={`${iconSizeClass} object-contain shrink-0`}
         />
       );

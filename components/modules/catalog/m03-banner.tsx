@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   AlertTriangle,
   AlertCircle,
@@ -22,6 +23,8 @@ import { resolveI18nText, setI18nText } from "@/lib/validations/module";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction } from "@/actions/pages";
+import { getBrandMediaAction } from "@/actions/media";
+import { MediaAsset } from "@/lib/types/media";
 
 const PRESET_STYLES: Record<
   M03BannerVariant,
@@ -210,7 +213,49 @@ export default function M03BannerModule({
     });
   };
 
-  // Resolve Icon Component
+  const params = useParams();
+  const brandId = (params?.brandId as string) || "";
+  const [brandMedia, setBrandMedia] = useState<MediaAsset[]>([]);
+
+  useEffect(() => {
+    if (!brandId) return;
+    getBrandMediaAction(brandId)
+      .then((res) => {
+        if (res.success && res.media) {
+          setBrandMedia(res.media);
+        }
+      })
+      .catch((err) => console.error("Error loading brand media for M03:", err));
+  }, [brandId]);
+
+  // Map banner variant to semantic role
+  const semanticRoleForVariant = useMemo(() => {
+    switch (variant) {
+      case "success":
+        return "SUCCESS";
+      case "danger":
+        return "ERROR";
+      case "warning":
+        return "WARNING";
+      case "info":
+        return "INFO";
+      default:
+        return null;
+    }
+  }, [variant]);
+
+  // Find matching semantic icon in brand media
+  const brandSemanticIcon = useMemo(() => {
+    if (!semanticRoleForVariant) return null;
+    return brandMedia.find(
+      (m) =>
+        m.fileType === "ICON" &&
+        m.semanticRole === semanticRoleForVariant &&
+        m.fileUrl
+    );
+  }, [brandMedia, semanticRoleForVariant]);
+
+  // Resolve Icon Component or Brand Image
   const activeIconEntry =
     AVAILABLE_ICONS.find((i) => i.id === iconConfig.iconId) || AVAILABLE_ICONS[0];
   const IconComponent = activeIconEntry.Icon;
@@ -424,7 +469,15 @@ export default function M03BannerModule({
               className={`p-2 rounded-[var(--brand-radius,4px)] bg-black/10 dark:bg-white/10 border border-current/15 shrink-0 mt-0.5 ${preset.iconClass}`}
               aria-hidden="true"
             >
-              <IconComponent className="h-5 w-5" />
+              {brandSemanticIcon?.fileUrl ? (
+                <img
+                  src={brandSemanticIcon.fileUrl}
+                  alt=""
+                  className="h-5 w-5 object-contain"
+                />
+              ) : (
+                <IconComponent className="h-5 w-5" />
+              )}
             </div>
           )}
 
@@ -473,7 +526,15 @@ export default function M03BannerModule({
               className={`p-2 rounded-[var(--brand-radius,4px)] bg-black/10 dark:bg-white/10 border border-current/15 shrink-0 mt-0.5 ${preset.iconClass}`}
               aria-hidden="true"
             >
-              <IconComponent className="h-5 w-5" />
+              {brandSemanticIcon?.fileUrl ? (
+                <img
+                  src={brandSemanticIcon.fileUrl}
+                  alt=""
+                  className="h-5 w-5 object-contain"
+                />
+              ) : (
+                <IconComponent className="h-5 w-5" />
+              )}
             </div>
           )}
         </div>

@@ -13,10 +13,26 @@ export interface ManualCustomColors {
   accentColor?: string;
 }
 
+export interface ManualPatternConfig {
+  enabled: boolean;
+  patternUrl?: string;
+  patternType?: "repeat" | "cover" | "contain" | "zoom";
+  zoomPercent?: number; // e.g. 10 to 300, default 100
+  colorMode?: "original" | "primary" | "secondary" | "accent" | "custom";
+  customColorHex?: string;
+  opacity?: number; // 0 to 1, default 0.15
+  overlayGradient?: {
+    enabled: boolean;
+    direction: "to-bottom" | "to-top" | "to-right" | "to-left" | "to-bottom-right" | "to-bottom-left" | "radial";
+    intensity?: number; // 0 to 1, default 1.0 (fade from 100% bg color to 0% transparent)
+  };
+}
+
 export interface ManualThemeConfig {
   themeId: ManualThemeId;
   headingColor?: string;
   custom?: ManualCustomColors;
+  pattern?: ManualPatternConfig;
 }
 
 export interface ManualThemeDefinition {
