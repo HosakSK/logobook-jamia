@@ -82,7 +82,7 @@ export function PublishedManualView({
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-8 max-w-6xl space-y-8">
+    <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Chapter Navigation Tabs (Only shown if multiple top-level sections exist) */}
       {rootChapters.length > 1 && (
         <nav className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border/60 scrollbar-none">

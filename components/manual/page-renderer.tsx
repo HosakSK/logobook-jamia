@@ -73,7 +73,7 @@ export function PageRenderer({
   );
 
   return (
-    <article className={`page-renderer w-full max-w-7xl mx-auto space-y-10 sm:space-y-12 ${className}`}>
+    <article className={`page-renderer w-full max-w-[1280px] mx-auto space-y-10 sm:space-y-12 ${className}`}>
       {/* 3. Page Header (H1 Title + Complete Clickable Breadcrumbs Trail) */}
       {showPageHeader && (
         <header className="page-header space-y-3 border-b border-border/40 pb-6 sm:pb-8">
