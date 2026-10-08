@@ -119,7 +119,7 @@ export function PublicManualShell({
       className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors`}
     >
       {/* Sticky Top Header */}
-      <header className="sticky top-0 z-40 h-18 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6">
+      <header className="sticky top-0 z-40 min-h-18 py-2 border-b border-border/50 bg-card/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between gap-3 sm:gap-6">
         {/* Left: Brand Title / Logo */}
         <div className="flex items-center gap-3 shrink-0">
           <Link
@@ -128,14 +128,14 @@ export function PublicManualShell({
           >
             {brand.headerLogoUrl ? (
               <div
-                className="flex items-center justify-center"
+                className="flex items-center justify-center transition-all"
                 style={{ height: `${brand.headerLogoHeight || 40}px` }}
               >
                 <img
                   src={brand.headerLogoUrl}
                   alt={brand.name}
-                  style={{ maxHeight: `${brand.headerLogoHeight || 40}px` }}
-                  className="w-auto max-w-[200px] sm:max-w-[280px] object-contain object-left transition-transform group-hover:scale-[1.02]"
+                  style={{ height: `${brand.headerLogoHeight || 40}px`, maxHeight: `${brand.headerLogoHeight || 40}px` }}
+                  className="w-auto max-w-[260px] sm:max-w-[380px] object-contain object-left transition-transform group-hover:scale-[1.02]"
                 />
               </div>
             ) : (

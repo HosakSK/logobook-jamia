@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { getServerPocketBase } from "@/lib/pocketbase-server";
@@ -6,6 +7,51 @@ import { BrandCascadeProvider } from "@/components/modules/cascade";
 import { ManualLockScreen } from "@/components/manual/manual-lock-screen";
 import { PublicManualShell } from "@/components/manual/public-manual-shell";
 import { PublishedBrandSnapshot } from "@/actions/publish";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ domain: string; locale?: string }>;
+}): Promise<Metadata> {
+  const { domain } = await params;
+  try {
+    const pb = await getServerPocketBase();
+    const brandRecord = await pb
+      .collection("brands")
+      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`, {
+        expand: "headerLogo,favicon",
+      });
+
+    let favUrl = "";
+    if (brandRecord?.expand?.favicon) {
+      const f = brandRecord.expand.favicon;
+      favUrl = pb.files.getURL(f, f.file);
+    } else if (brandRecord?.favicon && typeof brandRecord.favicon === "string" && brandRecord.favicon.startsWith("http")) {
+      favUrl = brandRecord.favicon;
+    } else if (typeof brandRecord?.description === "object" && brandRecord.description?.faviconUrl) {
+      favUrl = brandRecord.description.faviconUrl;
+    }
+
+    if (!favUrl) {
+      const pub = brandRecord?.publishedConfig as any;
+      if (pub?.brand?.faviconUrl) favUrl = pub.brand.faviconUrl;
+    }
+
+    if (favUrl) {
+      return {
+        icons: {
+          icon: [{ url: favUrl }],
+          shortcut: [{ url: favUrl }],
+          apple: [{ url: favUrl }],
+        },
+      };
+    }
+  } catch {
+    // fallback
+  }
+
+  return {};
+}
 
 export default async function ManualLayout({
   children,

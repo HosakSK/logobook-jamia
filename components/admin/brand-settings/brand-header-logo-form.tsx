@@ -225,13 +225,13 @@ export function BrandHeaderLogoForm({
             </span>
           </div>
           <p className="text-xs text-[#96abbe]">
-            Nastavte výšku loga v pixeloch (od 24px do 64px, predvolene 40px). Pomer strán je zachovaný.
+            Nastavte výšku loga v pixeloch (od 24px do 110px, predvolene 44px). Pomer strán je automaticky zachovaný.
           </p>
           <div className="flex items-center gap-4 pt-1">
             <input
               type="range"
               min="24"
-              max="64"
+              max="110"
               step="2"
               value={logoHeight}
               onChange={(e) => setLogoHeight(Number(e.target.value))}
@@ -239,20 +239,21 @@ export function BrandHeaderLogoForm({
             />
             <Input
               type="number"
-              min={24}
-              max={64}
+              min={20}
+              max={140}
               value={logoHeight}
               onChange={(e) => {
                 const val = Number(e.target.value);
-                if (!isNaN(val)) setLogoHeight(Math.max(20, Math.min(80, val)));
+                if (!isNaN(val)) setLogoHeight(Math.max(20, Math.min(140, val)));
               }}
               className="w-20 h-9 text-xs rounded-lg bg-background/50 border-[rgba(63,85,102,0.4)] text-center font-mono"
             />
           </div>
           <div className="flex justify-between text-[10px] text-[#96abbe]/60 font-mono pt-0.5">
             <span>24px (Kompaktné)</span>
-            <span>40px (Predvolené)</span>
-            <span>64px (Veľké)</span>
+            <span>44px (Štandard)</span>
+            <span>72px (Veľké)</span>
+            <span>110px (Extra veľké)</span>
           </div>
         </div>
 
