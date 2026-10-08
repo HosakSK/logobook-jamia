@@ -180,9 +180,9 @@ export function PublicManualShell({
                 style={{
                   paddingLeft: "2.75rem",
                   paddingRight: "2.25rem",
-                  backgroundColor: "var(--card, #17212a)",
-                  color: "var(--foreground, #fafbfc)",
-                  borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+                  backgroundColor: "var(--card)",
+                  color: "var(--foreground)",
+                  borderColor: "var(--border)",
                 }}
                 className="w-full py-2 text-xs border rounded-[3px] focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground transition-all shadow-xs"
               />
@@ -204,9 +204,9 @@ export function PublicManualShell({
             {searchOpen && searchQuery.trim() && (
               <div
                 style={{
-                  backgroundColor: "var(--card, #17212a)",
-                  color: "var(--foreground, #fafbfc)",
-                  borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+                  backgroundColor: "var(--card)",
+                  color: "var(--foreground)",
+                  borderColor: "var(--border)",
                 }}
                 className="absolute top-full left-0 right-0 mt-1.5 border rounded-xl shadow-2xl overflow-hidden z-50 max-h-80 overflow-y-auto p-1.5 space-y-1"
               >
@@ -303,17 +303,17 @@ export function PublicManualShell({
           {/* Drawer content sliding from the RIGHT */}
           <div
             style={{
-              backgroundColor: "var(--card, #17212a)",
-              color: "var(--foreground, #fafbfc)",
-              borderColor: "var(--border, rgba(63, 85, 102, 0.45))",
+              backgroundColor: "var(--card)",
+              color: "var(--foreground)",
+              borderColor: "var(--border)",
             }}
             className="fixed inset-y-0 right-0 w-80 max-w-[85vw] border-l p-0 shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-200"
           >
             <div
               style={{
-                backgroundColor: "var(--card, #17212a)",
-                borderBottomColor: "var(--border, rgba(63, 85, 102, 0.45))",
-                color: "var(--foreground, #fafbfc)",
+                backgroundColor: "var(--card)",
+                borderBottomColor: "var(--border)",
+                color: "var(--foreground)",
               }}
               className="p-4 border-b flex items-center justify-between"
             >
@@ -321,7 +321,7 @@ export function PublicManualShell({
                 <BookOpen className="h-4 w-4" style={{ color: "var(--brand-color-primary, #c8d400)" }} />
                 <span
                   className="text-xs font-bold uppercase tracking-wider"
-                  style={{ color: "var(--foreground, #fafbfc)" }}
+                  style={{ color: "var(--foreground)" }}
                 >
                   {locale === "sk" ? "Navigácia manuálu" : locale === "cs" ? "Navigace manuálu" : "Manual Navigation"}
                 </span>
@@ -330,7 +330,7 @@ export function PublicManualShell({
                 type="button"
                 onClick={() => setNavDrawerOpen(false)}
                 className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
-                style={{ color: "var(--foreground, #fafbfc)" }}
+                style={{ color: "var(--foreground)" }}
                 aria-label="Close menu"
               >
                 <X className="h-4 w-4" />

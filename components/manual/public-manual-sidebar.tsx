@@ -264,7 +264,7 @@ export function PublicManualSidebar({
     <aside
       className={`w-full flex flex-col h-full select-none ${className}`}
       style={{
-        backgroundColor: "var(--card, #17212a)",
+        backgroundColor: "var(--card)",
         color: "var(--foreground)",
       }}
     >

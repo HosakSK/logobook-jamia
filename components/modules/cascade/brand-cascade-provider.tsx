@@ -95,8 +95,21 @@ export function BrandCascadeProvider({
   }, [initialTokens, shapes, colors, typography]);
 
   const cssVariables = useMemo(() => {
+    if (initialTokens?.theme) {
+      return computeBrandCssVariables(
+        {
+          themeConfig: initialTokens.themeConfig,
+          manualBgColor: initialTokens.manualBgColor,
+          radiusMode: initialTokens.radiusMode,
+          customRadiusPx: initialTokens.customRadiusPx,
+          borderWidthPx: initialTokens.borderWidthPx,
+        } as any,
+        initialTokens.palette as any,
+        undefined
+      );
+    }
     return computeBrandCssVariables(shapes, colors, typography);
-  }, [shapes, colors, typography]);
+  }, [initialTokens, shapes, colors, typography]);
 
   const contextValue = useMemo<BrandCascadeContextValue>(() => {
     return {
