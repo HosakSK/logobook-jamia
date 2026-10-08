@@ -166,6 +166,12 @@ export default async function ManualLayout({
           name: brandName,
           slug: brandSlug,
           headerLogoUrl: headerLogoUrl || (publishedConfig?.brand as any)?.headerLogoUrl,
+          headerLogoHeight: typeof brandRecord?.description === "object" && typeof brandRecord?.description?.headerLogoHeight === "number"
+            ? brandRecord.description.headerLogoHeight
+            : ((publishedConfig?.brand as any)?.headerLogoHeight ?? 40),
+          showHeaderBrandName: typeof brandRecord?.description === "object" && typeof brandRecord?.description?.showHeaderBrandName === "boolean"
+            ? brandRecord.description.showHeaderBrandName
+            : ((publishedConfig?.brand as any)?.showHeaderBrandName ?? true),
           hideLogobookBadge,
         }}
         snapshot={publishedConfig}

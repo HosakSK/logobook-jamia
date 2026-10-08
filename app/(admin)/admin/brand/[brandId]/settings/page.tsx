@@ -189,7 +189,14 @@ export default async function BrandSettingsPage({
       <BrandGeneralForm brand={serializedBrand} userTier={userTier} dict={dict} />
 
       {/* 2. Header Logo in Top Bar */}
-      <BrandHeaderLogoForm brandId={brand.id} initialHeaderLogoUrl={headerLogoUrl} dict={dict} />
+      <BrandHeaderLogoForm
+        brandId={brand.id}
+        initialHeaderLogoUrl={headerLogoUrl}
+        initialHeaderLogoHeight={typeof brand.description === "object" && typeof brand.description?.headerLogoHeight === "number" ? brand.description.headerLogoHeight : 40}
+        initialShowHeaderBrandName={typeof brand.description === "object" && typeof brand.description?.showHeaderBrandName === "boolean" ? brand.description.showHeaderBrandName : true}
+        brandName={brand.name}
+        dict={dict}
+      />
 
       {/* 3. Favicon Upload */}
       <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />

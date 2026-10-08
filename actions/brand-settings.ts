@@ -262,8 +262,18 @@ export async function setBrandFaviconAction(
  */
 export async function setBrandHeaderLogoAction(
   brandId: string,
-  mediaAssetIdOrUrl: string | null
-): Promise<{ success: boolean; error?: string; headerLogoUrl?: string }> {
+  mediaAssetIdOrUrl: string | null,
+  options?: {
+    headerLogoHeight?: number;
+    showHeaderBrandName?: boolean;
+  }
+): Promise<{
+  success: boolean;
+  error?: string;
+  headerLogoUrl?: string;
+  headerLogoHeight?: number;
+  showHeaderBrandName?: boolean;
+}> {
   try {
     const pb = await getServerPocketBase();
     const user = pb.authStore.record;
@@ -273,17 +283,33 @@ export async function setBrandHeaderLogoAction(
 
     const { brand } = await verifyBrandAccess(pb, brandId, user.id);
 
+    const existingDesc = (typeof brand.description === "object" && brand.description !== null)
+      ? { ...brand.description }
+      : {};
+
+    const updatedDesc = {
+      ...existingDesc,
+      headerLogoHeight: options?.headerLogoHeight ?? existingDesc.headerLogoHeight ?? 40,
+      showHeaderBrandName: options?.showHeaderBrandName ?? existingDesc.showHeaderBrandName ?? true,
+    };
+
     if (!mediaAssetIdOrUrl) {
       // Remove header logo
       await pb.collection("brands").update(brand.id, {
         headerLogo: null,
+        description: updatedDesc,
       });
 
       revalidatePath(`/admin/brand/${brand.id}/settings`);
       revalidatePath(`/admin/brand/${brand.slug}/settings`);
       revalidatePath(`/manual/${brand.slug}`, "layout");
       revalidatePath(`/m/${brand.slug}`, "layout");
-      return { success: true, headerLogoUrl: "" };
+      return {
+        success: true,
+        headerLogoUrl: "",
+        headerLogoHeight: updatedDesc.headerLogoHeight,
+        showHeaderBrandName: updatedDesc.showHeaderBrandName,
+      };
     }
 
     let finalUrl = mediaAssetIdOrUrl;
@@ -309,6 +335,7 @@ export async function setBrandHeaderLogoAction(
 
     await pb.collection("brands").update(brand.id, {
       headerLogo: headerMediaId,
+      description: updatedDesc,
     });
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
@@ -319,6 +346,8 @@ export async function setBrandHeaderLogoAction(
     return {
       success: true,
       headerLogoUrl: finalUrl,
+      headerLogoHeight: updatedDesc.headerLogoHeight,
+      showHeaderBrandName: updatedDesc.showHeaderBrandName,
     };
   } catch (err: unknown) {
     console.error("Failed to set brand header logo:", err);

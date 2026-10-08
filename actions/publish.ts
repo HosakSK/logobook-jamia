@@ -60,6 +60,8 @@ export interface PublishedBrandSnapshot {
     enabledLocales?: string[];
     headerLogo?: string;
     headerLogoUrl?: string;
+    headerLogoHeight?: number;
+    showHeaderBrandName?: boolean;
     favicon?: string;
     hideLogobookBadge?: boolean;
   };
@@ -297,6 +299,12 @@ export async function publishBrandAction(brandId: string): Promise<{
         enabledLocales: brand.enabledLocales || ["en", "sk", "cs"],
         headerLogo: brand.headerLogo || undefined,
         headerLogoUrl: snapshotHeaderLogoUrl,
+        headerLogoHeight: typeof brand.description === "object" && typeof brand.description?.headerLogoHeight === "number"
+          ? brand.description.headerLogoHeight
+          : 40,
+        showHeaderBrandName: typeof brand.description === "object" && typeof brand.description?.showHeaderBrandName === "boolean"
+          ? brand.description.showHeaderBrandName
+          : true,
         favicon: brand.favicon || undefined,
         hideLogobookBadge: brand.hideLogobookBadge || false,
       },

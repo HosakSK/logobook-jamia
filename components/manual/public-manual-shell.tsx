@@ -17,6 +17,8 @@ interface PublicManualShellProps {
     name: string;
     slug: string;
     headerLogoUrl?: string;
+    headerLogoHeight?: number;
+    showHeaderBrandName?: boolean;
     hideLogobookBadge?: boolean;
   };
   snapshot: PublishedBrandSnapshot | null;
@@ -125,11 +127,15 @@ export function PublicManualShell({
             className="flex items-center gap-3 hover:opacity-90 transition-opacity group"
           >
             {brand.headerLogoUrl ? (
-              <div className="h-10 flex items-center justify-center">
+              <div
+                className="flex items-center justify-center"
+                style={{ height: `${brand.headerLogoHeight || 40}px` }}
+              >
                 <img
                   src={brand.headerLogoUrl}
                   alt={brand.name}
-                  className="max-h-10 w-auto max-w-[160px] sm:max-w-[220px] object-contain object-left transition-transform group-hover:scale-[1.02]"
+                  style={{ maxHeight: `${brand.headerLogoHeight || 40}px` }}
+                  className="w-auto max-w-[200px] sm:max-w-[280px] object-contain object-left transition-transform group-hover:scale-[1.02]"
                 />
               </div>
             ) : (
@@ -143,14 +149,16 @@ export function PublicManualShell({
               </div>
             )}
 
-            <div className="hidden sm:block">
-              <span className="font-bold tracking-tight text-sm sm:text-base uppercase text-foreground">
-                {brand.name}
-              </span>
-              <span className="text-xs text-muted-foreground ml-2.5 border-l border-border/60 pl-2.5 font-medium">
-                Brand Manual
-              </span>
-            </div>
+            {(brand.showHeaderBrandName ?? true) && (
+              <div className="hidden sm:block">
+                <span className="font-bold tracking-tight text-sm sm:text-base uppercase text-foreground">
+                  {brand.name}
+                </span>
+                <span className="text-xs text-muted-foreground ml-2.5 border-l border-border/60 pl-2.5 font-medium">
+                  Brand Manual
+                </span>
+              </div>
+            )}
           </Link>
         </div>
 

@@ -4,19 +4,26 @@ import { useState, useTransition } from "react";
 import { setBrandHeaderLogoAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Dictionary } from "@/lib/i18n";
-import { Check, AlertCircle, Loader2, Sparkles, FolderOpen, Trash2 } from "lucide-react";
+import { Check, AlertCircle, Loader2, Sparkles, FolderOpen, Trash2, Eye, Sliders } from "lucide-react";
 import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
 
 interface BrandHeaderLogoFormProps {
   brandId: string;
   initialHeaderLogoUrl?: string | null;
+  initialHeaderLogoHeight?: number;
+  initialShowHeaderBrandName?: boolean;
+  brandName?: string;
   dict: Dictionary;
 }
 
 export function BrandHeaderLogoForm({
   brandId,
   initialHeaderLogoUrl,
+  initialHeaderLogoHeight = 40,
+  initialShowHeaderBrandName = true,
+  brandName = "Brand",
   dict,
 }: BrandHeaderLogoFormProps) {
   const [isPending, startTransition] = useTransition();
@@ -27,6 +34,14 @@ export function BrandHeaderLogoForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialHeaderLogoUrl || null);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
+  // Logo height (in px, 24px - 64px, default 40px)
+  const [logoHeight, setLogoHeight] = useState<number>(initialHeaderLogoHeight || 40);
+  const [savedLogoHeight, setSavedLogoHeight] = useState<number>(initialHeaderLogoHeight || 40);
+
+  // Show brand name next to logo in header
+  const [showHeaderBrandName, setShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
+  const [savedShowHeaderBrandName, setSavedShowHeaderBrandName] = useState<boolean>(initialShowHeaderBrandName ?? true);
+
   // When media is picked from modal, update preview and mark as pending save
   const handleMediaSelect = (item: SelectedMediaItem) => {
     setError(null);
@@ -35,20 +50,25 @@ export function BrandHeaderLogoForm({
   };
 
   const handleSaveLogo = () => {
-    if (!selectedItem && previewUrl === savedLogoUrl) return;
-
     setError(null);
     startTransition(async () => {
-      const res = await setBrandHeaderLogoAction(brandId, selectedItem ? (selectedItem.id || selectedItem.url) : previewUrl);
+      const mediaParam = selectedItem ? (selectedItem.id || selectedItem.url) : previewUrl;
+      const res = await setBrandHeaderLogoAction(brandId, mediaParam, {
+        headerLogoHeight: logoHeight,
+        showHeaderBrandName,
+      });
+
       if (res.success) {
         setSuccess(true);
         const newUrl = res.headerLogoUrl || (selectedItem ? selectedItem.url : previewUrl);
         setSavedLogoUrl(newUrl);
         setPreviewUrl(newUrl);
         setSelectedItem(null);
+        setSavedLogoHeight(res.headerLogoHeight ?? logoHeight);
+        setSavedShowHeaderBrandName(res.showHeaderBrandName ?? showHeaderBrandName);
         setTimeout(() => setSuccess(false), 4000);
       } else {
-        setError(res.error || "Nepodarilo sa uložiť logo v hlavičke");
+        setError(res.error || "Nepodarilo sa uložiť nastavenia loga v hlavičke");
       }
     });
   };
@@ -56,11 +76,16 @@ export function BrandHeaderLogoForm({
   const handleRemoveLogo = () => {
     setError(null);
     startTransition(async () => {
-      const res = await setBrandHeaderLogoAction(brandId, null);
+      const res = await setBrandHeaderLogoAction(brandId, null, {
+        headerLogoHeight: logoHeight,
+        showHeaderBrandName,
+      });
       if (res.success) {
         setSavedLogoUrl(null);
         setPreviewUrl(null);
         setSelectedItem(null);
+        setSavedLogoHeight(res.headerLogoHeight ?? logoHeight);
+        setSavedShowHeaderBrandName(res.showHeaderBrandName ?? showHeaderBrandName);
         setSuccess(true);
         setTimeout(() => setSuccess(false), 4000);
       } else {
@@ -69,14 +94,18 @@ export function BrandHeaderLogoForm({
     });
   };
 
-  const hasUnsavedChanges = selectedItem !== null || (previewUrl !== savedLogoUrl);
+  const hasUnsavedChanges =
+    selectedItem !== null ||
+    previewUrl !== savedLogoUrl ||
+    logoHeight !== savedLogoHeight ||
+    showHeaderBrandName !== savedShowHeaderBrandName;
 
   return (
     <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-6">
       <div className="border-b border-[rgba(63,85,102,0.4)] pb-5">
-        <h2 className="text-lg font-bold text-[#fafbfc]">Logo v hlavičke manuálu (Top bar)</h2>
+        <h2 className="text-lg font-bold text-[#fafbfc]">Logo a zobrazenie v hlavičke (Top bar)</h2>
         <p className="text-xs text-[#96abbe] mt-1">
-          Oficiálne logo alebo symbol zobrazený v ľavom hornom rohu verejného manuálu a na uzamknutej obrazovke.
+          Oficiálne logo manuálu, jeho veľkosť a nastavenie zobrazenia názvu značky v hornom paneli.
         </p>
       </div>
 
@@ -90,35 +119,72 @@ export function BrandHeaderLogoForm({
       {success && (
         <div className="flex items-center gap-2.5 p-4 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-xl">
           <Check className="h-4 w-4 shrink-0" />
-          <span>Logo v hlavičke bolo úspešne uložené!</span>
+          <span>Nastavenia loga v hlavičke boli úspešne uložené!</span>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-        {/* Header Logo Preview Box */}
-        <div className="h-24 w-44 rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Logo v hlavičke"
-              className="max-h-16 max-w-full object-contain"
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-1.5 text-center">
-              <Sparkles className="h-6 w-6 text-muted-foreground/40" />
-              <span className="text-[10px] text-muted-foreground/60">Zatiaľ nezvolené</span>
-            </div>
-          )}
+      {/* Live Preview Box representing Top Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5 font-medium text-[#96abbe]">
+            <Eye className="h-3.5 w-3.5 text-[#c8d400]" />
+            Náhľad hlavičky verejného manuálu:
+          </span>
+          <span className="text-[11px] text-[#96abbe]/80">Výška loga: {logoHeight}px</span>
         </div>
+        <div className="rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] px-5 py-4 shadow-inner flex items-center justify-between overflow-hidden">
+          <div className="flex items-center gap-3">
+            {previewUrl ? (
+              <div
+                className="flex items-center justify-center transition-all duration-200"
+                style={{ height: `${logoHeight}px` }}
+              >
+                <img
+                  src={previewUrl}
+                  alt="Logo v hlavičke"
+                  style={{ maxHeight: `${logoHeight}px` }}
+                  className="w-auto max-w-[200px] object-contain object-left"
+                />
+              </div>
+            ) : (
+              <div className="h-10 w-10 text-[#070b0f] bg-[#c8d400] flex items-center justify-center font-bold text-xs shadow-xs rounded-xl">
+                {brandName.slice(0, 2).toUpperCase()}
+              </div>
+            )}
 
-        <div className="space-y-2.5 flex-1">
-          <Label className="text-xs font-semibold text-muted-foreground">
-            Logo manuálu značky
-          </Label>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Vyberte oficiálne logo z nahraných súborov značky, grafických symbolov alebo nahrajte nový SVG / PNG súbor. Ak logo nezvolíte, zobrazí sa farebný symbol s iniciálami a textovým názvom značky.
-          </p>
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {showHeaderBrandName && (
+              <div className="flex items-center">
+                <span className="font-bold tracking-tight text-sm uppercase text-[#fafbfc]">
+                  {brandName}
+                </span>
+                <span className="text-xs text-[#96abbe] ml-2.5 border-l border-[rgba(63,85,102,0.6)] pl-2.5 font-medium">
+                  Brand Manual
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="text-[11px] font-mono text-[#96abbe]/50 hidden sm:block">
+            Top Bar Preview
+          </div>
+        </div>
+      </div>
+
+      {/* Main Controls */}
+      <div className="space-y-6 pt-2">
+        {/* Logo Picker Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-[rgba(63,85,102,0.3)] bg-[#0e161d]">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold text-[#fafbfc]">
+              Grafický súbor loga
+            </Label>
+            <p className="text-xs text-[#96abbe]">
+              {previewUrl
+                ? "Logo je vybrané. Môžete ho nahradiť iným formátom alebo zmazať."
+                : "Zatiaľ nie je zvolené žiadne logo. Zobrazuje sa iniciálový odznak."}
+            </p>
+          </div>
+          <div className="flex items-center gap-2.5 shrink-0">
             <Button
               type="button"
               variant="outline"
@@ -128,7 +194,7 @@ export function BrandHeaderLogoForm({
               className="shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
             >
               <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
-              <span>{previewUrl ? "Zmeniť logo v hlavičke" : "Vybrať logo v hlavičke"}</span>
+              <span>{previewUrl ? "Zmeniť logo" : "Vybrať logo"}</span>
             </Button>
 
             {previewUrl && (
@@ -146,15 +212,85 @@ export function BrandHeaderLogoForm({
             )}
           </div>
         </div>
+
+        {/* Logo Size Control (Slider) */}
+        <div className="p-4 rounded-xl border border-[rgba(63,85,102,0.3)] bg-[#0e161d] space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold text-[#fafbfc] flex items-center gap-1.5">
+              <Sliders className="h-3.5 w-3.5 text-[#c8d400]" />
+              Veľkosť loga v hlavičke
+            </Label>
+            <span className="text-xs font-mono font-bold text-[#c8d400] bg-[#17212a] px-2.5 py-0.5 rounded border border-[rgba(63,85,102,0.4)]">
+              {logoHeight} px
+            </span>
+          </div>
+          <p className="text-xs text-[#96abbe]">
+            Nastavte výšku loga v pixeloch (od 24px do 64px, predvolene 40px). Pomer strán je zachovaný.
+          </p>
+          <div className="flex items-center gap-4 pt-1">
+            <input
+              type="range"
+              min="24"
+              max="64"
+              step="2"
+              value={logoHeight}
+              onChange={(e) => setLogoHeight(Number(e.target.value))}
+              className="flex-1 accent-[#c8d400] h-2 bg-neutral-800 rounded-lg cursor-pointer"
+            />
+            <Input
+              type="number"
+              min={24}
+              max={64}
+              value={logoHeight}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                if (!isNaN(val)) setLogoHeight(Math.max(20, Math.min(80, val)));
+              }}
+              className="w-20 h-9 text-xs rounded-lg bg-background/50 border-[rgba(63,85,102,0.4)] text-center font-mono"
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-[#96abbe]/60 font-mono pt-0.5">
+            <span>24px (Kompaktné)</span>
+            <span>40px (Predvolené)</span>
+            <span>64px (Veľké)</span>
+          </div>
+        </div>
+
+        {/* Show Brand Name Toggle Switch */}
+        <div className="p-4 rounded-xl border border-[rgba(63,85,102,0.3)] bg-[#0e161d] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <Label className="text-xs font-semibold text-[#fafbfc]">
+              Zobraziť v hlavičke aj textový názov značky
+            </Label>
+            <p className="text-xs text-[#96abbe] leading-relaxed max-w-lg">
+              Zapnuté: vedľa loga sa zobrazí aj textový názov „{brandName}“ a štítok Brand Manual. Vypnuté: v hlavičke sa zobrazí iba čisté logo.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showHeaderBrandName}
+            onClick={() => setShowHeaderBrandName(!showHeaderBrandName)}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+              showHeaderBrandName ? "bg-[#c8d400]" : "bg-neutral-800 border-[rgba(63,85,102,0.5)]"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[#070b0f] shadow-md ring-0 transition duration-200 ease-in-out ${
+                showHeaderBrandName ? "translate-x-5" : "translate-x-0 bg-neutral-400"
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Save Button Bar */}
       <div className="flex items-center justify-between pt-4 border-t border-[rgba(63,85,102,0.3)]">
         <span className="text-xs text-muted-foreground">
           {hasUnsavedChanges ? (
-            <span className="text-amber-400 font-medium">Máte neuložený výber loga</span>
+            <span className="text-amber-400 font-medium">Máte neuložené zmeny v nastavení hlavičky</span>
           ) : (
-            "Zmeny sa aplikujú na verejný manuál"
+            "Všetky zmeny hlavičky sú uložené"
           )}
         </span>
         <Button
@@ -172,7 +308,7 @@ export function BrandHeaderLogoForm({
           ) : (
             <>
               <Check className="h-4 w-4 mr-2" />
-              <span>Uložiť logo</span>
+              <span>Uložiť nastavenia hlavičky</span>
             </>
           )}
         </Button>
