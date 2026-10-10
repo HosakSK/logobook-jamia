@@ -201,8 +201,21 @@ export default async function ManualLayout({
     }
   }
 
+  // Helper: Sanitize legacy PB URLs (e.g. sslip.io temporary domains)
+  const sanitizePbUrl = (url?: string | null) => {
+    if (!url) return undefined;
+    if (url.includes("89.168.121.252.sslip.io")) {
+      return url.replace(/https?:\/\/[^/]+\.89\.168\.121\.252\.sslip\.io/, "https://pb.logobook.eu");
+    }
+    return url;
+  };
+
   const publishedConfig = (brandRecord?.publishedConfig || null) as PublishedBrandSnapshot | null;
-  const activeFavicon = faviconUrl || (publishedConfig?.brand as any)?.faviconUrl || "/logo/logo-symbol-dark.svg";
+  const rawFavicon = faviconUrl || (publishedConfig?.brand as any)?.faviconUrl || "/logo/logo-symbol-dark.svg";
+  const activeFavicon = sanitizePbUrl(rawFavicon) || "/logo/logo-symbol-dark.svg";
+
+  const rawHeaderLogoUrl = headerLogoUrl || (publishedConfig?.brand as any)?.headerLogoUrl;
+  const activeHeaderLogoUrl = sanitizePbUrl(rawHeaderLogoUrl);
 
   return (
     <BrandCascadeProvider
@@ -221,7 +234,7 @@ export default async function ManualLayout({
           id: brandRecord?.id || domain,
           name: brandName,
           slug: brandSlug,
-          headerLogoUrl: headerLogoUrl || (publishedConfig?.brand as any)?.headerLogoUrl,
+          headerLogoUrl: activeHeaderLogoUrl,
           headerLogoHeight: typeof brandRecord?.description === "object" && typeof brandRecord?.description?.headerLogoHeight === "number"
             ? brandRecord.description.headerLogoHeight
             : ((publishedConfig?.brand as any)?.headerLogoHeight ?? 40),
