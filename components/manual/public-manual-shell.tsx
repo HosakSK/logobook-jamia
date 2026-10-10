@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { Locale } from "@/lib/i18n";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { getWcagContrast } from "@/lib/utils/color-calc";
+import { isSubdomainOrCustomHost } from "@/lib/domains";
 
 interface PublicManualShellProps {
   children: React.ReactNode;
@@ -64,16 +65,7 @@ export function PublicManualShell({
   // Resolve target link URL
   const getPageHref = (slug: string) => {
     if (typeof window !== "undefined") {
-      const host = window.location.hostname.toLowerCase();
-      const isSubdomainOrCustom =
-        host !== "logobook.sk" &&
-        host !== "www.logobook.sk" &&
-        host !== "logobook.eu" &&
-        host !== "www.logobook.eu" &&
-        host !== "localhost" &&
-        !host.endsWith(".sslip.io");
-
-      if (isSubdomainOrCustom) {
+      if (isSubdomainOrCustomHost()) {
         return `/${slug}`;
       }
 

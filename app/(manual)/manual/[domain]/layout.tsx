@@ -205,7 +205,8 @@ export default async function ManualLayout({
   const sanitizePbUrl = (url?: string | null) => {
     if (!url) return undefined;
     if (url.includes("89.168.121.252.sslip.io")) {
-      return url.replace(/https?:\/\/[^/]+\.89\.168\.121\.252\.sslip\.io/, "https://pb.logobook.eu");
+      const activePb = process.env.NEXT_PUBLIC_POCKETBASE_URL || "https://pb.logobook.eu";
+      return url.replace(/https?:\/\/[^/]+\.89\.168\.121\.252\.sslip\.io/, activePb);
     }
     return url;
   };

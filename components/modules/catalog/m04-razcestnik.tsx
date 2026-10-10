@@ -23,6 +23,7 @@ import {
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import { M04RazcestnikConfig, M04CardItem } from "@/lib/validations/modules/m04";
 import { resolveI18nText, setI18nText } from "@/lib/validations/module";
+import { isSubdomainOrCustomHost } from "@/lib/domains";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { InlineEditableText } from "@/components/admin/builder/inline-editable-text";
 import { updateModuleConfigAction, getBrandPagesAction } from "@/actions/pages";
@@ -348,14 +349,7 @@ export default function M04RazcestnikModule({
     if (isEditor) {
       return `/admin/brand/${currentBrand}/builder/${finalSlug}`;
     } else {
-      const isSubdomainOrCustom =
-        typeof window !== "undefined" &&
-        !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
-          window.location.hostname.toLowerCase()
-        ) &&
-        !window.location.hostname.toLowerCase().endsWith(".sslip.io");
-
-      if (isSubdomainOrCustom) {
+      if (isSubdomainOrCustomHost()) {
         return `/${finalSlug}`;
       }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, Locale, isValidLocale } from "@/lib/i18n";
+import { extractTenantDomain } from "@/lib/domains";
 
 export const config = {
   matcher: [
@@ -113,42 +114,12 @@ export function middleware(req: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. Hostname & Subdomain Classification
+  // 3. Hostname & Subdomain Classification (Dynamic via lib/domains)
   // ---------------------------------------------------------------------------
-  const isMarketingHost =
-    hostWithoutPort === "logobook.sk" ||
-    hostWithoutPort === "www.logobook.sk" ||
-    hostWithoutPort === "logobook.eu" ||
-    hostWithoutPort === "www.logobook.eu" ||
-    hostWithoutPort === "localhost" ||
-    hostWithoutPort.endsWith(".sslip.io"); // Coolify temp domain root
-
-  // Subdomain on logobook.sk or logobook.eu (e.g. demo.logobook.eu or brand.logobook.eu)
-  let domain = "";
-  if (!isMarketingHost) {
-    if (hostWithoutPort.endsWith(".logobook.sk")) {
-      const subdomain = hostWithoutPort.replace(/\.logobook\.sk$/, "");
-      if (subdomain && subdomain !== "www") {
-        domain = subdomain;
-      }
-    } else if (hostWithoutPort.endsWith(".logobook.eu")) {
-      const subdomain = hostWithoutPort.replace(/\.logobook\.eu$/, "");
-      if (subdomain && subdomain !== "www") {
-        domain = subdomain;
-      }
-    } else if (hostWithoutPort.endsWith(".localhost")) {
-      const subdomain = hostWithoutPort.replace(/\.localhost$/, "");
-      if (subdomain && subdomain !== "www") {
-        domain = subdomain;
-      }
-    } else {
-      // Custom domain (e.g. brand.klient.sk or custom.com)
-      domain = hostWithoutPort;
-    }
-  }
+  const domain = extractTenantDomain(hostWithoutPort);
 
   // ---------------------------------------------------------------------------
-  // 4. Subdomain clean URL handling & /m/ redirect
+  // 4. Subdomain clean URL handling & /m/ routing
   // ---------------------------------------------------------------------------
   if (domain) {
     // If request is for a static asset file with an extension (e.g. /logo/..., .svg, .png, .jpg, .ico, etc.)
@@ -157,23 +128,17 @@ export function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // If user accesses /m/[domain]/[rest] on subdomain (e.g. demo.logobook.eu/m/demo/foo)
-    // redirect 301 to clean URL: demo.logobook.eu/foo
-    if (pathname.startsWith("/m/")) {
-      const segments = pathname.replace(/^\/m\//, "").split("/").filter(Boolean);
-      // Remove domain slug if it matches current subdomain (e.g. /m/demo/foo -> /foo)
-      const rest = segments[0] === domain ? segments.slice(1) : segments;
-      const cleanPath = rest.length > 0 ? `/${rest.join("/")}` : "/";
-      const redirectUrl = new URL(cleanPath, req.url);
-      redirectUrl.search = url.search;
-      return NextResponse.redirect(redirectUrl, 301);
-    }
-
     // Rewrite clean paths directly to internal manual
-    const pathSegments = pathname.split("/").filter(Boolean);
-    const firstSegment = pathSegments[0];
+    const pathSegments = pathname.startsWith("/m/")
+      ? pathname.replace(/^\/m\//, "").split("/").filter(Boolean)
+      : pathname.split("/").filter(Boolean);
+
+    // If path starts with /m/[domain]/... or /m/... strip matching domain segment
+    const normalizedParts = (pathSegments[0] === domain) ? pathSegments.slice(1) : pathSegments;
+
+    const firstSegment = normalizedParts[0];
     const { locale, isFromPath } = resolveLocale(req, firstSegment);
-    const restParts = isFromPath ? pathSegments.slice(1) : pathSegments;
+    const restParts = isFromPath ? normalizedParts.slice(1) : normalizedParts;
     const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "";
 
     const targetUrl = new URL(`/manual/${domain}/${locale}${restPath}`, req.url);

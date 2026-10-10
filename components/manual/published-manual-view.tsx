@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen, Layers, ShieldAlert, Sparkles, ChevronRight, Hash } from "lucide-react";
 import { PublishedBrandSnapshot } from "@/actions/publish";
 import { PageRenderer } from "./page-renderer";
+import { isSubdomainOrCustomHost } from "@/lib/domains";
 
 interface PublishedManualViewProps {
   snapshot: PublishedBrandSnapshot | null;
@@ -89,13 +90,7 @@ export function PublishedManualView({
           {rootChapters.map((page) => {
             const isActive = isChapterActive(page);
             const title = getLocalized(page.title) || page.slug;
-            const isSubdomainOrCustom =
-              typeof window !== "undefined" &&
-              !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
-                window.location.hostname.toLowerCase()
-              ) &&
-              !window.location.hostname.toLowerCase().endsWith(".sslip.io");
-            const href = isSubdomainOrCustom ? `/${page.slug}` : `/m/${brandSlug}/${page.slug}`;
+            const href = isSubdomainOrCustomHost() ? `/${page.slug}` : `/m/${brandSlug}/${page.slug}`;
 
             return (
               <Link

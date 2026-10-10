@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChevronRight, FileText, Search, Folder, FolderOpen } from "lucide-react";
 import { PublishedPageItem } from "@/actions/publish";
+import { isSubdomainOrCustomHost } from "@/lib/domains";
 
 interface TreeNodeItem extends PublishedPageItem {
   children: TreeNodeItem[];
@@ -136,16 +137,7 @@ export function PublicManualSidebar({
   // Resolve target link URL
   const getPageHref = (slug: string) => {
     if (typeof window !== "undefined") {
-      const host = window.location.hostname.toLowerCase();
-      const isSubdomainOrCustom =
-        host !== "logobook.sk" &&
-        host !== "www.logobook.sk" &&
-        host !== "logobook.eu" &&
-        host !== "www.logobook.eu" &&
-        host !== "localhost" &&
-        !host.endsWith(".sslip.io");
-
-      if (isSubdomainOrCustom) {
+      if (isSubdomainOrCustomHost()) {
         return slug ? `/${slug}` : "/";
       }
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronRight, FileQuestion } from "lucide-react";
 import { PublishedPageItem } from "@/actions/publish";
 import { ContainerRenderer } from "./container-renderer";
+import { isSubdomainOrCustomHost } from "@/lib/domains";
 
 export interface PageRendererProps {
   page: PublishedPageItem;
@@ -43,12 +44,7 @@ export function PageRenderer({
   const breadcrumbs = useMemo(() => {
     const items: Array<{ id: string; slug: string; title: string; href: string }> = [];
 
-    const isSubdomainOrCustom =
-      typeof window !== "undefined" &&
-      !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
-        window.location.hostname.toLowerCase()
-      ) &&
-      !window.location.hostname.toLowerCase().endsWith(".sslip.io");
+    const isSubdomain = isSubdomainOrCustomHost();
 
     if (allPages && page.parent) {
       const visited = new Set<string>();
@@ -63,7 +59,7 @@ export function PageRenderer({
             id: parentPage.id,
             slug: parentPage.slug,
             title: parentTitle,
-            href: isSubdomainOrCustom
+            href: isSubdomain
               ? `/${parentPage.slug}`
               : `/m/${brandSlug || "logobook"}/${parentPage.slug}`,
           });
@@ -90,15 +86,7 @@ export function PageRenderer({
             {/* Brand Home Link */}
             {brandName && (
               <Link
-                href={
-                  typeof window !== "undefined" &&
-                  !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
-                    window.location.hostname.toLowerCase()
-                  ) &&
-                  !window.location.hostname.toLowerCase().endsWith(".sslip.io")
-                    ? "/"
-                    : `/m/${brandSlug || "logobook"}`
-                }
+                href={isSubdomainOrCustomHost() ? "/" : `/m/${brandSlug || "logobook"}`}
                 className="hover:text-foreground hover:underline transition-colors"
               >
                 {brandName}
