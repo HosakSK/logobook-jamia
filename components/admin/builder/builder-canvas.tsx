@@ -39,6 +39,7 @@ import { TemplateBrowserModal } from "./template-browser-modal";
 import { SaveTemplateModal } from "./save-template-modal";
 import { PublishBrandButton } from "./publish-brand-button";
 import { OfflineExportModal } from "@/components/admin/export/offline-export-modal";
+import { getBrandPublicUrl } from "@/lib/domains";
 import { ModuleDispatcher } from "@/components/modules/dispatcher";
 import { useBrandCascade } from "@/components/modules/cascade";
 import { getBrandColorsAction } from "@/actions/colors";
@@ -693,10 +694,10 @@ export function BuilderCanvas({
             </Button>
 
             <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1.5 rounded-[2px]">
-              <Link href={`/m/${brandSlug}`} target="_blank">
+              <a href={getBrandPublicUrl(brandSlug)} target="_blank" rel="noopener noreferrer">
                 <span>Verejný náhľad</span>
                 <ExternalLink className="h-3 w-3" />
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

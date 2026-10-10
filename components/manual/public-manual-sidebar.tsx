@@ -136,17 +136,7 @@ export function PublicManualSidebar({
 
   // Resolve target link URL
   const getPageHref = (slug: string) => {
-    if (typeof window !== "undefined") {
-      if (isSubdomainOrCustomHost()) {
-        return slug ? `/${slug}` : "/";
-      }
-
-      const path = window.location.pathname;
-      if (path.startsWith("/manual/")) {
-        return `/manual/${domain}/${locale}/${slug}`;
-      }
-    }
-    return `/m/${domain}/${slug}`;
+    return slug ? `/${slug}` : "/";
   };
 
   // Search filtering

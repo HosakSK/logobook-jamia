@@ -59,9 +59,7 @@ export function PageRenderer({
             id: parentPage.id,
             slug: parentPage.slug,
             title: parentTitle,
-            href: isSubdomain
-              ? `/${parentPage.slug}`
-              : `/m/${brandSlug || "logobook"}/${parentPage.slug}`,
+            href: `/${parentPage.slug}`,
           });
           currParentId = parentPage.parent;
         } else {
@@ -86,7 +84,7 @@ export function PageRenderer({
             {/* Brand Home Link */}
             {brandName && (
               <Link
-                href={isSubdomainOrCustomHost() ? "/" : `/m/${brandSlug || "logobook"}`}
+                href="/"
                 className="hover:text-foreground hover:underline transition-colors"
               >
                 {brandName}

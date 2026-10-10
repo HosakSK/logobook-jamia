@@ -11,6 +11,7 @@ import { BrandFaviconForm } from "@/components/admin/brand-settings/brand-favico
 import { BrandHeaderLogoForm } from "@/components/admin/brand-settings/brand-header-logo-form";
 import { BrandShapesForm } from "@/components/admin/brand-settings/brand-shapes-form";
 import { BrandDangerZone } from "@/components/admin/brand-settings/brand-danger-zone";
+import { getBrandPublicUrl } from "@/lib/domains";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, ArrowLeft, Users, ArrowRight } from "lucide-react";
 
@@ -248,10 +249,10 @@ export default async function BrandSettingsPage({
         </div>
 
         <Button asChild variant="outline" size="default" className="self-start sm:self-auto shrink-0 shadow-xs">
-          <Link href={`/m/${brand.slug || brandId}`} target="_blank">
+          <a href={getBrandPublicUrl(brand.slug || brandId, brand.customDomain)} target="_blank" rel="noopener noreferrer">
             <span>{dict.admin.viewLiveManual}</span>
             <ExternalLink className="h-4 w-4" />
-          </Link>
+          </a>
         </Button>
       </div>
 

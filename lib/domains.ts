@@ -71,3 +71,36 @@ export function isSubdomainOrCustomHost(): boolean {
   if (typeof window === "undefined") return false;
   return !isMarketingHost(window.location.hostname);
 }
+
+/**
+ * Constructs absolute public URL for a brand manual (e.g. https://demo.logobook.eu).
+ * In development (localhost), uses http://demo.localhost:3000 or query param.
+ */
+export function getBrandPublicUrl(brandSlug: string, customDomain?: string): string {
+  if (customDomain) {
+    return `https://${customDomain}`;
+  }
+
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const protocol = window.location.protocol;
+    const port = window.location.port ? `:${window.location.port}` : "";
+
+    if (host.includes("localhost") || host === "127.0.0.1") {
+      return `${protocol}//${brandSlug}.localhost${port}`;
+    }
+    
+    const roots = getRootDomains();
+    for (const root of roots) {
+      if (host.endsWith(root)) {
+        return `${protocol}//${brandSlug}.${root}${port}`;
+      }
+    }
+  }
+
+  const primaryRoot = getRootDomains()[0] || "logobook.eu";
+  if (primaryRoot === "localhost") {
+    return `http://${brandSlug}.localhost:3000`;
+  }
+  return `https://${brandSlug}.${primaryRoot}`;
+}

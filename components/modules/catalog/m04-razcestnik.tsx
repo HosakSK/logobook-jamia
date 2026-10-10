@@ -349,23 +349,7 @@ export default function M04RazcestnikModule({
     if (isEditor) {
       return `/admin/brand/${currentBrand}/builder/${finalSlug}`;
     } else {
-      if (isSubdomainOrCustomHost()) {
-        return `/${finalSlug}`;
-      }
-
-      let prefix = "";
-      if (typeof window !== "undefined") {
-        const path = window.location.pathname;
-        if (path.startsWith("/m/")) {
-          const parts = path.split("/").filter(Boolean);
-          const domainPart = parts[1] || currentBrand;
-          prefix = `/m/${domainPart}`;
-        }
-      }
-      if (!prefix) {
-        prefix = `/m/${currentBrand}`;
-      }
-      return `${prefix}/${finalSlug}`;
+      return `/${finalSlug}`;
     }
   };
 

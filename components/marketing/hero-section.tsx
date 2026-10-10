@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Locale, getDictionary } from "@/lib/i18n";
+import { getBrandPublicUrl } from "@/lib/domains";
 import { ArrowRight, Sparkles, CheckCircle2, Play, Eye, FileCode2, Layers } from "lucide-react";
 
 interface HeroSectionProps {
@@ -36,13 +37,13 @@ export function HeroSection({ currentLocale }: HeroSectionProps) {
 
         {/* CTA Buttons: Primary is "Zobraziť DEMO", Secondary is "Vytvoriť vlastný logobook" */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <Link
-            href="/m/demo"
+          <a
+            href={getBrandPublicUrl("demo")}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-gradient-to-b from-[#d8e600] to-[#b6c400] text-[#070b0f] font-bold text-sm shadow-[0_4px_24px_rgba(200,212,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_8px_32px_rgba(200,212,0,0.45)] hover:brightness-105 hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer"
           >
             <Play className="w-4 h-4 fill-current" />
             <span>{dict.marketing.ctaDemo}</span>
-          </Link>
+          </a>
           <Link
             href="/register"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-white/[0.04] border border-white/10 hover:border-white/20 text-foreground font-semibold text-sm hover:bg-white/[0.08] hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer shadow-lg"

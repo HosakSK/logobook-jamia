@@ -90,7 +90,7 @@ export function PublishedManualView({
           {rootChapters.map((page) => {
             const isActive = isChapterActive(page);
             const title = getLocalized(page.title) || page.slug;
-            const href = isSubdomainOrCustomHost() ? `/${page.slug}` : `/m/${brandSlug}/${page.slug}`;
+            const href = `/${page.slug}`;
 
             return (
               <Link

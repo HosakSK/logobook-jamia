@@ -119,7 +119,7 @@ export function middleware(req: NextRequest) {
   const domain = extractTenantDomain(hostWithoutPort);
 
   // ---------------------------------------------------------------------------
-  // 4. Subdomain clean URL handling & /m/ routing
+  // 4. Subdomain clean URL handling
   // ---------------------------------------------------------------------------
   if (domain) {
     // If request is for a static asset file with an extension (e.g. /logo/..., .svg, .png, .jpg, .ico, etc.)
@@ -128,17 +128,22 @@ export function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    // Strip optional /m/ prefix if user arrives via old bookmark
+    let cleanPath = pathname;
+    if (cleanPath.startsWith("/m/")) {
+      cleanPath = cleanPath.replace(/^\/m\//, "");
+      if (cleanPath.startsWith(`${domain}/`)) {
+        cleanPath = cleanPath.slice(domain.length);
+      } else if (cleanPath === domain) {
+        cleanPath = "/";
+      }
+    }
+
     // Rewrite clean paths directly to internal manual
-    const pathSegments = pathname.startsWith("/m/")
-      ? pathname.replace(/^\/m\//, "").split("/").filter(Boolean)
-      : pathname.split("/").filter(Boolean);
-
-    // If path starts with /m/[domain]/... or /m/... strip matching domain segment
-    const normalizedParts = (pathSegments[0] === domain) ? pathSegments.slice(1) : pathSegments;
-
-    const firstSegment = normalizedParts[0];
+    const pathSegments = cleanPath.split("/").filter(Boolean);
+    const firstSegment = pathSegments[0];
     const { locale, isFromPath } = resolveLocale(req, firstSegment);
-    const restParts = isFromPath ? normalizedParts.slice(1) : normalizedParts;
+    const restParts = isFromPath ? pathSegments.slice(1) : pathSegments;
     const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "";
 
     const targetUrl = new URL(`/manual/${domain}/${locale}${restPath}`, req.url);
@@ -156,30 +161,22 @@ export function middleware(req: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // 5. Dev / Marketing host path routing: /m/[domain]/[locale?]/...
-  //    e.g. logobook.eu/m/demo or logobook.eu/m/demo/sk
+  // 5. Legacy /m/[domain] requested on marketing site -> redirect to subdomain
   // ---------------------------------------------------------------------------
   if (pathname.startsWith("/m/")) {
     const segments = pathname.replace(/^\/m\//, "").split("/").filter(Boolean);
-    const domainSlug = segments[0] || "demo";
-    const secondSegment = segments[1];
+    const targetBrand = segments[0] || "demo";
+    const restParts = segments.slice(1);
+    const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "/";
 
-    const { locale, isFromPath } = resolveLocale(req, secondSegment);
-    const restParts = isFromPath ? segments.slice(2) : segments.slice(1);
-    const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "";
+    const hostRoots = (process.env.NEXT_PUBLIC_APP_DOMAIN || "logobook.eu").split(",").map(d => d.trim().toLowerCase());
+    const primaryDomain = hostRoots[0] || "logobook.eu";
 
-    const targetUrl = new URL(`/manual/${domainSlug}/${locale}${restPath}`, req.url);
-    targetUrl.search = url.search;
-
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set("x-brand-domain", domainSlug);
-    requestHeaders.set("x-brand-locale", locale);
-
-    const res = NextResponse.rewrite(targetUrl, {
-      request: { headers: requestHeaders },
-    });
-    res.cookies.set("NEXT_LOCALE", locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
-    return res;
+    if (hostWithoutPort.includes("localhost")) {
+      const port = url.port ? `:${url.port}` : "";
+      return NextResponse.redirect(new URL(`${url.protocol}//${targetBrand}.localhost${port}${restPath}`, req.url), 307);
+    }
+    return NextResponse.redirect(new URL(`https://${targetBrand}.${primaryDomain}${restPath}`, req.url), 307);
   }
 
   // ---------------------------------------------------------------------------

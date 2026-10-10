@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useBrandStore, ActiveBrand } from "@/lib/store/brand-store";
 import { getDictionary, Locale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { getBrandPublicUrl } from "@/lib/domains";
 import { ChevronsUpDown, Check, Plus, ExternalLink, Sparkles } from "lucide-react";
 
 interface BrandSwitcherProps {
@@ -97,15 +98,16 @@ export function BrandSwitcher({
           </div>
 
           <div className="border-t border-white/[0.08] pt-1.5 mt-1">
-            <Link
-              href={`/m/${currentBrand.slug}`}
+            <a
+              href={getBrandPublicUrl(currentBrand.slug)}
               target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-white hover:bg-white/[0.05] rounded-lg transition-colors"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>{dict.admin.viewLiveManual}</span>
-            </Link>
+            </a>
           </div>
         </div>
       )}

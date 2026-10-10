@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { getDictionary, DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
+import { getBrandPublicUrl } from "@/lib/domains";
 import { ExternalLink, Palette, Type, Image as ImageIcon, LayoutGrid, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,10 +20,12 @@ export default async function BrandOverviewPage({
   const pb = await getServerPocketBase();
   let brandName = brandId;
   let brandSlug = brandId;
+  let customDomain = "";
   try {
     const brand = await pb.collection("brands").getOne(brandId);
     if (brand?.name) brandName = brand.name;
     if (brand?.slug) brandSlug = brand.slug;
+    if (brand?.customDomain) customDomain = brand.customDomain;
   } catch {
     try {
       const brand = await pb.collection("brands").getFirstListItem(`slug = "${brandId}"`);
@@ -78,10 +81,10 @@ export default async function BrandOverviewPage({
           </p>
         </div>
         <Button asChild variant="outline" size="sm" className="gap-2 self-start sm:self-auto text-xs rounded-[3px] bg-[#17212a] text-[#fafbfc] border-[rgba(63,85,102,0.6)] hover:bg-[#1f2c36] hover:text-[#fafbfc]">
-          <Link href={`/m/${brandSlug}`} target="_blank">
+          <a href={getBrandPublicUrl(brandSlug, customDomain)} target="_blank" rel="noopener noreferrer">
             <span>{dict.admin.viewLiveManual}</span>
             <ExternalLink className="h-3.5 w-3.5" />
-          </Link>
+          </a>
         </Button>
       </div>
 

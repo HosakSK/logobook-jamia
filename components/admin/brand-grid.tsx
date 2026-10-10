@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useBrandStore } from "@/lib/store/brand-store";
 import { getDictionary, Locale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { getBrandPublicUrl } from "@/lib/domains";
 import {
   ExternalLink,
   Search,
@@ -151,14 +152,15 @@ export function BrandGrid({ brands, locale = DEFAULT_LOCALE }: BrandGridProps) {
 
                 {/* Bottom Actions */}
                 <div className="pt-3 border-t border-border/40 flex items-center justify-between gap-2">
-                  <Link
-                    href={`/m/${brand.slug}`}
+                  <a
+                    href={getBrandPublicUrl(brand.slug, brand.customDomain)}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <span>{dict.admin.viewManual}</span>
                     <ExternalLink className="h-3.5 w-3.5" />
-                  </Link>
+                  </a>
 
                   <Button
                     size="sm"
