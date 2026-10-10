@@ -170,6 +170,8 @@ export function middleware(req: NextRequest) {
   const isMarketingHost =
     hostWithoutPort === "logobook.sk" ||
     hostWithoutPort === "www.logobook.sk" ||
+    hostWithoutPort === "logobook.eu" ||
+    hostWithoutPort === "www.logobook.eu" ||
     hostWithoutPort === "localhost" ||
     hostWithoutPort.endsWith(".sslip.io"); // Coolify temp domain root
 
@@ -178,10 +180,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Subdomain on logobook.sk (e.g. demo.logobook.sk or brand.logobook.sk)
+  // Subdomain on logobook.sk or logobook.eu (e.g. demo.logobook.eu or brand.logobook.eu)
   let domain = "";
   if (hostWithoutPort.endsWith(".logobook.sk")) {
     const subdomain = hostWithoutPort.replace(/\.logobook\.sk$/, "");
+    if (subdomain && subdomain !== "www") {
+      domain = subdomain;
+    }
+  } else if (hostWithoutPort.endsWith(".logobook.eu")) {
+    const subdomain = hostWithoutPort.replace(/\.logobook\.eu$/, "");
     if (subdomain && subdomain !== "www") {
       domain = subdomain;
     }
