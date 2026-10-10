@@ -113,8 +113,80 @@ export function middleware(req: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // 3. Dev / Temporary domain path routing: /m/[domain]/[locale?]/...
-  //    e.g. /m/jamia or /m/jamia/sk or /m/demo/cs/colors
+  // 3. Hostname & Subdomain Classification
+  // ---------------------------------------------------------------------------
+  const isMarketingHost =
+    hostWithoutPort === "logobook.sk" ||
+    hostWithoutPort === "www.logobook.sk" ||
+    hostWithoutPort === "logobook.eu" ||
+    hostWithoutPort === "www.logobook.eu" ||
+    hostWithoutPort === "localhost" ||
+    hostWithoutPort.endsWith(".sslip.io"); // Coolify temp domain root
+
+  // Subdomain on logobook.sk or logobook.eu (e.g. demo.logobook.eu or brand.logobook.eu)
+  let domain = "";
+  if (!isMarketingHost) {
+    if (hostWithoutPort.endsWith(".logobook.sk")) {
+      const subdomain = hostWithoutPort.replace(/\.logobook\.sk$/, "");
+      if (subdomain && subdomain !== "www") {
+        domain = subdomain;
+      }
+    } else if (hostWithoutPort.endsWith(".logobook.eu")) {
+      const subdomain = hostWithoutPort.replace(/\.logobook\.eu$/, "");
+      if (subdomain && subdomain !== "www") {
+        domain = subdomain;
+      }
+    } else if (hostWithoutPort.endsWith(".localhost")) {
+      const subdomain = hostWithoutPort.replace(/\.localhost$/, "");
+      if (subdomain && subdomain !== "www") {
+        domain = subdomain;
+      }
+    } else {
+      // Custom domain (e.g. brand.klient.sk or custom.com)
+      domain = hostWithoutPort;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 4. Subdomain clean URL handling & /m/ redirect
+  // ---------------------------------------------------------------------------
+  if (domain) {
+    // If user accesses /m/[domain]/[rest] on subdomain (e.g. demo.logobook.eu/m/demo/foo)
+    // redirect 301 to clean URL: demo.logobook.eu/foo
+    if (pathname.startsWith("/m/")) {
+      const segments = pathname.replace(/^\/m\//, "").split("/").filter(Boolean);
+      // Remove domain slug if it matches current subdomain (e.g. /m/demo/foo -> /foo)
+      const rest = segments[0] === domain ? segments.slice(1) : segments;
+      const cleanPath = rest.length > 0 ? `/${rest.join("/")}` : "/";
+      const redirectUrl = new URL(cleanPath, req.url);
+      redirectUrl.search = url.search;
+      return NextResponse.redirect(redirectUrl, 301);
+    }
+
+    // Rewrite clean paths directly to internal manual
+    const pathSegments = pathname.split("/").filter(Boolean);
+    const firstSegment = pathSegments[0];
+    const { locale, isFromPath } = resolveLocale(req, firstSegment);
+    const restParts = isFromPath ? pathSegments.slice(1) : pathSegments;
+    const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "";
+
+    const targetUrl = new URL(`/manual/${domain}/${locale}${restPath}`, req.url);
+    targetUrl.search = url.search;
+
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-brand-domain", domain);
+    requestHeaders.set("x-brand-locale", locale);
+
+    const res = NextResponse.rewrite(targetUrl, {
+      request: { headers: requestHeaders },
+    });
+    res.cookies.set("NEXT_LOCALE", locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
+    return res;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5. Dev / Marketing host path routing: /m/[domain]/[locale?]/...
+  //    e.g. logobook.eu/m/demo or logobook.eu/m/demo/sk
   // ---------------------------------------------------------------------------
   if (pathname.startsWith("/m/")) {
     const segments = pathname.replace(/^\/m\//, "").split("/").filter(Boolean);
@@ -140,7 +212,7 @@ export function middleware(req: NextRequest) {
   }
 
   // ---------------------------------------------------------------------------
-  // 4. Query param domain support: ?domain=acme or ?brand=acme
+  // 6. Query param domain support: ?domain=acme or ?brand=acme
   // ---------------------------------------------------------------------------
   const queryDomain = url.searchParams.get("domain") || url.searchParams.get("brand");
   if (queryDomain && !pathname.startsWith("/manual")) {
@@ -155,65 +227,6 @@ export function middleware(req: NextRequest) {
 
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set("x-brand-domain", queryDomain);
-    requestHeaders.set("x-brand-locale", locale);
-
-    const res = NextResponse.rewrite(targetUrl, {
-      request: { headers: requestHeaders },
-    });
-    res.cookies.set("NEXT_LOCALE", locale, { path: "/", maxAge: 31536000, sameSite: "lax" });
-    return res;
-  }
-
-  // ---------------------------------------------------------------------------
-  // 5. Hostname & Subdomain Classification
-  // ---------------------------------------------------------------------------
-  const isMarketingHost =
-    hostWithoutPort === "logobook.sk" ||
-    hostWithoutPort === "www.logobook.sk" ||
-    hostWithoutPort === "logobook.eu" ||
-    hostWithoutPort === "www.logobook.eu" ||
-    hostWithoutPort === "localhost" ||
-    hostWithoutPort.endsWith(".sslip.io"); // Coolify temp domain root
-
-  if (isMarketingHost) {
-    // Marketing site
-    return NextResponse.next();
-  }
-
-  // Subdomain on logobook.sk or logobook.eu (e.g. demo.logobook.eu or brand.logobook.eu)
-  let domain = "";
-  if (hostWithoutPort.endsWith(".logobook.sk")) {
-    const subdomain = hostWithoutPort.replace(/\.logobook\.sk$/, "");
-    if (subdomain && subdomain !== "www") {
-      domain = subdomain;
-    }
-  } else if (hostWithoutPort.endsWith(".logobook.eu")) {
-    const subdomain = hostWithoutPort.replace(/\.logobook\.eu$/, "");
-    if (subdomain && subdomain !== "www") {
-      domain = subdomain;
-    }
-  } else if (hostWithoutPort.endsWith(".localhost")) {
-    const subdomain = hostWithoutPort.replace(/\.localhost$/, "");
-    if (subdomain && subdomain !== "www") {
-      domain = subdomain;
-    }
-  } else {
-    // Custom domain (e.g. brand.klient.sk or custom.com)
-    domain = hostWithoutPort;
-  }
-
-  if (domain) {
-    const pathSegments = pathname.split("/").filter(Boolean);
-    const firstSegment = pathSegments[0];
-    const { locale, isFromPath } = resolveLocale(req, firstSegment);
-    const restParts = isFromPath ? pathSegments.slice(1) : pathSegments;
-    const restPath = restParts.length > 0 ? `/${restParts.join("/")}` : "";
-
-    const targetUrl = new URL(`/manual/${domain}/${locale}${restPath}`, req.url);
-    targetUrl.search = url.search;
-
-    const requestHeaders = new Headers(req.headers);
-    requestHeaders.set("x-brand-domain", domain);
     requestHeaders.set("x-brand-locale", locale);
 
     const res = NextResponse.rewrite(targetUrl, {

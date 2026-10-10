@@ -43,6 +43,13 @@ export function PageRenderer({
   const breadcrumbs = useMemo(() => {
     const items: Array<{ id: string; slug: string; title: string; href: string }> = [];
 
+    const isSubdomainOrCustom =
+      typeof window !== "undefined" &&
+      !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
+        window.location.hostname.toLowerCase()
+      ) &&
+      !window.location.hostname.toLowerCase().endsWith(".sslip.io");
+
     if (allPages && page.parent) {
       const visited = new Set<string>();
       let currParentId: string | undefined = page.parent;
@@ -56,7 +63,9 @@ export function PageRenderer({
             id: parentPage.id,
             slug: parentPage.slug,
             title: parentTitle,
-            href: `/m/${brandSlug || "logobook"}/${parentPage.slug}`,
+            href: isSubdomainOrCustom
+              ? `/${parentPage.slug}`
+              : `/m/${brandSlug || "logobook"}/${parentPage.slug}`,
           });
           currParentId = parentPage.parent;
         } else {
@@ -81,7 +90,15 @@ export function PageRenderer({
             {/* Brand Home Link */}
             {brandName && (
               <Link
-                href={`/m/${brandSlug || "logobook"}`}
+                href={
+                  typeof window !== "undefined" &&
+                  !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
+                    window.location.hostname.toLowerCase()
+                  ) &&
+                  !window.location.hostname.toLowerCase().endsWith(".sslip.io")
+                    ? "/"
+                    : `/m/${brandSlug || "logobook"}`
+                }
                 className="hover:text-foreground hover:underline transition-colors"
               >
                 {brandName}

@@ -136,6 +136,19 @@ export function PublicManualSidebar({
   // Resolve target link URL
   const getPageHref = (slug: string) => {
     if (typeof window !== "undefined") {
+      const host = window.location.hostname.toLowerCase();
+      const isSubdomainOrCustom =
+        host !== "logobook.sk" &&
+        host !== "www.logobook.sk" &&
+        host !== "logobook.eu" &&
+        host !== "www.logobook.eu" &&
+        host !== "localhost" &&
+        !host.endsWith(".sslip.io");
+
+      if (isSubdomainOrCustom) {
+        return slug ? `/${slug}` : "/";
+      }
+
       const path = window.location.pathname;
       if (path.startsWith("/manual/")) {
         return `/manual/${domain}/${locale}/${slug}`;

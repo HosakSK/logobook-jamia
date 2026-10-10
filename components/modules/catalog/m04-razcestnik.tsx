@@ -348,6 +348,17 @@ export default function M04RazcestnikModule({
     if (isEditor) {
       return `/admin/brand/${currentBrand}/builder/${finalSlug}`;
     } else {
+      const isSubdomainOrCustom =
+        typeof window !== "undefined" &&
+        !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
+          window.location.hostname.toLowerCase()
+        ) &&
+        !window.location.hostname.toLowerCase().endsWith(".sslip.io");
+
+      if (isSubdomainOrCustom) {
+        return `/${finalSlug}`;
+      }
+
       let prefix = "";
       if (typeof window !== "undefined") {
         const path = window.location.pathname;

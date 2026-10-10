@@ -89,7 +89,13 @@ export function PublishedManualView({
           {rootChapters.map((page) => {
             const isActive = isChapterActive(page);
             const title = getLocalized(page.title) || page.slug;
-            const href = `/m/${brandSlug}/${page.slug}`;
+            const isSubdomainOrCustom =
+              typeof window !== "undefined" &&
+              !["logobook.sk", "www.logobook.sk", "logobook.eu", "www.logobook.eu", "localhost"].includes(
+                window.location.hostname.toLowerCase()
+              ) &&
+              !window.location.hostname.toLowerCase().endsWith(".sslip.io");
+            const href = isSubdomainOrCustom ? `/${page.slug}` : `/m/${brandSlug}/${page.slug}`;
 
             return (
               <Link
