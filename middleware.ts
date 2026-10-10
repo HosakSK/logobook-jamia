@@ -151,6 +151,12 @@ export function middleware(req: NextRequest) {
   // 4. Subdomain clean URL handling & /m/ redirect
   // ---------------------------------------------------------------------------
   if (domain) {
+    // If request is for a static asset file with an extension (e.g. /logo/..., .svg, .png, .jpg, .ico, etc.)
+    // let Next.js serve it directly from public/
+    if (/\.[a-zA-Z0-9]+$/.test(pathname)) {
+      return NextResponse.next();
+    }
+
     // If user accesses /m/[domain]/[rest] on subdomain (e.g. demo.logobook.eu/m/demo/foo)
     // redirect 301 to clean URL: demo.logobook.eu/foo
     if (pathname.startsWith("/m/")) {
