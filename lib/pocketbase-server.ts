@@ -4,7 +4,7 @@ import { cookies, headers } from "next/headers";
 const pbUrl =
   process.env.NEXT_PUBLIC_POCKETBASE_URL ||
   process.env.POCKETBASE_INTERNAL_URL ||
-  "http://pocketbase-slkwd3bakl5khufyiyd27tth.89.168.121.252.sslip.io";
+  "https://pb.logobook.eu";
 
 /**
  * Returns a new PocketBase instance populated with session from Next.js cookies
