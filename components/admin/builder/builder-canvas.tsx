@@ -534,9 +534,72 @@ export function BuilderCanvas({
 
   const isDarkCanvas = tokens?.theme?.isDark ?? true;
 
+  const sanitizePbUrl = (url?: string | null) => {
+    if (!url) return undefined;
+    if (url.includes("89.168.121.252.sslip.io")) {
+      const activePb = process.env.NEXT_PUBLIC_POCKETBASE_URL || "https://pb.logobook.eu";
+      return url.replace(/https?:\/\/[^/]+\.89\.168\.121\.252\.sslip\.io/, activePb);
+    }
+    return url;
+  };
+
+  const patternConfig = tokens?.themeConfig?.pattern;
+  const activePatternUrl = sanitizePbUrl(patternConfig?.patternUrl);
+  const isPatternActive = Boolean(patternConfig?.enabled && activePatternUrl);
+
+  const bgPositionCss = React.useMemo(() => {
+    const pos = patternConfig?.position || "center";
+    const margin = patternConfig?.marginPx ?? 0;
+    if (margin === 0) {
+      switch (pos) {
+        case "top-left": return "left top";
+        case "top-center": return "center top";
+        case "top-right": return "right top";
+        case "bottom-left": return "left bottom";
+        case "bottom-center": return "center bottom";
+        case "bottom-right": return "right bottom";
+        case "center":
+        default: return "center center";
+      }
+    }
+    switch (pos) {
+      case "top-left": return `left ${margin}px top ${margin}px`;
+      case "top-center": return `center top ${margin}px`;
+      case "top-right": return `right ${margin}px top ${margin}px`;
+      case "bottom-left": return `left ${margin}px bottom ${margin}px`;
+      case "bottom-center": return `center bottom ${margin}px`;
+      case "bottom-right": return `right ${margin}px bottom ${margin}px`;
+      case "center":
+      default: return "center center";
+    }
+  }, [patternConfig?.position, patternConfig?.marginPx]);
+
+  const gradientCss = React.useMemo(() => {
+    if (!patternConfig?.overlayGradient?.enabled) return "";
+    const dir = patternConfig.overlayGradient.direction || "to-bottom";
+    const bg = tokens?.manualBgColor || "var(--background)";
+    const spread = patternConfig.overlayGradient.spreadPercent ?? 60;
+    if (dir === "radial") {
+      const centerTransparent = Math.max(0, 100 - spread);
+      return `radial-gradient(circle at center, transparent 0%, transparent ${centerTransparent * 0.4}%, ${bg} ${100 - (centerTransparent * 0.2)}%)`;
+    }
+    const dirMap: Record<string, string> = {
+      "to-bottom": "to bottom",
+      "to-top": "to top",
+      "to-right": "to right",
+      "to-left": "to left",
+      "to-bottom-right": "to bottom right",
+      "to-bottom-left": "to bottom left",
+    };
+    const cssDir = dirMap[dir] || "to bottom";
+    const solidStop = Math.min(100, Math.max(0, spread));
+    const transStop = Math.max(0, 100 - solidStop);
+    return `linear-gradient(${cssDir}, ${bg} 0%, ${bg} ${solidStop * 0.75}%, transparent ${Math.min(100, solidStop + transStop * 0.6)}%, transparent 100%)`;
+  }, [patternConfig, tokens?.manualBgColor]);
+
   return (
     <div
-      className={`flex-1 space-y-6 max-w-5xl rounded-[6px] p-6 border shadow-sm transition-colors ${
+      className={`flex-1 space-y-6 max-w-5xl rounded-[6px] p-6 border shadow-sm transition-colors relative overflow-hidden ${
         isDarkCanvas ? "dark" : "light"
       }`}
       data-theme={isDarkCanvas ? "dark" : "light"}
@@ -547,17 +610,50 @@ export function BuilderCanvas({
         colorScheme: isDarkCanvas ? "dark" : "light",
       }}
     >
-      {/* Page Header Bar */}
-      <div
-        className="border rounded-[3px] p-5 shadow-2xs space-y-3"
-        style={{
-          backgroundColor: "var(--card)",
-          borderColor: "var(--border)",
-          color: "var(--foreground)",
-        }}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1.5">
+      {/* Background Pattern Layer */}
+      {patternConfig && isPatternActive && activePatternUrl && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0 rounded-[6px]"
+          style={{
+            backgroundImage: `url(${activePatternUrl})`,
+            backgroundRepeat: patternConfig.patternType === "repeat" ? "repeat" : "no-repeat",
+            backgroundSize:
+              patternConfig.patternType === "cover"
+                ? "cover"
+                : patternConfig.patternType === "contain"
+                ? "contain"
+                : patternConfig.patternType === "zoom" || patternConfig.patternType === "single" || patternConfig.patternType === "repeat"
+                ? `${patternConfig.zoomPercent ?? 100}%`
+                : "auto",
+            backgroundPosition: bgPositionCss,
+            opacity: patternConfig.opacity ?? 0.15,
+          }}
+        />
+      )}
+
+      {/* Background Gradient Fade-out Overlay */}
+      {isPatternActive && gradientCss && (
+        <div
+          className="absolute inset-0 pointer-events-none z-0 rounded-[6px]"
+          style={{
+            background: gradientCss,
+          }}
+        />
+      )}
+
+      {/* Canvas Content (Elevated above background pattern layer) */}
+      <div className="relative z-10 space-y-6">
+        {/* Page Header Bar */}
+        <div
+          className="border rounded-[3px] p-5 shadow-2xs space-y-3"
+          style={{
+            backgroundColor: "var(--card)",
+            borderColor: "var(--border)",
+            color: "var(--foreground)",
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1.5">
             {/* Clickable Ancestor Breadcrumb Trail */}
             <nav aria-label="Drobková navigácia" className="flex flex-wrap items-center gap-1.5 text-xs font-mono text-muted-foreground">
               <Link
@@ -1177,6 +1273,7 @@ export function BuilderCanvas({
           </div>
         </div>
       )}
+      </div>
 
       {/* Module Configuration Modal (Pure GUI) */}
       {editingModule && (() => {

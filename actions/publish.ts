@@ -64,6 +64,8 @@ export interface PublishedBrandSnapshot {
     showHeaderBrandName?: boolean;
     favicon?: string;
     hideLogobookBadge?: boolean;
+    themeConfig?: any;
+    manualBgColor?: string;
   };
   pages: PublishedPageItem[];
 }
@@ -289,6 +291,19 @@ export async function publishBrandAction(brandId: string): Promise<{
       }
     }
 
+    // Resolve themeConfig & manualBgColor from globalShapes
+    let snapshotThemeConfig: any = undefined;
+    let snapshotManualBgColor: string | undefined = undefined;
+    try {
+      const shapesRec = await pb.collection("globalShapes").getFirstListItem(`brand = "${brand.id}"`);
+      if (shapesRec) {
+        if (shapesRec.themeConfig) snapshotThemeConfig = shapesRec.themeConfig;
+        if (shapesRec.manualBgColor) snapshotManualBgColor = shapesRec.manualBgColor;
+      }
+    } catch {
+      // no shapes record
+    }
+
     const snapshot: PublishedBrandSnapshot = {
       brandId: brand.id,
       publishedAt,
@@ -311,6 +326,8 @@ export async function publishBrandAction(brandId: string): Promise<{
           : true,
         favicon: brand.favicon || undefined,
         hideLogobookBadge: brand.hideLogobookBadge || false,
+        themeConfig: snapshotThemeConfig,
+        manualBgColor: snapshotManualBgColor,
       },
       pages: publishedPages,
     };

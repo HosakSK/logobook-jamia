@@ -103,8 +103,18 @@ export function PublicManualShell({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const sanitizePbUrl = (url?: string | null) => {
+    if (!url) return undefined;
+    if (url.includes("89.168.121.252.sslip.io")) {
+      const activePb = process.env.NEXT_PUBLIC_POCKETBASE_URL || "https://pb.logobook.eu";
+      return url.replace(/https?:\/\/[^/]+\.89\.168\.121\.252\.sslip\.io/, activePb);
+    }
+    return url;
+  };
+
   const patternConfig = tokens?.themeConfig?.pattern;
-  const isPatternActive = Boolean(patternConfig?.enabled && patternConfig.patternUrl);
+  const activePatternUrl = sanitizePbUrl(patternConfig?.patternUrl);
+  const isPatternActive = Boolean(patternConfig?.enabled && activePatternUrl);
 
   // Helper for background position CSS
   const bgPositionCss = useMemo(() => {
@@ -187,11 +197,11 @@ export function PublicManualShell({
       className={`${isDarkBg ? "dark" : "light"} min-h-screen flex flex-col text-foreground selection:bg-neutral-900 selection:text-white dark:selection:bg-white dark:selection:text-neutral-900 transition-colors relative`}
     >
       {/* Background Pattern Layer (Strictly behind all content with negative z-index) */}
-      {isPatternActive && patternConfig?.patternUrl && (
+      {patternConfig && isPatternActive && activePatternUrl && (
         <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
-            backgroundImage: `url(${patternConfig.patternUrl})`,
+            backgroundImage: `url(${activePatternUrl})`,
             backgroundRepeat:
               patternConfig.patternType === "repeat"
                 ? "repeat"

@@ -43,7 +43,18 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
         .collection("globalShapes")
         .getFirstListItem<GlobalShapesRecord>(`brand = "${targetBrandId}"`);
     } catch {
-      // Shapes record not yet created -> defaults apply
+      // Shapes record not yet created or unauthenticated -> check if brand has publishedConfig fallback
+      try {
+        const bRec = await pb.collection("brands").getOne(targetBrandId);
+        if (bRec?.publishedConfig?.brand?.themeConfig) {
+          shapes = {
+            themeConfig: bRec.publishedConfig.brand.themeConfig,
+            manualBgColor: bRec.publishedConfig.brand.manualBgColor,
+          } as any;
+        }
+      } catch {
+        // defaults apply
+      }
     }
 
     // 2. Fetch global colors

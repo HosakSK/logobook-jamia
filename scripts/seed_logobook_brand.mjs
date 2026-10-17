@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-const PB_URL = 'http://pocketbase-slkwd3bakl5khufyiyd27tth.89.168.121.252.sslip.io';
-const BRAND_ID = 'w93g3ux3rkybxxa'; // Brand "Logobook"
+const PB_URL = process.env.POCKETBASE_URL || process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const BRAND_ID = process.env.BRAND_ID || 'w93g3ux3rkybxxa'; // Brand "Logobook"
 
 async function request(endpoint, options = {}) {
   const url = `${PB_URL}${endpoint}`;
@@ -1238,7 +1239,7 @@ async function main() {
   });
 
   console.log('🎉 Hotovo! Manuál Logobook pre Logobook bol úspešne vygenerovaný a publikovaný.');
-  console.log(`🔗 URL Manuálu: http://qgfd3o69bvxi73ybe3lzqwiy.89.168.121.252.sslip.io/m/logobook`);
+  console.log(`🔗 URL Manuálu: ${APP_URL}/m/logobook`);
 }
 
 main().catch(err => {
