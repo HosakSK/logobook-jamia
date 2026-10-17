@@ -17,7 +17,8 @@ export interface ManualPatternConfig {
   enabled: boolean;
   patternUrl?: string;
   patternType?: "repeat" | "cover" | "contain" | "zoom" | "single";
-  zoomPercent?: number; // e.g. 10 to 300, default 100
+  patternSizePx?: number; // size in px, e.g. 16 to 800, default 80
+  zoomPercent?: number; // legacy fallback
   position?: "center" | "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
   marginPx?: number; // offset margin in px, e.g. 0 to 160
   colorMode?: "original" | "primary" | "secondary" | "accent" | "custom";

@@ -212,7 +212,7 @@ export function PublicManualShell({
                 : patternConfig.patternType === "contain"
                 ? "contain"
                 : patternConfig.patternType === "zoom" || patternConfig.patternType === "single" || patternConfig.patternType === "repeat"
-                ? `${patternConfig.zoomPercent ?? 100}%`
+                ? `${patternConfig.patternSizePx ?? patternConfig.zoomPercent ?? 80}px`
                 : "auto",
             backgroundPosition: bgPositionCss,
             opacity: patternConfig.opacity ?? 0.15,

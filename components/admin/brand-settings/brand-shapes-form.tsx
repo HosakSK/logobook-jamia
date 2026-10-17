@@ -159,7 +159,9 @@ export function BrandShapesForm({
     "center" | "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"
   >(initialPattern?.position || "center");
   const [marginPx, setMarginPx] = useState<number>(initialPattern?.marginPx ?? 0);
-  const [zoomPercent, setZoomPercent] = useState<number>(initialPattern?.zoomPercent ?? 100);
+  const [patternSizePx, setPatternSizePx] = useState<number>(
+    initialPattern?.patternSizePx ?? initialPattern?.zoomPercent ?? 80
+  );
   const [patternOpacity, setPatternOpacity] = useState<number>(initialPattern?.opacity ?? 0.15);
   const [gradientEnabled, setGradientEnabled] = useState<boolean>(Boolean(initialPattern?.overlayGradient?.enabled));
   const [gradientDirection, setGradientDirection] = useState<
@@ -305,7 +307,8 @@ export function BrandShapesForm({
         enabled: patternEnabled,
         patternUrl,
         patternType,
-        zoomPercent,
+        patternSizePx,
+        zoomPercent: patternSizePx,
         position: patternPosition,
         marginPx,
         opacity: patternOpacity,
@@ -471,7 +474,7 @@ export function BrandShapesForm({
                     : patternType === "contain"
                     ? "contain"
                     : patternType === "zoom" || patternType === "single" || patternType === "repeat"
-                    ? `${zoomPercent || 100}%`
+                    ? `${patternSizePx || 80}px`
                     : "auto",
                 backgroundPosition: previewBgPositionCss,
                 opacity: patternOpacity,
@@ -1322,26 +1325,26 @@ export function BrandShapesForm({
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs font-medium">
-                  <Label>Mierka / Zoom</Label>
-                  <span className="font-mono text-muted-foreground">{zoomPercent}%</span>
+                  <Label>Veľkosť vzoru / dlaždice</Label>
+                  <span className="font-mono text-muted-foreground">{patternSizePx}px</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
-                    min="1"
-                    max="300"
-                    step="1"
-                    value={zoomPercent}
-                    onChange={(e) => setZoomPercent(Number(e.target.value))}
+                    min="16"
+                    max="800"
+                    step="2"
+                    value={patternSizePx}
+                    onChange={(e) => setPatternSizePx(Number(e.target.value))}
                     className="flex-1 accent-primary h-2 bg-neutral-800 rounded-lg cursor-pointer"
                   />
                   <Input
                     type="number"
-                    min="1"
-                    max="300"
-                    value={zoomPercent}
-                    onChange={(e) => setZoomPercent(Number(e.target.value))}
-                    className="w-16 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
+                    min="16"
+                    max="800"
+                    value={patternSizePx}
+                    onChange={(e) => setPatternSizePx(Number(e.target.value))}
+                    className="w-20 h-8 text-xs rounded-md text-center font-mono bg-[#070b0f]"
                   />
                 </div>
               </div>
@@ -1499,7 +1502,7 @@ export function BrandShapesForm({
                           : patternType === "contain"
                           ? "contain"
                           : patternType === "zoom" || patternType === "single" || patternType === "repeat"
-                          ? `${zoomPercent || 100}%`
+                          ? `${patternSizePx || 80}px`
                           : "auto",
                       backgroundPosition: previewBgPositionCss,
                       opacity: patternOpacity,
