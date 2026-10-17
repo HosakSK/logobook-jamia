@@ -4,6 +4,7 @@ import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { VerificationBanner } from "@/components/verification-banner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
+import { resolveBrandFaviconUrl } from "@/lib/utils/brand-media";
 
 export default async function AdminLayout({
   children,
@@ -33,14 +34,18 @@ export default async function AdminLayout({
       }
     : null;
 
-  let availableBrands: { id: string; slug: string; name: string }[] = [];
+  let availableBrands: { id: string; slug: string; name: string; iconUrl?: string | null }[] = [];
   if (user) {
     try {
-      const records = await pb.collection("brands").getFullList();
+      const records = await pb.collection("brands").getFullList({
+        expand: "favicon",
+        sort: "-updated",
+      });
       availableBrands = records.map((b) => ({
         id: b.id,
         slug: b.slug,
         name: b.name,
+        iconUrl: resolveBrandFaviconUrl(b, pb),
       }));
     } catch (err) {
       console.error("Failed to load user brands in layout:", err);

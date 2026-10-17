@@ -299,8 +299,15 @@ export default async function BrandSettingsPage({
         dict={dict}
       />
 
-      {/* 3. Favicon Upload */}
-      <BrandFaviconForm brandId={brand.id} initialFaviconUrl={faviconUrl} dict={dict} />
+      {/* 3. Favicon & Brand Icon Studio */}
+      <BrandFaviconForm
+        brandId={brand.id}
+        initialFaviconUrl={faviconUrl}
+        dict={dict}
+        brandName={brand.name}
+        brandColors={brandColors}
+        defaultRadiusMode={globalShapes?.radiusMode}
+      />
 
       {/* 3. Global Shapes & Theme (Corner radius, border width, theme & background) */}
       <BrandShapesForm

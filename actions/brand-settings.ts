@@ -166,16 +166,28 @@ export async function uploadBrandFaviconAction(
 
     const mediaAsset = await pb.collection("mediaAssets").create(assetPayload);
 
+    const finalUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
+    const existingDesc = (typeof brand.description === "object" && brand.description !== null)
+      ? { ...brand.description }
+      : {};
+    existingDesc.faviconUrl = finalUrl;
+
     // Link in brands collection
     await pb.collection("brands").update(brand.id, {
       favicon: mediaAsset.id,
+      description: existingDesc,
     });
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}`);
+    revalidatePath(`/admin/brand/${brand.slug}`);
+    revalidatePath("/admin");
+    revalidatePath(`/manual/${brand.slug}`, "layout");
+    revalidatePath(`/m/${brand.slug}`, "layout");
     return {
       success: true,
-      faviconUrl: pb.files.getURL(mediaAsset, mediaAsset.file),
+      faviconUrl: finalUrl,
     };
   } catch (err: unknown) {
     console.error("Failed to upload favicon:", err);
@@ -277,6 +289,9 @@ export async function setBrandFaviconAction(
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
+    revalidatePath(`/admin/brand/${brand.id}`);
+    revalidatePath(`/admin/brand/${brand.slug}`);
+    revalidatePath("/admin");
     revalidatePath(`/manual/${brand.slug}`, "layout");
     revalidatePath(`/m/${brand.slug}`, "layout");
     return {

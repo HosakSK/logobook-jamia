@@ -5,6 +5,7 @@ export interface ActiveBrand {
   id: string;
   slug: string;
   name: string;
+  iconUrl?: string | null;
 }
 
 interface BrandState {

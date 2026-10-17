@@ -31,6 +31,7 @@ export interface BrandItem {
   role: "OWNER" | "EDITOR" | "VIEWER" | string;
   description?: string;
   updated?: string;
+  iconUrl?: string | null;
 }
 
 interface BrandGridProps {
@@ -100,9 +101,19 @@ export function BrandGrid({ brands, locale = DEFAULT_LOCALE }: BrandGridProps) {
                   {/* Top Row: Avatar monogram, Status Badge, Role */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-[3px] bg-primary text-primary-foreground font-extrabold flex items-center justify-center text-sm shadow-xs">
-                        {initials}
-                      </div>
+                      {brand.iconUrl ? (
+                        <div className="h-10 w-10 rounded-[4px] bg-[#070b0f] border border-white/10 flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                          <img
+                            src={brand.iconUrl}
+                            alt={brand.name}
+                            className="h-full w-full object-contain p-1"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-10 w-10 rounded-[3px] bg-primary text-primary-foreground font-extrabold flex items-center justify-center text-sm shadow-xs">
+                          {initials}
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-semibold text-base text-foreground leading-tight group-hover:text-primary transition-colors">
                           {brand.name}

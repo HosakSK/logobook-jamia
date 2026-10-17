@@ -11,6 +11,7 @@ import {
   Locale,
   getLocalizedValue,
 } from "@/lib/i18n";
+import { resolveBrandFaviconUrl } from "@/lib/utils/brand-media";
 import { FolderKanban, HardDrive, ShieldCheck, Zap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +32,10 @@ export default async function AdminDashboardPage() {
   // 1. Fetch user's accessible brands from PocketBase
   let brandsRaw: any[] = [];
   try {
-    brandsRaw = await pb.collection("brands").getFullList();
+    brandsRaw = await pb.collection("brands").getFullList({
+      expand: "favicon",
+      sort: "-updated",
+    });
   } catch (err) {
     console.error("Failed to fetch brands in admin dashboard:", err);
   }
@@ -63,6 +67,7 @@ export default async function AdminDashboardPage() {
       role,
       description: getLocalizedValue(b.description, currentLocale) || undefined,
       updated: b.updated,
+      iconUrl: resolveBrandFaviconUrl(b, pb),
     };
   });
 

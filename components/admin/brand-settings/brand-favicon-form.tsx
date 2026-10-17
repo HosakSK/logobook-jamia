@@ -1,79 +1,509 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { setBrandFaviconAction } from "@/actions/brand-settings";
+import React, { useState, useEffect, useRef, useTransition } from "react";
+import { setBrandFaviconAction, uploadBrandFaviconAction } from "@/actions/brand-settings";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Dictionary } from "@/lib/i18n";
-import { Check, AlertCircle, Loader2, Sparkles, FolderOpen, Trash2 } from "lucide-react";
-import { UniversalMediaPickerModal, SelectedMediaItem } from "@/components/admin/media/universal-media-picker-modal";
+import {
+  Check,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  FolderOpen,
+  Trash2,
+  Upload,
+  RefreshCw,
+  Palette,
+  Maximize2,
+  Sliders,
+  Globe,
+  Layout,
+  Smartphone,
+  CheckCircle2,
+  Layers,
+} from "lucide-react";
+import {
+  UniversalMediaPickerModal,
+  SelectedMediaItem,
+} from "@/components/admin/media/universal-media-picker-modal";
+
+interface BrandColorItem {
+  hex: string;
+  role?: string;
+  name?: string;
+}
 
 interface BrandFaviconFormProps {
   brandId: string;
   initialFaviconUrl?: string | null;
   dict: Dictionary;
+  brandName?: string;
+  brandColors?: BrandColorItem[];
+  defaultRadiusMode?: string;
 }
 
-export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFaviconFormProps) {
+type ContainerShape = "squircle" | "circle" | "rounded" | "square" | "transparent";
+type SymbolTint = "original" | "white" | "dark" | "primary" | "custom";
+
+export function BrandFaviconForm({
+  brandId,
+  initialFaviconUrl,
+  dict,
+  brandName = "Brand",
+  brandColors = [],
+  defaultRadiusMode = "rounded",
+}: BrandFaviconFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [savedFaviconUrl, setSavedFaviconUrl] = useState<string | null>(initialFaviconUrl || null);
-  const [selectedItem, setSelectedItem] = useState<SelectedMediaItem | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(initialFaviconUrl || null);
+
+  // Active Mode: "studio" (interactive generator) vs "direct" (direct upload/file link)
+  const [mode, setMode] = useState<"studio" | "direct">("studio");
+
+  // Studio Settings
+  const primaryBrandColor = brandColors.find((c) => c.role?.toUpperCase() === "PRIMARY")?.hex ||
+    brandColors[0]?.hex ||
+    "#c8d400";
+  const secondaryBrandColor = brandColors.find((c) => c.role?.toUpperCase() === "SECONDARY")?.hex ||
+    brandColors[1]?.hex ||
+    "#009f80";
+
+  const [sourceSymbolUrl, setSourceSymbolUrl] = useState<string | null>(initialFaviconUrl || null);
+  const [rawSvgContent, setRawSvgContent] = useState<string | null>(null);
+
+  const initialShape: ContainerShape =
+    defaultRadiusMode === "PILL"
+      ? "circle"
+      : defaultRadiusMode === "SQUARE"
+      ? "square"
+      : "squircle";
+
+  const [shape, setShape] = useState<ContainerShape>(initialShape);
+  const [bgColor, setBgColor] = useState<string>("#0e161d");
+  const [isTransparentBg, setIsTransparentBg] = useState<boolean>(false);
+  const [paddingPercent, setPaddingPercent] = useState<number>(20);
+  const [symbolTint, setSymbolTint] = useState<SymbolTint>("original");
+  const [customTintColor, setCustomTintColor] = useState<string>("#ffffff");
+
+  // Output generated live preview
+  const [studioPreviewUrl, setStudioPreviewUrl] = useState<string | null>(initialFaviconUrl || null);
+  const [isRendering, setIsRendering] = useState<boolean>(false);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  // When media is picked from modal, update preview and mark as pending save
+  // Hidden offscreen canvas for rendering
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const directFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Load SVG content if source is an SVG string or URL
+  useEffect(() => {
+    if (!sourceSymbolUrl) {
+      setRawSvgContent(null);
+      return;
+    }
+
+    if (sourceSymbolUrl.startsWith("data:image/svg+xml")) {
+      try {
+        const base64Part = sourceSymbolUrl.split(",")[1];
+        const decoded = atob(base64Part);
+        setRawSvgContent(decoded);
+      } catch {
+        setRawSvgContent(null);
+      }
+      return;
+    }
+
+    const isSvgUrl =
+      sourceSymbolUrl.toLowerCase().includes(".svg") ||
+      sourceSymbolUrl.includes("/api/assets/") ||
+      sourceSymbolUrl.includes("/svg");
+
+    if (isSvgUrl) {
+      fetch(sourceSymbolUrl)
+        .then((res) => {
+          if (res.ok) return res.text();
+          throw new Error("Failed to load SVG");
+        })
+        .then((text) => {
+          if (text.includes("<svg")) {
+            setRawSvgContent(text);
+          } else {
+            setRawSvgContent(null);
+          }
+        })
+        .catch(() => {
+          setRawSvgContent(null);
+        });
+    } else {
+      setRawSvgContent(null);
+    }
+  }, [sourceSymbolUrl]);
+
+  // Main Canvas Render Engine (512x512 Master)
+  useEffect(() => {
+    if (!sourceSymbolUrl) {
+      setStudioPreviewUrl(null);
+      return;
+    }
+
+    let isMounted = true;
+    setIsRendering(true);
+
+    const canvas = canvasRef.current || document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) {
+      setIsRendering(false);
+      return;
+    }
+
+    // Prepare modified SVG or direct image
+    let effectiveImgSrc = sourceSymbolUrl;
+    let objectUrlToRevoke: string | null = null;
+
+    if (rawSvgContent && symbolTint !== "original") {
+      try {
+        const targetColor =
+          symbolTint === "white"
+            ? "#ffffff"
+            : symbolTint === "dark"
+            ? "#0e161d"
+            : symbolTint === "primary"
+            ? primaryBrandColor
+            : customTintColor;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rawSvgContent, "image/svg+xml");
+        const svgEl = doc.querySelector("svg");
+
+        if (svgEl) {
+          const allEls = svgEl.querySelectorAll("*");
+          allEls.forEach((el) => {
+            const fill = el.getAttribute("fill");
+            if (fill && fill !== "none") {
+              el.setAttribute("fill", targetColor);
+            }
+            const stroke = el.getAttribute("stroke");
+            if (stroke && stroke !== "none") {
+              el.setAttribute("stroke", targetColor);
+            }
+          });
+
+          const serializer = new XMLSerializer();
+          const modifiedXml = serializer.serializeToString(doc);
+          const blob = new Blob([modifiedXml], { type: "image/svg+xml;charset=utf-8" });
+          objectUrlToRevoke = URL.createObjectURL(blob);
+          effectiveImgSrc = objectUrlToRevoke;
+        }
+      } catch (err) {
+        console.error("Failed to tint SVG:", err);
+      }
+    }
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (!isMounted) {
+        if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+        return;
+      }
+
+      ctx.clearRect(0, 0, 512, 512);
+
+      // 1. Draw Background Shape
+      if (!isTransparentBg && shape !== "transparent") {
+        ctx.fillStyle = bgColor;
+        ctx.beginPath();
+
+        if (shape === "circle") {
+          ctx.arc(256, 256, 256, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (shape === "squircle") {
+          // Modern squircle with 115px radius on 512px canvas (~22.5%)
+          if (typeof ctx.roundRect === "function") {
+            ctx.roundRect(0, 0, 512, 512, 115);
+          } else {
+            drawFallbackRoundRect(ctx, 0, 0, 512, 512, 115);
+          }
+          ctx.fill();
+        } else if (shape === "rounded") {
+          // Gentle rounding 56px
+          if (typeof ctx.roundRect === "function") {
+            ctx.roundRect(0, 0, 512, 512, 56);
+          } else {
+            drawFallbackRoundRect(ctx, 0, 0, 512, 512, 56);
+          }
+          ctx.fill();
+        } else {
+          // Plain square
+          ctx.fillRect(0, 0, 512, 512);
+        }
+      }
+
+      // 2. Draw Symbol Centered with Padding
+      const padPx = (512 * paddingPercent) / 100;
+      const maxInnerW = Math.max(32, 512 - padPx * 2);
+      const maxInnerH = Math.max(32, 512 - padPx * 2);
+
+      const naturalW = img.naturalWidth || img.width || 100;
+      const naturalH = img.naturalHeight || img.height || 100;
+      const imgRatio = naturalW / naturalH;
+
+      let drawW = maxInnerW;
+      let drawH = drawW / imgRatio;
+
+      if (drawH > maxInnerH) {
+        drawH = maxInnerH;
+        drawW = drawH * imgRatio;
+      }
+
+      const drawX = (512 - drawW) / 2;
+      const drawY = (512 - drawH) / 2;
+
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+      try {
+        const dataUrl = canvas.toDataURL("image/png");
+        setStudioPreviewUrl(dataUrl);
+      } catch (err) {
+        console.warn("Could not generate dataURL (likely CORS tainted image):", err);
+        setStudioPreviewUrl(sourceSymbolUrl);
+      }
+
+      setIsRendering(false);
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+    };
+
+    img.onerror = () => {
+      setIsRendering(false);
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+    };
+
+    img.src = effectiveImgSrc;
+
+    return () => {
+      isMounted = false;
+      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
+    };
+  }, [
+    sourceSymbolUrl,
+    rawSvgContent,
+    shape,
+    bgColor,
+    isTransparentBg,
+    paddingPercent,
+    symbolTint,
+    customTintColor,
+    primaryBrandColor,
+  ]);
+
+  // Helper for roundRect fallback on older rendering engines
+  function drawFallbackRoundRect(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    r: number
+  ) {
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+  }
+
+  // Handle media selection from UniversalMediaPickerModal
   const handleMediaSelect = (item: SelectedMediaItem) => {
     setError(null);
-    setSelectedItem(item);
-    setPreviewUrl(item.url);
+    setSourceSymbolUrl(item.url);
+    setIsPickerOpen(false);
   };
 
-  const handleSaveFavicon = () => {
-    if (!selectedItem && previewUrl === savedFaviconUrl) return;
+  // Local file upload into studio (FileReader)
+  const handleLocalFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Súbor symbolu musí mať menej ako 5 MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      if (result) {
+        setError(null);
+        setSourceSymbolUrl(result);
+      }
+    };
+    reader.readAsDataURL(file);
+    // Reset file input
+    e.target.value = "";
+  };
+
+  // Save generated canvas PNG as brand favicon and icon
+  const handleSaveStudioIcon = () => {
     setError(null);
+
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      setError("Chyba inicializácie canvasu.");
+      return;
+    }
+
     startTransition(async () => {
-      const res = await setBrandFaviconAction(brandId, selectedItem ? (selectedItem.id || selectedItem.url) : previewUrl);
-      if (res.success) {
-        setSuccess(true);
-        const newUrl = res.faviconUrl || (selectedItem ? selectedItem.url : previewUrl);
-        setSavedFaviconUrl(newUrl);
-        setPreviewUrl(newUrl);
-        setSelectedItem(null);
-        setTimeout(() => setSuccess(false), 4000);
-      } else {
-        setError(res.error || "Nepodarilo sa uložiť favicon");
+      try {
+        canvas.toBlob(
+          async (blob) => {
+            if (!blob) {
+              setError("Nepodarilo sa vygenerovať obraz favicony.");
+              return;
+            }
+
+            const formData = new FormData();
+            const file = new File([blob], "brand-favicon.png", { type: "image/png" });
+            formData.append("favicon", file);
+
+            const res = await uploadBrandFaviconAction(brandId, formData);
+            if (res.success && res.faviconUrl) {
+              setSavedFaviconUrl(res.faviconUrl);
+              setSuccess(true);
+              setTimeout(() => setSuccess(false), 4500);
+            } else {
+              setError(res.error || "Nepodarilo sa uložiť favicon.");
+            }
+          },
+          "image/png",
+          1.0
+        );
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Chyba pri ukladaní ikony.");
       }
     });
   };
 
+  // Direct file upload without studio modifications
+  const handleDirectFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Favicon súbor musí mať menej ako 2 MB.");
+      return;
+    }
+
+    setError(null);
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("favicon", file);
+      const res = await uploadBrandFaviconAction(brandId, formData);
+      if (res.success && res.faviconUrl) {
+        setSavedFaviconUrl(res.faviconUrl);
+        setStudioPreviewUrl(res.faviconUrl);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 4500);
+      } else {
+        setError(res.error || "Nepodarilo sa nahrať súbor faviconu.");
+      }
+    });
+    e.target.value = "";
+  };
+
+  // Remove existing favicon
   const handleRemoveFavicon = () => {
     setError(null);
     startTransition(async () => {
       const res = await setBrandFaviconAction(brandId, "");
       if (res.success) {
         setSavedFaviconUrl(null);
-        setPreviewUrl(null);
-        setSelectedItem(null);
+        setStudioPreviewUrl(null);
+        setSourceSymbolUrl(null);
         setSuccess(true);
-        setTimeout(() => setSuccess(false), 4000);
+        setTimeout(() => setSuccess(false), 4500);
       } else {
-        setError(res.error || "Nepodarilo sa odstrániť favicon");
+        setError(res.error || "Nepodarilo sa odstrániť favicon.");
       }
     });
   };
 
-  const hasUnsavedChanges = selectedItem !== null || (previewUrl !== savedFaviconUrl);
+  const hasUnsavedStudioChanges =
+    Boolean(studioPreviewUrl) && studioPreviewUrl !== savedFaviconUrl;
 
   return (
-    <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-6">
-      <div className="border-b border-[rgba(63,85,102,0.4)] pb-5">
-        <h2 className="text-lg font-bold text-[#fafbfc]">{dict.admin.faviconLabel}</h2>
-        <p className="text-xs text-[#96abbe] mt-1">
-          {dict.admin.faviconHint}
-        </p>
+    <div className="border border-[rgba(63,85,102,0.45)] rounded-2xl bg-[#17212a] text-[#fafbfc] p-6 sm:p-8 shadow-sm space-y-7">
+      {/* Hidden processing canvas */}
+      <canvas ref={canvasRef} className="hidden" width={512} height={512} />
+
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/svg+xml,image/png,image/jpeg"
+        className="hidden"
+        onChange={handleLocalFileSelect}
+      />
+      <input
+        ref={directFileInputRef}
+        type="file"
+        accept=".ico,image/png,image/svg+xml,.png,.ico,.svg"
+        className="hidden"
+        onChange={handleDirectFileUpload}
+      />
+
+      {/* Header with Mode Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[rgba(63,85,102,0.4)] pb-5">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[#fafbfc]">
+              Favicon & Ikona značky
+            </h2>
+            <span className="text-[10px] font-mono uppercase bg-[#c8d400]/15 text-[#c8d400] border border-[#c8d400]/30 px-2 py-0.5 rounded-full font-bold">
+              Studio
+            </span>
+          </div>
+          <p className="text-xs text-[#96abbe] mt-1">
+            Vytvorte z loga značky perfektne zarovnanú ikonu pre záložku prehliadača, administráciu a mobilné zariadenia.
+          </p>
+        </div>
+
+        {/* Tab Switcher */}
+        <div className="flex items-center bg-[#0e161d] p-1 rounded-xl border border-white/[0.08] shrink-0 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setMode("studio")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              mode === "studio"
+                ? "bg-[#c8d400] text-[#070b0f] shadow-xs"
+                : "text-muted-foreground hover:text-white"
+            }`}
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Generátor ikony</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("direct")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              mode === "direct"
+                ? "bg-[#c8d400] text-[#070b0f] shadow-xs"
+                : "text-muted-foreground hover:text-white"
+            }`}
+          >
+            <Upload className="h-3.5 w-3.5" />
+            <span>Priamy upload</span>
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -86,92 +516,483 @@ export function BrandFaviconForm({ brandId, initialFaviconUrl, dict }: BrandFavi
       {success && (
         <div className="flex items-center gap-2.5 p-4 text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-400 rounded-xl">
           <Check className="h-4 w-4 shrink-0" />
-          <span>Favicon bol úspešne uložený!</span>
+          <span>Favicon a ikona značky boli úspešne uložené a synchronizované!</span>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-        {/* Favicon Preview Box */}
-        <div className="h-20 w-20 rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
-          {previewUrl ? (
-            <img src={previewUrl} alt="Favicon preview" className="h-10 w-10 object-contain" />
-          ) : (
-            <Sparkles className="h-8 w-8 text-muted-foreground/40" />
-          )}
-        </div>
+      {/* ============================================================== */}
+      {/* MODE 1: BRAND ICON STUDIO (RECOMMENDED) */}
+      {/* ============================================================== */}
+      {mode === "studio" && (
+        <div className="space-y-8">
+          {/* Top Row: Symbol Picker Buttons & Status */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0e161d] p-3.5 rounded-xl border border-white/[0.08]">
+            <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">1. Zdroj symbolu:</span>
+              <span className="truncate max-w-[200px] text-xs font-mono text-[#96abbe]">
+                {sourceSymbolUrl ? "Symbol vybratý" : "Žiadny symbol"}
+              </span>
+            </div>
 
-        <div className="space-y-2.5 flex-1">
-          <Label className="text-xs font-semibold text-muted-foreground">Favicon a ikona záložky</Label>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Vyberte z už nahraných médií a symbolov značky alebo nahrajte nový .ico, .png, .svg súbor.
-          </p>
-          <div className="flex flex-wrap items-center gap-2.5 pt-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="default"
-              disabled={isPending}
-              onClick={() => setIsPickerOpen(true)}
-              className="shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
-            >
-              <FolderOpen className="h-4 w-4 mr-2 text-[#c8d400]" />
-              <span>{previewUrl ? "Zmeniť favicon" : "Vybrať alebo nahrať favicon"}</span>
-            </Button>
-
-            {previewUrl && (
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 type="button"
-                variant="ghost"
-                size="default"
-                disabled={isPending}
-                onClick={handleRemoveFavicon}
-                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-950/30"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsPickerOpen(true)}
+                className="cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-xs h-8 text-[#fafbfc]"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                <span>Odstrániť</span>
+                <FolderOpen className="h-3.5 w-3.5 mr-1.5 text-[#c8d400]" />
+                <span>Vybrať z log značky</span>
               </Button>
-            )}
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="cursor-pointer border-white/20 hover:border-white text-xs h-8 text-[#fafbfc]"
+              >
+                <Upload className="h-3.5 w-3.5 mr-1.5" />
+                <span>Nahrať SVG / PNG</span>
+              </Button>
+
+              {savedFaviconUrl && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemoveFavicon}
+                  disabled={isPending}
+                  className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-950/30 text-xs h-8"
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                  <span>Odstrániť</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Center Configuration Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Controls (7 cols) */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* 1. Shape of Container */}
+              <div className="space-y-2.5">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
+                  Tvar kontajnera (Ikony)
+                </Label>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {[
+                    { id: "squircle", label: "Squircle", sub: "App Icon" },
+                    { id: "circle", label: "Kruh", sub: "Circle" },
+                    { id: "rounded", label: "Zaoblený", sub: "Soft" },
+                    { id: "square", label: "Štvorec", sub: "Flat" },
+                    { id: "transparent", label: "Bez pozadia", sub: "Symbol" },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        setShape(s.id as ContainerShape);
+                        if (s.id === "transparent") {
+                          setIsTransparentBg(true);
+                        } else {
+                          setIsTransparentBg(false);
+                        }
+                      }}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        shape === s.id
+                          ? "bg-[#c8d400]/10 border-[#c8d400] text-foreground font-semibold"
+                          : "bg-[#0e161d] border-white/[0.08] text-muted-foreground hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      <div className="text-xs font-medium">{s.label}</div>
+                      <div className="text-[10px] text-muted-foreground">{s.sub}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Background Color */}
+              {!isTransparentBg && shape !== "transparent" && (
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
+                      Farba pozadia
+                    </Label>
+                    <span className="text-[11px] font-mono text-muted-foreground">{bgColor}</span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Default Slate Theme Background */}
+                    <button
+                      type="button"
+                      onClick={() => setBgColor("#0e161d")}
+                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
+                        bgColor.toLowerCase() === "#0e161d"
+                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                      style={{ backgroundColor: "#0e161d" }}
+                    >
+                      <span className="h-3 w-3 rounded-full bg-[#0e161d] border border-white/30" />
+                      <span>Manuál Slate</span>
+                    </button>
+
+                    {/* Black */}
+                    <button
+                      type="button"
+                      onClick={() => setBgColor("#000000")}
+                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
+                        bgColor.toLowerCase() === "#000000"
+                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                      style={{ backgroundColor: "#000000" }}
+                    >
+                      <span className="h-3 w-3 rounded-full bg-black border border-white/30" />
+                      <span>Čierna</span>
+                    </button>
+
+                    {/* White */}
+                    <button
+                      type="button"
+                      onClick={() => setBgColor("#ffffff")}
+                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 text-black cursor-pointer transition-all ${
+                        bgColor.toLowerCase() === "#ffffff"
+                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
+                          : "border-white/10 hover:border-white/30"
+                      }`}
+                      style={{ backgroundColor: "#ffffff" }}
+                    >
+                      <span className="h-3 w-3 rounded-full bg-white border border-black/20" />
+                      <span>Biela</span>
+                    </button>
+
+                    {/* Brand Palette Colors */}
+                    {brandColors.map((color, idx) => (
+                      <button
+                        key={`${color.hex}-${idx}`}
+                        type="button"
+                        onClick={() => setBgColor(color.hex)}
+                        className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
+                          bgColor.toLowerCase() === color.hex.toLowerCase()
+                            ? "ring-2 ring-white border-transparent font-bold"
+                            : "border-white/10 hover:border-white/30"
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      >
+                        <span
+                          className="h-3 w-3 rounded-full border border-black/20"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <span className="text-black font-semibold drop-shadow-xs">
+                          {color.name || color.role || color.hex}
+                        </span>
+                      </button>
+                    ))}
+
+                    {/* Custom Color Input */}
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <input
+                        type="color"
+                        value={bgColor.startsWith("#") ? bgColor : "#0e161d"}
+                        onChange={(e) => setBgColor(e.target.value)}
+                        className="h-8 w-8 rounded-lg cursor-pointer bg-transparent border border-white/20 p-0.5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 3. Padding / Symbol Scale Slider */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
+                    Odsadenie symbolu (Padding)
+                  </Label>
+                  <span className="text-xs font-mono text-[#c8d400] font-bold">
+                    {paddingPercent} %
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-[11px] text-muted-foreground">Plný</span>
+                  <input
+                    type="range"
+                    value={paddingPercent}
+                    onChange={(e) => setPaddingPercent(Number(e.target.value))}
+                    min={5}
+                    max={40}
+                    step={1}
+                    className="flex-1 cursor-pointer h-2 bg-white/10 rounded-lg accent-[#c8d400]"
+                  />
+                  <span className="text-[11px] text-muted-foreground">Malý</span>
+                </div>
+              </div>
+
+              {/* 4. Symbol Tinting (Especially for monochrome SVG) */}
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
+                    Prefarbenie symbolu (SVG)
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground">
+                    {rawSvgContent ? "Aktívne SVG" : "Pôvodné farby"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: "original", label: "Pôvodné" },
+                    { id: "white", label: "Biela (#fff)" },
+                    { id: "dark", label: "Tmavá (#0e161d)" },
+                    { id: "primary", label: "Brand primárna" },
+                  ].map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setSymbolTint(t.id as SymbolTint)}
+                      className={`p-2 rounded-lg border text-xs text-center transition-all cursor-pointer ${
+                        symbolTint === t.id
+                          ? "bg-[#c8d400]/10 border-[#c8d400] text-foreground font-semibold"
+                          : "bg-[#0e161d] border-white/[0.08] text-muted-foreground hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Live Multi-Context Mockups (5 cols) */}
+            <div className="lg:col-span-5 space-y-4 bg-[#0e161d] p-5 rounded-2xl border border-white/[0.08]">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Sliders className="h-3.5 w-3.5 text-[#c8d400]" />
+                  Živý kontextový náhľad
+                </span>
+                {isRendering && (
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground animate-pulse">
+                    <Loader2 className="h-3 w-3 animate-spin text-[#c8d400]" />
+                    Generujem...
+                  </span>
+                )}
+              </div>
+
+              {/* Master Studio Preview (128x128) */}
+              <div className="flex flex-col items-center justify-center py-4">
+                <div className="relative h-32 w-32 rounded-2xl bg-[radial-gradient(#2b3b48_1px,transparent_1px)] [background-size:10px_10px] border border-white/[0.12] flex items-center justify-center p-3 shadow-inner">
+                  {studioPreviewUrl ? (
+                    <img
+                      src={studioPreviewUrl}
+                      alt="Favicon master preview"
+                      className="h-full w-full object-contain filter drop-shadow-md"
+                    />
+                  ) : (
+                    <div className="text-center text-muted-foreground/60 text-xs">
+                      <Sparkles className="h-8 w-8 mx-auto mb-1 text-muted-foreground/30" />
+                      <span>Zvoľte symbol</span>
+                    </div>
+                  )}
+                </div>
+                <span className="text-[11px] font-mono text-muted-foreground mt-2">
+                  512 × 512 px High-DPI Master
+                </span>
+              </div>
+
+              {/* Mockup 1: Browser Tabs (Dark & Light) */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  Záložka v prehliadači (Favicon)
+                </span>
+
+                {/* Dark Browser Tab */}
+                <div className="bg-[#202124] rounded-t-lg border-t border-x border-[#3c4043] px-3 py-1.5 flex items-center gap-2 text-[11px] text-[#e8eaed] shadow-xs">
+                  {studioPreviewUrl ? (
+                    <img src={studioPreviewUrl} alt="Favicon tab" className="h-4 w-4 object-contain" />
+                  ) : (
+                    <div className="h-4 w-4 rounded bg-[#c8d400]" />
+                  )}
+                  <span className="truncate max-w-[130px] font-medium">{brandName} Manual</span>
+                  <span className="text-muted-foreground/60 ml-auto text-[10px]">×</span>
+                </div>
+
+                {/* Light Browser Tab */}
+                <div className="bg-[#dee1e6] rounded-t-lg border-t border-x border-[#bdc1c6] px-3 py-1.5 flex items-center gap-2 text-[11px] text-[#202124] shadow-xs">
+                  {studioPreviewUrl ? (
+                    <img src={studioPreviewUrl} alt="Favicon tab" className="h-4 w-4 object-contain" />
+                  ) : (
+                    <div className="h-4 w-4 rounded bg-[#c8d400]" />
+                  )}
+                  <span className="truncate max-w-[130px] font-medium">{brandName} Manual</span>
+                  <span className="text-black/40 ml-auto text-[10px]">×</span>
+                </div>
+              </div>
+
+              {/* Mockup 2: Admin Sidebar Brand Switcher */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                  <Layout className="h-3 w-3" />
+                  Ikona v Admine (Brand Switcher)
+                </span>
+
+                <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.03]">
+                  {studioPreviewUrl ? (
+                    <div className="h-6 w-6 rounded-md bg-[#070b0f] border border-white/[0.12] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+                      <img src={studioPreviewUrl} alt="Brand icon" className="h-full w-full object-contain p-0.5" />
+                    </div>
+                  ) : (
+                    <div className="h-6 w-6 rounded-md bg-[#c8d400] text-black font-bold text-[10px] flex items-center justify-center">
+                      {brandName.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="truncate">
+                    <div className="text-xs font-semibold text-foreground truncate">{brandName}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">active project</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mockup 3: Mobile Touch Icon */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                  <Smartphone className="h-3 w-3" />
+                  Mobilná plocha (Touch Icon)
+                </span>
+
+                <div className="flex items-center gap-3 bg-black/40 p-2.5 rounded-xl border border-white/[0.05]">
+                  <div className="h-12 w-12 rounded-xl overflow-hidden shadow-lg border border-white/10 shrink-0 bg-[#070b0f]">
+                    {studioPreviewUrl ? (
+                      <img src={studioPreviewUrl} alt="App icon" className="h-full w-full object-contain" />
+                    ) : (
+                      <div className="h-full w-full bg-[#c8d400]" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium text-foreground">{brandName}</div>
+                    <div className="text-[10px] text-muted-foreground">PWA & iOS Bookmark</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Action Bar */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-[rgba(63,85,102,0.3)]">
+            <span className="text-xs text-muted-foreground">
+              {hasUnsavedStudioChanges ? (
+                <span className="text-amber-400 font-medium flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                  Máte neuložený vygenerovaný favicon
+                </span>
+              ) : savedFaviconUrl ? (
+                <span className="text-emerald-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Favicon a ikona sú aktívne a synchronizované
+                </span>
+              ) : (
+                "Zvoľte symbol značky a vygenerujte favicon"
+              )}
+            </span>
+
+            <Button
+              type="button"
+              onClick={handleSaveStudioIcon}
+              disabled={isPending || !studioPreviewUrl || !hasUnsavedStudioChanges}
+              size="default"
+              className="bg-[#c8d400] hover:bg-[#b0bc00] text-[#070b0f] font-bold shadow-md cursor-pointer disabled:opacity-50 px-6"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <span>Ukladám a synchronizujem...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  <span>Uložiť favicon & ikonu</span>
+                </>
+              )}
+            </Button>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Save Button Bar */}
-      <div className="flex items-center justify-between pt-4 border-t border-[rgba(63,85,102,0.3)]">
-        <span className="text-xs text-muted-foreground">
-          {hasUnsavedChanges ? (
-            <span className="text-amber-400 font-medium">Máte neuložený výber favicony</span>
-          ) : (
-            "Zmeny sa aplikujú na záložku prehliadača manuálu"
-          )}
-        </span>
-        <Button
-          type="button"
-          onClick={handleSaveFavicon}
-          disabled={isPending || !hasUnsavedChanges}
-          size="default"
-          className="bg-[#c8d400] hover:bg-[#b0bc00] text-[#070b0f] font-bold shadow-md cursor-pointer disabled:opacity-50"
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              <span>Ukladám...</span>
-            </>
-          ) : (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              <span>Uložiť favicon</span>
-            </>
-          )}
-        </Button>
-      </div>
+      {/* ============================================================== */}
+      {/* MODE 2: DIRECT UPLOAD / FILE PICKER (TRADITIONAL) */}
+      {/* ============================================================== */}
+      {mode === "direct" && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 bg-[#0e161d] p-6 rounded-2xl border border-white/[0.08]">
+            <div className="h-20 w-20 rounded-xl border border-[rgba(63,85,102,0.6)] bg-[#070b0f] flex items-center justify-center overflow-hidden p-3 shadow-sm shrink-0">
+              {savedFaviconUrl ? (
+                <img src={savedFaviconUrl} alt="Favicon preview" className="h-10 w-10 object-contain" />
+              ) : (
+                <Sparkles className="h-8 w-8 text-muted-foreground/40" />
+              )}
+            </div>
 
+            <div className="space-y-2.5 flex-1">
+              <Label className="text-xs font-semibold text-muted-foreground">
+                Priamy súbor faviconu (.ico, .png, .svg)
+              </Label>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Nahrajte vopred pripravený súbor priamo z počítača alebo zvoľte z knižnice médií.
+              </p>
+              <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="default"
+                  disabled={isPending}
+                  onClick={() => directFileInputRef.current?.click()}
+                  className="shadow-xs cursor-pointer border-[#c8d400]/40 hover:border-[#c8d400] text-[#fafbfc]"
+                >
+                  <Upload className="h-4 w-4 mr-2 text-[#c8d400]" />
+                  <span>Nahrať .ico / .png z počítača</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="default"
+                  disabled={isPending}
+                  onClick={() => setIsPickerOpen(true)}
+                  className="shadow-xs cursor-pointer border-white/20 hover:border-white text-[#fafbfc]"
+                >
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  <span>Vybrať z médií projektu</span>
+                </Button>
+
+                {savedFaviconUrl && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="default"
+                    disabled={isPending}
+                    onClick={handleRemoveFavicon}
+                    className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-950/30"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    <span>Odstrániť</span>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Picker Modal */}
       <UniversalMediaPickerModal
         isOpen={isPickerOpen}
         onClose={() => setIsPickerOpen(false)}
         brandId={brandId}
-        title="Vybrať favicon značky"
-        description="Zvoľte existujúci symbol, ikonu z knižnice médií alebo nahrajte nový súbor (.ico, .png, .svg)."
-        currentUrl={previewUrl}
+        title="Vybrať symbol značky pre Favicon"
+        description="Zvoľte symbol značky, logo alebo ikonu. Štúdio z neho automaticky vygeneruje favicon s vaším pozadím a tvarom."
+        currentUrl={sourceSymbolUrl}
         onSelect={handleMediaSelect}
         acceptedFileTypes=".ico,image/png,image/svg+xml,.png,.ico,.svg"
         allowDirectUrl={true}

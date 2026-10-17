@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 interface AdminSidebarProps {
-  availableBrands?: { id: string; slug: string; name: string }[];
+  availableBrands?: { id: string; slug: string; name: string; iconUrl?: string | null }[];
   locale?: Locale;
   mobileOpen?: boolean;
   onMobileClose?: () => void;

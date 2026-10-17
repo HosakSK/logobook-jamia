@@ -12,7 +12,7 @@ interface AdminShellProps {
     tier?: string;
     verified?: boolean;
   } | null;
-  brands?: { id: string; slug: string; name: string }[];
+  brands?: { id: string; slug: string; name: string; iconUrl?: string | null }[];
   locale?: Locale;
   children: React.ReactNode;
 }

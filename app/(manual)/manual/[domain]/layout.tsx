@@ -186,6 +186,7 @@ export default async function ManualLayout({
             ? brandRecord.description.showHeaderBrandName
             : ((publishedConfig?.brand as any)?.showHeaderBrandName ?? true),
           hideLogobookBadge,
+          faviconUrl: activeFavicon,
         }}
         snapshot={publishedConfig}
         domain={domain}

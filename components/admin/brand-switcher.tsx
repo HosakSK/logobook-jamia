@@ -41,7 +41,10 @@ export function BrandSwitcher({
     router.push(`/admin/brand/${brand.id}`);
   };
 
-  const currentBrand = activeBrand || availableBrands[0];
+  const currentBrand =
+    availableBrands.find((b) => b.id === activeBrand?.id || b.slug === activeBrand?.slug) ||
+    activeBrand ||
+    availableBrands[0];
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -51,9 +54,19 @@ export function BrandSwitcher({
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2.5 truncate">
-          <div className="h-6 w-6 rounded-md bg-primary text-black flex items-center justify-center font-bold text-[10px] shrink-0 shadow-[0_0_10px_rgba(200,212,0,0.15)]">
-            {currentBrand.name.slice(0, 2).toUpperCase()}
-          </div>
+          {currentBrand.iconUrl ? (
+            <div className="h-6 w-6 rounded-md bg-[#070b0f] border border-white/[0.12] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+              <img
+                src={currentBrand.iconUrl}
+                alt={currentBrand.name}
+                className="h-full w-full object-contain p-0.5"
+              />
+            </div>
+          ) : (
+            <div className="h-6 w-6 rounded-md bg-primary text-black flex items-center justify-center font-bold text-[10px] shrink-0 shadow-[0_0_10px_rgba(200,212,0,0.15)]">
+              {currentBrand.name.slice(0, 2).toUpperCase()}
+            </div>
+          )}
           <div className="truncate">
             <div className="text-xs font-semibold text-foreground truncate">
               {currentBrand.name}
@@ -86,9 +99,19 @@ export function BrandSwitcher({
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    <div className="h-5 w-5 rounded-md bg-white/[0.06] border border-white/[0.08] flex items-center justify-center font-bold text-[9px] text-foreground">
-                      {brand.name.slice(0, 2).toUpperCase()}
-                    </div>
+                    {brand.iconUrl ? (
+                      <div className="h-5 w-5 rounded-md bg-[#070b0f] border border-white/[0.1] flex items-center justify-center shrink-0 overflow-hidden">
+                        <img
+                          src={brand.iconUrl}
+                          alt={brand.name}
+                          className="h-full w-full object-contain p-0.5"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-5 w-5 rounded-md bg-white/[0.06] border border-white/[0.08] flex items-center justify-center font-bold text-[9px] text-foreground">
+                        {brand.name.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
                     <span className="truncate">{brand.name}</span>
                   </div>
                   {isSelected && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}

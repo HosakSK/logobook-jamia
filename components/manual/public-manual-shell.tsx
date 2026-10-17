@@ -21,6 +21,7 @@ interface PublicManualShellProps {
     headerLogoHeight?: number;
     showHeaderBrandName?: boolean;
     hideLogobookBadge?: boolean;
+    faviconUrl?: string;
   };
   snapshot: PublishedBrandSnapshot | null;
   domain: string;
@@ -248,6 +249,14 @@ export function PublicManualShell({
                   alt={brand.name}
                   style={{ height: `${brand.headerLogoHeight || 40}px`, maxHeight: `${brand.headerLogoHeight || 40}px` }}
                   className="w-auto max-w-[260px] sm:max-w-[380px] object-contain object-left transition-transform group-hover:scale-[1.02]"
+                />
+              </div>
+            ) : brand.faviconUrl ? (
+              <div className="h-10 w-10 flex items-center justify-center shrink-0 overflow-hidden rounded-xl bg-background/50 border border-border/40 p-1">
+                <img
+                  src={brand.faviconUrl}
+                  alt={brand.name}
+                  className="h-full w-full object-contain"
                 />
               </div>
             ) : (
