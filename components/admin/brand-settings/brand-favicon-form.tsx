@@ -115,9 +115,13 @@ export function BrandFaviconForm({
 
     if (sourceSymbolUrl.startsWith("data:image/svg+xml")) {
       try {
-        const base64Part = sourceSymbolUrl.split(",")[1];
-        const decoded = atob(base64Part);
-        setRawSvgContent(decoded);
+        if (sourceSymbolUrl.includes(";base64,")) {
+          const base64Part = sourceSymbolUrl.split(";base64,")[1];
+          setRawSvgContent(atob(base64Part));
+        } else {
+          const commaIdx = sourceSymbolUrl.indexOf(",");
+          setRawSvgContent(decodeURIComponent(sourceSymbolUrl.slice(commaIdx + 1)));
+        }
       } catch {
         setRawSvgContent(null);
       }
@@ -150,13 +154,64 @@ export function BrandFaviconForm({
     }
   }, [sourceSymbolUrl]);
 
-  // Main Canvas Render Engine (512x512 Master)
+  // Studio Preview Generator:
+  // When SVG is available, we generate a 100% pure vector SVG Data URI (no bitmap degradation).
+  // When raster PNG is provided, we use the fallback canvas.
   useEffect(() => {
     if (!sourceSymbolUrl) {
       setStudioPreviewUrl(null);
       return;
     }
 
+    // 1. Vector Path: Pure SVG composition without canvas rasterization during editing
+    if (rawSvgContent) {
+      try {
+        const modifiedInnerSvg = !isOriginalIconColor
+          ? recolorSvgContent(rawSvgContent, iconColorHex)
+          : rawSvgContent;
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(modifiedInnerSvg, "image/svg+xml");
+        const svgEl = doc.querySelector("svg");
+
+        if (svgEl) {
+          let viewBox = svgEl.getAttribute("viewBox");
+          if (!viewBox) {
+            const w = parseFloat(svgEl.getAttribute("width") || "100") || 100;
+            const h = parseFloat(svgEl.getAttribute("height") || "100") || 100;
+            viewBox = `0 0 ${w} ${h}`;
+          }
+
+          let bgShapeSvg = "";
+          if (!isTransparentBg && shape !== "transparent") {
+            if (shape === "circle") {
+              bgShapeSvg = `<circle cx="256" cy="256" r="256" fill="${bgColor}" />`;
+            } else if (shape === "squircle") {
+              bgShapeSvg = `<rect x="0" y="0" width="512" height="512" rx="115" ry="115" fill="${bgColor}" />`;
+            } else if (shape === "rounded") {
+              bgShapeSvg = `<rect x="0" y="0" width="512" height="512" rx="56" ry="56" fill="${bgColor}" />`;
+            } else {
+              bgShapeSvg = `<rect x="0" y="0" width="512" height="512" fill="${bgColor}" />`;
+            }
+          }
+
+          const padPx = (512 * paddingPercent) / 100;
+          const innerSize = Math.max(16, 512 - padPx * 2);
+          const offset = padPx;
+
+          const masterSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">${bgShapeSvg}<svg x="${offset}" y="${offset}" width="${innerSize}" height="${innerSize}" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">${svgEl.innerHTML}</svg></svg>`.trim();
+
+          const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(masterSvg)}`;
+          setStudioPreviewUrl(svgDataUrl);
+          setIsRendering(false);
+          return;
+        }
+      } catch (err) {
+        console.warn("Direct vector SVG assembly failed, falling back to canvas:", err);
+      }
+    }
+
+    // 2. Raster Fallback Path: Canvas for transparent PNG symbols
     let isMounted = true;
     setIsRendering(true);
 
@@ -170,28 +225,10 @@ export function BrandFaviconForm({
       return;
     }
 
-    // Prepare modified SVG or direct image
-    let effectiveImgSrc = sourceSymbolUrl;
-    let objectUrlToRevoke: string | null = null;
-
-    if (rawSvgContent && !isOriginalIconColor) {
-      try {
-        const modifiedXml = recolorSvgContent(rawSvgContent, iconColorHex);
-        const blob = new Blob([modifiedXml], { type: "image/svg+xml;charset=utf-8" });
-        objectUrlToRevoke = URL.createObjectURL(blob);
-        effectiveImgSrc = objectUrlToRevoke;
-      } catch (err) {
-        console.error("Failed to recolor SVG:", err);
-      }
-    }
-
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      if (!isMounted) {
-        if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
-        return;
-      }
+      if (!isMounted) return;
 
       ctx.clearRect(0, 0, 512, 512);
 
@@ -204,7 +241,6 @@ export function BrandFaviconForm({
           ctx.arc(256, 256, 256, 0, Math.PI * 2);
           ctx.fill();
         } else if (shape === "squircle") {
-          // Modern squircle with 115px radius on 512px canvas (~22.5%)
           if (typeof ctx.roundRect === "function") {
             ctx.roundRect(0, 0, 512, 512, 115);
           } else {
@@ -212,7 +248,6 @@ export function BrandFaviconForm({
           }
           ctx.fill();
         } else if (shape === "rounded") {
-          // Gentle rounding 56px
           if (typeof ctx.roundRect === "function") {
             ctx.roundRect(0, 0, 512, 512, 56);
           } else {
@@ -220,7 +255,6 @@ export function BrandFaviconForm({
           }
           ctx.fill();
         } else {
-          // Plain square
           ctx.fillRect(0, 0, 512, 512);
         }
       }
@@ -246,8 +280,7 @@ export function BrandFaviconForm({
       const drawY = (512 - drawH) / 2;
 
       // Draw tinted or original symbol
-      if (!rawSvgContent && !isOriginalIconColor) {
-        // Fallback tinting for raster PNG symbols
+      if (!isOriginalIconColor) {
         const offCanvas = document.createElement("canvas");
         offCanvas.width = drawW;
         offCanvas.height = drawH;
@@ -269,24 +302,20 @@ export function BrandFaviconForm({
         const dataUrl = canvas.toDataURL("image/png");
         setStudioPreviewUrl(dataUrl);
       } catch (err) {
-        console.warn("Could not generate dataURL (likely CORS tainted image):", err);
         setStudioPreviewUrl(sourceSymbolUrl);
       }
 
       setIsRendering(false);
-      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
     };
 
     img.onerror = () => {
       setIsRendering(false);
-      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
     };
 
-    img.src = effectiveImgSrc;
+    img.src = sourceSymbolUrl;
 
     return () => {
       isMounted = false;
-      if (objectUrlToRevoke) URL.revokeObjectURL(objectUrlToRevoke);
     };
   }, [
     sourceSymbolUrl,
@@ -337,59 +366,91 @@ export function BrandFaviconForm({
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result as string;
-      if (result) {
-        setError(null);
-        setSourceSymbolUrl(result);
-      }
-    };
-    reader.readAsDataURL(file);
+    if (file.type === "image/svg+xml" || file.name.toLowerCase().endsWith(".svg")) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        if (text && text.includes("<svg")) {
+          setError(null);
+          setRawSvgContent(text);
+          setSourceSymbolUrl(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(text)}`);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const result = ev.target?.result as string;
+        if (result) {
+          setError(null);
+          setRawSvgContent(null);
+          setSourceSymbolUrl(result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
     // Reset file input
     e.target.value = "";
   };
 
-  // Save generated canvas PNG as brand favicon and icon
+  // Save generated canvas PNG as brand favicon and icon (converts vector to 512x512 PNG only on save)
   const handleSaveStudioIcon = () => {
     setError(null);
-
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      setError("Chyba inicializácie canvasu.");
-      return;
-    }
+    if (!studioPreviewUrl) return;
 
     startTransition(async () => {
       try {
-        canvas.toBlob(
-          async (blob) => {
-            if (!blob) {
-              setError("Nepodarilo sa vygenerovať obraz favicony.");
-              return;
-            }
+        const canvas = canvasRef.current || document.createElement("canvas");
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          setError("Chyba inicializácie canvasu.");
+          return;
+        }
 
-            const formData = new FormData();
-            const file = new File([blob], "brand-favicon.png", { type: "image/png" });
-            formData.append("favicon", file);
+        // Rasterize current master preview (SVG or PNG) onto 512x512 canvas for high-DPI rasterization
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          ctx.clearRect(0, 0, 512, 512);
+          ctx.drawImage(img, 0, 0, 512, 512);
 
-            const res = await uploadBrandFaviconAction(brandId, formData);
-            if (res.success && res.faviconUrl) {
-              const cleanUrl = toPublicPbUrl(res.faviconUrl);
-              setSavedFaviconUrl(cleanUrl);
-              setStudioPreviewUrl(cleanUrl);
-              setSuccess(true);
-              router.refresh();
-              setTimeout(() => setSuccess(false), 4500);
-            } else {
-              setError(res.error || "Nepodarilo sa uložiť favicon.");
-            }
-          },
-          "image/png",
-          1.0
-        );
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Chyba pri ukladaní ikony.");
+          canvas.toBlob(
+            async (blob) => {
+              if (!blob) {
+                setError("Nepodarilo sa vygenerovať obraz favicony.");
+                return;
+              }
+
+              const formData = new FormData();
+              const file = new File([blob], "brand-favicon.png", { type: "image/png" });
+              formData.append("favicon", file);
+
+              const res = await uploadBrandFaviconAction(brandId, formData);
+              if (res.success && res.faviconUrl) {
+                const cleanUrl = toPublicPbUrl(res.faviconUrl);
+                setSavedFaviconUrl(cleanUrl);
+                setStudioPreviewUrl(cleanUrl);
+                setSuccess(true);
+                router.refresh();
+                setTimeout(() => setSuccess(false), 4500);
+              } else {
+                setError(res.error || "Nepodarilo sa uložiť favicon.");
+              }
+            },
+            "image/png",
+            1.0
+          );
+        };
+
+        img.onerror = () => {
+          setError("Nepodarilo sa rasterizovať ikonu pre uloženie.");
+        };
+
+        img.src = studioPreviewUrl;
+      } catch (err: any) {
+        console.error("Save icon error:", err);
       }
     });
   };
@@ -978,12 +1039,33 @@ export function BrandFaviconForm({
 }
 
 /**
- * Accurately recolors monochrome/black SVG elements (paths, strokes, styles, classes) to targetColor.
+ * Checks if a color is transparent/none or explicitly white (e.g. background cutout)
+ */
+function isColorWhiteOrNone(colorStr: string): boolean {
+  if (!colorStr) return false;
+  const c = colorStr.toLowerCase().trim();
+  return (
+    c === "none" ||
+    c === "transparent" ||
+    c === "#ffffff" ||
+    c === "#fff" ||
+    c === "white" ||
+    c.startsWith("rgb(255,") ||
+    c.startsWith("rgb(255, ") ||
+    c.startsWith("rgba(255, 255, 255") ||
+    c.startsWith("rgba(255,255,255")
+  );
+}
+
+/**
+ * Accurately recolors SVG artwork elements (paths, strokes, styles, classes) to targetColor.
  * Handles:
+ * - Pure black (#000, #000000, black)
+ * - Semi-transparent black (rgba(0, 0, 0, x), opacity, fill-opacity) -> resets opacity to solid 1 so color is vibrant
+ * - Rich blacks and dark tones (#231F20, #1A171B, #1D1D1B, etc.)
+ * - Grey tones produced by flattened vector transparency (#333, #666, #888, #aaa, etc.)
+ * - Elements with NO fill attribute (SVG standard defaults to black)
  * - <style> CSS rules with .st0, .cls-1 classes exported by Illustrator / Figma
- * - Elements with explicit black fills/strokes (#000, #000000, black, rgb(0,0,0), #1d1d1b)
- * - Elements with NO fill attribute which SVG standard defaults to black
- * - Inline style="fill: ...; stroke: ..." attributes
  * - Preserves transparent fills/strokes and explicitly white cutouts (#ffffff)
  */
 function recolorSvgContent(rawSvg: string, targetColor: string): string {
@@ -999,79 +1081,88 @@ function recolorSvgContent(rawSvg: string, targetColor: string): string {
     const styleTags = doc.querySelectorAll("style");
     styleTags.forEach((st) => {
       let css = st.textContent || "";
-      css = css.replace(
-        /fill\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
-        `fill: ${targetColor}`
-      );
-      css = css.replace(
-        /stroke\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
-        `stroke: ${targetColor}`
-      );
+      // Replace fill in css rules unless white or none
+      css = css.replace(/fill\s*:\s*([^;!}]+)/gi, (match, val) => {
+        if (isColorWhiteOrNone(val)) return match;
+        return `fill: ${targetColor}`;
+      });
+      // Replace stroke in css rules unless white or none
+      css = css.replace(/stroke\s*:\s*([^;!}]+)/gi, (match, val) => {
+        if (isColorWhiteOrNone(val)) return match;
+        return `stroke: ${targetColor}`;
+      });
+      // Reset opacity in CSS rules so recolored shapes are solid and vibrant
+      css = css.replace(/opacity\s*:\s*([0-9.]+)/gi, "opacity: 1");
+      css = css.replace(/fill-opacity\s*:\s*([0-9.]+)/gi, "fill-opacity: 1");
       st.textContent = css;
     });
 
-    // 2. Graphical elements (path, polygon, rect, circle, ellipse, line, polyline)
-    const elements = svgEl.querySelectorAll("path, polygon, rect, circle, ellipse, line, polyline");
-    elements.forEach((el) => {
+    // 2. Iterate over all elements (including <g>, path, polygon, rect, circle, ellipse, line, polyline)
+    const allElements = svgEl.querySelectorAll("*");
+    allElements.forEach((el) => {
+      const tagName = el.tagName.toLowerCase();
+      // Skip metadata or definition elements
+      if (
+        tagName === "style" ||
+        tagName === "script" ||
+        tagName === "defs" ||
+        tagName === "clippath" ||
+        tagName === "lineargradient" ||
+        tagName === "radialgradient"
+      ) {
+        return;
+      }
+
       const fill = el.getAttribute("fill");
       const stroke = el.getAttribute("stroke");
       const inlineStyle = el.getAttribute("style");
 
-      // Replace in inline style attribute
+      // A. Replace in inline style attribute
       if (inlineStyle) {
-        let updatedStyle = inlineStyle
-          .replace(
-            /fill\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
-            `fill: ${targetColor}`
-          )
-          .replace(
-            /stroke\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
-            `stroke: ${targetColor}`
-          );
+        let updatedStyle = inlineStyle;
+        updatedStyle = updatedStyle.replace(/fill\s*:\s*([^;!}]+)/gi, (match, val) => {
+          if (isColorWhiteOrNone(val)) return match;
+          return `fill: ${targetColor}`;
+        });
+        updatedStyle = updatedStyle.replace(/stroke\s*:\s*([^;!}]+)/gi, (match, val) => {
+          if (isColorWhiteOrNone(val)) return match;
+          return `stroke: ${targetColor}`;
+        });
+        // Normalize opacity
+        updatedStyle = updatedStyle.replace(/opacity\s*:\s*([0-9.]+)/gi, "opacity: 1");
+        updatedStyle = updatedStyle.replace(/fill-opacity\s*:\s*([0-9.]+)/gi, "fill-opacity: 1");
         el.setAttribute("style", updatedStyle);
       }
 
-      // Fill attribute
+      // B. Fill attribute handling
       if (fill !== null) {
-        const lower = fill.toLowerCase().trim();
-        if (
-          lower === "#000000" ||
-          lower === "#000" ||
-          lower === "#1d1d1b" ||
-          lower === "#111111" ||
-          lower === "#222222" ||
-          lower === "#333333" ||
-          lower === "black" ||
-          lower === "currentcolor" ||
-          lower.startsWith("rgb(0,")
-        ) {
+        if (!isColorWhiteOrNone(fill)) {
           el.setAttribute("fill", targetColor);
+          // Remove opacity attributes so color is solid
+          el.removeAttribute("opacity");
+          el.removeAttribute("fill-opacity");
         }
       } else {
-        // Element has NO fill attribute. In SVG spec, default is black (#000000).
+        // Element has NO fill attribute.
+        // In SVG spec, shapes like path, polygon, circle, rect default to black!
+        const isShape = ["path", "polygon", "rect", "circle", "ellipse", "line", "polyline"].includes(tagName);
         const hasStyleFill = inlineStyle && inlineStyle.toLowerCase().includes("fill");
-        if (!hasStyleFill) {
+        if (isShape && !hasStyleFill) {
           if (stroke && stroke !== "none") {
             // Keep pure stroke element
           } else {
             el.setAttribute("fill", targetColor);
+            el.removeAttribute("opacity");
+            el.removeAttribute("fill-opacity");
           }
         }
       }
 
-      // Stroke attribute
+      // C. Stroke attribute handling
       if (stroke !== null) {
-        const lowerStroke = stroke.toLowerCase().trim();
-        if (
-          lowerStroke === "#000000" ||
-          lowerStroke === "#000" ||
-          lowerStroke === "#1d1d1b" ||
-          lowerStroke === "#111111" ||
-          lowerStroke === "black" ||
-          lowerStroke === "currentcolor" ||
-          lowerStroke.startsWith("rgb(0,")
-        ) {
+        if (!isColorWhiteOrNone(stroke)) {
           el.setAttribute("stroke", targetColor);
+          el.removeAttribute("stroke-opacity");
         }
       }
     });
