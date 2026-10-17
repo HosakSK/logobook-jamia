@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
-import JSZip from "jszip";
 import {
   Download,
   ExternalLink,
@@ -203,6 +202,8 @@ export default function M07ZobrazenieLogaModule({
 
     try {
       setIsZipping(true);
+      const JSZipModule = await import("jszip");
+      const JSZip = JSZipModule.default || JSZipModule;
       const zip = new JSZip();
       const folder = zip.folder("logo_assets") || zip;
 

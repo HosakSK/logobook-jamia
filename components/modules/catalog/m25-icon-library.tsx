@@ -23,7 +23,6 @@ import {
   Loader2,
   ZoomIn,
 } from "lucide-react";
-import JSZip from "jszip";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import {
   M25IconLibraryConfig,
@@ -266,6 +265,8 @@ export default function M25KniznicaIkonModule({
 
     try {
       setIsZipping(true);
+      const JSZipModule = await import("jszip");
+      const JSZip = JSZipModule.default || JSZipModule;
       const zip = new JSZip();
       const folder = zip.folder("icons");
 

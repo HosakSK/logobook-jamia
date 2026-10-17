@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { getServerPocketBase } from "@/lib/pocketbase-server";
-import { getBrandCascadeTokensAction } from "@/actions/cascade";
+import { getCachedBrandBySlug, getCachedBrandTokens } from "@/lib/manual/brand-cache";
 import { BrandCascadeProvider } from "@/components/modules/cascade";
 import { ManualLockScreen } from "@/components/manual/manual-lock-screen";
 import { PublicManualShell } from "@/components/manual/public-manual-shell";
@@ -15,26 +15,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { domain } = await params;
   try {
-    const pb = await getServerPocketBase();
-    const brandRecord = await pb
-      .collection("brands")
-      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`, {
-        expand: "headerLogo,favicon",
-      });
+    const brandRecord = await getCachedBrandBySlug(domain);
 
     let favUrl = "";
-    if (brandRecord?.expand?.favicon) {
+    if (brandRecord?.publishedConfig?.brand?.faviconUrl) {
+      favUrl = brandRecord.publishedConfig.brand.faviconUrl;
+    } else if (brandRecord?.expand?.favicon) {
       const f = brandRecord.expand.favicon;
+      const pb = await getServerPocketBase();
       favUrl = pb.files.getURL(f, f.file);
     } else if (brandRecord?.favicon && typeof brandRecord.favicon === "string" && brandRecord.favicon.startsWith("http")) {
       favUrl = brandRecord.favicon;
     } else if (typeof brandRecord?.description === "object" && brandRecord.description?.faviconUrl) {
       favUrl = brandRecord.description.faviconUrl;
-    }
-
-    if (!favUrl) {
-      const pub = brandRecord?.publishedConfig as any;
-      if (pub?.brand?.faviconUrl) favUrl = pub.brand.faviconUrl;
     }
 
     if (favUrl) {
@@ -63,109 +56,59 @@ export default async function ManualLayout({
   const { domain, locale } = await params;
   const currentLocale: Locale = locale && isValidLocale(locale) ? locale : DEFAULT_LOCALE;
 
-  const pb = await getServerPocketBase();
-  let brandRecord: any = null;
+  const brandRecord = await getCachedBrandBySlug(domain);
   let brandTokens;
   let cssVariables: Record<string, string> = {};
   let headerLogoUrl: string | undefined = undefined;
   let faviconUrl: string | undefined = undefined;
 
-  try {
-    brandRecord = await pb
-      .collection("brands")
-      .getFirstListItem(`slug = "${domain}" || customDomain = "${domain}" || id = "${domain}"`, {
-        expand: "headerLogo,favicon",
-      });
-  } catch {
-    // Brand record not matched directly by slug
-  }
-
   const brandName = brandRecord?.name || domain;
   const brandSlug = brandRecord?.slug || domain;
   const hideLogobookBadge = brandRecord?.hideLogobookBadge || false;
 
-  // Resolve favicon URL
-  if (brandRecord?.expand?.favicon) {
-    const fAsset = brandRecord.expand.favicon;
-    faviconUrl = pb.files.getURL(fAsset, fAsset.file);
-  } else if (brandRecord?.favicon) {
-    const fav = brandRecord.favicon;
-    if (typeof fav === "string" && (fav.startsWith("http://") || fav.startsWith("https://") || fav.startsWith("/"))) {
-      faviconUrl = fav;
-    } else {
-      try {
-        const mediaRec = await pb.collection("mediaAssets").getOne(fav);
-        if (mediaRec && mediaRec.file) {
-          faviconUrl = pb.files.getURL(mediaRec, mediaRec.file);
-        }
-      } catch {
-        try {
-          const assetRec = await pb.collection("assets").getOne(fav);
-          if (assetRec) {
-            faviconUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? pb.files.getURL(assetRec, assetRec.preview) : "");
-          }
-        } catch {
-          // not found
-        }
+  // Fast-path: Check publishedConfig first before any extra DB calls
+  if (brandRecord?.publishedConfig?.brand?.faviconUrl) {
+    faviconUrl = brandRecord.publishedConfig.brand.faviconUrl;
+  }
+  if (brandRecord?.publishedConfig?.brand?.headerLogoUrl) {
+    headerLogoUrl = brandRecord.publishedConfig.brand.headerLogoUrl;
+  }
+
+  // Fallback: Resolve favicon URL if not resolved via published fast-path
+  if (!faviconUrl && brandRecord) {
+    if (brandRecord.expand?.favicon) {
+      const fAsset = brandRecord.expand.favicon;
+      const pb = await getServerPocketBase();
+      faviconUrl = pb.files.getURL(fAsset, fAsset.file);
+    } else if (brandRecord.favicon) {
+      const fav = brandRecord.favicon;
+      if (typeof fav === "string" && (fav.startsWith("http://") || fav.startsWith("https://") || fav.startsWith("/"))) {
+        faviconUrl = fav;
       }
+    } else if (typeof brandRecord.description === "object" && brandRecord.description?.faviconUrl) {
+      faviconUrl = brandRecord.description.faviconUrl;
     }
   }
 
-  // Fallback to description.faviconUrl
-  if (!faviconUrl && typeof brandRecord?.description === "object" && brandRecord.description?.faviconUrl) {
-    faviconUrl = brandRecord.description.faviconUrl;
-  }
-
-  // Resolve header logo URL from expanded relation, mediaAssets, assets, or publishedConfig
-  if (brandRecord?.expand?.headerLogo) {
-    const hlAsset = brandRecord.expand.headerLogo;
-    headerLogoUrl = pb.files.getURL(hlAsset, hlAsset.file);
-  } else if (brandRecord?.headerLogo) {
-    const hl = brandRecord.headerLogo;
-    if (typeof hl === "string" && (hl.startsWith("http://") || hl.startsWith("https://") || hl.startsWith("/"))) {
-      headerLogoUrl = hl;
-    } else {
-      try {
-        const mediaRec = await pb.collection("mediaAssets").getOne(hl);
-        if (mediaRec && mediaRec.file) {
-          headerLogoUrl = pb.files.getURL(mediaRec, mediaRec.file);
-        }
-      } catch {
-        try {
-          const assetRec = await pb.collection("assets").getOne(hl);
-          if (assetRec) {
-            headerLogoUrl = assetRec.svgContent ? `/api/assets/${assetRec.id}/svg` : (assetRec.preview ? pb.files.getURL(assetRec, assetRec.preview) : "");
-          }
-        } catch {
-          // not found
-        }
+  // Fallback: Resolve header logo URL if not resolved via published fast-path
+  if (!headerLogoUrl && brandRecord) {
+    if (brandRecord.expand?.headerLogo) {
+      const hlAsset = brandRecord.expand.headerLogo;
+      const pb = await getServerPocketBase();
+      headerLogoUrl = pb.files.getURL(hlAsset, hlAsset.file);
+    } else if (brandRecord.headerLogo) {
+      const hl = brandRecord.headerLogo;
+      if (typeof hl === "string" && (hl.startsWith("http://") || hl.startsWith("https://") || hl.startsWith("/"))) {
+        headerLogoUrl = hl;
       }
-    }
-  }
-
-  // Fallback to description.headerLogoUrl
-  if (!headerLogoUrl && typeof brandRecord?.description === "object" && brandRecord.description?.headerLogoUrl) {
-    headerLogoUrl = brandRecord.description.headerLogoUrl;
-  }
-
-  // Fallback: If no header logo set, look for the first brand asset (logo)
-  if (!headerLogoUrl && brandRecord?.id) {
-    try {
-      const firstAsset = await pb.collection("assets").getFirstListItem(
-        `brand = "${brandRecord.id}"`,
-        { sort: "order" }
-      );
-      if (firstAsset) {
-        headerLogoUrl = firstAsset.svgContent ? `/api/assets/${firstAsset.id}/svg` : (firstAsset.preview ? pb.files.getURL(firstAsset, firstAsset.preview) : "");
-      }
-    } catch {
-      // No assets found
+    } else if (typeof brandRecord.description === "object" && brandRecord.description?.headerLogoUrl) {
+      headerLogoUrl = brandRecord.description.headerLogoUrl;
     }
   }
 
   if (brandRecord) {
     try {
-      const res = await getBrandCascadeTokensAction(brandRecord.id);
+      const res = await getCachedBrandTokens(brandRecord.id, brandRecord.publishedConfig);
       if (res.success) {
         brandTokens = res.tokens;
         cssVariables = res.cssVariables;

@@ -2,8 +2,8 @@ import PocketBase from "pocketbase";
 import { cookies, headers } from "next/headers";
 
 const pbUrl =
-  process.env.NEXT_PUBLIC_POCKETBASE_URL ||
   process.env.POCKETBASE_INTERNAL_URL ||
+  process.env.NEXT_PUBLIC_POCKETBASE_URL ||
   "https://pb.logobook.eu";
 
 /**

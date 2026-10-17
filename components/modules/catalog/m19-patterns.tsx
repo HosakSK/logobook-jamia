@@ -23,7 +23,6 @@ import {
   Archive,
   Image as ImageIcon,
 } from "lucide-react";
-import JSZip from "jszip";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import {
   M19PatternsConfig,
@@ -159,6 +158,8 @@ export default function M19PatternyModule({
     if (!item.downloads || item.downloads.length === 0) return;
     try {
       setIsZipping(item.id);
+      const JSZipModule = await import("jszip");
+      const JSZip = JSZipModule.default || JSZipModule;
       const zip = new JSZip();
       const safeTitle = resolveI18nText(item.title, locale) || "brand-pattern";
       const folderName = safeTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-");

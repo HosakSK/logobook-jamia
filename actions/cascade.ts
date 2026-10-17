@@ -1,16 +1,7 @@
 "use server";
 
-import { getServerPocketBase } from "@/lib/pocketbase-server";
+import { getCachedBrandTokens } from "@/lib/manual/brand-cache";
 import { BrandCascadeTokens } from "@/lib/types/module";
-import {
-  buildBrandCascadeTokens,
-  computeBrandCssVariables,
-} from "@/lib/utils/cascade";
-import {
-  GlobalShapesRecord,
-  GlobalColorsRecord,
-  GlobalTypographyRecord,
-} from "@/types/pocketbase-types";
 
 /**
  * Server action to fetch and compute Level 1 Brand Tokens for a given brand project.
@@ -22,78 +13,5 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
   cssVariables: Record<string, string>;
   error?: string;
 }> {
-  try {
-    const pb = await getServerPocketBase();
-
-    let targetBrandId = brandId;
-    try {
-      const b = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
-      targetBrandId = b.id;
-    } catch {
-      // fallback
-    }
-
-    let shapes: GlobalShapesRecord | null = null;
-    let colors: GlobalColorsRecord[] = [];
-    let typography: GlobalTypographyRecord[] = [];
-
-    // 1. Fetch global shapes
-    try {
-      shapes = await pb
-        .collection("globalShapes")
-        .getFirstListItem<GlobalShapesRecord>(`brand = "${targetBrandId}"`);
-    } catch {
-      // Shapes record not yet created or unauthenticated -> check if brand has publishedConfig fallback
-      try {
-        const bRec = await pb.collection("brands").getOne(targetBrandId);
-        if (bRec?.publishedConfig?.brand?.themeConfig) {
-          shapes = {
-            themeConfig: bRec.publishedConfig.brand.themeConfig,
-            manualBgColor: bRec.publishedConfig.brand.manualBgColor,
-          } as any;
-        }
-      } catch {
-        // defaults apply
-      }
-    }
-
-    // 2. Fetch global colors
-    try {
-      colors = await pb.collection("globalColors").getFullList<GlobalColorsRecord>({
-        filter: `brand = "${targetBrandId}"`,
-        sort: "order",
-      });
-    } catch {
-      // Colors empty -> defaults apply
-    }
-
-    // 3. Fetch global typography
-    try {
-      typography = await pb
-        .collection("globalTypography")
-        .getFullList<GlobalTypographyRecord>({
-          filter: `brand = "${targetBrandId}"`,
-          sort: "order",
-        });
-    } catch {
-      // Typography empty -> defaults apply
-    }
-
-    const tokens = buildBrandCascadeTokens(shapes, colors, typography);
-    const cssVariables = computeBrandCssVariables(shapes, colors, typography);
-
-    return {
-      success: true,
-      tokens,
-      cssVariables,
-    };
-  } catch (err: unknown) {
-    console.error("Failed to load brand cascade tokens:", err);
-    return {
-      success: false,
-      tokens: buildBrandCascadeTokens(null, null, null),
-      cssVariables: computeBrandCssVariables(null, null, null),
-      error: err instanceof Error ? err.message : "Failed to load brand tokens",
-    };
-  }
+  return getCachedBrandTokens(brandId);
 }

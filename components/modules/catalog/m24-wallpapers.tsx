@@ -22,7 +22,6 @@ import {
   Eye,
   Sliders,
 } from "lucide-react";
-import JSZip from "jszip";
 import { ModuleRenderProps, BaseModuleConfig } from "@/lib/types/module";
 import {
   M24WallpapersConfig,
@@ -225,6 +224,8 @@ export default function M24FiremneTapetyAPozadiaModule({
 
     setIsZipping(true);
     try {
+      const JSZipModule = await import("jszip");
+      const JSZip = JSZipModule.default || JSZipModule;
       const zip = new JSZip();
       const folder = zip.folder("brand-wallpapers");
 
