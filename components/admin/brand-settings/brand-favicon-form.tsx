@@ -1039,6 +1039,35 @@ export function BrandFaviconForm({
 }
 
 /**
+ * Converts a hex string (#RRGGBB or #RGB) to RGB numbers
+ */
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  let c = hex.replace("#", "").trim();
+  if (c.length === 3) {
+    c = c.split("").map((x) => x + x).join("");
+  }
+  const num = parseInt(c, 16);
+  if (isNaN(num)) return { r: 255, g: 255, b: 255 };
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+/**
+ * Returns a target color in rgba() format preserving original alpha
+ */
+function toRgbaString(targetHex: string, alpha: string | number): string {
+  try {
+    const { r, g, b } = hexToRgb(targetHex);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  } catch {
+    return targetHex;
+  }
+}
+
+/**
  * Checks if a color is transparent/none or explicitly white (e.g. background cutout)
  */
 function isColorWhiteOrNone(colorStr: string): boolean {
@@ -1058,15 +1087,8 @@ function isColorWhiteOrNone(colorStr: string): boolean {
 }
 
 /**
- * Accurately recolors SVG artwork elements (paths, strokes, styles, classes) to targetColor.
- * Handles:
- * - Pure black (#000, #000000, black)
- * - Semi-transparent black (rgba(0, 0, 0, x), opacity, fill-opacity) -> resets opacity to solid 1 so color is vibrant
- * - Rich blacks and dark tones (#231F20, #1A171B, #1D1D1B, etc.)
- * - Grey tones produced by flattened vector transparency (#333, #666, #888, #aaa, etc.)
- * - Elements with NO fill attribute (SVG standard defaults to black)
- * - <style> CSS rules with .st0, .cls-1 classes exported by Illustrator / Figma
- * - Preserves transparent fills/strokes and explicitly white cutouts (#ffffff)
+ * Accurately recolors SVG artwork elements (paths, strokes, styles, classes) to targetColor
+ * WHILE PRESERVING ORIGINAL TRANSPARENCY (opacity, fill-opacity, rgba alpha channel).
  */
 function recolorSvgContent(rawSvg: string, targetColor: string): string {
   if (!rawSvg || !targetColor || targetColor === "original") return rawSvg;
@@ -1081,19 +1103,25 @@ function recolorSvgContent(rawSvg: string, targetColor: string): string {
     const styleTags = doc.querySelectorAll("style");
     styleTags.forEach((st) => {
       let css = st.textContent || "";
-      // Replace fill in css rules unless white or none
+      // Replace fill in css rules unless white or none; preserve rgba alpha if present
       css = css.replace(/fill\s*:\s*([^;!}]+)/gi, (match, val) => {
         if (isColorWhiteOrNone(val)) return match;
+        const rgbaM = val.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+        if (rgbaM) {
+          return `fill: ${toRgbaString(targetColor, rgbaM[1])}`;
+        }
         return `fill: ${targetColor}`;
       });
       // Replace stroke in css rules unless white or none
       css = css.replace(/stroke\s*:\s*([^;!}]+)/gi, (match, val) => {
         if (isColorWhiteOrNone(val)) return match;
+        const rgbaM = val.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+        if (rgbaM) {
+          return `stroke: ${toRgbaString(targetColor, rgbaM[1])}`;
+        }
         return `stroke: ${targetColor}`;
       });
-      // Reset opacity in CSS rules so recolored shapes are solid and vibrant
-      css = css.replace(/opacity\s*:\s*([0-9.]+)/gi, "opacity: 1");
-      css = css.replace(/fill-opacity\s*:\s*([0-9.]+)/gi, "fill-opacity: 1");
+      // NOTICE: We deliberately PRESERVE opacity and fill-opacity in CSS rules!
       st.textContent = css;
     });
 
@@ -1122,25 +1150,34 @@ function recolorSvgContent(rawSvg: string, targetColor: string): string {
         let updatedStyle = inlineStyle;
         updatedStyle = updatedStyle.replace(/fill\s*:\s*([^;!}]+)/gi, (match, val) => {
           if (isColorWhiteOrNone(val)) return match;
+          const rgbaM = val.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+          if (rgbaM) {
+            return `fill: ${toRgbaString(targetColor, rgbaM[1])}`;
+          }
           return `fill: ${targetColor}`;
         });
         updatedStyle = updatedStyle.replace(/stroke\s*:\s*([^;!}]+)/gi, (match, val) => {
           if (isColorWhiteOrNone(val)) return match;
+          const rgbaM = val.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+          if (rgbaM) {
+            return `stroke: ${toRgbaString(targetColor, rgbaM[1])}`;
+          }
           return `stroke: ${targetColor}`;
         });
-        // Normalize opacity
-        updatedStyle = updatedStyle.replace(/opacity\s*:\s*([0-9.]+)/gi, "opacity: 1");
-        updatedStyle = updatedStyle.replace(/fill-opacity\s*:\s*([0-9.]+)/gi, "fill-opacity: 1");
+        // NOTICE: We deliberately PRESERVE opacity and fill-opacity in inline styles!
         el.setAttribute("style", updatedStyle);
       }
 
-      // B. Fill attribute handling
+      // B. Fill attribute handling (preserving alpha or opacity)
       if (fill !== null) {
         if (!isColorWhiteOrNone(fill)) {
-          el.setAttribute("fill", targetColor);
-          // Remove opacity attributes so color is solid
-          el.removeAttribute("opacity");
-          el.removeAttribute("fill-opacity");
+          const rgbaM = fill.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+          if (rgbaM) {
+            el.setAttribute("fill", toRgbaString(targetColor, rgbaM[1]));
+          } else {
+            el.setAttribute("fill", targetColor);
+          }
+          // NOTICE: We deliberately DO NOT remove opacity or fill-opacity attributes!
         }
       } else {
         // Element has NO fill attribute.
@@ -1152,8 +1189,6 @@ function recolorSvgContent(rawSvg: string, targetColor: string): string {
             // Keep pure stroke element
           } else {
             el.setAttribute("fill", targetColor);
-            el.removeAttribute("opacity");
-            el.removeAttribute("fill-opacity");
           }
         }
       }
@@ -1161,8 +1196,12 @@ function recolorSvgContent(rawSvg: string, targetColor: string): string {
       // C. Stroke attribute handling
       if (stroke !== null) {
         if (!isColorWhiteOrNone(stroke)) {
-          el.setAttribute("stroke", targetColor);
-          el.removeAttribute("stroke-opacity");
+          const rgbaM = stroke.match(/rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*([0-9.]+)\s*\)/i);
+          if (rgbaM) {
+            el.setAttribute("stroke", toRgbaString(targetColor, rgbaM[1]));
+          } else {
+            el.setAttribute("stroke", targetColor);
+          }
         }
       }
     });
