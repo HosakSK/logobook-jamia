@@ -36,10 +36,26 @@ export default async function AdminLayout({
 
   let availableBrands: { id: string; slug: string; name: string; iconUrl?: string | null }[] = [];
   if (user) {
+    let records: any[] = [];
     try {
-      const records = await pb.collection("brands").getFullList({
+      records = await pb.collection("brands").getFullList({
         expand: "favicon",
-        sort: "-updated",
+      });
+    } catch (err) {
+      console.error("Failed to load user brands with expand in layout, retrying plain getFullList:", err);
+      try {
+        records = await pb.collection("brands").getFullList();
+      } catch (fallbackErr) {
+        console.error("Failed fallback load user brands in layout:", fallbackErr);
+      }
+    }
+
+    if (records.length > 0) {
+      records.sort((a, b) => {
+        if (a.updated && b.updated) {
+          return b.updated.localeCompare(a.updated);
+        }
+        return (a.name || "").localeCompare(b.name || "");
       });
       availableBrands = records.map((b) => ({
         id: b.id,
@@ -47,8 +63,6 @@ export default async function AdminLayout({
         name: b.name,
         iconUrl: resolveBrandFaviconUrl(b, pb),
       }));
-    } catch (err) {
-      console.error("Failed to load user brands in layout:", err);
     }
   }
 

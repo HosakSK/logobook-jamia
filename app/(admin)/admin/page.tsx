@@ -34,11 +34,23 @@ export default async function AdminDashboardPage() {
   try {
     brandsRaw = await pb.collection("brands").getFullList({
       expand: "favicon",
-      sort: "-updated",
     });
   } catch (err) {
-    console.error("Failed to fetch brands in admin dashboard:", err);
+    console.error("Failed to fetch brands with expand in admin dashboard, retrying plain getFullList:", err);
+    try {
+      brandsRaw = await pb.collection("brands").getFullList();
+    } catch (fallbackErr) {
+      console.error("Failed fallback fetch brands in admin dashboard:", fallbackErr);
+    }
   }
+
+  // Sort in memory by updated (descending) or name
+  brandsRaw.sort((a, b) => {
+    if (a.updated && b.updated) {
+      return b.updated.localeCompare(a.updated);
+    }
+    return (a.name || "").localeCompare(b.name || "");
+  });
 
   // 2. Fetch team memberships for role distinction (Owner vs Editor)
   const teamMemberships: Record<string, string> = {};
