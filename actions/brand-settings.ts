@@ -157,12 +157,17 @@ export async function uploadBrandFaviconAction(
       return { success: false, error: "Favicon must be less than 2 MB" };
     }
 
-    // Upload to mediaAssets collection
+    // Upload to mediaAssets collection with exact schema fields
+    const rawFileName = faviconFile.name && faviconFile.name !== "blob" ? faviconFile.name : "brand-favicon.png";
     const assetPayload = new FormData();
     assetPayload.set("brand", brand.id);
-    assetPayload.set("name", "Favicon");
-    assetPayload.set("type", "ICON");
     assetPayload.set("file", faviconFile);
+    assetPayload.set("fileName", rawFileName);
+    assetPayload.set("fileType", "ICON");
+    assetPayload.set("fileSize", String(faviconFile.size));
+    assetPayload.set("mimeType", faviconFile.type || "image/png");
+    assetPayload.set("altText", `${brand.name} Favicon & Brand Icon`);
+    assetPayload.set("order", "0");
 
     const mediaAsset = await pb.collection("mediaAssets").create(assetPayload);
 
@@ -189,11 +194,18 @@ export async function uploadBrandFaviconAction(
       success: true,
       faviconUrl: finalUrl,
     };
-  } catch (err: unknown) {
+  } catch (err: any) {
     console.error("Failed to upload favicon:", err);
+    let errorMsg = err?.message || "Failed to upload favicon";
+    if (err?.data?.data) {
+      const details = Object.entries(err.data.data)
+        .map(([k, v]: [string, any]) => `${k}: ${v?.message || JSON.stringify(v)}`)
+        .join("; ");
+      if (details) errorMsg += ` (${details})`;
+    }
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to upload favicon",
+      error: errorMsg,
     };
   }
 }
