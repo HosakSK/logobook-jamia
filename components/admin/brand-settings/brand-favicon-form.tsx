@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { setBrandFaviconAction, uploadBrandFaviconAction } from "@/actions/brand-settings";
+import { toPublicPbUrl } from "@/lib/utils/brand-media";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -55,10 +57,12 @@ export function BrandFaviconForm({
   brandColors = [],
   defaultRadiusMode = "rounded",
 }: BrandFaviconFormProps) {
+  const router = useRouter();
+  const normalizedInitialFavicon = initialFaviconUrl ? toPublicPbUrl(initialFaviconUrl) : null;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [savedFaviconUrl, setSavedFaviconUrl] = useState<string | null>(initialFaviconUrl || null);
+  const [savedFaviconUrl, setSavedFaviconUrl] = useState<string | null>(normalizedInitialFavicon);
 
   // Active Mode: "studio" (interactive generator) vs "direct" (direct upload/file link)
   const [mode, setMode] = useState<"studio" | "direct">("studio");
@@ -71,7 +75,7 @@ export function BrandFaviconForm({
     brandColors[1]?.hex ||
     "#009f80";
 
-  const [sourceSymbolUrl, setSourceSymbolUrl] = useState<string | null>(initialFaviconUrl || null);
+  const [sourceSymbolUrl, setSourceSymbolUrl] = useState<string | null>(normalizedInitialFavicon);
   const [rawSvgContent, setRawSvgContent] = useState<string | null>(null);
 
   const initialShape: ContainerShape =
@@ -377,8 +381,11 @@ export function BrandFaviconForm({
 
             const res = await uploadBrandFaviconAction(brandId, formData);
             if (res.success && res.faviconUrl) {
-              setSavedFaviconUrl(res.faviconUrl);
+              const cleanUrl = toPublicPbUrl(res.faviconUrl);
+              setSavedFaviconUrl(cleanUrl);
+              setStudioPreviewUrl(cleanUrl);
               setSuccess(true);
+              router.refresh();
               setTimeout(() => setSuccess(false), 4500);
             } else {
               setError(res.error || "Nepodarilo sa uložiť favicon.");
@@ -409,9 +416,11 @@ export function BrandFaviconForm({
       formData.append("favicon", file);
       const res = await uploadBrandFaviconAction(brandId, formData);
       if (res.success && res.faviconUrl) {
-        setSavedFaviconUrl(res.faviconUrl);
-        setStudioPreviewUrl(res.faviconUrl);
+        const cleanUrl = toPublicPbUrl(res.faviconUrl);
+        setSavedFaviconUrl(cleanUrl);
+        setStudioPreviewUrl(cleanUrl);
         setSuccess(true);
+        router.refresh();
         setTimeout(() => setSuccess(false), 4500);
       } else {
         setError(res.error || "Nepodarilo sa nahrať súbor faviconu.");
@@ -430,6 +439,7 @@ export function BrandFaviconForm({
         setStudioPreviewUrl(null);
         setSourceSymbolUrl(null);
         setSuccess(true);
+        router.refresh();
         setTimeout(() => setSuccess(false), 4500);
       } else {
         setError(res.error || "Nepodarilo sa odstrániť favicon.");

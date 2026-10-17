@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useBrandStore, ActiveBrand } from "@/lib/store/brand-store";
 import { getDictionary, Locale, DEFAULT_LOCALE } from "@/lib/i18n";
 import { getBrandPublicUrl } from "@/lib/domains";
+import { toPublicPbUrl } from "@/lib/utils/brand-media";
 import { ChevronsUpDown, Check, Plus, ExternalLink, Sparkles } from "lucide-react";
 
 interface BrandSwitcherProps {
@@ -35,6 +36,19 @@ export function BrandSwitcher({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Synchronize fresh iconUrl from availableBrands into persisted activeBrand
+  useEffect(() => {
+    if (activeBrand && availableBrands.length > 0) {
+      const matched = availableBrands.find((b) => b.id === activeBrand.id || b.slug === activeBrand.slug);
+      if (matched && matched.iconUrl && matched.iconUrl !== activeBrand.iconUrl) {
+        setActiveBrand({
+          ...activeBrand,
+          iconUrl: matched.iconUrl,
+        });
+      }
+    }
+  }, [availableBrands, activeBrand, setActiveBrand]);
+
   const handleSelect = (brand: ActiveBrand) => {
     setActiveBrand(brand);
     setIsOpen(false);
@@ -46,6 +60,8 @@ export function BrandSwitcher({
     activeBrand ||
     availableBrands[0];
 
+  const currentIconUrl = toPublicPbUrl(currentBrand?.iconUrl);
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -54,10 +70,10 @@ export function BrandSwitcher({
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2.5 truncate">
-          {currentBrand.iconUrl ? (
+          {currentIconUrl ? (
             <div className="h-6 w-6 rounded-md bg-[#070b0f] border border-white/[0.12] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
               <img
-                src={currentBrand.iconUrl}
+                src={currentIconUrl}
                 alt={currentBrand.name}
                 className="h-full w-full object-contain p-0.5"
               />
@@ -88,6 +104,7 @@ export function BrandSwitcher({
           <div className="py-1 space-y-0.5">
             {availableBrands.map((brand) => {
               const isSelected = activeBrand?.id === brand.id;
+              const itemIconUrl = toPublicPbUrl(brand.iconUrl);
               return (
                 <button
                   key={brand.id}
@@ -99,10 +116,10 @@ export function BrandSwitcher({
                   }`}
                 >
                   <div className="flex items-center gap-2 truncate">
-                    {brand.iconUrl ? (
+                    {itemIconUrl ? (
                       <div className="h-5 w-5 rounded-md bg-[#070b0f] border border-white/[0.1] flex items-center justify-center shrink-0 overflow-hidden">
                         <img
-                          src={brand.iconUrl}
+                          src={itemIconUrl}
                           alt={brand.name}
                           className="h-full w-full object-contain p-0.5"
                         />

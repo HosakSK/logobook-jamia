@@ -3,6 +3,7 @@
 import { getServerPocketBase } from "@/lib/pocketbase-server";
 import { brandGeneralSettingsSchema, globalShapesSchema } from "@/lib/validations/brand-settings";
 import { revalidatePath } from "next/cache";
+import { toPublicPbUrl } from "@/lib/utils/brand-media";
 
 // Helper to check user permission on a brand (accepts either PocketBase record ID or slug)
 async function verifyBrandAccess(pb: any, brandIdOrSlug: string, userId: string, requireOwner = false) {
@@ -171,17 +172,30 @@ export async function uploadBrandFaviconAction(
 
     const mediaAsset = await pb.collection("mediaAssets").create(assetPayload);
 
-    const finalUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
+    const rawFileUrl = pb.files.getURL(mediaAsset, mediaAsset.file);
+    const finalUrl = toPublicPbUrl(rawFileUrl);
     const existingDesc = (typeof brand.description === "object" && brand.description !== null)
       ? { ...brand.description }
       : {};
     existingDesc.faviconUrl = finalUrl;
 
-    // Link in brands collection
-    await pb.collection("brands").update(brand.id, {
+    const updatePayload: Record<string, any> = {
       favicon: mediaAsset.id,
       description: existingDesc,
-    });
+    };
+
+    if (typeof brand.publishedConfig === "object" && brand.publishedConfig !== null && brand.publishedConfig.brand) {
+      updatePayload.publishedConfig = {
+        ...brand.publishedConfig,
+        brand: {
+          ...brand.publishedConfig.brand,
+          faviconUrl: finalUrl,
+        },
+      };
+    }
+
+    // Link in brands collection
+    await pb.collection("brands").update(brand.id, updatePayload);
 
     revalidatePath(`/admin/brand/${brand.id}/settings`);
     revalidatePath(`/admin/brand/${brand.slug}/settings`);
@@ -283,9 +297,10 @@ export async function setBrandFaviconAction(
       }
     }
 
+    const cleanFavUrl = finalUrl ? toPublicPbUrl(finalUrl) : "";
     const updatedDesc = {
       ...existingDesc,
-      faviconUrl: finalUrl || "",
+      faviconUrl: cleanFavUrl,
     };
 
     const updatePayload: Record<string, any> = {
@@ -295,6 +310,16 @@ export async function setBrandFaviconAction(
       updatePayload.favicon = favAssetId;
     } else {
       updatePayload.favicon = null;
+    }
+
+    if (typeof brand.publishedConfig === "object" && brand.publishedConfig !== null && brand.publishedConfig.brand) {
+      updatePayload.publishedConfig = {
+        ...brand.publishedConfig,
+        brand: {
+          ...brand.publishedConfig.brand,
+          faviconUrl: cleanFavUrl,
+        },
+      };
     }
 
     await pb.collection("brands").update(brand.id, updatePayload);

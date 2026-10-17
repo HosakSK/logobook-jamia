@@ -7,6 +7,7 @@ import { BrandCascadeProvider } from "@/components/modules/cascade";
 import { ManualLockScreen } from "@/components/manual/manual-lock-screen";
 import { PublicManualShell } from "@/components/manual/public-manual-shell";
 import { PublishedBrandSnapshot } from "@/actions/publish";
+import { resolveBrandFaviconUrl, toPublicPbUrl } from "@/lib/utils/brand-media";
 
 export async function generateMetadata({
   params,
@@ -17,25 +18,17 @@ export async function generateMetadata({
   try {
     const brandRecord = await getCachedBrandBySlug(domain);
 
-    let favUrl = "";
-    if (brandRecord?.publishedConfig?.brand?.faviconUrl) {
-      favUrl = brandRecord.publishedConfig.brand.faviconUrl;
-    } else if (brandRecord?.expand?.favicon) {
-      const f = brandRecord.expand.favicon;
-      const pb = await getServerPocketBase();
-      favUrl = pb.files.getURL(f, f.file);
-    } else if (brandRecord?.favicon && typeof brandRecord.favicon === "string" && brandRecord.favicon.startsWith("http")) {
-      favUrl = brandRecord.favicon;
-    } else if (typeof brandRecord?.description === "object" && brandRecord.description?.faviconUrl) {
-      favUrl = brandRecord.description.faviconUrl;
-    }
-
+    const favUrl = resolveBrandFaviconUrl(brandRecord);
     if (favUrl) {
       return {
         icons: {
-          icon: [{ url: favUrl }],
-          shortcut: [{ url: favUrl }],
-          apple: [{ url: favUrl }],
+          icon: [
+            { url: favUrl, sizes: "any" },
+            { url: favUrl, sizes: "32x32", type: "image/png" },
+            { url: favUrl, sizes: "256x256", type: "image/png" },
+          ],
+          shortcut: favUrl,
+          apple: [{ url: favUrl, sizes: "180x180" }],
         },
       };
     }
@@ -155,11 +148,12 @@ export default async function ManualLayout({
   };
 
   const publishedConfig = (brandRecord?.publishedConfig || null) as PublishedBrandSnapshot | null;
-  const rawFavicon = faviconUrl || (publishedConfig?.brand as any)?.faviconUrl || "/logo/logo-symbol-dark.svg";
-  const activeFavicon = sanitizePbUrl(rawFavicon) || "/logo/logo-symbol-dark.svg";
+  const resolvedDbFavicon = resolveBrandFaviconUrl(brandRecord);
+  const rawFavicon = faviconUrl || resolvedDbFavicon || (publishedConfig?.brand as any)?.faviconUrl || "/logo/logo-symbol-dark.svg";
+  const activeFavicon = toPublicPbUrl(rawFavicon) || "/logo/logo-symbol-dark.svg";
 
   const rawHeaderLogoUrl = headerLogoUrl || (publishedConfig?.brand as any)?.headerLogoUrl;
-  const activeHeaderLogoUrl = sanitizePbUrl(rawHeaderLogoUrl);
+  const activeHeaderLogoUrl = toPublicPbUrl(rawHeaderLogoUrl);
 
   return (
     <BrandCascadeProvider
@@ -169,8 +163,11 @@ export default async function ManualLayout({
     >
       {activeFavicon && (
         <head>
-          <link rel="icon" href={activeFavicon} />
-          <link rel="apple-touch-icon" href={activeFavicon} />
+          <link rel="icon" href={activeFavicon} sizes="any" />
+          <link rel="icon" href={activeFavicon} type="image/png" sizes="32x32" />
+          <link rel="icon" href={activeFavicon} type="image/png" sizes="256x256" />
+          <link rel="shortcut icon" href={activeFavicon} />
+          <link rel="apple-touch-icon" href={activeFavicon} sizes="180x180" />
         </head>
       )}
       <PublicManualShell
