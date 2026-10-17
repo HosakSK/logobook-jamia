@@ -25,7 +25,9 @@ import {
   Smartphone,
   CheckCircle2,
   Layers,
+  Pipette,
 } from "lucide-react";
+import { useColorPickerStore } from "@/lib/store/color-picker-store";
 import {
   UniversalMediaPickerModal,
   SelectedMediaItem,
@@ -85,12 +87,14 @@ export function BrandFaviconForm({
       ? "square"
       : "squircle";
 
+  const { openColorPicker } = useColorPickerStore();
+
   const [shape, setShape] = useState<ContainerShape>(initialShape);
   const [bgColor, setBgColor] = useState<string>("#0e161d");
   const [isTransparentBg, setIsTransparentBg] = useState<boolean>(false);
   const [paddingPercent, setPaddingPercent] = useState<number>(20);
-  const [symbolTint, setSymbolTint] = useState<SymbolTint>("original");
-  const [customTintColor, setCustomTintColor] = useState<string>("#ffffff");
+  const [iconColorHex, setIconColorHex] = useState<string>(primaryBrandColor || "#ffffff");
+  const [isOriginalIconColor, setIsOriginalIconColor] = useState<boolean>(true);
 
   // Output generated live preview
   const [studioPreviewUrl, setStudioPreviewUrl] = useState<string | null>(initialFaviconUrl || null);
@@ -170,42 +174,14 @@ export function BrandFaviconForm({
     let effectiveImgSrc = sourceSymbolUrl;
     let objectUrlToRevoke: string | null = null;
 
-    if (rawSvgContent && symbolTint !== "original") {
+    if (rawSvgContent && !isOriginalIconColor) {
       try {
-        const targetColor =
-          symbolTint === "white"
-            ? "#ffffff"
-            : symbolTint === "dark"
-            ? "#0e161d"
-            : symbolTint === "primary"
-            ? primaryBrandColor
-            : customTintColor;
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(rawSvgContent, "image/svg+xml");
-        const svgEl = doc.querySelector("svg");
-
-        if (svgEl) {
-          const allEls = svgEl.querySelectorAll("*");
-          allEls.forEach((el) => {
-            const fill = el.getAttribute("fill");
-            if (fill && fill !== "none") {
-              el.setAttribute("fill", targetColor);
-            }
-            const stroke = el.getAttribute("stroke");
-            if (stroke && stroke !== "none") {
-              el.setAttribute("stroke", targetColor);
-            }
-          });
-
-          const serializer = new XMLSerializer();
-          const modifiedXml = serializer.serializeToString(doc);
-          const blob = new Blob([modifiedXml], { type: "image/svg+xml;charset=utf-8" });
-          objectUrlToRevoke = URL.createObjectURL(blob);
-          effectiveImgSrc = objectUrlToRevoke;
-        }
+        const modifiedXml = recolorSvgContent(rawSvgContent, iconColorHex);
+        const blob = new Blob([modifiedXml], { type: "image/svg+xml;charset=utf-8" });
+        objectUrlToRevoke = URL.createObjectURL(blob);
+        effectiveImgSrc = objectUrlToRevoke;
       } catch (err) {
-        console.error("Failed to tint SVG:", err);
+        console.error("Failed to recolor SVG:", err);
       }
     }
 
@@ -269,7 +245,25 @@ export function BrandFaviconForm({
       const drawX = (512 - drawW) / 2;
       const drawY = (512 - drawH) / 2;
 
-      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      // Draw tinted or original symbol
+      if (!rawSvgContent && !isOriginalIconColor) {
+        // Fallback tinting for raster PNG symbols
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = drawW;
+        offCanvas.height = drawH;
+        const offCtx = offCanvas.getContext("2d");
+        if (offCtx) {
+          offCtx.drawImage(img, 0, 0, drawW, drawH);
+          offCtx.globalCompositeOperation = "source-in";
+          offCtx.fillStyle = iconColorHex;
+          offCtx.fillRect(0, 0, drawW, drawH);
+          ctx.drawImage(offCanvas, drawX, drawY);
+        } else {
+          ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        }
+      } else {
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+      }
 
       try {
         const dataUrl = canvas.toDataURL("image/png");
@@ -301,8 +295,8 @@ export function BrandFaviconForm({
     bgColor,
     isTransparentBg,
     paddingPercent,
-    symbolTint,
-    customTintColor,
+    isOriginalIconColor,
+    iconColorHex,
     primaryBrandColor,
   ]);
 
@@ -624,97 +618,101 @@ export function BrandFaviconForm({
                 </div>
               </div>
 
-              {/* 2. Background Color */}
-              {!isTransparentBg && shape !== "transparent" && (
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
-                      Farba pozadia
-                    </Label>
-                    <span className="text-[11px] font-mono text-muted-foreground">{bgColor}</span>
+              {/* 2. Color Selection (Background & Icon) with circular swatch + pipette */}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
+                  Farby ikony & pozadia
+                </Label>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  {/* Background Color Swatch */}
+                  <div className="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.08] bg-[#0e161d]">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-semibold text-[#fafbfc] block">
+                        Farba pozadia
+                      </span>
+                      <span className="text-[11px] font-mono text-[#96abbe]">
+                        {isTransparentBg || shape === "transparent" ? "Bez pozadia" : bgColor}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openColorPicker({
+                          title: "Farba pozadia ikony",
+                          color: isTransparentBg || shape === "transparent" ? "transparent" : bgColor,
+                          palette: brandColors.map((c) => ({ name: c.name, role: c.role, hex: c.hex })),
+                          allowTransparent: true,
+                          onSelect: (selectedHex) => {
+                            if (selectedHex === "transparent") {
+                              setIsTransparentBg(true);
+                              setShape("transparent");
+                            } else {
+                              setIsTransparentBg(false);
+                              if (shape === "transparent") setShape("squircle");
+                              setBgColor(selectedHex);
+                            }
+                          },
+                        })
+                      }
+                      title="Kliknite pre výber farby pozadia"
+                      className="group relative h-9 w-9 rounded-full border-2 border-white/20 shadow-md flex items-center justify-center transition-all duration-150 hover:scale-110 hover:border-[#c8d400] cursor-pointer shrink-0"
+                      style={{
+                        backgroundColor: isTransparentBg || shape === "transparent" ? "transparent" : bgColor,
+                      }}
+                    >
+                      <Pipette className="h-4 w-4 drop-shadow-md text-white group-hover:text-[#c8d400] transition-colors" />
+                    </button>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    {/* Default Slate Theme Background */}
-                    <button
-                      type="button"
-                      onClick={() => setBgColor("#0e161d")}
-                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
-                        bgColor.toLowerCase() === "#0e161d"
-                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
-                          : "border-white/10 hover:border-white/30"
-                      }`}
-                      style={{ backgroundColor: "#0e161d" }}
-                    >
-                      <span className="h-3 w-3 rounded-full bg-[#0e161d] border border-white/30" />
-                      <span>Manuál Slate</span>
-                    </button>
-
-                    {/* Black */}
-                    <button
-                      type="button"
-                      onClick={() => setBgColor("#000000")}
-                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
-                        bgColor.toLowerCase() === "#000000"
-                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
-                          : "border-white/10 hover:border-white/30"
-                      }`}
-                      style={{ backgroundColor: "#000000" }}
-                    >
-                      <span className="h-3 w-3 rounded-full bg-black border border-white/30" />
-                      <span>Čierna</span>
-                    </button>
-
-                    {/* White */}
-                    <button
-                      type="button"
-                      onClick={() => setBgColor("#ffffff")}
-                      className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 text-black cursor-pointer transition-all ${
-                        bgColor.toLowerCase() === "#ffffff"
-                          ? "ring-2 ring-[#c8d400] border-transparent font-bold"
-                          : "border-white/10 hover:border-white/30"
-                      }`}
-                      style={{ backgroundColor: "#ffffff" }}
-                    >
-                      <span className="h-3 w-3 rounded-full bg-white border border-black/20" />
-                      <span>Biela</span>
-                    </button>
-
-                    {/* Brand Palette Colors */}
-                    {brandColors.map((color, idx) => (
-                      <button
-                        key={`${color.hex}-${idx}`}
-                        type="button"
-                        onClick={() => setBgColor(color.hex)}
-                        className={`h-8 px-3 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
-                          bgColor.toLowerCase() === color.hex.toLowerCase()
-                            ? "ring-2 ring-white border-transparent font-bold"
-                            : "border-white/10 hover:border-white/30"
-                        }`}
-                        style={{ backgroundColor: color.hex }}
-                      >
-                        <span
-                          className="h-3 w-3 rounded-full border border-black/20"
-                          style={{ backgroundColor: color.hex }}
-                        />
-                        <span className="text-black font-semibold drop-shadow-xs">
-                          {color.name || color.role || color.hex}
+                  {/* Icon / Symbol Color Swatch */}
+                  <div className="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.08] bg-[#0e161d]">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-semibold text-[#fafbfc] block">
+                        Farba ikony (SVG)
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-mono text-[#96abbe]">
+                          {isOriginalIconColor ? "Pôvodné farby" : iconColorHex}
                         </span>
-                      </button>
-                    ))}
-
-                    {/* Custom Color Input */}
-                    <div className="flex items-center gap-1.5 ml-auto">
-                      <input
-                        type="color"
-                        value={bgColor.startsWith("#") ? bgColor : "#0e161d"}
-                        onChange={(e) => setBgColor(e.target.value)}
-                        className="h-8 w-8 rounded-lg cursor-pointer bg-transparent border border-white/20 p-0.5"
-                      />
+                        {!isOriginalIconColor && (
+                          <button
+                            type="button"
+                            onClick={() => setIsOriginalIconColor(true)}
+                            className="text-[10px] text-muted-foreground hover:text-[#c8d400] underline cursor-pointer"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openColorPicker({
+                          title: "Farba ikony / symbolu",
+                          color: isOriginalIconColor ? "#ffffff" : iconColorHex,
+                          palette: brandColors.map((c) => ({ name: c.name, role: c.role, hex: c.hex })),
+                          allowTransparent: false,
+                          onSelect: (selectedHex) => {
+                            setIsOriginalIconColor(false);
+                            setIconColorHex(selectedHex);
+                          },
+                        })
+                      }
+                      title="Kliknite pre výber farby ikony"
+                      className="group relative h-9 w-9 rounded-full border-2 border-white/20 shadow-md flex items-center justify-center transition-all duration-150 hover:scale-110 hover:border-[#c8d400] cursor-pointer shrink-0"
+                      style={{
+                        backgroundColor: isOriginalIconColor ? "#0e161d" : iconColorHex,
+                      }}
+                    >
+                      <Pipette className="h-4 w-4 drop-shadow-md text-white group-hover:text-[#c8d400] transition-colors" />
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* 3. Padding / Symbol Scale Slider */}
               <div className="space-y-2.5">
@@ -738,39 +736,6 @@ export function BrandFaviconForm({
                     className="flex-1 cursor-pointer h-2 bg-white/10 rounded-lg accent-[#c8d400]"
                   />
                   <span className="text-[11px] text-muted-foreground">Malý</span>
-                </div>
-              </div>
-
-              {/* 4. Symbol Tinting (Especially for monochrome SVG) */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-[#96abbe]">
-                    Prefarbenie symbolu (SVG)
-                  </Label>
-                  <span className="text-[11px] text-muted-foreground">
-                    {rawSvgContent ? "Aktívne SVG" : "Pôvodné farby"}
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {[
-                    { id: "original", label: "Pôvodné" },
-                    { id: "white", label: "Biela (#fff)" },
-                    { id: "dark", label: "Tmavá (#0e161d)" },
-                    { id: "primary", label: "Brand primárna" },
-                  ].map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => setSymbolTint(t.id as SymbolTint)}
-                      className={`p-2 rounded-lg border text-xs text-center transition-all cursor-pointer ${
-                        symbolTint === t.id
-                          ? "bg-[#c8d400]/10 border-[#c8d400] text-foreground font-semibold"
-                          : "bg-[#0e161d] border-white/[0.08] text-muted-foreground hover:border-white/20 hover:text-white"
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
                 </div>
               </div>
             </div>
@@ -1011,3 +976,111 @@ export function BrandFaviconForm({
     </div>
   );
 }
+
+/**
+ * Accurately recolors monochrome/black SVG elements (paths, strokes, styles, classes) to targetColor.
+ * Handles:
+ * - <style> CSS rules with .st0, .cls-1 classes exported by Illustrator / Figma
+ * - Elements with explicit black fills/strokes (#000, #000000, black, rgb(0,0,0), #1d1d1b)
+ * - Elements with NO fill attribute which SVG standard defaults to black
+ * - Inline style="fill: ...; stroke: ..." attributes
+ * - Preserves transparent fills/strokes and explicitly white cutouts (#ffffff)
+ */
+function recolorSvgContent(rawSvg: string, targetColor: string): string {
+  if (!rawSvg || !targetColor || targetColor === "original") return rawSvg;
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rawSvg, "image/svg+xml");
+    const svgEl = doc.querySelector("svg");
+    if (!svgEl) return rawSvg;
+
+    // 1. Rewrite <style> tags (CSS rules like .st0, .cls-1 from Illustrator/Figma)
+    const styleTags = doc.querySelectorAll("style");
+    styleTags.forEach((st) => {
+      let css = st.textContent || "";
+      css = css.replace(
+        /fill\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
+        `fill: ${targetColor}`
+      );
+      css = css.replace(
+        /stroke\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
+        `stroke: ${targetColor}`
+      );
+      st.textContent = css;
+    });
+
+    // 2. Graphical elements (path, polygon, rect, circle, ellipse, line, polyline)
+    const elements = svgEl.querySelectorAll("path, polygon, rect, circle, ellipse, line, polyline");
+    elements.forEach((el) => {
+      const fill = el.getAttribute("fill");
+      const stroke = el.getAttribute("stroke");
+      const inlineStyle = el.getAttribute("style");
+
+      // Replace in inline style attribute
+      if (inlineStyle) {
+        let updatedStyle = inlineStyle
+          .replace(
+            /fill\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
+            `fill: ${targetColor}`
+          )
+          .replace(
+            /stroke\s*:\s*(#000000|#000|#1d1d1b|#111111|#222222|#333333|black|rgb\(0,\s*0,\s*0\))/gi,
+            `stroke: ${targetColor}`
+          );
+        el.setAttribute("style", updatedStyle);
+      }
+
+      // Fill attribute
+      if (fill !== null) {
+        const lower = fill.toLowerCase().trim();
+        if (
+          lower === "#000000" ||
+          lower === "#000" ||
+          lower === "#1d1d1b" ||
+          lower === "#111111" ||
+          lower === "#222222" ||
+          lower === "#333333" ||
+          lower === "black" ||
+          lower === "currentcolor" ||
+          lower.startsWith("rgb(0,")
+        ) {
+          el.setAttribute("fill", targetColor);
+        }
+      } else {
+        // Element has NO fill attribute. In SVG spec, default is black (#000000).
+        const hasStyleFill = inlineStyle && inlineStyle.toLowerCase().includes("fill");
+        if (!hasStyleFill) {
+          if (stroke && stroke !== "none") {
+            // Keep pure stroke element
+          } else {
+            el.setAttribute("fill", targetColor);
+          }
+        }
+      }
+
+      // Stroke attribute
+      if (stroke !== null) {
+        const lowerStroke = stroke.toLowerCase().trim();
+        if (
+          lowerStroke === "#000000" ||
+          lowerStroke === "#000" ||
+          lowerStroke === "#1d1d1b" ||
+          lowerStroke === "#111111" ||
+          lowerStroke === "black" ||
+          lowerStroke === "currentcolor" ||
+          lowerStroke.startsWith("rgb(0,")
+        ) {
+          el.setAttribute("stroke", targetColor);
+        }
+      }
+    });
+
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(doc);
+  } catch (err) {
+    console.error("Failed to recolor SVG DOM:", err);
+    return rawSvg;
+  }
+}
+

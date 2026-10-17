@@ -5,6 +5,7 @@ import { VerificationBanner } from "@/components/verification-banner";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DEFAULT_LOCALE, isValidLocale, Locale } from "@/lib/i18n";
 import { resolveBrandFaviconUrl } from "@/lib/utils/brand-media";
+import { GlobalColorPickerModal } from "@/components/admin/color-picker/global-color-picker-modal";
 
 export default async function AdminLayout({
   children,
@@ -74,6 +75,7 @@ export default async function AdminLayout({
       <AdminShell user={userData} brands={availableBrands} locale={currentLocale}>
         {children}
       </AdminShell>
+      <GlobalColorPickerModal />
     </div>
   );
 }
