@@ -40,6 +40,27 @@ function resolveLocale(req: NextRequest, pathSegment?: string): { locale: Locale
   return { locale: DEFAULT_LOCALE, isFromPath: false };
 }
 
+/**
+ * Verifies if a JWT token exists, has 3 valid segments, and has not expired.
+ */
+function isJwtValid(token: string): boolean {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return false;
+    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) {
+      base64 += "=";
+    }
+    const jsonStr = atob(base64);
+    const payload = JSON.parse(jsonStr);
+    if (!payload.exp || typeof payload.exp !== "number") return false;
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp > now;
+  } catch {
+    return false;
+  }
+}
+
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const pathname = url.pathname;
@@ -49,9 +70,11 @@ export function middleware(req: NextRequest) {
   // ---------------------------------------------------------------------------
   // 1. Fast Edge Session Check for /admin
   // ---------------------------------------------------------------------------
-  // Helper to test if pb_auth cookie represents an authenticated user
+  // Helper to test if pb_auth cookie represents an authenticated user with a valid, non-expired token
   const pbAuthCookie = req.cookies.get("pb_auth")?.value;
   let isAuthenticated = false;
+  let hasExpiredCookie = false;
+
   if (pbAuthCookie && pbAuthCookie.trim() !== "" && pbAuthCookie !== "{}") {
     try {
       let cookieVal = pbAuthCookie;
@@ -62,13 +85,17 @@ export function middleware(req: NextRequest) {
         cookieVal = decodeURIComponent(cookieVal);
       }
       const parsed = JSON.parse(cookieVal);
-      if (parsed.token && typeof parsed.token === "string" && parsed.token.length > 10) {
+      if (parsed.token && typeof parsed.token === "string" && isJwtValid(parsed.token)) {
         isAuthenticated = true;
+      } else {
+        hasExpiredCookie = true;
       }
     } catch {
       // Raw token string fallback
-      if (pbAuthCookie.length > 20) {
+      if (pbAuthCookie.length > 20 && isJwtValid(pbAuthCookie)) {
         isAuthenticated = true;
+      } else {
+        hasExpiredCookie = true;
       }
     }
   }
@@ -80,7 +107,11 @@ export function middleware(req: NextRequest) {
     if (!isAuthenticated) {
       const redirectUrl = new URL("/login", req.url);
       redirectUrl.searchParams.set("redirect", pathname + (url.search || ""));
-      return NextResponse.redirect(redirectUrl);
+      const response = NextResponse.redirect(redirectUrl);
+      if (hasExpiredCookie || pbAuthCookie) {
+        response.cookies.delete("pb_auth");
+      }
+      return response;
     }
 
     // Authenticated admin user: pass through to (admin) route group
@@ -93,7 +124,7 @@ export function middleware(req: NextRequest) {
 
   // ---------------------------------------------------------------------------
   // 2. Public auth routes: /login, /register, /reset-password, /auth/*
-  //    If user is already authenticated, redirect them directly to /admin
+  //    If user is already authenticated with a valid token, redirect them to /admin
   // ---------------------------------------------------------------------------
   if (
     pathname === "/login" ||
@@ -104,8 +135,18 @@ export function middleware(req: NextRequest) {
   ) {
     if (isAuthenticated) {
       const targetRedirect = url.searchParams.get("redirect") || "/admin";
-      return NextResponse.redirect(new URL(targetRedirect, req.url));
+      if (!targetRedirect.startsWith("/login")) {
+        return NextResponse.redirect(new URL(targetRedirect, req.url));
+      }
     }
+
+    // Proactively clean up dirty or expired session cookie on auth pages
+    if (hasExpiredCookie || (pbAuthCookie && !isAuthenticated)) {
+      const response = NextResponse.next();
+      response.cookies.delete("pb_auth");
+      return response;
+    }
+
     return NextResponse.next();
   }
 
