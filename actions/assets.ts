@@ -15,6 +15,21 @@ import {
 } from "@/lib/validations/asset";
 
 /**
+ * Resolves brand ID even if a slug was passed (e.g. from page params).
+ */
+async function resolveTargetBrandId(pb: any, brandId: string): Promise<string> {
+  if (brandId && brandId.length === 15) {
+    return brandId;
+  }
+  try {
+    const b = await pb.collection("brands").getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+    return b.id;
+  } catch {
+    return brandId;
+  }
+}
+
+/**
  * Fetches all assets for a given brand project with their attached files.
  */
 export async function getBrandAssetsAction(
@@ -26,10 +41,21 @@ export async function getBrandAssetsAction(
       return { success: false, assets: [], error: "Unauthorized" };
     }
 
-    const assetRecords = await pb.collection("assets").getFullList({
-      filter: `brand = "${brandId}"`,
-      sort: "order",
-    });
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
+    let assetRecords: any[] = [];
+    try {
+      assetRecords = await pb.collection("assets").getFullList({
+        filter: `brand = "${resolvedBrandId}"`,
+        sort: "order",
+      });
+    } catch (sortErr) {
+      console.warn("Failed to fetch assets with sort=order, retrying without sort:", sortErr);
+      assetRecords = await pb.collection("assets").getFullList({
+        filter: `brand = "${resolvedBrandId}"`,
+      });
+      assetRecords.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
 
     if (assetRecords.length === 0) {
       return { success: true, assets: [] };
@@ -37,10 +63,21 @@ export async function getBrandAssetsAction(
 
     // Query assetFiles for these assets
     const assetIdsFilter = assetRecords.map((a: any) => `asset = "${a.id}"`).join(" || ");
-    const fileRecords = await pb.collection("assetFiles").getFullList({
-      filter: assetIdsFilter,
-      sort: "order",
-    });
+    let fileRecords: any[] = [];
+    if (assetIdsFilter) {
+      try {
+        fileRecords = await pb.collection("assetFiles").getFullList({
+          filter: assetIdsFilter,
+          sort: "order",
+        });
+      } catch (fileSortErr) {
+        console.warn("Failed to fetch assetFiles with sort=order, retrying without sort:", fileSortErr);
+        fileRecords = await pb.collection("assetFiles").getFullList({
+          filter: assetIdsFilter,
+        });
+        fileRecords.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      }
+    }
 
     // Map files by asset ID
     const filesByAsset: Record<string, BrandAssetFile[]> = {};
@@ -162,8 +199,10 @@ export async function uploadBrandAssetAction(
       scopedSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect width="300" height="200" rx="12" fill="#1f2c36" /><text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="28" font-weight="bold" fill="#c8d400">VECTOR</text><text x="50%" y="70%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#96abbe">${medium}</text></svg>`;
     }
 
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
     const assetData = new FormData();
-    assetData.append("brand", brandId);
+    assetData.append("brand", resolvedBrandId);
     assetData.append("name", JSON.stringify(nameObj));
     assetData.append("medium", medium);
     assetData.append("orientation", orientation);
@@ -219,7 +258,10 @@ export async function uploadBrandAssetAction(
       }
     }
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return {
       success: true,
       message: `Logo „${name}“ bolo úspešne nahrané a uložené do knižnice.`,
@@ -260,6 +302,8 @@ export async function updateBrandAssetAction(
     if (!pb.authStore.isValid) {
       return { success: false, message: "Unauthorized" };
     }
+
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
 
     const name = (formData.get("name") as string) || "";
     const nameSk = (formData.get("nameSk") as string) || "";
@@ -312,7 +356,10 @@ export async function updateBrandAssetAction(
 
     await pb.collection("assets").update(assetId, updatePayload);
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return { success: true, message: "Parametre loga boli úspešne upravené." };
   } catch (err: any) {
     console.error("Failed to update brand asset:", err);
@@ -336,6 +383,8 @@ export async function deleteBrandAssetAction(
       return { success: false, message: "Unauthorized" };
     }
 
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
     // Query attached files to delete them (PocketBase handles S3 file deletion)
     const attachedFiles = await pb.collection("assetFiles").getFullList({
       filter: `asset = "${assetId}"`,
@@ -352,7 +401,10 @@ export async function deleteBrandAssetAction(
 
     await pb.collection("assets").delete(assetId);
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return { success: true, message: "Logo a všetky priradené formáty boli úspešne odstránené." };
   } catch (err: any) {
     console.error("Failed to delete brand asset:", err);
@@ -376,6 +428,8 @@ export async function bulkDeleteBrandAssetsAction(
       return { success: false, message: "Unauthorized", deletedCount: 0 };
     }
 
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
     let deletedCount = 0;
     for (const id of assetIds) {
       try {
@@ -397,7 +451,10 @@ export async function bulkDeleteBrandAssetsAction(
       }
     }
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return {
       success: true,
       message: `Úspešne bolo vymazaných ${deletedCount} lôg.`,
@@ -427,6 +484,8 @@ export async function uploadAssetFileAction(
       return { success: false, message: "Unauthorized" };
     }
 
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
     const fileFormat = formData.get("fileFormat") as AssetFileFormat;
     const file = formData.get("file");
 
@@ -446,7 +505,10 @@ export async function uploadAssetFileAction(
 
     const createdRec = await pb.collection("assetFiles").create(fileData);
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return {
       success: true,
       message: `Formát ${fileFormat} bol úspešne priradený k logu.`,
@@ -481,9 +543,14 @@ export async function deleteAssetFileAction(
       return { success: false, message: "Unauthorized" };
     }
 
+    const resolvedBrandId = await resolveTargetBrandId(pb, brandId);
+
     await pb.collection("assetFiles").delete(fileId);
 
-    revalidatePath(`/admin/brand/${brandId}/logos`);
+    revalidatePath(`/admin/brand/${resolvedBrandId}/logos`);
+    if (brandId !== resolvedBrandId) {
+      revalidatePath(`/admin/brand/${brandId}/logos`);
+    }
     return { success: true, message: "Súbor formátu bol úspešne vymazaný." };
   } catch (err: any) {
     console.error("Failed to delete asset file:", err);

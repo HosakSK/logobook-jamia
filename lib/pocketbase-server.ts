@@ -23,12 +23,21 @@ export async function getServerPocketBase() {
         cookieVal = decodeURIComponent(cookieVal);
       }
       pb.authStore.loadFromCookie(`pb_auth=${cookieVal}`);
-      // Refresh token if expired or about to expire
-      if (pb.authStore.isValid) {
+      // Only refresh token if it is valid but close to expiry (< 24 hours)
+      if (pb.authStore.isValid && pb.authStore.token) {
         try {
-          await pb.collection("users").authRefresh();
+          const parts = pb.authStore.token.split(".");
+          if (parts.length === 3) {
+            const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf-8"));
+            const exp = payload?.exp;
+            const now = Math.floor(Date.now() / 1000);
+            // If less than 24h remaining, refresh token
+            if (exp && exp - now < 86400) {
+              await pb.collection("users").authRefresh();
+            }
+          }
         } catch {
-          // Token refresh failure (e.g. user deleted or network issue)
+          // Token refresh failure or decode error - don't clear unless token is strictly invalid
         }
       }
     } catch {

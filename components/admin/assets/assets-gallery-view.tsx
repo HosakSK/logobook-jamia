@@ -31,6 +31,7 @@ interface AssetsGalleryViewProps {
   brandName: string;
   locale: string;
   dict: Dictionary;
+  errorMessage?: string;
 }
 
 export function AssetsGalleryView({
@@ -39,6 +40,7 @@ export function AssetsGalleryView({
   brandName,
   locale,
   dict,
+  errorMessage,
 }: AssetsGalleryViewProps) {
   const router = useRouter();
   const [assets, setAssets] = useState<BrandAsset[]>(initialAssets);
@@ -163,6 +165,25 @@ export function AssetsGalleryView({
           <span>Hromadné nahrávanie (Bulk Upload)</span>
         </Button>
       </div>
+
+      {/* Error Alert if fetching failed */}
+      {errorMessage && (
+        <div className="p-4 rounded-[3px] bg-red-950/40 border border-red-500/50 text-red-200 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-bold">Chyba pri načítaní lôg:</span>
+            <span>{errorMessage}</span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => router.refresh()}
+            className="h-7 text-xs border-red-500/50 text-red-100 hover:bg-red-900/50 cursor-pointer"
+          >
+            Skúsiť znova
+          </Button>
+        </div>
+      )}
 
       {/* 2. Filters & Search Bar */}
       <div className="p-4 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">

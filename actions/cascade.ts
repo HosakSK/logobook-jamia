@@ -1,6 +1,6 @@
 "use server";
 
-import { getCachedBrandTokens } from "@/lib/manual/brand-cache";
+import { computeBrandTokens } from "@/lib/manual/brand-cache";
 import { BrandCascadeTokens } from "@/lib/types/module";
 
 /**
@@ -13,5 +13,5 @@ export async function getBrandCascadeTokensAction(brandId: string): Promise<{
   cssVariables: Record<string, string>;
   error?: string;
 }> {
-  return getCachedBrandTokens(brandId);
+  return computeBrandTokens(brandId);
 }

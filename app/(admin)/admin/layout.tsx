@@ -19,8 +19,8 @@ export default async function AdminLayout({
   const pb = await getServerPocketBase();
   const user = pb.authStore.record;
 
-  // Authorization check
-  if (!user && !pb.authStore.isValid) {
+  // Authorization check - must have valid authenticated session
+  if (!user || !pb.authStore.isValid) {
     redirect("/login?redirect=/admin");
   }
 

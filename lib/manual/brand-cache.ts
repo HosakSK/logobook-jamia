@@ -33,71 +33,74 @@ export const getCachedBrandBySlug = cache(async (domainOrSlug: string) => {
 });
 
 /**
- * React cache() deduplicates cascade tokens and CSS variables.
+ * Computes cascade tokens and CSS variables.
  * Executes shapes, colors, and typography queries concurrently via Promise.allSettled.
  */
-export const getCachedBrandTokens = cache(
-  async (brandId: string, fallbackSnapshot?: any) => {
-    try {
-      const pb = await getServerPocketBase();
+export async function computeBrandTokens(brandId: string, fallbackSnapshot?: any) {
+  try {
+    const pb = await getServerPocketBase();
 
-      let targetBrandId = brandId;
-      if (brandId.length !== 15) {
-        try {
-          const b = await pb
-            .collection("brands")
-            .getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
-          targetBrandId = b.id;
-        } catch {
-          // fallback
-        }
+    let targetBrandId = brandId;
+    if (brandId.length !== 15) {
+      try {
+        const b = await pb
+          .collection("brands")
+          .getFirstListItem(`id = "${brandId}" || slug = "${brandId}"`);
+        targetBrandId = b.id;
+      } catch {
+        // fallback
       }
-
-      // Concurrently query shapes, colors, and typography
-      const [shapesResult, colorsResult, typographyResult] = await Promise.allSettled([
-        pb
-          .collection("globalShapes")
-          .getFirstListItem<GlobalShapesRecord>(`brand = "${targetBrandId}"`),
-        pb.collection("globalColors").getFullList<GlobalColorsRecord>({
-          filter: `brand = "${targetBrandId}"`,
-          sort: "order",
-        }),
-        pb.collection("globalTypography").getFullList<GlobalTypographyRecord>({
-          filter: `brand = "${targetBrandId}"`,
-          sort: "order",
-        }),
-      ]);
-
-      let shapes: GlobalShapesRecord | null =
-        shapesResult.status === "fulfilled" ? shapesResult.value : null;
-      const colors: GlobalColorsRecord[] =
-        colorsResult.status === "fulfilled" ? colorsResult.value : [];
-      const typography: GlobalTypographyRecord[] =
-        typographyResult.status === "fulfilled" ? typographyResult.value : [];
-
-      // Fallback if shapes record is not in database or unauthenticated
-      if (!shapes && fallbackSnapshot?.brand?.themeConfig) {
-        shapes = {
-          themeConfig: fallbackSnapshot.brand.themeConfig,
-          manualBgColor: fallbackSnapshot.brand.manualBgColor,
-        } as any;
-      }
-
-      const tokens = buildBrandCascadeTokens(shapes, colors, typography);
-      const cssVariables = computeBrandCssVariables(shapes, colors, typography);
-
-      return {
-        success: true,
-        tokens,
-        cssVariables,
-      };
-    } catch (err: unknown) {
-      return {
-        success: false,
-        tokens: buildBrandCascadeTokens(null, null, null),
-        cssVariables: computeBrandCssVariables(null, null, null),
-        error: err instanceof Error ? err.message : "Failed to load brand tokens",
-      };
     }
+
+    // Concurrently query shapes, colors, and typography
+    const [shapesResult, colorsResult, typographyResult] = await Promise.allSettled([
+      pb
+        .collection("globalShapes")
+        .getFirstListItem<GlobalShapesRecord>(`brand = "${targetBrandId}"`),
+      pb.collection("globalColors").getFullList<GlobalColorsRecord>({
+        filter: `brand = "${targetBrandId}"`,
+        sort: "order",
+      }),
+      pb.collection("globalTypography").getFullList<GlobalTypographyRecord>({
+        filter: `brand = "${targetBrandId}"`,
+        sort: "order",
+      }),
+    ]);
+
+    let shapes: GlobalShapesRecord | null =
+      shapesResult.status === "fulfilled" ? shapesResult.value : null;
+    const colors: GlobalColorsRecord[] =
+      colorsResult.status === "fulfilled" ? colorsResult.value : [];
+    const typography: GlobalTypographyRecord[] =
+      typographyResult.status === "fulfilled" ? typographyResult.value : [];
+
+    // Fallback if shapes record is not in database or unauthenticated
+    if (!shapes && fallbackSnapshot?.brand?.themeConfig) {
+      shapes = {
+        themeConfig: fallbackSnapshot.brand.themeConfig,
+        manualBgColor: fallbackSnapshot.brand.manualBgColor,
+      } as any;
+    }
+
+    const tokens = buildBrandCascadeTokens(shapes, colors, typography);
+    const cssVariables = computeBrandCssVariables(shapes, colors, typography);
+
+    return {
+      success: true,
+      tokens,
+      cssVariables,
+    };
+  } catch (err: unknown) {
+    return {
+      success: false,
+      tokens: buildBrandCascadeTokens(null, null, null),
+      cssVariables: computeBrandCssVariables(null, null, null),
+      error: err instanceof Error ? err.message : "Failed to load brand tokens",
+    };
   }
-);
+}
+
+/**
+ * React cache() deduplicates cascade tokens and CSS variables within a single RSC render lifecycle.
+ */
+export const getCachedBrandTokens = cache(computeBrandTokens);

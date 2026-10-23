@@ -30,6 +30,7 @@ export default async function BrandLogosPage({
 
   const assetsRes = await getBrandAssetsAction(brand.id);
   const assets = assetsRes.success ? assetsRes.assets : [];
+  const errorMessage = assetsRes.success ? undefined : assetsRes.error;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -39,6 +40,7 @@ export default async function BrandLogosPage({
         brandName={brand.name}
         locale={currentLocale}
         dict={dict}
+        errorMessage={errorMessage}
       />
     </div>
   );

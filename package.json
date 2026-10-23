@@ -1,6 +1,6 @@
 {
   "name": "logobook-sk",
-  "version": "0.0.1.151",
+  "version": "0.0.1.152",
   "private": true,
   "scripts": {
     "dev": "next dev",
