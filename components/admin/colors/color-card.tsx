@@ -5,6 +5,7 @@ import { BrandColor } from "@/lib/types/color";
 import { deleteGlobalColorAction } from "@/actions/colors";
 import {
   getWcagContrast,
+  getWcagScoreBadgeClass,
   generateSystematicScale,
   SystematicStepItem,
 } from "@/lib/utils/color-calc";
@@ -144,51 +145,61 @@ export function ColorCard({
     <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] bg-[#17212a] text-[#fafbfc] overflow-hidden flex flex-col justify-between transition-all hover:border-[rgba(63,85,102,0.8)] shadow-xs group">
       {/* 1. Large Color Swatch Block with contextual role preview */}
       <div
-        className="h-40 w-full p-4 flex flex-col justify-between relative transition-transform duration-200"
+        className="min-h-[168px] h-auto w-full p-3.5 flex flex-col justify-between gap-3 relative transition-transform duration-200"
         style={{ backgroundColor: color.hex }}
       >
         {/* Top Badges */}
-        <div className="flex items-center justify-between gap-1.5 flex-wrap">
+        <div className="flex items-start justify-between gap-1.5">
           {/* Detailed Role Badge with Category Context */}
-          <span
-            className={`px-2 py-0.5 rounded-[2px] text-[10px] font-mono font-bold tracking-wider uppercase shadow-xs flex items-center gap-1.5 ${
-              isTextWhite
-                ? "bg-black/60 text-white backdrop-blur-md border border-white/20"
-                : "bg-white/85 text-black backdrop-blur-md border border-black/20"
-            }`}
-          >
+          <span className="px-2 py-1 rounded-[3px] text-[10px] font-mono font-bold tracking-wider uppercase shadow-md flex items-center gap-1.5 bg-[#070b0f]/92 text-[#fafbfc] backdrop-blur-sm border border-white/20 shrink-0">
             {renderRoleIcon()}
             <span>{locale === "en" ? roleDef.badgeLabelEn : roleDef.badgeLabelSk}</span>
           </span>
 
-          {/* WCAG Contrast Ratio */}
-          <span
-            className={`px-2 py-0.5 rounded-[2px] text-[10px] font-mono font-bold tracking-wider shadow-xs flex items-center gap-1 ${
-              isTextWhite
-                ? "bg-black/60 text-white backdrop-blur-md border border-white/20"
-                : "bg-white/85 text-black backdrop-blur-md border border-black/20"
-            }`}
-            title={`Kontrast voči bielemu: ${contrast.whiteRatio}:1 (${contrast.whiteScore}), voči čiernemu: ${contrast.blackRatio}:1 (${contrast.blackScore})`}
-          >
-            <span>WCAG</span>
-            <span
-              className={
-                (isTextWhite ? contrast.whiteScore : contrast.blackScore) === "Fail"
-                  ? "text-red-400 font-extrabold"
-                  : "text-emerald-400 font-extrabold"
-              }
+          {/* WCAG Contrast Indicators (White & Black targets) */}
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {/* White Target (#FFFFFF) */}
+            <div
+              className="flex items-center gap-1.5 bg-[#070b0f]/92 text-[#fafbfc] px-1.5 py-0.5 rounded-[3px] border border-white/20 text-[10px] font-mono shadow-md backdrop-blur-sm"
+              title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 — Hodnotenie: ${contrast.whiteScore}`}
             >
-              {isTextWhite ? contrast.whiteRatio : contrast.blackRatio}:1
-            </span>
-          </span>
+              <span className="w-2 h-2 rounded-full bg-white border border-black/50 shrink-0 shadow-xs" />
+              <span className="text-[9px] text-[#96abbe] font-semibold">{locale === "en" ? "White" : "Biela"}</span>
+              <span className="font-extrabold text-[#fafbfc]">{contrast.whiteRatio}:1</span>
+              <span
+                className={`px-1 py-0.2 rounded text-[9px] font-black tracking-tight ${getWcagScoreBadgeClass(
+                  contrast.whiteScore
+                )}`}
+              >
+                {contrast.whiteScore}
+              </span>
+            </div>
+
+            {/* Black Target (#000000) */}
+            <div
+              className="flex items-center gap-1.5 bg-[#070b0f]/92 text-[#fafbfc] px-1.5 py-0.5 rounded-[3px] border border-white/20 text-[10px] font-mono shadow-md backdrop-blur-sm"
+              title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio}:1 — Hodnotenie: ${contrast.blackScore}`}
+            >
+              <span className="w-2 h-2 rounded-full bg-black border border-white/60 shrink-0 shadow-xs" />
+              <span className="text-[9px] text-[#96abbe] font-semibold">{locale === "en" ? "Black" : "Čierna"}</span>
+              <span className="font-extrabold text-[#fafbfc]">{contrast.blackRatio}:1</span>
+              <span
+                className={`px-1 py-0.2 rounded text-[9px] font-black tracking-tight ${getWcagScoreBadgeClass(
+                  contrast.blackScore
+                )}`}
+              >
+                {contrast.blackScore}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Center: Contextual Visual Preview */}
         {category === "TYPOGRAPHY" ? (
           <div
-            className={`px-2.5 py-1.5 rounded-[2px] text-xs font-sans font-bold flex items-center justify-between ${
+            className={`px-2.5 py-1.5 rounded-[3px] text-xs font-sans font-bold flex items-center justify-between shadow-xs ${
               color.role === "TEXT_DAY"
-                ? "bg-[#fafbfc] text-[#0e161d] shadow-sm"
+                ? "bg-[#fafbfc] text-[#0e161d]"
                 : "bg-[#070b0f] text-[#fafbfc] border border-white/10"
             }`}
           >
@@ -200,25 +211,17 @@ export function ColorCard({
             </span>
           </div>
         ) : category === "BACKGROUND" ? (
-          <div className="flex items-center gap-1.5 text-[10px] font-mono opacity-80">
-            <span
-              className={`px-1.5 py-0.5 rounded-[2px] border ${
-                isTextWhite ? "border-white/30 text-white" : "border-black/30 text-black"
-              }`}
-            >
+          <div className="flex items-center gap-1.5 text-[10px] font-mono">
+            <span className="px-2 py-0.5 rounded-[2px] bg-[#070b0f]/90 text-white border border-white/20 shadow-xs">
               Surface Canvas
             </span>
-            <span className={isTextWhite ? "text-white/80" : "text-black/80"}>
+            <span className="px-2 py-0.5 rounded-[2px] bg-[#070b0f]/90 text-white border border-white/20 shadow-xs">
               {color.role === "BG_DAY" ? "☀️ Svetlý mód" : "🌙 Tmavý mód"}
             </span>
           </div>
         ) : category === "SEMANTIC" ? (
           <div className="flex items-center gap-1">
-            <span
-              className={`text-[10px] font-mono px-2 py-0.5 rounded-[2px] font-semibold flex items-center gap-1 ${
-                isTextWhite ? "bg-black/50 text-white" : "bg-white/70 text-black"
-              }`}
-            >
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] font-semibold flex items-center gap-1 bg-[#070b0f]/90 text-white border border-white/20 shadow-xs">
               {renderRoleIcon()}
               <span>
                 {color.role === "SUCCESS"
@@ -234,12 +237,12 @@ export function ColorCard({
         ) : null}
 
         {/* HEX with 1-click Copy */}
-        <div className="flex items-end justify-between">
+        <div className="flex items-end justify-between pt-1">
           <button
             type="button"
             onClick={handleCopyHex}
-            className={`flex items-center gap-1.5 font-mono text-xl font-extrabold tracking-wider transition-opacity hover:opacity-80 ${
-              isTextWhite ? "text-white" : "text-black"
+            className={`flex items-center gap-1.5 font-mono text-xl font-black tracking-wider transition-opacity hover:opacity-80 ${
+              isTextWhite ? "text-white drop-shadow-md" : "text-black drop-shadow-xs"
             }`}
             title="Kliknutím skopírujete HEX kód"
           >

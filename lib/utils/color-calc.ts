@@ -13,12 +13,14 @@ export interface RgbColor {
   b: number;
 }
 
+export type WcagScore = "AAA" | "AA" | "AA Large" | "Fail";
+
 export interface WcagContrastResult {
   whiteRatio: number;
   blackRatio: number;
   preferredText: "white" | "black";
-  whiteScore: "AAA" | "AA" | "AA Large" | "Fail";
-  blackScore: "AAA" | "AA" | "AA Large" | "Fail";
+  whiteScore: WcagScore;
+  blackScore: WcagScore;
 }
 
 export interface RalMatch {
@@ -93,11 +95,28 @@ export function calculateContrastRatio(lum1: number, lum2: number): number {
   return Number(((lighter + 0.05) / (darker + 0.05)).toFixed(2));
 }
 
-function evaluateScore(ratio: number): "AAA" | "AA" | "AA Large" | "Fail" {
+export function evaluateScore(ratio: number): WcagScore {
   if (ratio >= 7.0) return "AAA";
   if (ratio >= 4.5) return "AA";
   if (ratio >= 3.0) return "AA Large";
   return "Fail";
+}
+
+/**
+ * Returns accessible, high-contrast Tailwind styling for WCAG compliance score tags.
+ */
+export function getWcagScoreBadgeClass(score: WcagScore): string {
+  switch (score) {
+    case "AAA":
+      return "bg-emerald-500/25 text-emerald-300 border border-emerald-500/40";
+    case "AA":
+      return "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+    case "AA Large":
+      return "bg-amber-500/25 text-amber-300 border border-amber-500/40";
+    case "Fail":
+    default:
+      return "bg-rose-500/25 text-rose-300 border border-rose-500/40";
+  }
 }
 
 /**

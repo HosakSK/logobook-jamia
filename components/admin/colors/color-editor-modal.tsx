@@ -15,6 +15,7 @@ import {
 import {
   hexToRgb,
   getWcagContrast,
+  getWcagScoreBadgeClass,
   findNearestRal,
   generateSystematicScale,
   RalMatch,
@@ -365,36 +366,66 @@ export function ColorEditorModal({
 
             {/* Live WCAG Contrast & Nearest RAL info strip */}
             <div className="pt-3 border-t border-[rgba(63,85,102,0.35)] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              {/* WCAG Preview */}
-              <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-[#96abbe] uppercase font-mono block">
-                    WCAG Kontrast
+              {/* WCAG Preview (White & Black targets) */}
+              <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#96abbe] uppercase font-mono tracking-wider">
+                    WCAG 2.1 Kontrast
                   </span>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-mono font-bold text-[#fafbfc]">
-                      {contrast.preferredText === "white"
-                        ? `${contrast.whiteRatio}:1 (Biela)`
-                        : `${contrast.blackRatio}:1 (Čierna)`}
-                    </span>
+                  <span className="text-[10px] font-mono text-[#96abbe]">
+                    Odporúčané:{" "}
+                    <strong className="text-[#fafbfc]">
+                      {contrast.preferredText === "white" ? "Biely text" : "Čierny text"}
+                    </strong>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {/* White background */}
+                  <div
+                    className="p-1.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1"
+                    title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 (${contrast.whiteScore})`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-white border border-black/50 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Biela</div>
+                        <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
+                          {contrast.whiteRatio}:1
+                        </div>
+                      </div>
+                    </div>
                     <span
-                      className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-[2px] ${
-                        (contrast.preferredText === "white"
-                          ? contrast.whiteScore
-                          : contrast.blackScore) === "Fail"
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-emerald-500/20 text-emerald-400"
-                      }`}
+                      className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[2px] shrink-0 ${getWcagScoreBadgeClass(
+                        contrast.whiteScore
+                      )}`}
                     >
-                      {contrast.preferredText === "white" ? contrast.whiteScore : contrast.blackScore}
+                      {contrast.whiteScore}
                     </span>
                   </div>
-                </div>
-                <div
-                  className="h-8 w-12 rounded-[2px] flex items-center justify-center font-bold text-[10px] shadow-xs"
-                  style={{ backgroundColor: hex, color: contrast.preferredText }}
-                >
-                  Text
+
+                  {/* Black background */}
+                  <div
+                    className="p-1.5 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1"
+                    title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio}:1 (${contrast.blackScore})`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/50 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Čierna</div>
+                        <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
+                          {contrast.blackRatio}:1
+                        </div>
+                      </div>
+                    </div>
+                    <span
+                      className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[2px] shrink-0 ${getWcagScoreBadgeClass(
+                        contrast.blackScore
+                      )}`}
+                    >
+                      {contrast.blackScore}
+                    </span>
+                  </div>
                 </div>
               </div>
 

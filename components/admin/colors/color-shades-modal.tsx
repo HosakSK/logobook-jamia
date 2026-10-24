@@ -6,6 +6,7 @@ import {
   generateSystematicScale,
   SystematicStepItem,
   getWcagContrast,
+  getWcagScoreBadgeClass,
 } from "@/lib/utils/color-calc";
 import { Button } from "@/components/ui/button";
 import { X, Copy, Check, Sliders, Code2, Sparkles, ExternalLink } from "lucide-react";
@@ -289,15 +290,30 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">
+                          {/* White background contrast */}
                           <span
-                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] font-bold ${
-                              s.isTextWhite ? contrast.whiteScore : contrast.blackScore
-                            } === "Fail" ? "bg-red-500/20 text-red-400" : "bg-emerald-500/20 text-emerald-400"`}
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] font-bold flex items-center gap-1 ${getWcagScoreBadgeClass(
+                              contrast.whiteScore
+                            )}`}
+                            title={`WCAG voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 (${contrast.whiteScore})`}
                           >
-                            {s.isTextWhite
-                              ? `${contrast.whiteRatio}:1 W`
-                              : `${contrast.blackRatio}:1 B`}
+                            <span className="w-1.5 h-1.5 rounded-full bg-white border border-black/50 shrink-0" />
+                            <span>{contrast.whiteRatio}:1</span>
+                            <span className="font-black text-[8px] opacity-90">{contrast.whiteScore}</span>
                           </span>
+
+                          {/* Black background contrast */}
+                          <span
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] font-bold flex items-center gap-1 ${getWcagScoreBadgeClass(
+                              contrast.blackScore
+                            )}`}
+                            title={`WCAG voči Čiernej (#000000): ${contrast.blackRatio}:1 (${contrast.blackScore})`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-black border border-white/50 shrink-0" />
+                            <span>{contrast.blackRatio}:1</span>
+                            <span className="font-black text-[8px] opacity-90">{contrast.blackScore}</span>
+                          </span>
+
                           <div className="p-1 rounded-[2px] bg-[#070b0f] text-[#96abbe] group-hover:text-[#fafbfc]">
                             {isCopied ? (
                               <Check className="h-3.5 w-3.5 text-emerald-400" />
