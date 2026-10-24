@@ -388,24 +388,24 @@ export function ColorsGalleryView({
             return (
               <div
                 key={catKey}
-                className="rounded-[3px] border border-[rgba(63,85,102,0.4)] bg-[#131b22] p-5 space-y-4"
+                className="rounded-2xl border border-white/[0.08] bg-[#0a1118]/80 p-5 sm:p-6 backdrop-blur-md space-y-4 shadow-sm"
               >
                 {/* Category Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[rgba(63,85,102,0.3)] pb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-[3px] bg-[#070b0f] flex items-center justify-center border border-[rgba(63,85,102,0.5)]">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/[0.07] pb-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/10 text-[#c8d400] shadow-xs shrink-0">
                       {renderCategoryIcon(catKey)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h2 className="text-base font-bold font-mono text-[#fafbfc]">
+                        <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                           {def.labelSk}
                         </h2>
-                        <span className="px-1.5 py-0.5 rounded-[2px] bg-[#070b0f] text-[10px] font-mono text-[#96abbe] border border-[rgba(63,85,102,0.4)]">
-                          {catColors.length} farieb
+                        <span className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[11px] font-mono font-medium text-slate-300 border border-white/10">
+                          {catColors.length} {catColors.length === 1 ? "farba" : catColors.length >= 2 && catColors.length <= 4 ? "farby" : "farieb"}
                         </span>
                       </div>
-                      <p className="text-xs text-[#96abbe] mt-0.5">
+                      <p className="text-xs text-slate-400 mt-0.5">
                         {def.descriptionSk}
                       </p>
                     </div>
@@ -416,27 +416,27 @@ export function ColorsGalleryView({
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenAdd(catKey)}
-                    className="h-7 px-2.5 text-xs font-mono rounded-[2px] border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc] hover:border-[#c8d400] gap-1 shrink-0 self-start sm:self-auto"
+                    className="h-8 px-3 text-xs font-medium rounded-lg border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-[#c8d400] gap-1.5 shrink-0 self-start sm:self-auto transition-all cursor-pointer"
                   >
-                    <Plus className="h-3 w-3 text-[#c8d400]" />
+                    <Plus className="h-3.5 w-3.5 text-[#c8d400]" />
                     <span>Pridať farbu</span>
                   </Button>
                 </div>
 
                 {/* Category Cards Grid or Empty Notice */}
                 {catColors.length === 0 ? (
-                  <div className="p-6 rounded-[2px] border border-dashed border-[rgba(63,85,102,0.35)] bg-[#070b0f]/60 text-center text-xs text-[#96abbe]">
+                  <div className="p-8 rounded-xl border border-dashed border-white/10 bg-white/[0.02] text-center text-xs text-slate-400">
                     <span>V tejto kategórii zatiaľ nie sú priradené žiadne farby. </span>
                     <button
                       type="button"
                       onClick={() => handleOpenAdd(catKey)}
-                      className="text-[#c8d400] underline hover:no-underline font-semibold ml-1"
+                      className="text-[#c8d400] underline hover:no-underline font-semibold ml-1 cursor-pointer"
                     >
                       Pridať farbu do {def.labelSk}
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-2.5">
+                  <div className="space-y-2">
                     {catColors.map((color) => {
                       const globalIdx = colors.findIndex((c) => c.id === color.id);
                       return (
