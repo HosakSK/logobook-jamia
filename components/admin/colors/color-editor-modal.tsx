@@ -80,8 +80,13 @@ export function ColorEditorModal({
   useEffect(() => {
     if (color) {
       setHex(color.hex);
-      setName(color.name.en || color.name.sk || "");
-      setNameSk(color.name.sk || "");
+      const initialName =
+        color.name.sk ||
+        color.name.en ||
+        color.name.cs ||
+        (typeof color.name === "string" ? color.name : "");
+      setName(initialName);
+      setNameSk(initialName);
       const cat = resolveColorCategory(color.role, color.category);
       setCategory(cat);
       setRole(color.role);
@@ -95,8 +100,8 @@ export function ColorEditorModal({
       setRal(color.ral || "");
     } else {
       setHex("#0055FF");
-      setName("Primary Blue");
-      setNameSk("Primárna modrá");
+      setName("Nová farba");
+      setNameSk("Nová farba");
       setCategory("CORE");
       setRole("PRIMARY");
       setRgb("0, 85, 255");
@@ -450,27 +455,19 @@ export function ColorEditorModal({
             </div>
           </div>
 
-          {/* 4. Names */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-[#96abbe]">Názov farby (EN / Predvolený)</Label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Primary Blue"
-                required
-                className="mt-1 h-9 rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-[#c8d400]"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-[#96abbe]">Názov farby (SK)</Label>
-              <Input
-                value={nameSk}
-                onChange={(e) => setNameSk(e.target.value)}
-                placeholder="napr. Primárna modrá"
-                className="mt-1 h-9 rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-[#c8d400]"
-              />
-            </div>
+          {/* 4. Single Color Name */}
+          <div>
+            <Label className="text-xs font-semibold text-[#fafbfc]">Názov farby</Label>
+            <Input
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameSk(e.target.value);
+              }}
+              placeholder="napr. Primárna modrá, Základný text, Pozadie..."
+              required
+              className="mt-1.5 h-9.5 rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-sm text-[#fafbfc] focus:border-[#c8d400]"
+            />
           </div>
 
           {/* 5. Print Standards Section (CMYK, Pantone, RAL) */}
