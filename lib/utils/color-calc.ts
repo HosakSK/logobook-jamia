@@ -341,3 +341,87 @@ export function generateTonalSteps(baseHex: string): TonalStepItem[] {
     };
   });
 }
+
+/**
+ * ---------------------------------------------------------------------------
+ * Systematic Color Scale Specification (Jiří Chlebus / IBM Carbon Architecture)
+ * 12 calibrated lightness steps from Black (L 0) to White (L 100)
+ * ---------------------------------------------------------------------------
+ */
+export interface SystematicStepItem {
+  id: string; // "black", "100", "90", ..., "10", "white"
+  label: string; // "Black", "100", "90", ..., "10", "White"
+  step: number | null; // 100, 90, ..., 10, or null for Black/White
+  lightness: number; // 0, 7, 15, 24, 35, 47, 59, 69, 80, 89, 96, 100
+  hex: string;
+  isTextWhite: boolean;
+}
+
+export const SYSTEMATIC_SCALE_SPECS = [
+  { id: "black", label: "Black", step: null, l: 0 },
+  { id: "100", label: "100", step: 100, l: 7 },
+  { id: "90", label: "90", step: 90, l: 15 },
+  { id: "80", label: "80", step: 80, l: 24 },
+  { id: "70", label: "70", step: 70, l: 35 },
+  { id: "60", label: "60", step: 60, l: 47 },
+  { id: "50", label: "50", step: 50, l: 59 },
+  { id: "40", label: "40", step: 40, l: 69 },
+  { id: "30", label: "30", step: 30, l: 80 },
+  { id: "20", label: "20", step: 20, l: 89 },
+  { id: "10", label: "10", step: 10, l: 96 },
+  { id: "white", label: "White", step: null, l: 100 },
+] as const;
+
+/**
+ * Generates the exact 12-step perceptual scale (L 0 to L 100)
+ * using the HSLuv color space.
+ */
+export function generateSystematicScale(baseHex: string): SystematicStepItem[] {
+  const conv = new Hsluv();
+  conv.hex = baseHex.startsWith("#") ? baseHex : `#${baseHex}`;
+  try {
+    conv.hexToHsluv();
+  } catch {
+    conv.hex = "#3B82F6";
+    conv.hexToHsluv();
+  }
+  const baseH = conv.hsluv_h;
+  const baseS = conv.hsluv_s;
+
+  return SYSTEMATIC_SCALE_SPECS.map((spec) => {
+    if (spec.l === 0) {
+      return {
+        id: spec.id,
+        label: spec.label,
+        step: spec.step,
+        lightness: 0,
+        hex: "#000000",
+        isTextWhite: true,
+      };
+    }
+    if (spec.l === 100) {
+      return {
+        id: spec.id,
+        label: spec.label,
+        step: spec.step,
+        lightness: 100,
+        hex: "#FFFFFF",
+        isTextWhite: false,
+      };
+    }
+
+    conv.hsluv_h = baseH;
+    conv.hsluv_s = baseS;
+    conv.hsluv_l = spec.l;
+    conv.hsluvToHex();
+
+    return {
+      id: spec.id,
+      label: spec.label,
+      step: spec.step,
+      lightness: spec.l,
+      hex: conv.hex.toUpperCase(),
+      isTextWhite: spec.l < 55,
+    };
+  });
+}

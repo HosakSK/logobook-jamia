@@ -16,7 +16,7 @@ import {
   hexToRgb,
   getWcagContrast,
   findNearestRal,
-  generateTonalSteps,
+  generateSystematicScale,
   RalMatch,
 } from "@/lib/utils/color-calc";
 import { Button } from "@/components/ui/button";
@@ -118,10 +118,10 @@ export function ColorEditorModal({
     }
   };
 
-  // Compute live contrast, nearest RAL and 10-step tonal scale
+  // Compute live contrast, nearest RAL and 12-step systematic scale
   const contrast = getWcagContrast(hex);
   const nearestRal: RalMatch | null = findNearestRal(hex);
-  const tonalSteps = generateTonalSteps(hex);
+  const systematicScale = generateSystematicScale(hex);
 
   // Handle HEX change from color picker or input
   const handleHexChange = (newHex: string) => {
@@ -330,29 +330,34 @@ export function ColorEditorModal({
               </div>
             </div>
 
-            {/* Live Computed Tonal Scale 50 - 900 */}
-            <div className="space-y-1.5 pt-2 border-t border-[rgba(63,85,102,0.35)]">
+            {/* Live Computed Systematic Scale L 0 - L 100 */}
+            <div className="space-y-2 pt-2 border-t border-[rgba(63,85,102,0.35)]">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-[#96abbe] font-semibold flex items-center gap-1 font-mono">
+                <span className="text-[#fafbfc] font-semibold flex items-center gap-1 font-mono">
                   <Sliders className="h-3 w-3 text-[#c8d400]" />
-                  <span>Automatický prepočet odtieňov (50 – 900)</span>
+                  <span>Systematická škála svetlosti (L 0 až L 100)</span>
                 </span>
-                <span className="text-[10px] text-[#96abbe]/70 font-mono">10 stupňov HSLuv</span>
+                <span className="text-[10px] text-[#96abbe] font-mono">12 stupňov HSLuv</span>
               </div>
-              <div className="h-7 w-full flex rounded-[2px] overflow-hidden border border-[rgba(63,85,102,0.5)]">
-                {tonalSteps.map((s) => (
-                  <div
-                    key={s.step}
-                    className="flex-1 h-full flex flex-col items-center justify-center relative group"
-                    style={{ backgroundColor: s.hex }}
-                    title={`${s.step}: ${s.hex}`}
-                  >
-                    <span
-                      className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity select-none"
-                      style={{ color: s.lightness > 60 ? "#070b0f" : "#fafbfc" }}
+
+              {/* 12 Swatches Row */}
+              <div className="grid grid-cols-12 gap-1 select-none">
+                {systematicScale.map((s) => (
+                  <div key={s.id} className="flex flex-col items-center group">
+                    <div className="text-[9px] font-mono text-[#96abbe] group-hover:text-[#fafbfc] truncate w-full text-center">
+                      {s.step !== null ? s.step : s.label.slice(0, 1)}
+                    </div>
+                    <div className="h-1.5 w-px bg-[rgba(150,171,190,0.4)] my-0.5" />
+                    <div
+                      className="w-full h-8 rounded-[2px] flex items-center justify-center font-mono text-[9px] font-bold border border-black/20 shadow-xs cursor-pointer transition-transform hover:scale-110"
+                      style={{
+                        backgroundColor: s.hex,
+                        color: s.isTextWhite ? "#FFFFFF" : "#000000",
+                      }}
+                      title={`${s.label}: ${s.hex} (L ${s.lightness})`}
                     >
-                      {s.step}
-                    </span>
+                      L{s.lightness}
+                    </div>
                   </div>
                 ))}
               </div>

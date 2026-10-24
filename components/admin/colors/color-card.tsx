@@ -3,7 +3,11 @@
 import { useState, useTransition } from "react";
 import { BrandColor } from "@/lib/types/color";
 import { deleteGlobalColorAction } from "@/actions/colors";
-import { getWcagContrast, generateTonalSteps, TonalStepItem } from "@/lib/utils/color-calc";
+import {
+  getWcagContrast,
+  generateSystematicScale,
+  SystematicStepItem,
+} from "@/lib/utils/color-calc";
 import {
   COLOR_ROLE_DEFINITIONS,
   COLOR_CATEGORY_DEFINITIONS,
@@ -70,8 +74,8 @@ export function ColorCard({
   const roleDef = COLOR_ROLE_DEFINITIONS[color.role] || COLOR_ROLE_DEFINITIONS.CUSTOM;
   const catDef = COLOR_CATEGORY_DEFINITIONS[category] || COLOR_CATEGORY_DEFINITIONS.CUSTOM;
 
-  // 10-step tonal scale
-  const tonalSteps: TonalStepItem[] = generateTonalSteps(color.hex);
+  // 12-step systematic perceptual scale (L 0 to L 100)
+  const systematicScale: SystematicStepItem[] = generateSystematicScale(color.hex);
 
   const handleCopyHex = async () => {
     try {
@@ -256,16 +260,16 @@ export function ColorCard({
         </div>
       </div>
 
-      {/* 2. Mini Tonal Scale Strip (50 - 900) */}
+      {/* 2. Mini Systematic Scale Strip (L 0 - L 100) */}
       <div className="border-t border-b border-[rgba(63,85,102,0.5)] bg-[#070b0f] flex h-4.5 w-full">
-        {tonalSteps.map((step) => (
+        {systematicScale.map((s) => (
           <button
-            key={step.step}
+            key={s.id}
             type="button"
-            onClick={() => handleCopyStep(step.step, step.hex)}
+            onClick={() => handleCopyStep(s.lightness, s.hex)}
             className="flex-1 h-full transition-all hover:scale-y-125 hover:z-10 focus:outline-hidden"
-            style={{ backgroundColor: step.hex }}
-            title={`Odtieň ${step.step}: ${step.hex} (kliknutím skopírujete)`}
+            style={{ backgroundColor: s.hex }}
+            title={`${s.label}: ${s.hex} (L ${s.lightness}) - kliknutím skopírujete`}
           />
         ))}
       </div>
@@ -359,17 +363,17 @@ export function ColorCard({
 
           {/* Action buttons: Shades 50-900, Edit, Delete */}
           <div className="flex items-center gap-1">
-            {/* Odtiene 50-900 Button */}
+            {/* Systematic Shades L 0-100 Button */}
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={() => setShadesOpen(true)}
               className="h-7 px-2 text-xs font-mono rounded-[2px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#c8d400] hover:bg-[#c8d400] hover:text-[#070b0f] gap-1 transition-colors"
-              title="Zobraziť kompletnú stupnicu 10 odtieňov (50 až 900)"
+              title="Zobraziť systematickú stupnicu 12 odtieňov (L 0 až L 100)"
             >
               <Sliders className="h-3 w-3" />
-              <span>50–900</span>
+              <span>L 0–100</span>
             </Button>
 
             <Button
