@@ -3,12 +3,13 @@
 import { useState, useTransition } from "react";
 import { BrandColor } from "@/lib/types/color";
 import { deleteGlobalColorAction } from "@/actions/colors";
-import { getWcagContrast } from "@/lib/utils/color-calc";
+import { getWcagContrast, generateTonalSteps, TonalStepItem } from "@/lib/utils/color-calc";
 import {
   COLOR_ROLE_DEFINITIONS,
   COLOR_CATEGORY_DEFINITIONS,
   resolveColorCategory,
 } from "@/lib/validations/color";
+import { ColorShadesModal } from "@/components/admin/colors/color-shades-modal";
 import { Button } from "@/components/ui/button";
 import { Dictionary } from "@/lib/i18n";
 import {
@@ -28,6 +29,7 @@ import {
   Info,
   Type,
   Layers,
+  Sliders,
 } from "lucide-react";
 
 interface ColorCardProps {
@@ -54,6 +56,8 @@ export function ColorCard({
   onMoveDown,
 }: ColorCardProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedStepHex, setCopiedStepHex] = useState<string | null>(null);
+  const [shadesOpen, setShadesOpen] = useState(false);
   const [isDeleting, startDelete] = useTransition();
 
   const contrast = getWcagContrast(color.hex);
@@ -66,6 +70,9 @@ export function ColorCard({
   const roleDef = COLOR_ROLE_DEFINITIONS[color.role] || COLOR_ROLE_DEFINITIONS.CUSTOM;
   const catDef = COLOR_CATEGORY_DEFINITIONS[category] || COLOR_CATEGORY_DEFINITIONS.CUSTOM;
 
+  // 10-step tonal scale
+  const tonalSteps: TonalStepItem[] = generateTonalSteps(color.hex);
+
   const handleCopyHex = async () => {
     try {
       await navigator.clipboard.writeText(color.hex);
@@ -73,6 +80,16 @@ export function ColorCard({
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Clipboard copy failed:", err);
+    }
+  };
+
+  const handleCopyStep = async (step: number, stepHex: string) => {
+    try {
+      await navigator.clipboard.writeText(stepHex);
+      setCopiedStepHex(`${step}: ${stepHex}`);
+      setTimeout(() => setCopiedStepHex(null), 2000);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -229,10 +246,31 @@ export function ColorCard({
               <Copy className="h-3.5 w-3.5 opacity-60" />
             )}
           </button>
+
+          {/* Quick feedback if a step was copied from strip */}
+          {copiedStepHex && (
+            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-[2px] bg-emerald-500/90 text-white shadow-xs">
+              ✓ {copiedStepHex}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* 2. Color Details and Category Descriptor */}
+      {/* 2. Mini Tonal Scale Strip (50 - 900) */}
+      <div className="border-t border-b border-[rgba(63,85,102,0.5)] bg-[#070b0f] flex h-4.5 w-full">
+        {tonalSteps.map((step) => (
+          <button
+            key={step.step}
+            type="button"
+            onClick={() => handleCopyStep(step.step, step.hex)}
+            className="flex-1 h-full transition-all hover:scale-y-125 hover:z-10 focus:outline-hidden"
+            style={{ backgroundColor: step.hex }}
+            title={`Odtieň ${step.step}: ${step.hex} (kliknutím skopírujete)`}
+          />
+        ))}
+      </div>
+
+      {/* 3. Color Details and Category Descriptor */}
       <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-[#17212a] text-[#fafbfc]">
         <div>
           {/* Category Pill Tag */}
@@ -291,7 +329,7 @@ export function ColorCard({
           </div>
         </div>
 
-        {/* 3. Action Toolbar */}
+        {/* 4. Action Toolbar */}
         <div className="pt-3 border-t border-[rgba(63,85,102,0.35)] flex items-center justify-between gap-1 text-xs">
           {/* Reordering arrows */}
           <div className="flex items-center gap-0.5">
@@ -319,8 +357,21 @@ export function ColorCard({
             </Button>
           </div>
 
-          {/* Edit & Delete */}
+          {/* Action buttons: Shades 50-900, Edit, Delete */}
           <div className="flex items-center gap-1">
+            {/* Odtiene 50-900 Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShadesOpen(true)}
+              className="h-7 px-2 text-xs font-mono rounded-[2px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#c8d400] hover:bg-[#c8d400] hover:text-[#070b0f] gap-1 transition-colors"
+              title="Zobraziť kompletnú stupnicu 10 odtieňov (50 až 900)"
+            >
+              <Sliders className="h-3 w-3" />
+              <span>50–900</span>
+            </Button>
+
             <Button
               type="button"
               variant="outline"
@@ -346,6 +397,13 @@ export function ColorCard({
           </div>
         </div>
       </div>
+
+      {/* 5. Tonal Shades Modal (50 to 900) */}
+      <ColorShadesModal
+        color={color}
+        isOpen={shadesOpen}
+        onClose={() => setShadesOpen(false)}
+      />
     </div>
   );
 }

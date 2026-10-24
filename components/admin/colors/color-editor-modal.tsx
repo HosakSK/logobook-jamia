@@ -16,6 +16,7 @@ import {
   hexToRgb,
   getWcagContrast,
   findNearestRal,
+  generateTonalSteps,
   RalMatch,
 } from "@/lib/utils/color-calc";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import {
   ShieldCheck,
   Type,
   Layers,
+  Sliders,
 } from "lucide-react";
 
 interface ColorEditorModalProps {
@@ -116,9 +118,10 @@ export function ColorEditorModal({
     }
   };
 
-  // Compute live contrast and nearest RAL
+  // Compute live contrast, nearest RAL and 10-step tonal scale
   const contrast = getWcagContrast(hex);
   const nearestRal: RalMatch | null = findNearestRal(hex);
+  const tonalSteps = generateTonalSteps(hex);
 
   // Handle HEX change from color picker or input
   const handleHexChange = (newHex: string) => {
@@ -324,6 +327,34 @@ export function ColorEditorModal({
                     className="mt-1 h-9 rounded-[3px] bg-[#17212a] border-[rgba(63,85,102,0.6)] font-mono text-xs text-[#fafbfc] focus:border-[#c8d400]"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Live Computed Tonal Scale 50 - 900 */}
+            <div className="space-y-1.5 pt-2 border-t border-[rgba(63,85,102,0.35)]">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-[#96abbe] font-semibold flex items-center gap-1 font-mono">
+                  <Sliders className="h-3 w-3 text-[#c8d400]" />
+                  <span>Automatický prepočet odtieňov (50 – 900)</span>
+                </span>
+                <span className="text-[10px] text-[#96abbe]/70 font-mono">10 stupňov HSLuv</span>
+              </div>
+              <div className="h-7 w-full flex rounded-[2px] overflow-hidden border border-[rgba(63,85,102,0.5)]">
+                {tonalSteps.map((s) => (
+                  <div
+                    key={s.step}
+                    className="flex-1 h-full flex flex-col items-center justify-center relative group"
+                    style={{ backgroundColor: s.hex }}
+                    title={`${s.step}: ${s.hex}`}
+                  >
+                    <span
+                      className="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity select-none"
+                      style={{ color: s.lightness > 60 ? "#070b0f" : "#fafbfc" }}
+                    >
+                      {s.step}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
