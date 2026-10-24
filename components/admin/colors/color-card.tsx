@@ -74,7 +74,7 @@ export function ColorCard({
   const roleDef = COLOR_ROLE_DEFINITIONS[color.role] || COLOR_ROLE_DEFINITIONS.CUSTOM;
   const catDef = COLOR_CATEGORY_DEFINITIONS[category] || COLOR_CATEGORY_DEFINITIONS.CUSTOM;
 
-  // 12-step systematic perceptual scale (L 0 to L 100)
+  // 10-step systematic perceptual scale (10 to 100, L 7 to L 96)
   const systematicScale: SystematicStepItem[] = generateSystematicScale(color.hex);
 
   const handleCopyHex = async () => {
@@ -363,17 +363,17 @@ export function ColorCard({
 
           {/* Action buttons: Shades 50-900, Edit, Delete */}
           <div className="flex items-center gap-1">
-            {/* Systematic Shades L 0-100 Button */}
+            {/* Systematic Shades 10-100 Button */}
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={() => setShadesOpen(true)}
               className="h-7 px-2 text-xs font-mono rounded-[2px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#c8d400] hover:bg-[#c8d400] hover:text-[#070b0f] gap-1 transition-colors"
-              title="Zobraziť systematickú stupnicu 12 odtieňov (L 0 až L 100)"
+              title="Zobraziť systematickú stupnicu 10 odtieňov (10 až 100 • L 7 až L 96)"
             >
               <Sliders className="h-3 w-3" />
-              <span>L 0–100</span>
+              <span>10–100</span>
             </Button>
 
             <Button

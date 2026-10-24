@@ -330,22 +330,22 @@ export function ColorEditorModal({
               </div>
             </div>
 
-            {/* Live Computed Systematic Scale L 0 - L 100 */}
+            {/* Live Computed Systematic Scale 10 - 100 */}
             <div className="space-y-2 pt-2 border-t border-[rgba(63,85,102,0.35)]">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-[#fafbfc] font-semibold flex items-center gap-1 font-mono">
                   <Sliders className="h-3 w-3 text-[#c8d400]" />
-                  <span>Systematická škála svetlosti (L 0 až L 100)</span>
+                  <span>Systematická škála svetlosti (10 až 100 • L 7 až L 96)</span>
                 </span>
-                <span className="text-[10px] text-[#96abbe] font-mono">12 stupňov HSLuv</span>
+                <span className="text-[10px] text-[#96abbe] font-mono">10 stupňov HSLuv</span>
               </div>
 
-              {/* 12 Swatches Row */}
-              <div className="grid grid-cols-12 gap-1 select-none">
+              {/* 10 Swatches Row */}
+              <div className="grid grid-cols-10 gap-1 select-none">
                 {systematicScale.map((s) => (
                   <div key={s.id} className="flex flex-col items-center group">
                     <div className="text-[9px] font-mono text-[#96abbe] group-hover:text-[#fafbfc] truncate w-full text-center">
-                      {s.step !== null ? s.step : s.label.slice(0, 1)}
+                      {s.step}
                     </div>
                     <div className="h-1.5 w-px bg-[rgba(150,171,190,0.4)] my-0.5" />
                     <div

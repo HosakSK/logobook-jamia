@@ -40,12 +40,11 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
     }
   };
 
-  // 1. Systematic Format (10 - 100 + Black/White)
+  // 1. Systematic Format (10 - 100)
   const getSystematicCode = (): string => {
     const lines = [`// Systematická stupnica (10 - 100) podľa metodiky Jiřího Chlebusa`, `colors: {`, `  '${slug}': {`];
     scale.forEach((s) => {
-      const key = s.step !== null ? `${s.step}` : s.id;
-      lines.push(`    '${key}': '${s.hex}', // L ${s.lightness}`);
+      lines.push(`    '${s.step}': '${s.hex}', // L ${s.lightness}`);
     });
     lines.push(`  }`, `}`);
     return lines.join("\n");
@@ -53,9 +52,9 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
 
   // 2. Standard Tailwind (50 - 900)
   const getTailwindCode = (): string => {
-    // Mapping: 10->50, 20->100, 30->200, 40->300, 50->400, 60->500, 70->600, 80->700, 90->800, 100->900
+    // 10->50, 20->100, 30->200, 40->300, 50->400, 60->500, 70->600, 80->700, 90->800, 100->900
     const twSteps: Record<number, string> = {
-      50: scale.find((s) => s.step === 10)?.hex || "#FFFFFF",
+      50: scale.find((s) => s.step === 10)?.hex || "",
       100: scale.find((s) => s.step === 20)?.hex || "",
       200: scale.find((s) => s.step === 30)?.hex || "",
       300: scale.find((s) => s.step === 40)?.hex || "",
@@ -64,7 +63,7 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
       600: scale.find((s) => s.step === 70)?.hex || "",
       700: scale.find((s) => s.step === 80)?.hex || "",
       800: scale.find((s) => s.step === 90)?.hex || "",
-      900: scale.find((s) => s.step === 100)?.hex || "#000000",
+      900: scale.find((s) => s.step === 100)?.hex || "",
     };
 
     return `// tailwind.config.js (50 - 900 mapping)\n{\n  colors: {\n    '${slug}': {\n${Object.entries(twSteps)
@@ -74,9 +73,9 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
 
   // 3. CSS Custom Properties (:root)
   const getCssCode = (): string => {
-    const lines = [`:root {`, `  /* Systematická škála: ${colorName} */`];
+    const lines = [`:root {`, `  /* Systematická škála: ${colorName} (10 - 100) */`];
     scale.forEach((s) => {
-      lines.push(`  --color-${slug}-${s.id}: ${s.hex}; /* L ${s.lightness} */`);
+      lines.push(`  --color-${slug}-${s.step}: ${s.hex}; /* L ${s.lightness} */`);
     });
     lines.push(`}`);
     return lines.join("\n");
@@ -151,7 +150,7 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                 : "border-transparent text-[#96abbe] hover:text-[#fafbfc]"
             }`}
           >
-            Vizuálna stupnica (L 0 – L 100)
+            Vizuálna stupnica (10 – 100)
           </button>
           <button
             type="button"
@@ -198,17 +197,13 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                   <span className="font-bold text-[#fafbfc]">
                     Škála svetlosti: {colorName} ({color.hex})
                   </span>
-                  <span>12 stupňov percepčnej svetlosti</span>
+                  <span>10 stupňov percepčnej svetlosti (L 7 až L 96)</span>
                 </div>
 
-                {/* 12 Columns Ramp */}
-                <div className="min-w-[700px] grid grid-cols-12 gap-2 text-center select-none pt-2">
+                {/* 10 Columns Ramp */}
+                <div className="min-w-[640px] grid grid-cols-10 gap-2 text-center select-none pt-2">
                   {scale.map((s) => {
-                    const colName =
-                      s.step !== null
-                        ? `${colorName.split(" ")[0]} ${s.step}`
-                        : s.label;
-
+                    const colName = `${colorName.split(" ")[0]} ${s.step}`;
                     const isCopied = copiedId === s.id;
 
                     return (
