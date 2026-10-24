@@ -72,6 +72,7 @@ export function ColorEditorModal({
   const [pantoneC, setPantoneC] = useState(color?.pantoneC || "");
   const [pantoneU, setPantoneU] = useState(color?.pantoneU || "");
   const [ral, setRal] = useState(color?.ral || "");
+  const [hasScale, setHasScale] = useState<boolean>(true);
 
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -98,12 +99,18 @@ export function ColorEditorModal({
       setPantoneC(color.pantoneC || "");
       setPantoneU(color.pantoneU || "");
       setRal(color.ral || "");
+      setHasScale(
+        typeof color.hasScale === "boolean"
+          ? color.hasScale
+          : ["PRIMARY", "SECONDARY", "ACCENT", "DIGITAL"].includes(color.role)
+      );
     } else {
       setHex("#0055FF");
       setName("Nová farba");
       setNameSk("Nová farba");
       setCategory("CORE");
       setRole("PRIMARY");
+      setHasScale(true);
       setRgb("0, 85, 255");
       setCmykC("");
       setCmykM("");
@@ -118,6 +125,7 @@ export function ColorEditorModal({
   // When category changes, auto-select a valid default role for that category
   const handleCategoryChange = (newCat: ColorCategory) => {
     setCategory(newCat);
+    setHasScale(newCat === "CORE" || newCat === "DIGITAL");
     const catDef = COLOR_CATEGORY_DEFINITIONS[newCat];
     if (catDef && !catDef.allowedRoles.includes(role)) {
       setRole(catDef.allowedRoles[0]);
@@ -164,6 +172,7 @@ export function ColorEditorModal({
     if (pantoneC) formData.append("pantoneC", pantoneC);
     if (pantoneU) formData.append("pantoneU", pantoneU);
     if (ral) formData.append("ral", ral);
+    formData.append("hasScale", hasScale ? "true" : "false");
 
     startTransition(async () => {
       const res = await saveGlobalColorAction(brandId, color?.id || null, formData);
@@ -270,7 +279,7 @@ export function ColorEditorModal({
           </div>
 
           {/* 2. Specific Role Selector based on Category */}
-          <div className="p-3.5 rounded-[3px] bg-[#0e161d] border border-[rgba(63,85,102,0.45)] space-y-2">
+          <div className="p-3.5 rounded-[3px] bg-[#0e161d] border border-[rgba(63,85,102,0.45)] space-y-3">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-semibold text-[#fafbfc]">
                 Sémantická rola: <span className="text-[#c8d400] font-mono">{currentCatDef.labelSk}</span>
@@ -294,6 +303,28 @@ export function ColorEditorModal({
                 );
               })}
             </select>
+
+            {/* Scale 10-100 Toggle */}
+            <div className="pt-2.5 border-t border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-semibold text-[#fafbfc] flex items-center gap-1.5">
+                  <Sliders className="h-3.5 w-3.5 text-[#c8d400]" />
+                  <span>Zobraziť systematickú stupnicu (10 až 100)</span>
+                </div>
+                <p className="text-[10px] text-[#96abbe] mt-0.5">
+                  Vhodné pre brandové a digitálne farby. Pre farby pozadia a jednoduché ikony nechajte vypnuté.
+                </p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={hasScale}
+                  onChange={(e) => setHasScale(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-9 h-5 bg-[#070b0f] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all border border-[rgba(63,85,102,0.6)] peer-checked:bg-[#c8d400]"></div>
+              </label>
+            </div>
           </div>
 
           {/* 3. Color Picker & Live Swatch Preview */}

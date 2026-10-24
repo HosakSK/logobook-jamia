@@ -31,14 +31,28 @@ export default async function BrandColorsPage({
   const colorsRes = await getBrandColorsAction(brand.id);
   const colors = colorsRes.success ? colorsRes.colors : [];
 
+  let globalShapes: any = null;
+  try {
+    globalShapes = await pb.collection("globalShapes").getFirstListItem(`brand = "${brand.id}"`);
+  } catch {}
+
+  const radiusMode = (globalShapes?.radiusMode || "rounded").toLowerCase();
+  const customRadius = globalShapes?.customRadiusPx ?? 3;
+  const brandRadius =
+    radiusMode === "sharp" ? "0px" : radiusMode === "pill" ? "9999px" : `${customRadius}px`;
+
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div
+      className="max-w-6xl mx-auto space-y-6"
+      style={{ ["--brand-radius" as any]: brandRadius }}
+    >
       <ColorsGalleryView
         initialColors={colors}
         brandId={brand.id}
         brandName={brand.name}
         locale={currentLocale}
         dict={dict}
+        brandRadius={brandRadius}
       />
     </div>
   );

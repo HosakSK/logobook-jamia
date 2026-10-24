@@ -40,6 +40,7 @@ interface ColorsGalleryViewProps {
   brandName: string;
   locale: string;
   dict: Dictionary;
+  brandRadius?: string;
 }
 
 export function ColorsGalleryView({
@@ -48,6 +49,7 @@ export function ColorsGalleryView({
   brandName,
   locale,
   dict,
+  brandRadius,
 }: ColorsGalleryViewProps) {
   const router = useRouter();
   const [colors, setColors] = useState<BrandColor[]>(initialColors);
@@ -388,12 +390,16 @@ export function ColorsGalleryView({
             return (
               <div
                 key={catKey}
-                className="rounded-2xl border border-white/[0.08] bg-[#0a1118]/80 p-5 sm:p-6 backdrop-blur-md space-y-4 shadow-sm"
+                className="border border-white/[0.08] bg-[#0a1118]/80 p-5 sm:p-6 backdrop-blur-md space-y-4 shadow-sm"
+                style={{ borderRadius: brandRadius || "var(--brand-radius, 8px)" }}
               >
                 {/* Category Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/[0.07] pb-4">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center border border-white/10 text-[#c8d400] shadow-xs shrink-0">
+                    <div
+                      className="w-10 h-10 bg-white/[0.04] flex items-center justify-center border border-white/10 text-[#c8d400] shadow-xs shrink-0"
+                      style={{ borderRadius: brandRadius || "var(--brand-radius, 6px)" }}
+                    >
                       {renderCategoryIcon(catKey)}
                     </div>
                     <div>
@@ -401,7 +407,10 @@ export function ColorsGalleryView({
                         <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                           {def.labelSk}
                         </h2>
-                        <span className="px-2 py-0.5 rounded-full bg-white/[0.06] text-[11px] font-mono font-medium text-slate-300 border border-white/10">
+                        <span
+                          className="px-2 py-0.5 bg-white/[0.06] text-[11px] font-mono font-medium text-slate-300 border border-white/10"
+                          style={{ borderRadius: brandRadius || "var(--brand-radius, 4px)" }}
+                        >
                           {catColors.length} {catColors.length === 1 ? "farba" : catColors.length >= 2 && catColors.length <= 4 ? "farby" : "farieb"}
                         </span>
                       </div>
@@ -416,7 +425,8 @@ export function ColorsGalleryView({
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenAdd(catKey)}
-                    className="h-8 px-3 text-xs font-medium rounded-lg border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-[#c8d400] gap-1.5 shrink-0 self-start sm:self-auto transition-all cursor-pointer"
+                    className="h-8 px-3 text-xs font-medium border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:border-[#c8d400] gap-1.5 shrink-0 self-start sm:self-auto transition-all cursor-pointer"
+                    style={{ borderRadius: brandRadius || "var(--brand-radius, 4px)" }}
                   >
                     <Plus className="h-3.5 w-3.5 text-[#c8d400]" />
                     <span>Pridať farbu</span>
@@ -425,7 +435,10 @@ export function ColorsGalleryView({
 
                 {/* Category Cards Grid or Empty Notice */}
                 {catColors.length === 0 ? (
-                  <div className="p-8 rounded-xl border border-dashed border-white/10 bg-white/[0.02] text-center text-xs text-slate-400">
+                  <div
+                    className="p-8 border border-dashed border-white/10 bg-white/[0.02] text-center text-xs text-slate-400"
+                    style={{ borderRadius: brandRadius || "var(--brand-radius, 6px)" }}
+                  >
                     <span>V tejto kategórii zatiaľ nie sú priradené žiadne farby. </span>
                     <button
                       type="button"
@@ -436,7 +449,7 @@ export function ColorsGalleryView({
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {catColors.map((color) => {
                       const globalIdx = colors.findIndex((c) => c.id === color.id);
                       return (
@@ -448,6 +461,7 @@ export function ColorsGalleryView({
                           index={globalIdx}
                           total={colors.length}
                           dict={dict}
+                          brandRadius={brandRadius}
                           onEdit={handleOpenEdit}
                           onMoveUp={() => handleMove(globalIdx, "up")}
                           onMoveDown={() => handleMove(globalIdx, "down")}
@@ -474,6 +488,7 @@ export function ColorsGalleryView({
                 index={globalIdx}
                 total={colors.length}
                 dict={dict}
+                brandRadius={brandRadius}
                 onEdit={handleOpenEdit}
                 onMoveUp={() => handleMove(globalIdx, "up")}
                 onMoveDown={() => handleMove(globalIdx, "down")}

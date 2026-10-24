@@ -16,6 +16,7 @@ export interface BrandColor {
   pantoneU?: string;
   pantoneTCX?: string;
   ral?: string;
+  hasScale?: boolean;
   order: number;
   created: string;
   updated: string;

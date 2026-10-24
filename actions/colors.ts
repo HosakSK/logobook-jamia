@@ -70,6 +70,10 @@ export async function getBrandColorsAction(
         pantoneU: rec.pantoneU || "",
         pantoneTCX: rec.pantoneTCX || "",
         ral: rec.ral || "",
+        hasScale:
+          typeof rec.hasScale === "boolean"
+            ? rec.hasScale
+            : ["PRIMARY", "SECONDARY", "ACCENT", "DIGITAL"].includes(role),
         order: typeof rec.order === "number" ? rec.order : idx,
         created: rec.created,
         updated: rec.updated,
@@ -136,6 +140,11 @@ export async function saveGlobalColorAction(
     const pantoneU = (formData.get("pantoneU") as string)?.trim() || "";
     const pantoneTCX = (formData.get("pantoneTCX") as string)?.trim() || "";
     const ral = (formData.get("ral") as string)?.trim().toUpperCase() || "";
+    const hasScaleRaw = formData.get("hasScale");
+    const hasScale =
+      hasScaleRaw !== null
+        ? hasScaleRaw === "true"
+        : ["PRIMARY", "SECONDARY", "ACCENT", "DIGITAL"].includes(role);
 
     const parsed = saveColorSchema.safeParse({
       name,
@@ -181,6 +190,7 @@ export async function saveGlobalColorAction(
       pantoneU,
       pantoneTCX,
       ral,
+      hasScale,
     };
 
     let targetId = colorId;

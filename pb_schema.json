@@ -1033,6 +1033,11 @@
           "SEMANTIC",
           "CUSTOM"
         ]
+      },
+      {
+        "name": "hasScale",
+        "type": "bool",
+        "required": false
       }
     ],
     "indexes": [
