@@ -25,5 +25,6 @@ pocketbase.exe
 .DS_Store
 Thumbs.db
 *.log
+*.tsbuildinfo
 .vscode/
 .idea/

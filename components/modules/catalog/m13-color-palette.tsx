@@ -26,6 +26,7 @@ import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandColorsAction } from "@/actions/colors";
 import { BrandColor } from "@/lib/types/color";
 import { getWcagContrast } from "@/lib/utils/color-calc";
+import { COLOR_ROLE_DEFINITIONS } from "@/lib/validations/color";
 
 export default function M13PaletaFariebModule({
   id: moduleId,
@@ -337,7 +338,9 @@ export default function M13PaletaFariebModule({
                             : "rgba(0,0,0,0.15)",
                       }}
                     >
-                      {color.role}
+                      {locale === "en"
+                        ? COLOR_ROLE_DEFINITIONS[color.role]?.badgeLabelEn || color.role
+                        : COLOR_ROLE_DEFINITIONS[color.role]?.badgeLabelSk || color.role}
                     </span>
                   )}
                 </div>
@@ -508,7 +511,9 @@ export default function M13PaletaFariebModule({
                           : "rgba(0,0,0,0.15)",
                     }}
                   >
-                    {color.role || `Color 0${idx + 1}`}
+                    {locale === "en"
+                      ? COLOR_ROLE_DEFINITIONS[color.role]?.badgeLabelEn || color.role || `Color 0${idx + 1}`
+                      : COLOR_ROLE_DEFINITIONS[color.role]?.badgeLabelSk || color.role || `Farba 0${idx + 1}`}
                   </span>
                 </div>
 

@@ -1,9 +1,10 @@
-import { ColorRole } from "@/lib/validations/color";
+import { ColorCategory, ColorRole } from "@/lib/validations/color";
 
 export interface BrandColor {
   id: string;
   brand: string;
   name: Record<string, string>;
+  category?: ColorCategory;
   role: ColorRole;
   hex: string;
   rgb: string;

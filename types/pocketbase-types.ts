@@ -35,7 +35,29 @@ export type BrandStatus = "LIVE" | "DEV" | "ARCHIVED";
 
 export type TeamMemberRole = "OWNER" | "EDITOR" | "VIEWER";
 
-export type GlobalColorRole = "PRIMARY" | "SECONDARY" | "ACCENT" | "NEUTRAL" | "CUSTOM";
+export type GlobalColorCategory =
+  | "CORE"
+  | "DIGITAL"
+  | "BACKGROUND"
+  | "TYPOGRAPHY"
+  | "SEMANTIC"
+  | "CUSTOM";
+
+export type GlobalColorRole =
+  | "PRIMARY"
+  | "SECONDARY"
+  | "ACCENT"
+  | "NEUTRAL"
+  | "CUSTOM"
+  | "DIGITAL"
+  | "BG_DAY"
+  | "BG_NIGHT"
+  | "TEXT_DAY"
+  | "TEXT_NIGHT"
+  | "SUCCESS"
+  | "WARNING"
+  | "DANGER"
+  | "INFO";
 
 export type GlobalRadiusMode = "SQUARE" | "ROUNDED" | "PILL";
 
@@ -173,6 +195,7 @@ export interface PageTemplatesRecord<
 export interface GlobalColorsRecord<TName = Record<string, string>> {
   brand: RecordIdString;
   name: TName;
+  category?: GlobalColorCategory;
   role: GlobalColorRole;
   hex: string;
   rgb?: string;

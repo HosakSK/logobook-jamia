@@ -23,6 +23,7 @@ import { updateModuleConfigAction } from "@/actions/pages";
 import { getBrandColorsAction } from "@/actions/colors";
 import { BrandColor } from "@/lib/types/color";
 import { getWcagContrast } from "@/lib/utils/color-calc";
+import { COLOR_ROLE_DEFINITIONS } from "@/lib/validations/color";
 
 export default function M12KartaFarbyModule({
   id: moduleId,
@@ -213,7 +214,9 @@ export default function M12KartaFarbyModule({
                 borderColor: swatchTextColor === "#ffffff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)",
               }}
             >
-              {activeColor.role || "BRAND COLOR"}
+              {locale === "en"
+                ? COLOR_ROLE_DEFINITIONS[activeColor.role]?.badgeLabelEn || activeColor.role
+                : COLOR_ROLE_DEFINITIONS[activeColor.role]?.badgeLabelSk || activeColor.role || "FARBA"}
             </span>
 
             {/* WCAG Accessibility Badge */}

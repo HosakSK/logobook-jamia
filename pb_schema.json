@@ -848,7 +848,16 @@
           "SECONDARY",
           "ACCENT",
           "NEUTRAL",
-          "CUSTOM"
+          "CUSTOM",
+          "DIGITAL",
+          "BG_DAY",
+          "BG_NIGHT",
+          "TEXT_DAY",
+          "TEXT_NIGHT",
+          "SUCCESS",
+          "WARNING",
+          "DANGER",
+          "INFO"
         ]
       },
       {
@@ -1005,6 +1014,25 @@
         "required": false,
         "system": false,
         "type": "number"
+      },
+      {
+        "help": "",
+        "hidden": false,
+        "id": "select_category_col",
+        "maxSelect": 1,
+        "name": "category",
+        "presentable": false,
+        "required": false,
+        "system": false,
+        "type": "select",
+        "values": [
+          "CORE",
+          "DIGITAL",
+          "BACKGROUND",
+          "TYPOGRAPHY",
+          "SEMANTIC",
+          "CUSTOM"
+        ]
       }
     ],
     "indexes": [

@@ -50,11 +50,32 @@ export function computeBrandCssVariables(
   const radiusValue = computeBrandRadiusValue(radiusMode, customRadiusPx);
   const borderWidthValue = `${Math.max(0, borderWidthPx)}px`;
 
-  // Semantic colors
-  const success = shapes?.semanticSuccess || "#10b981";
-  const warning = shapes?.semanticWarning || "#f59e0b";
-  const danger = shapes?.semanticDanger || "#bb4934";
-  const info = shapes?.semanticInfo || "#3b82f6";
+  // Semantic colors (fallback from shapes, or overriden by brand colors)
+  let success = shapes?.semanticSuccess || "#10b981";
+  let warning = shapes?.semanticWarning || "#f59e0b";
+  let danger = shapes?.semanticDanger || "#bb4934";
+  let info = shapes?.semanticInfo || "#3b82f6";
+  let bgDay = "";
+  let bgNight = "";
+  let textDay = "";
+  let textNight = "";
+  let digital = "";
+
+  if (colors && colors.length > 0) {
+    for (const c of colors) {
+      if (!c.hex) continue;
+      const role = c.role?.toUpperCase();
+      if (role === "SUCCESS") success = c.hex;
+      else if (role === "WARNING") warning = c.hex;
+      else if (role === "DANGER") danger = c.hex;
+      else if (role === "INFO") info = c.hex;
+      else if (role === "BG_DAY") bgDay = c.hex;
+      else if (role === "BG_NIGHT") bgNight = c.hex;
+      else if (role === "TEXT_DAY") textDay = c.hex;
+      else if (role === "TEXT_NIGHT") textNight = c.hex;
+      else if (role === "DIGITAL") digital = c.hex;
+    }
+  }
 
   // Typography
   let headingFont = "var(--font-sans)";
@@ -118,6 +139,11 @@ export function computeBrandCssVariables(
     "--brand-color-warning": warning,
     "--brand-color-danger": danger,
     "--brand-color-info": info,
+    ...(bgDay ? { "--brand-bg-day": bgDay } : {}),
+    ...(bgNight ? { "--brand-bg-night": bgNight } : {}),
+    ...(textDay ? { "--brand-text-day": textDay } : {}),
+    ...(textNight ? { "--brand-text-night": textNight } : {}),
+    ...(digital ? { "--brand-color-digital": digital } : {}),
     "--brand-font-heading": headingFont,
     "--brand-font-body": bodyFont,
     "--brand-manual-bg": theme.bgColor,

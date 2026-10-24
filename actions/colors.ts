@@ -7,6 +7,8 @@ import {
   saveColorSchema,
   bulkImportColorsSchema,
   ColorRole,
+  ColorCategory,
+  resolveColorCategory,
   hexColorRegex,
 } from "@/lib/validations/color";
 import { hexToRgb } from "@/lib/utils/color-calc";
@@ -49,11 +51,15 @@ export async function getBrandColorsAction(
         }
       }
 
+      const role = (rec.role as ColorRole) || "CUSTOM";
+      const category = resolveColorCategory(role, rec.category);
+
       return {
         id: rec.id,
         brand: rec.brand,
         name: parsedName,
-        role: (rec.role as ColorRole) || "CUSTOM",
+        category,
+        role,
         hex: rec.hex?.toUpperCase() || "#000000",
         rgb,
         cmykC: rec.cmykC !== undefined && rec.cmykC !== null ? Number(rec.cmykC) : null,
@@ -83,6 +89,7 @@ export async function getBrandColorsAction(
 
 /**
  * Creates or updates a brand color record in globalColors.
+ * Automatically synchronizes semantic colors with globalShapes if applicable.
  */
 export async function saveGlobalColorAction(
   brandId: string,
@@ -98,7 +105,10 @@ export async function saveGlobalColorAction(
     const name = (formData.get("name") as string) || "";
     const nameSk = (formData.get("nameSk") as string) || "";
     const nameCs = (formData.get("nameCs") as string) || "";
-    const role = formData.get("role") as ColorRole;
+    const rawCategory = (formData.get("category") as string) || "";
+    const role = (formData.get("role") as ColorRole) || "PRIMARY";
+    const category = resolveColorCategory(role, rawCategory);
+
     let hex = (formData.get("hex") as string)?.trim().toUpperCase() || "";
     if (hex && !hex.startsWith("#")) {
       hex = `#${hex}`;
@@ -131,6 +141,7 @@ export async function saveGlobalColorAction(
       name,
       nameSk,
       nameCs,
+      category,
       role,
       hex,
       rgb,
@@ -158,6 +169,7 @@ export async function saveGlobalColorAction(
     const payload: Record<string, any> = {
       brand: brandId,
       name: nameObj,
+      category,
       role,
       hex,
       rgb,
@@ -186,6 +198,28 @@ export async function saveGlobalColorAction(
 
       const created = await pb.collection("globalColors").create(payload);
       targetId = created.id;
+    }
+
+    // Synchronize semantic roles with globalShapes record if present
+    if (["SUCCESS", "WARNING", "DANGER", "INFO"].includes(role)) {
+      try {
+        const shapesList = await pb.collection("globalShapes").getFullList({
+          filter: `brand = "${brandId}"`,
+          perPage: 1,
+        });
+        if (shapesList.length > 0) {
+          const shapeRecord = shapesList[0];
+          const updateShapesPayload: Record<string, string> = {};
+          if (role === "SUCCESS") updateShapesPayload.semanticSuccess = hex;
+          else if (role === "WARNING") updateShapesPayload.semanticWarning = hex;
+          else if (role === "DANGER") updateShapesPayload.semanticDanger = hex;
+          else if (role === "INFO") updateShapesPayload.semanticInfo = hex;
+
+          await pb.collection("globalShapes").update(shapeRecord.id, updateShapesPayload);
+        }
+      } catch (shapeErr) {
+        console.warn("Could not sync semantic color to globalShapes:", shapeErr);
+      }
     }
 
     revalidatePath(`/admin/brand/${brandId}/colors`);
@@ -267,7 +301,8 @@ export async function reorderGlobalColorsAction(
  */
 export async function bulkImportColorsAction(
   brandId: string,
-  hexListText: string
+  hexListText: string,
+  category: ColorCategory = "CORE"
 ): Promise<{ success: boolean; message: string; importedCount?: number }> {
   try {
     const pb = await getServerPocketBase();
@@ -275,7 +310,7 @@ export async function bulkImportColorsAction(
       return { success: false, message: "Unauthorized" };
     }
 
-    const parsed = bulkImportColorsSchema.safeParse({ hexText: hexListText });
+    const parsed = bulkImportColorsSchema.safeParse({ hexText: hexListText, category });
     if (!parsed.success) {
       return { success: false, message: "Zadajte aspoň jeden HEX kód." };
     }
@@ -303,6 +338,13 @@ export async function bulkImportColorsAction(
     });
     let currentOrder = existing.length > 0 ? (existing[0].order || 0) + 1 : 0;
 
+    let defaultRole: ColorRole = "CUSTOM";
+    if (category === "CORE") defaultRole = "PRIMARY";
+    else if (category === "DIGITAL") defaultRole = "DIGITAL";
+    else if (category === "BACKGROUND") defaultRole = "BG_DAY";
+    else if (category === "TYPOGRAPHY") defaultRole = "TEXT_DAY";
+    else if (category === "SEMANTIC") defaultRole = "INFO";
+
     let imported = 0;
     for (let i = 0; i < validHexes.length; i++) {
       const hex = validHexes[i];
@@ -313,7 +355,8 @@ export async function bulkImportColorsAction(
       const payload = {
         brand: brandId,
         name: { en: colorName, sk: `Farba ${existing.length + i + 1}` },
-        role: "CUSTOM",
+        category,
+        role: defaultRole,
         hex,
         rgb,
         order: currentOrder++,

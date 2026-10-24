@@ -3,7 +3,15 @@
 import { useState, useEffect, useTransition } from "react";
 import { BrandColor } from "@/lib/types/color";
 import { saveGlobalColorAction } from "@/actions/colors";
-import { COLOR_ROLES, ColorRole } from "@/lib/validations/color";
+import {
+  COLOR_CATEGORIES,
+  ColorCategory,
+  COLOR_ROLES,
+  ColorRole,
+  COLOR_CATEGORY_DEFINITIONS,
+  COLOR_ROLE_DEFINITIONS,
+  resolveColorCategory,
+} from "@/lib/validations/color";
 import {
   hexToRgb,
   getWcagContrast,
@@ -18,10 +26,12 @@ import {
   Palette,
   Loader2,
   AlertCircle,
-  Sparkles,
-  Info,
-  Check,
-  ArrowRight,
+  Sun,
+  Moon,
+  Monitor,
+  ShieldCheck,
+  Type,
+  Layers,
 } from "lucide-react";
 
 interface ColorEditorModalProps {
@@ -44,6 +54,9 @@ export function ColorEditorModal({
   const [hex, setHex] = useState(color?.hex || "#0055FF");
   const [name, setName] = useState(color?.name.en || color?.name.sk || "");
   const [nameSk, setNameSk] = useState(color?.name.sk || "");
+
+  const initialCat = resolveColorCategory(color?.role || "PRIMARY", color?.category);
+  const [category, setCategory] = useState<ColorCategory>(initialCat);
   const [role, setRole] = useState<ColorRole>(color?.role || "PRIMARY");
 
   // Color values
@@ -66,6 +79,8 @@ export function ColorEditorModal({
       setHex(color.hex);
       setName(color.name.en || color.name.sk || "");
       setNameSk(color.name.sk || "");
+      const cat = resolveColorCategory(color.role, color.category);
+      setCategory(cat);
       setRole(color.role);
       setRgb(color.rgb);
       setCmykC(color.cmykC?.toString() ?? "");
@@ -79,6 +94,7 @@ export function ColorEditorModal({
       setHex("#0055FF");
       setName("Primary Blue");
       setNameSk("Primárna modrá");
+      setCategory("CORE");
       setRole("PRIMARY");
       setRgb("0, 85, 255");
       setCmykC("");
@@ -90,6 +106,15 @@ export function ColorEditorModal({
       setRal("");
     }
   }, [color, isOpen]);
+
+  // When category changes, auto-select a valid default role for that category
+  const handleCategoryChange = (newCat: ColorCategory) => {
+    setCategory(newCat);
+    const catDef = COLOR_CATEGORY_DEFINITIONS[newCat];
+    if (catDef && !catDef.allowedRoles.includes(role)) {
+      setRole(catDef.allowedRoles[0]);
+    }
+  };
 
   // Compute live contrast and nearest RAL
   const contrast = getWcagContrast(hex);
@@ -117,6 +142,7 @@ export function ColorEditorModal({
     const formData = new FormData();
     formData.append("name", name);
     formData.append("nameSk", nameSk);
+    formData.append("category", category);
     formData.append("role", role);
     formData.append("hex", hex);
     formData.append("rgb", rgb);
@@ -143,24 +169,26 @@ export function ColorEditorModal({
 
   if (!isOpen) return null;
 
+  const currentCatDef = COLOR_CATEGORY_DEFINITIONS[category];
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in-0">
       <div className="relative w-full max-w-xl max-h-[92vh] flex flex-col rounded-[3px] bg-[#17212a] text-[#fafbfc] border border-[rgba(63,85,102,0.6)] shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-[rgba(63,85,102,0.4)] flex items-center justify-between shrink-0">
+        <div className="p-5 border-b border-[rgba(63,85,102,0.4)] flex items-center justify-between shrink-0 bg-[#0e161d]">
           <div>
-            <h2 className="text-base font-bold text-[#fafbfc] flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#fafbfc] flex items-center gap-2 font-mono">
               <Palette className="h-4 w-4 text-[#c8d400]" />
               <span>{isEditing ? "Upraviť farbu značky" : "Pridať novú farbu do palety"}</span>
             </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Definícia presných hodnôt pre digitál (RGB/HEX) a tlačové štandardy (CMYK, Pantone, RAL).
+            <p className="text-xs text-[#96abbe] mt-0.5">
+              Kategorizácia, Day/Night režimy, digitálne tokeny a tlačové normy.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-[3px] text-muted-foreground hover:text-foreground hover:bg-neutral-800 transition-colors"
+            className="p-1 rounded-[3px] text-[#96abbe] hover:text-[#fafbfc] hover:bg-[#1f2c36] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -175,57 +203,146 @@ export function ColorEditorModal({
             </div>
           )}
 
-          {/* Color Picker & Live Swatch Preview */}
-          <div className="p-4 rounded-[3px] bg-neutral-900 border border-border/40 space-y-4">
+          {/* 1. Category Selector Pills */}
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-[#fafbfc]">
+              Kategória farby v manuáli
+            </Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {COLOR_CATEGORIES.map((catKey) => {
+                const def = COLOR_CATEGORY_DEFINITIONS[catKey];
+                const isSelected = category === catKey;
+
+                let iconNode = <Palette className="h-3.5 w-3.5" />;
+                if (catKey === "DIGITAL") iconNode = <Monitor className="h-3.5 w-3.5" />;
+                if (catKey === "BACKGROUND") iconNode = <Sun className="h-3.5 w-3.5" />;
+                if (catKey === "TYPOGRAPHY") iconNode = <Type className="h-3.5 w-3.5" />;
+                if (catKey === "SEMANTIC") iconNode = <ShieldCheck className="h-3.5 w-3.5" />;
+                if (catKey === "CUSTOM") iconNode = <Layers className="h-3.5 w-3.5" />;
+
+                return (
+                  <button
+                    key={catKey}
+                    type="button"
+                    onClick={() => handleCategoryChange(catKey)}
+                    className={`p-2.5 rounded-[3px] border text-left flex items-start gap-2 transition-all ${
+                      isSelected
+                        ? "bg-[#c8d400]/15 border-[#c8d400] text-[#fafbfc] shadow-xs"
+                        : "bg-[#070b0f] border-[rgba(63,85,102,0.4)] text-[#96abbe] hover:bg-[#131b22] hover:text-[#fafbfc]"
+                    }`}
+                  >
+                    <div
+                      className={`mt-0.5 p-1 rounded-[2px] ${
+                        isSelected
+                          ? "bg-[#c8d400] text-[#070b0f]"
+                          : "bg-[#17212a] text-[#96abbe]"
+                      }`}
+                    >
+                      {iconNode}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold leading-tight truncate">
+                        {def.labelSk}
+                      </div>
+                      <div className="text-[10px] text-[#96abbe] line-clamp-1 mt-0.5">
+                        {catKey === "BACKGROUND"
+                          ? "Day & Night plátna"
+                          : catKey === "TYPOGRAPHY"
+                          ? "Day & Night texty"
+                          : catKey === "SEMANTIC"
+                          ? "Do's / Don'ts stavy"
+                          : def.descriptionSk}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. Specific Role Selector based on Category */}
+          <div className="p-3.5 rounded-[3px] bg-[#0e161d] border border-[rgba(63,85,102,0.45)] space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold text-[#fafbfc]">
+                Sémantická rola: <span className="text-[#c8d400] font-mono">{currentCatDef.labelSk}</span>
+              </Label>
+              <span className="text-[11px] text-[#96abbe]">
+                Vyberte presné určenie farby
+              </span>
+            </div>
+
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as ColorRole)}
+              className="w-full h-9 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] text-xs px-3 text-[#fafbfc] focus:outline-hidden focus:border-[#c8d400]"
+            >
+              {currentCatDef.allowedRoles.map((r) => {
+                const rDef = COLOR_ROLE_DEFINITIONS[r];
+                return (
+                  <option key={r} value={r}>
+                    {rDef ? rDef.labelSk : r}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          {/* 3. Color Picker & Live Swatch Preview */}
+          <div className="p-4 rounded-[3px] bg-[#070b0f] border border-[rgba(63,85,102,0.5)] space-y-4">
             <div className="flex items-center gap-4">
               {/* Native picker synced */}
-              <div className="relative h-14 w-14 shrink-0 rounded-[3px] overflow-hidden border-2 border-border/60 shadow-xs cursor-pointer">
+              <div
+                className="relative h-14 w-14 shrink-0 rounded-[3px] overflow-hidden border-2 border-[rgba(63,85,102,0.6)] shadow-xs cursor-pointer"
+                style={{ backgroundColor: hex }}
+              >
                 <input
                   type="color"
                   value={hex.length === 7 ? hex : "#0055FF"}
                   onChange={(e) => handleHexChange(e.target.value.toUpperCase())}
-                  className="absolute -top-3 -left-3 w-20 h-20 cursor-pointer border-0 p-0"
+                  className="absolute -top-3 -left-3 w-20 h-20 cursor-pointer border-0 p-0 opacity-0"
                 />
               </div>
 
               {/* HEX & RGB inputs */}
               <div className="grid grid-cols-2 gap-3 flex-1">
                 <div>
-                  <Label className="text-[11px] text-muted-foreground">HEX kód</Label>
+                  <Label className="text-[11px] text-[#96abbe]">HEX kód</Label>
                   <Input
                     value={hex}
                     onChange={(e) => handleHexChange(e.target.value.toUpperCase())}
                     placeholder="#0055FF"
                     required
-                    className="mt-1 h-9 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-xs font-bold"
+                    className="mt-1 h-9 rounded-[3px] bg-[#17212a] border-[rgba(63,85,102,0.6)] font-mono text-xs font-bold text-[#fafbfc] focus:border-[#c8d400]"
                   />
                 </div>
                 <div>
-                  <Label className="text-[11px] text-muted-foreground">RGB hodnota</Label>
+                  <Label className="text-[11px] text-[#96abbe]">RGB hodnota</Label>
                   <Input
                     value={rgb}
                     onChange={(e) => setRgb(e.target.value)}
                     placeholder="0, 85, 255"
-                    className="mt-1 h-9 rounded-[3px] bg-neutral-950 border-border/60 font-mono text-xs"
+                    className="mt-1 h-9 rounded-[3px] bg-[#17212a] border-[rgba(63,85,102,0.6)] font-mono text-xs text-[#fafbfc] focus:border-[#c8d400]"
                   />
                 </div>
               </div>
             </div>
 
             {/* Live WCAG Contrast & Nearest RAL info strip */}
-            <div className="pt-3 border-t border-border/30 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="pt-3 border-t border-[rgba(63,85,102,0.35)] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               {/* WCAG Preview */}
-              <div className="p-2.5 rounded-[2px] bg-neutral-950/60 border border-border/30 flex items-center justify-between">
+              <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] text-muted-foreground uppercase font-mono block">WCAG Kontrast</span>
+                  <span className="text-[10px] text-[#96abbe] uppercase font-mono block">
+                    WCAG Kontrast
+                  </span>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="font-mono font-bold text-foreground">
+                    <span className="font-mono font-bold text-[#fafbfc]">
                       {contrast.preferredText === "white"
                         ? `${contrast.whiteRatio}:1 (Biela)`
                         : `${contrast.blackRatio}:1 (Čierna)`}
                     </span>
                     <span
-                      className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-[2px] ${
+                      className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-[2px] ${
                         (contrast.preferredText === "white"
                           ? contrast.whiteScore
                           : contrast.blackScore) === "Fail"
@@ -246,9 +363,9 @@ export function ColorEditorModal({
               </div>
 
               {/* RAL Match */}
-              <div className="p-2.5 rounded-[2px] bg-neutral-950/60 border border-border/30 flex items-center justify-between">
+              <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-between">
                 <div className="min-w-0 pr-2">
-                  <span className="text-[10px] text-muted-foreground uppercase font-mono block">
+                  <span className="text-[10px] text-[#96abbe] uppercase font-mono block">
                     Najbližšia RAL zhoda ({nearestRal?.similarity}%)
                   </span>
                   <span className="font-mono text-xs font-bold text-[#c8d400] truncate block">
@@ -258,7 +375,7 @@ export function ColorEditorModal({
                 <button
                   type="button"
                   onClick={handleApplyNearestRal}
-                  className="px-2 py-1 rounded-[2px] bg-neutral-800 hover:bg-[#c8d400] hover:text-[#070b0f] text-[10px] font-semibold text-foreground transition-colors shrink-0"
+                  className="px-2 py-1 rounded-[2px] bg-[#070b0f] border border-[rgba(63,85,102,0.6)] hover:bg-[#c8d400] hover:text-[#070b0f] text-[10px] font-semibold text-[#fafbfc] transition-colors shrink-0"
                 >
                   Použiť
                 </button>
@@ -266,57 +383,43 @@ export function ColorEditorModal({
             </div>
           </div>
 
-          {/* Names and Role */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* 4. Names */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-muted-foreground">Názov (EN / Predvolený)</Label>
+              <Label className="text-xs text-[#96abbe]">Názov farby (EN / Predvolený)</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Primary Blue"
                 required
-                className="mt-1 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs"
+                className="mt-1 h-9 rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-[#c8d400]"
               />
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">Názov (SK)</Label>
+              <Label className="text-xs text-[#96abbe]">Názov farby (SK)</Label>
               <Input
                 value={nameSk}
                 onChange={(e) => setNameSk(e.target.value)}
                 placeholder="napr. Primárna modrá"
-                className="mt-1 h-9 rounded-[3px] bg-neutral-900 border-border/60 text-xs"
+                className="mt-1 h-9 rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-xs text-[#fafbfc] focus:border-[#c8d400]"
               />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">Sémantická rola</Label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as ColorRole)}
-                className="w-full mt-1 h-9 rounded-[3px] bg-neutral-900 border border-border/60 text-xs px-2.5 text-foreground focus:outline-hidden focus:border-[#c8d400]"
-              >
-                <option value="PRIMARY">PRIMARY (Primárna farba značky)</option>
-                <option value="SECONDARY">SECONDARY (Sekundárna farba)</option>
-                <option value="ACCENT">ACCENT (Akcent / Tlačidlá)</option>
-                <option value="NEUTRAL">NEUTRAL (Neutrálna / Podklad)</option>
-                <option value="CUSTOM">CUSTOM (Doplnková)</option>
-              </select>
             </div>
           </div>
 
-          {/* Print Standards Section (CMYK, Pantone, RAL) */}
-          <div className="space-y-3 pt-3 border-t border-border/30">
+          {/* 5. Print Standards Section (CMYK, Pantone, RAL) */}
+          <div className="space-y-3 pt-3 border-t border-[rgba(63,85,102,0.35)]">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">
+              <span className="text-xs font-bold text-[#fafbfc] uppercase tracking-wider font-mono">
                 Tlačové normy (DTP)
               </span>
-              <span className="text-[10px] text-muted-foreground italic">
-                *CMYK sa neautopočíta, zadajte hodnoty z tlačového manuálu
+              <span className="text-[10px] text-[#96abbe] italic">
+                *Hodnoty z grafického a tlačového manuálu
               </span>
             </div>
 
             {/* CMYK Inputs */}
             <div>
-              <Label className="text-[11px] text-muted-foreground">CMYK hodnoty (0 až 100 %)</Label>
+              <Label className="text-[11px] text-[#96abbe]">CMYK hodnoty (0 až 100 %)</Label>
               <div className="grid grid-cols-4 gap-2 mt-1 font-mono">
                 <div>
                   <div className="relative">
@@ -330,7 +433,7 @@ export function ColorEditorModal({
                       value={cmykC}
                       onChange={(e) => setCmykC(e.target.value)}
                       placeholder="0"
-                      className="pl-7 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+                      className="pl-7 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#fafbfc]"
                     />
                   </div>
                 </div>
@@ -346,7 +449,7 @@ export function ColorEditorModal({
                       value={cmykM}
                       onChange={(e) => setCmykM(e.target.value)}
                       placeholder="0"
-                      className="pl-7 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+                      className="pl-7 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#fafbfc]"
                     />
                   </div>
                 </div>
@@ -362,7 +465,7 @@ export function ColorEditorModal({
                       value={cmykY}
                       onChange={(e) => setCmykY(e.target.value)}
                       placeholder="0"
-                      className="pl-7 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+                      className="pl-7 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#fafbfc]"
                     />
                   </div>
                 </div>
@@ -378,7 +481,7 @@ export function ColorEditorModal({
                       value={cmykK}
                       onChange={(e) => setCmykK(e.target.value)}
                       placeholder="0"
-                      className="pl-7 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60"
+                      className="pl-7 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] text-[#fafbfc]"
                     />
                   </div>
                 </div>
@@ -388,43 +491,43 @@ export function ColorEditorModal({
             {/* RAL and Pantone */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-[11px] text-muted-foreground">RAL kód</Label>
+                <Label className="text-[11px] text-[#96abbe]">RAL kód</Label>
                 <Input
                   value={ral}
                   onChange={(e) => setRal(e.target.value.toUpperCase())}
                   placeholder="napr. RAL 5002"
-                  className="mt-1 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60 font-mono"
+                  className="mt-1 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] font-mono text-[#fafbfc]"
                 />
               </div>
               <div>
-                <Label className="text-[11px] text-muted-foreground">Pantone Coated (C)</Label>
+                <Label className="text-[11px] text-[#96abbe]">Pantone Coated (C)</Label>
                 <Input
                   value={pantoneC}
                   onChange={(e) => setPantoneC(e.target.value)}
                   placeholder="napr. 286 C"
-                  className="mt-1 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60 font-mono"
+                  className="mt-1 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] font-mono text-[#fafbfc]"
                 />
               </div>
               <div>
-                <Label className="text-[11px] text-muted-foreground">Pantone Uncoated (U)</Label>
+                <Label className="text-[11px] text-[#96abbe]">Pantone Uncoated (U)</Label>
                 <Input
                   value={pantoneU}
                   onChange={(e) => setPantoneU(e.target.value)}
                   placeholder="napr. 286 U"
-                  className="mt-1 h-8 text-xs rounded-[3px] bg-neutral-900 border-border/60 font-mono"
+                  className="mt-1 h-8 text-xs rounded-[3px] bg-[#070b0f] border-[rgba(63,85,102,0.6)] font-mono text-[#fafbfc]"
                 />
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-border/30">
+          <div className="flex justify-end gap-2 pt-4 border-t border-[rgba(63,85,102,0.35)]">
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={onClose}
-              className="h-9 px-4 text-xs rounded-[3px] border-border/50"
+              className="h-9 px-4 text-xs rounded-[3px] border-[rgba(63,85,102,0.6)] bg-[#070b0f] text-[#fafbfc]"
             >
               Zrušiť
             </Button>
@@ -432,7 +535,7 @@ export function ColorEditorModal({
               type="submit"
               size="sm"
               disabled={isPending}
-              className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors"
+              className="h-9 px-5 text-xs font-semibold rounded-[3px] bg-[#c8d400] text-[#070b0f] hover:bg-[#b5c000] gap-1.5 transition-colors shadow-xs"
             >
               {isPending ? (
                 <>
