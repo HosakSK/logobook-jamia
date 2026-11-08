@@ -54,7 +54,6 @@ export function ColorsGalleryView({
   const router = useRouter();
   const [colors, setColors] = useState<BrandColor[]>(initialColors);
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [viewMode, setViewMode] = useState<"grouped" | "flat">("grouped");
 
   // Modals state
@@ -74,19 +73,6 @@ export function ColorsGalleryView({
     );
   }, [colors]);
 
-  // Category counts
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { ALL: paletteColors.length };
-    COLOR_CATEGORIES.forEach((cat) => {
-      counts[cat] = 0;
-    });
-    paletteColors.forEach((c) => {
-      const cat = resolveColorCategory(c.role, c.category);
-      counts[cat] = (counts[cat] || 0) + 1;
-    });
-    return counts;
-  }, [paletteColors]);
-
   // Filter colors
   const filteredColors = useMemo(() => {
     return paletteColors.filter((c) => {
@@ -104,16 +90,9 @@ export function ColorsGalleryView({
         }
       }
 
-      if (selectedCategory !== "ALL") {
-        const cat = resolveColorCategory(c.role, c.category);
-        if (cat !== selectedCategory) {
-          return false;
-        }
-      }
-
       return true;
     });
-  }, [paletteColors, search, selectedCategory, locale]);
+  }, [paletteColors, search, locale]);
 
   // Grouped by Category for sectioned view
   const groupedByCategory = useMemo(() => {
@@ -237,57 +216,7 @@ export function ColorsGalleryView({
         </div>
       </div>
 
-      {/* 2. Category Quick Tabs Bar */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
-        <button
-          type="button"
-          onClick={() => setSelectedCategory("ALL")}
-          className={`px-3 py-1.5 rounded-[3px] text-xs font-mono font-semibold transition-all shrink-0 flex items-center gap-1.5 border ${
-            selectedCategory === "ALL"
-              ? "bg-[#c8d400] text-[#070b0f] border-[#c8d400]"
-              : "bg-[#17212a] text-[#96abbe] border-[rgba(63,85,102,0.4)] hover:text-[#fafbfc] hover:bg-[#1f2c36]"
-          }`}
-        >
-          <span>Všetky kategórie</span>
-          <span
-            className={`px-1.5 py-0.2 rounded-[2px] text-[10px] ${
-              selectedCategory === "ALL" ? "bg-black/20 text-black font-bold" : "bg-[#070b0f] text-[#96abbe]"
-            }`}
-          >
-            {categoryCounts.ALL}
-          </span>
-        </button>
-
-        {COLOR_CATEGORIES.map((cat) => {
-          const def = COLOR_CATEGORY_DEFINITIONS[cat];
-          const count = categoryCounts[cat] || 0;
-          const isSelected = selectedCategory === cat;
-
-          return (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-[3px] text-xs font-mono font-semibold transition-all shrink-0 flex items-center gap-1.5 border ${
-                isSelected
-                  ? "bg-[#c8d400] text-[#070b0f] border-[#c8d400]"
-                  : "bg-[#17212a] text-[#96abbe] border-[rgba(63,85,102,0.4)] hover:text-[#fafbfc] hover:bg-[#1f2c36]"
-              }`}
-            >
-              <span>{def.labelSk}</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-[2px] text-[10px] ${
-                  isSelected ? "bg-black/20 text-black font-bold" : "bg-[#070b0f] text-[#96abbe]"
-                }`}
-              >
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 3. Search and View Mode Controls */}
+      {/* 2. Search and View Mode Controls */}
       <div className="p-3.5 rounded-[3px] bg-[#17212a] border border-[rgba(63,85,102,0.45)] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 shadow-xs">
         {/* Search */}
         <div className="relative flex-1 min-w-[200px]">
@@ -367,22 +296,19 @@ export function ColorsGalleryView({
       ) : filteredColors.length === 0 ? (
         <div className="border border-[rgba(63,85,102,0.45)] rounded-[3px] p-10 text-center bg-[#17212a] text-[#fafbfc] space-y-2">
           <p className="text-sm font-medium text-[#fafbfc]">
-            Žiadne farby nezodpovedajú zvolenému filtru.
+            Žiadne farby nezodpovedajú vyhľadávaniu.
           </p>
           <p className="text-xs text-[#96abbe]">
-            Skúste upraviť vyhľadávanie alebo zvoľte „Všetky kategórie“.
+            Skúste upraviť hľadaný výraz.
           </p>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => {
-              setSearch("");
-              setSelectedCategory("ALL");
-            }}
-            className="h-8 text-xs rounded-[3px] mt-2"
+            onClick={() => setSearch("")}
+            className="h-8 text-xs rounded-[3px] mt-2 cursor-pointer"
           >
-            Resetovať filtre
+            Resetovať vyhľadávanie
           </Button>
         </div>
       ) : viewMode === "grouped" ? (
@@ -390,7 +316,7 @@ export function ColorsGalleryView({
         <div className="space-y-8">
           {COLOR_CATEGORIES.map((catKey) => {
             const catColors = groupedByCategory.get(catKey) || [];
-            if (catColors.length === 0 && selectedCategory !== "ALL" && selectedCategory !== catKey) {
+            if (catColors.length === 0) {
               return null;
             }
 
