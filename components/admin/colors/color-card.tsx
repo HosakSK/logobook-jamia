@@ -272,14 +272,16 @@ export function ColorCard({
                 >
                   {titleName}
                 </h3>
-                {/* Role Pill */}
-                <span
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium bg-white/[0.06] text-slate-300 border border-white/10"
-                  style={{ borderRadius: brandRadius }}
-                >
-                  {renderRoleIcon()}
-                  <span>{roleDef ? roleDef.badgeLabelSk : color.role}</span>
-                </span>
+                {/* Role Pill (hidden for background and typography colors) */}
+                {!isBgOrTypography && (
+                  <span
+                    className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium bg-white/[0.06] text-slate-300 border border-white/10"
+                    style={{ borderRadius: brandRadius }}
+                  >
+                    {renderRoleIcon()}
+                    <span>{roleDef ? roleDef.badgeLabelSk : color.role}</span>
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 mt-0.5 truncate">
                 Kategória: <strong className="text-slate-300">{catDef ? catDef.labelSk : category}</strong>

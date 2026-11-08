@@ -36,6 +36,7 @@ import {
   Type,
   Layers,
   Sliders,
+  Sparkles,
 } from "lucide-react";
 
 interface ColorEditorModalProps {
@@ -109,7 +110,7 @@ export function ColorEditorModal({
       setHex("#0055FF");
       setName("Nová farba");
       setNameSk("Nová farba");
-      setCategory("CORE");
+      setCategory("PRIMARY");
       setRole("PRIMARY");
       setHasScale(true);
       setRgb("0, 85, 255");
@@ -126,7 +127,7 @@ export function ColorEditorModal({
   // When category changes, auto-select a valid default role for that category
   const handleCategoryChange = (newCat: ColorCategory) => {
     setCategory(newCat);
-    setHasScale(newCat === "CORE" || newCat === "DIGITAL");
+    setHasScale(newCat === "PRIMARY" || newCat === "SECONDARY" || newCat === "ACCENT");
     const catDef = COLOR_CATEGORY_DEFINITIONS[newCat];
     if (catDef && !catDef.allowedRoles.includes(role)) {
       setRole(catDef.allowedRoles[0]);
@@ -239,11 +240,12 @@ export function ColorEditorModal({
                 const isSelected = category === catKey;
 
                 let iconNode = <Palette className="h-3.5 w-3.5" />;
-                if (catKey === "DIGITAL") iconNode = <Monitor className="h-3.5 w-3.5" />;
-                if (catKey === "BACKGROUND") iconNode = <Sun className="h-3.5 w-3.5" />;
-                if (catKey === "TYPOGRAPHY") iconNode = <Type className="h-3.5 w-3.5" />;
-                if (catKey === "SEMANTIC") iconNode = <ShieldCheck className="h-3.5 w-3.5" />;
-                if (catKey === "CUSTOM") iconNode = <Layers className="h-3.5 w-3.5" />;
+                if (catKey === "PRIMARY") iconNode = <Palette className="h-3.5 w-3.5 text-amber-400" />;
+                if (catKey === "SECONDARY") iconNode = <Palette className="h-3.5 w-3.5 text-blue-400" />;
+                if (catKey === "ACCENT") iconNode = <Sparkles className="h-3.5 w-3.5 text-emerald-400" />;
+                if (catKey === "BACKGROUND") iconNode = <Sun className="h-3.5 w-3.5 text-orange-400" />;
+                if (catKey === "TYPOGRAPHY") iconNode = <Type className="h-3.5 w-3.5 text-purple-400" />;
+                if (catKey === "CUSTOM") iconNode = <Layers className="h-3.5 w-3.5 text-[#96abbe]" />;
 
                 return (
                   <button
@@ -274,8 +276,6 @@ export function ColorEditorModal({
                           ? "Day & Night plátna"
                           : catKey === "TYPOGRAPHY"
                           ? "Day & Night texty"
-                          : catKey === "SEMANTIC"
-                          ? "Do's / Don'ts stavy"
                           : def.descriptionSk}
                       </div>
                     </div>

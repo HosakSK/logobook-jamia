@@ -31,7 +31,7 @@ export function BulkImportColorsModal({
   onSuccess,
 }: BulkImportColorsModalProps) {
   const [text, setText] = useState("");
-  const [category, setCategory] = useState<ColorCategory>("CORE");
+  const [category, setCategory] = useState<ColorCategory>("PRIMARY");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 

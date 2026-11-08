@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const COLOR_CATEGORIES = [
-  "CORE",
-  "DIGITAL",
+  "PRIMARY",
+  "SECONDARY",
+  "ACCENT",
   "BACKGROUND",
   "TYPOGRAPHY",
-  "SEMANTIC",
   "CUSTOM",
 ] as const;
 
@@ -41,23 +41,32 @@ export interface ColorCategoryDefinition {
 }
 
 export const COLOR_CATEGORY_DEFINITIONS: Record<ColorCategory, ColorCategoryDefinition> = {
-  CORE: {
-    id: "CORE",
-    labelSk: "Brandové jadro",
-    labelEn: "Core Brand",
-    descriptionSk: "Primárne, sekundárne a akcentové farby tvoriace základ vizuálnej identity",
-    descriptionEn: "Primary, secondary and accent colors shaping the core brand identity",
+  PRIMARY: {
+    id: "PRIMARY",
+    labelSk: "Primárna farba",
+    labelEn: "Primary Color",
+    descriptionSk: "Hlavná identitná farba značky, dominantné prvky a logá",
+    descriptionEn: "Main brand identity color, dominant elements and logos",
     icon: "Palette",
-    allowedRoles: ["PRIMARY", "SECONDARY", "ACCENT"],
+    allowedRoles: ["PRIMARY"],
   },
-  DIGITAL: {
-    id: "DIGITAL",
-    labelSk: "Digitálne prvky & UI",
-    labelEn: "Digital & UI",
-    descriptionSk: "Interaktívne prvky, linky, tlačidlá, aktívne a hover stavy v digitálnych rozhraniach",
-    descriptionEn: "Interactive accents, links, buttons, active and hover states across digital products",
-    icon: "Monitor",
-    allowedRoles: ["DIGITAL"],
+  SECONDARY: {
+    id: "SECONDARY",
+    labelSk: "Sekundárna farba",
+    labelEn: "Secondary Color",
+    descriptionSk: "Doplnková sprievodná farba podporujúca primárnu identitu",
+    descriptionEn: "Secondary supporting color complementing the primary identity",
+    icon: "Palette",
+    allowedRoles: ["SECONDARY"],
+  },
+  ACCENT: {
+    id: "ACCENT",
+    labelSk: "Akcentová farba",
+    labelEn: "Accent Color",
+    descriptionSk: "Výrazná akcentová farba pre upútavky, interakcie a detaily",
+    descriptionEn: "Distinct accent color for highlights, interactions and details",
+    icon: "Sparkles",
+    allowedRoles: ["ACCENT"],
   },
   BACKGROUND: {
     id: "BACKGROUND",
@@ -76,15 +85,6 @@ export const COLOR_CATEGORY_DEFINITIONS: Record<ColorCategory, ColorCategoryDefi
     descriptionEn: "Text shades for headings, body copy and muted captions in day and night modes",
     icon: "Type",
     allowedRoles: ["TEXT_DAY", "TEXT_NIGHT"],
-  },
-  SEMANTIC: {
-    id: "SEMANTIC",
-    labelSk: "Sémantické farby (Do's & Don'ts)",
-    labelEn: "UI Semantics (Do's & Don'ts)",
-    descriptionSk: "Systémové stavy rozhrania: úspech / odporúčané, varovanie, chyba / zákaz a informácie",
-    descriptionEn: "System UI statuses: success/do's, warning, danger/don'ts, and informational notices",
-    icon: "ShieldAlert",
-    allowedRoles: ["SUCCESS", "WARNING", "DANGER", "INFO"],
   },
   CUSTOM: {
     id: "CUSTOM",
@@ -111,7 +111,7 @@ export interface ColorRoleDefinition {
 export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   PRIMARY: {
     role: "PRIMARY",
-    category: "CORE",
+    category: "PRIMARY",
     labelSk: "Primárna farba (hlavná identita)",
     labelEn: "Primary Color (Main Identity)",
     badgeLabelSk: "Primárna",
@@ -120,7 +120,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   SECONDARY: {
     role: "SECONDARY",
-    category: "CORE",
+    category: "SECONDARY",
     labelSk: "Sekundárna farba (sprievodná)",
     labelEn: "Secondary Color (Supporting)",
     badgeLabelSk: "Sekundárna",
@@ -129,7 +129,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   ACCENT: {
     role: "ACCENT",
-    category: "CORE",
+    category: "ACCENT",
     labelSk: "Akcentová farba (upútavka)",
     labelEn: "Accent Color (Highlight)",
     badgeLabelSk: "Akcent",
@@ -138,7 +138,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   DIGITAL: {
     role: "DIGITAL",
-    category: "DIGITAL",
+    category: "CUSTOM",
     labelSk: "Digitálna / Interaktívna (web & app)",
     labelEn: "Digital / Interactive (Web & App)",
     badgeLabelSk: "Digitálna",
@@ -187,7 +187,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   SUCCESS: {
     role: "SUCCESS",
-    category: "SEMANTIC",
+    category: "CUSTOM",
     labelSk: "Úspech / Odporúčané (Do's pravidlá)",
     labelEn: "Success / Approved (Do's rules)",
     badgeLabelSk: "Do's / Úspech",
@@ -196,7 +196,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   WARNING: {
     role: "WARNING",
-    category: "SEMANTIC",
+    category: "CUSTOM",
     labelSk: "Upozornenie (Pozor / Poznámka)",
     labelEn: "Warning (Notice / Attention)",
     badgeLabelSk: "Upozornenie",
@@ -205,7 +205,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   DANGER: {
     role: "DANGER",
-    category: "SEMANTIC",
+    category: "CUSTOM",
     labelSk: "Zákaz / Chyba (Don'ts pravidlá)",
     labelEn: "Danger / Restriction (Don'ts rules)",
     badgeLabelSk: "Don'ts / Zákaz",
@@ -214,7 +214,7 @@ export const COLOR_ROLE_DEFINITIONS: Record<ColorRole, ColorRoleDefinition> = {
   },
   INFO: {
     role: "INFO",
-    category: "SEMANTIC",
+    category: "CUSTOM",
     labelSk: "Informácia (Systémový oznam)",
     labelEn: "Information (Notice / Banner)",
     badgeLabelSk: "Informácia",
@@ -248,9 +248,22 @@ export function resolveColorCategory(
   role: ColorRole,
   category?: string | null
 ): ColorCategory {
+  if (role === "PRIMARY") return "PRIMARY";
+  if (role === "SECONDARY") return "SECONDARY";
+  if (role === "ACCENT") return "ACCENT";
+  if (role === "BG_DAY" || role === "BG_NIGHT") return "BACKGROUND";
+  if (role === "TEXT_DAY" || role === "TEXT_NIGHT") return "TYPOGRAPHY";
+  if (role === "DIGITAL") return "CUSTOM";
+
   if (category && (COLOR_CATEGORIES as readonly string[]).includes(category)) {
     return category as ColorCategory;
   }
+
+  if (category === "CORE") return "PRIMARY";
+  if (category === "DIGITAL") return "CUSTOM";
+  if (category === "BACKGROUND") return "BACKGROUND";
+  if (category === "TYPOGRAPHY") return "TYPOGRAPHY";
+
   const def = COLOR_ROLE_DEFINITIONS[role];
   return def ? def.category : "CUSTOM";
 }
@@ -281,7 +294,7 @@ export const saveColorSchema = z.object({
 
 export const bulkImportColorsSchema = z.object({
   hexText: z.string().min(3, { message: "Zadajte aspoň jeden platný HEX kód farby." }),
-  category: z.enum(COLOR_CATEGORIES).optional().default("CORE"),
+  category: z.enum(COLOR_CATEGORIES).optional().default("PRIMARY"),
 });
 
 export type SaveColorInput = z.infer<typeof saveColorSchema>;

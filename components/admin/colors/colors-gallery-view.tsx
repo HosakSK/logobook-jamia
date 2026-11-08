@@ -65,22 +65,31 @@ export function ColorsGalleryView({
 
   const [isReordering, startReorder] = useTransition();
 
+  // Non-semantic palette colors (semantic colors are managed strictly in Brand Settings)
+  const paletteColors = useMemo(() => {
+    return colors.filter(
+      (c) =>
+        c.category !== ("SEMANTIC" as any) &&
+        !["SUCCESS", "WARNING", "DANGER", "INFO"].includes(c.role)
+    );
+  }, [colors]);
+
   // Category counts
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { ALL: colors.length };
+    const counts: Record<string, number> = { ALL: paletteColors.length };
     COLOR_CATEGORIES.forEach((cat) => {
       counts[cat] = 0;
     });
-    colors.forEach((c) => {
+    paletteColors.forEach((c) => {
       const cat = resolveColorCategory(c.role, c.category);
       counts[cat] = (counts[cat] || 0) + 1;
     });
     return counts;
-  }, [colors]);
+  }, [paletteColors]);
 
   // Filter colors
   const filteredColors = useMemo(() => {
-    return colors.filter((c) => {
+    return paletteColors.filter((c) => {
       const name =
         c.name[locale] || c.name.sk || c.name.en || c.name.cs || "";
 
@@ -104,7 +113,7 @@ export function ColorsGalleryView({
 
       return true;
     });
-  }, [colors, search, selectedCategory, locale]);
+  }, [paletteColors, search, selectedCategory, locale]);
 
   // Grouped by Category for sectioned view
   const groupedByCategory = useMemo(() => {
@@ -156,16 +165,16 @@ export function ColorsGalleryView({
 
   const renderCategoryIcon = (cat: ColorCategory) => {
     switch (cat) {
-      case "CORE":
-        return <Palette className="h-4 w-4 text-[#c8d400]" />;
-      case "DIGITAL":
-        return <Monitor className="h-4 w-4 text-cyan-400" />;
+      case "PRIMARY":
+        return <Palette className="h-4 w-4 text-amber-400" />;
+      case "SECONDARY":
+        return <Palette className="h-4 w-4 text-blue-400" />;
+      case "ACCENT":
+        return <Sparkles className="h-4 w-4 text-emerald-400" />;
       case "BACKGROUND":
         return <Sun className="h-4 w-4 text-orange-400" />;
       case "TYPOGRAPHY":
         return <Type className="h-4 w-4 text-purple-400" />;
-      case "SEMANTIC":
-        return <ShieldCheck className="h-4 w-4 text-emerald-400" />;
       case "CUSTOM":
       default:
         return <Layers className="h-4 w-4 text-[#96abbe]" />;
@@ -182,7 +191,7 @@ export function ColorsGalleryView({
               {dict.admin.brandColors}
             </h1>
             <span className="px-2 py-0.5 rounded-[2px] bg-[#c8d400]/15 text-[#c8d400] text-xs font-mono font-semibold border border-[#c8d400]/30">
-              {colors.length} farieb
+              {paletteColors.length} farieb
             </span>
           </div>
           <p className="text-sm text-[#96abbe] mt-1">

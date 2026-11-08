@@ -175,10 +175,15 @@ export async function saveGlobalColorAction(
       cs: (nameCs || nameSk || name).trim(),
     };
 
+    const pbCategory =
+      category === "PRIMARY" || category === "SECONDARY" || category === "ACCENT"
+        ? "CORE"
+        : category;
+
     const payload: Record<string, any> = {
       brand: brandId,
       name: nameObj,
-      category,
+      category: pbCategory,
       role,
       hex,
       rgb,
@@ -312,7 +317,7 @@ export async function reorderGlobalColorsAction(
 export async function bulkImportColorsAction(
   brandId: string,
   hexListText: string,
-  category: ColorCategory = "CORE"
+  category: ColorCategory = "PRIMARY"
 ): Promise<{ success: boolean; message: string; importedCount?: number }> {
   try {
     const pb = await getServerPocketBase();
@@ -349,11 +354,16 @@ export async function bulkImportColorsAction(
     let currentOrder = existing.length > 0 ? (existing[0].order || 0) + 1 : 0;
 
     let defaultRole: ColorRole = "CUSTOM";
-    if (category === "CORE") defaultRole = "PRIMARY";
-    else if (category === "DIGITAL") defaultRole = "DIGITAL";
+    if (category === "PRIMARY") defaultRole = "PRIMARY";
+    else if (category === "SECONDARY") defaultRole = "SECONDARY";
+    else if (category === "ACCENT") defaultRole = "ACCENT";
     else if (category === "BACKGROUND") defaultRole = "BG_DAY";
     else if (category === "TYPOGRAPHY") defaultRole = "TEXT_DAY";
-    else if (category === "SEMANTIC") defaultRole = "INFO";
+
+    const pbCategory =
+      category === "PRIMARY" || category === "SECONDARY" || category === "ACCENT"
+        ? "CORE"
+        : category;
 
     let imported = 0;
     for (let i = 0; i < validHexes.length; i++) {
@@ -365,7 +375,7 @@ export async function bulkImportColorsAction(
       const payload = {
         brand: brandId,
         name: { en: colorName, sk: `Farba ${existing.length + i + 1}` },
-        category,
+        category: pbCategory,
         role: defaultRole,
         hex,
         rgb,
