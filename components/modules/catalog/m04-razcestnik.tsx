@@ -443,7 +443,7 @@ export default function M04RazcestnikModule({
               style={{
                 borderRadius: "var(--brand-radius, 3px)",
                 borderWidth: "var(--brand-border-width, 1px)",
-                borderStyle: "solid",
+                borderStyle: "var(--brand-border-style, solid)" as any,
                 ...(typedConfig?.styleOverrides?.backgroundColor
                   ? { backgroundColor: typedConfig.styleOverrides.backgroundColor }
                   : {}),

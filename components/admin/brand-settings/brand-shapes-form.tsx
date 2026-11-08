@@ -10,7 +10,6 @@ import {
   Check,
   AlertCircle,
   Loader2,
-  Square,
   CircleCheck,
   AlertTriangle,
   XCircle,
@@ -38,12 +37,13 @@ interface BrandShapesFormProps {
     radiusMode?: string;
     customRadiusPx?: number;
     borderWidthPx?: number;
+    borderStyle?: "solid" | "dashed" | "dotted";
     semanticSuccess?: string;
     semanticWarning?: string;
     semanticDanger?: string;
     semanticInfo?: string;
     manualBgColor?: string;
-    themeConfig?: ManualThemeConfig | null;
+    themeConfig?: (ManualThemeConfig & { borderStyle?: "solid" | "dashed" | "dotted" }) | null;
   } | null;
   brandColors?: Array<{ hex: string; role?: string; name?: string }>;
   dict: Dictionary;
@@ -60,15 +60,22 @@ export function BrandShapesForm({
   const [success, setSuccess] = useState<boolean>(false);
 
   // Form states for corner radius & borders
-  const rawRadius = (initialShapes?.radiusMode || "rounded").toLowerCase().trim();
-  const validRadius =
-    rawRadius === "sharp" || rawRadius === "pill" || rawRadius === "rounded"
-      ? rawRadius
-      : "rounded";
+  const initialRadiusValue = useMemo(() => {
+    if (initialShapes?.customRadiusPx !== undefined && initialShapes?.customRadiusPx !== null) {
+      if (initialShapes.radiusMode === "sharp" && initialShapes.customRadiusPx === 0) return 0;
+      if (initialShapes.radiusMode === "pill") return 9999;
+      return initialShapes.customRadiusPx;
+    }
+    if (initialShapes?.radiusMode === "sharp") return 0;
+    if (initialShapes?.radiusMode === "pill") return 9999;
+    return 3;
+  }, [initialShapes]);
 
-  const [radiusMode, setRadiusMode] = useState<string>(validRadius);
-  const [customRadius, setCustomRadius] = useState<number>(initialShapes?.customRadiusPx ?? 3);
+  const [customRadius, setCustomRadius] = useState<number>(initialRadiusValue);
   const [borderWidth, setBorderWidth] = useState<number>(initialShapes?.borderWidthPx ?? 1);
+  const [borderStyle, setBorderStyle] = useState<"solid" | "dashed" | "dotted">(
+    initialShapes?.borderStyle || initialShapes?.themeConfig?.borderStyle || "solid"
+  );
   const [successColor, setSuccessColor] = useState<string>(initialShapes?.semanticSuccess || "#009f80");
   const [warningColor, setWarningColor] = useState<string>(initialShapes?.semanticWarning || "#c8d400");
   const [dangerColor, setDangerColor] = useState<string>(initialShapes?.semanticDanger || "#bb4934");
@@ -171,8 +178,7 @@ export function BrandShapesForm({
   const [isPatternPickerOpen, setIsPatternPickerOpen] = useState(false);
 
   // Effective preview radius
-  const previewRadiusPx =
-    radiusMode === "sharp" ? 0 : radiusMode === "pill" ? 9999 : customRadius;
+  const previewRadiusPx = customRadius;
 
   // Resolved current active theme for live preview & submit
   const currentTheme = useMemo(() => {
@@ -289,6 +295,7 @@ export function BrandShapesForm({
 
     const themeConfigPayload: ManualThemeConfig = {
       themeId,
+      borderStyle,
       headingColor: resolvedHeading,
       custom:
         themeId === "custom"
@@ -320,10 +327,14 @@ export function BrandShapesForm({
       },
     };
 
+    const effectiveRadiusMode =
+      customRadius === 0 ? "sharp" : customRadius >= 9999 ? "pill" : "rounded";
+
     const formData = new FormData(e.currentTarget);
-    formData.set("radiusMode", radiusMode);
+    formData.set("radiusMode", effectiveRadiusMode);
     formData.set("customRadiusPx", String(customRadius));
     formData.set("borderWidthPx", String(borderWidth));
+    formData.set("borderStyle", borderStyle);
     formData.set("manualBgColor", currentTheme.bgColor);
     formData.set("themeConfig", JSON.stringify(themeConfigPayload));
 
@@ -497,6 +508,7 @@ export function BrandShapesForm({
             style={{
               borderRadius: `${previewRadiusPx}px`,
               borderWidth: `${borderWidth}px`,
+              borderStyle: borderStyle,
               borderColor: currentTheme.borderColor,
               backgroundColor: currentTheme.surfaceColor,
               color: currentTheme.textColor,
@@ -522,7 +534,7 @@ export function BrandShapesForm({
                 style={{ color: currentTheme.mutedColor }}
                 className="text-xs max-w-md leading-relaxed"
               >
-                Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px |
+                Zaoblenie: {previewRadiusPx}px | Orámovanie: {borderWidth}px ({borderStyle}) |
                 Hierarchia textu a komponentov prispôsobená téme.
               </p>
             </div>
@@ -536,6 +548,9 @@ export function BrandShapesForm({
                   borderRadius: `${previewRadiusPx}px`,
                   backgroundColor: currentTheme.primaryColor,
                   color: currentTheme.isDark ? "#070b0f" : "#0e161d",
+                  borderWidth: `${borderWidth}px`,
+                  borderStyle: borderStyle,
+                  borderColor: currentTheme.isDark ? "transparent" : "rgba(0,0,0,0.1)",
                 }}
                 className="px-4 py-2 text-xs font-bold shadow-sm transition-transform active:scale-95"
               >
@@ -549,6 +564,8 @@ export function BrandShapesForm({
                   backgroundColor: `${currentTheme.accentColor}20`,
                   color: currentTheme.accentColor,
                   borderColor: currentTheme.accentColor,
+                  borderWidth: `${borderWidth}px`,
+                  borderStyle: borderStyle,
                 }}
                 className="px-3 py-1.5 text-xs font-semibold border flex items-center gap-1.5"
               >
@@ -565,6 +582,8 @@ export function BrandShapesForm({
                 backgroundColor: `${successColor}20`,
                 borderColor: successColor,
                 color: successColor,
+                borderWidth: `${borderWidth}px`,
+                borderStyle: borderStyle,
               }}
               className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
             >
@@ -576,6 +595,8 @@ export function BrandShapesForm({
                 backgroundColor: `${warningColor}20`,
                 borderColor: warningColor,
                 color: warningColor,
+                borderWidth: `${borderWidth}px`,
+                borderStyle: borderStyle,
               }}
               className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
             >
@@ -587,6 +608,8 @@ export function BrandShapesForm({
                 backgroundColor: `${dangerColor}20`,
                 borderColor: dangerColor,
                 color: dangerColor,
+                borderWidth: `${borderWidth}px`,
+                borderStyle: borderStyle,
               }}
               className="px-3 py-1 text-xs font-bold border flex items-center gap-1.5"
             >
@@ -1127,113 +1150,180 @@ export function BrandShapesForm({
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* RADIUS MODE SELECTOR                                          */}
+      {/* CORNER RADIUS & BORDER SETTINGS                               */}
       {/* ------------------------------------------------------------- */}
-      <div className="space-y-3 pt-4 border-t border-border/30">
-        <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {dict.admin.cornerRounding}
-        </Label>
-        <div className="grid grid-cols-3 gap-3.5">
-          <button
-            type="button"
-            onClick={() => setRadiusMode("sharp")}
-            className={`p-4 sm:p-5 text-xs rounded-xl border text-center transition-all flex flex-col items-center gap-2.5 cursor-pointer ${
-              radiusMode === "sharp"
-                ? "border-[#c8d400] bg-[#c8d400]/10 text-foreground font-semibold shadow-[0_0_20px_rgba(200,212,0,0.12)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40 text-muted-foreground"
-            }`}
-          >
-            <Square className="h-5 w-5" />
-            <span className="font-medium">{dict.admin.radiusSharp}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setRadiusMode("rounded")}
-            className={`p-4 sm:p-5 text-xs rounded-xl border text-center transition-all flex flex-col items-center gap-2.5 cursor-pointer ${
-              radiusMode === "rounded"
-                ? "border-[#c8d400] bg-[#c8d400]/10 text-foreground font-semibold shadow-[0_0_20px_rgba(200,212,0,0.12)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40 text-muted-foreground"
-            }`}
-          >
-            <div className="h-5 w-5 rounded-md border-2 border-current" />
-            <span className="font-medium">{dict.admin.radiusRounded}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setRadiusMode("pill")}
-            className={`p-4 sm:p-5 text-xs rounded-xl border text-center transition-all flex flex-col items-center gap-2.5 cursor-pointer ${
-              radiusMode === "pill"
-                ? "border-[#c8d400] bg-[#c8d400]/10 text-foreground font-semibold shadow-[0_0_20px_rgba(200,212,0,0.12)]"
-                : "border-border/60 hover:border-border hover:bg-neutral-800/40 text-muted-foreground"
-            }`}
-          >
-            <div className="h-4 w-6 rounded-full border-2 border-current" />
-            <span className="font-medium">{dict.admin.radiusPill}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Numerical Adjustments */}
-      <div className="grid sm:grid-cols-2 gap-6">
-        {radiusMode === "rounded" && (
-          <div className="space-y-2.5">
+      <div className="space-y-6 pt-4 border-t border-border/30">
+        {/* Corner Radius Controls */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
             <Label
               htmlFor="customRadiusPx"
-              className="text-xs font-semibold text-muted-foreground"
+              className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
             >
-              {dict.admin.customRadiusLabel}
+              {dict.admin.cornerRounding}
             </Label>
-            <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min="0"
-                max="32"
-                value={customRadius}
-                onChange={(e) => setCustomRadius(Number(e.target.value))}
-                className="flex-1 accent-[#c8d400] h-2 bg-neutral-800 rounded-lg cursor-pointer"
-              />
+            <span className="text-[11px] font-mono text-muted-foreground">
+              Aktuálne: <strong className="text-[#fafbfc]">{customRadius}px</strong>
+              {customRadius === 0 ? " (Ostré)" : customRadius >= 9999 ? " (Pill / Ovál)" : ""}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <input
+              type="range"
+              min="0"
+              max="48"
+              step="1"
+              value={customRadius > 48 ? 48 : customRadius}
+              onChange={(e) => setCustomRadius(Number(e.target.value))}
+              className="flex-1 accent-[#c8d400] h-2 bg-neutral-800 rounded-lg cursor-pointer"
+            />
+            <div className="flex items-center gap-1.5 shrink-0">
               <Input
                 id="customRadiusPx"
                 name="customRadiusPx"
                 type="number"
                 min={0}
-                max={64}
+                max={9999}
                 value={customRadius}
-                onChange={(e) => setCustomRadius(Number(e.target.value))}
+                onChange={(e) => setCustomRadius(Math.max(0, Number(e.target.value)))}
                 className="w-20 h-10 text-xs rounded-xl bg-background/50 border-border/60 text-center font-mono"
               />
+              <span className="text-xs text-muted-foreground font-mono">px</span>
             </div>
           </div>
-        )}
 
-        <div className="space-y-2.5">
-          <Label
-            htmlFor="borderWidthPx"
-            className="text-xs font-semibold text-muted-foreground"
-          >
-            {dict.admin.borderWidthLabel} (px)
-          </Label>
-          <div className="flex items-center gap-4">
-            <input
-              type="range"
-              min="0"
-              max="6"
-              value={borderWidth}
-              onChange={(e) => setBorderWidth(Number(e.target.value))}
-              className="flex-1 accent-[#c8d400] h-2 bg-neutral-800 rounded-lg cursor-pointer"
-            />
-            <Input
-              id="borderWidthPx"
-              name="borderWidthPx"
-              type="number"
-              min={0}
-              max={8}
-              value={borderWidth}
-              onChange={(e) => setBorderWidth(Number(e.target.value))}
-              className="w-20 h-10 text-xs rounded-xl bg-background/50 border-border/60 text-center font-mono"
-            />
+          {/* Quick presets for radius */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">
+              Rýchly výber:
+            </span>
+            {[
+              { val: 0, label: "0px (Ostré)" },
+              { val: 4, label: "4px" },
+              { val: 8, label: "8px" },
+              { val: 12, label: "12px" },
+              { val: 16, label: "16px" },
+              { val: 24, label: "24px" },
+              { val: 9999, label: "Pill (Ovál)" },
+            ].map((chip) => (
+              <button
+                key={chip.val}
+                type="button"
+                onClick={() => setCustomRadius(chip.val)}
+                className={`px-2.5 py-1 text-[11px] rounded-lg border font-mono transition-colors cursor-pointer ${
+                  customRadius === chip.val
+                    ? "bg-[#c8d400]/20 border-[#c8d400] text-[#c8d400] font-bold shadow-xs"
+                    : "bg-[#070b0f] border-border/50 text-muted-foreground hover:text-foreground hover:bg-white/5"
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Border Controls: Style & Thickness */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          {/* Border Style Selector */}
+          <div className="space-y-3">
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {dict.admin.borderStyleLabel}
+            </Label>
+            <div className="grid grid-cols-3 gap-2.5">
+              {[
+                { id: "solid", label: dict.admin.borderStyleSolid, borderCss: "border-solid" },
+                { id: "dashed", label: dict.admin.borderStyleDashed, borderCss: "border-dashed" },
+                { id: "dotted", label: dict.admin.borderStyleDotted, borderCss: "border-dotted" },
+              ].map((style) => (
+                <button
+                  key={style.id}
+                  type="button"
+                  onClick={() => setBorderStyle(style.id as "solid" | "dashed" | "dotted")}
+                  className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                    borderStyle === style.id
+                      ? "border-[#c8d400] bg-[#c8d400]/10 text-foreground font-semibold shadow-[0_0_16px_rgba(200,212,0,0.12)] ring-1 ring-[#c8d400]"
+                      : "border-border/60 hover:border-border hover:bg-neutral-800/40 text-muted-foreground"
+                  }`}
+                >
+                  <div
+                    className={`w-12 h-0 border-t-2 ${style.borderCss} ${
+                      borderStyle === style.id ? "border-[#c8d400]" : "border-muted-foreground"
+                    }`}
+                  />
+                  <span className="text-[11px] font-medium leading-none">{style.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Border Width Controls */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label
+                htmlFor="borderWidthPx"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                {dict.admin.borderWidthLabel}
+              </Label>
+              <span className="text-[11px] font-mono text-muted-foreground">
+                Aktuálne: <strong className="text-[#fafbfc]">{borderWidth}px</strong>
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <input
+                type="range"
+                min="0"
+                max="6"
+                step="0.05"
+                value={borderWidth}
+                onChange={(e) => setBorderWidth(Number(e.target.value))}
+                className="flex-1 accent-[#c8d400] h-2 bg-neutral-800 rounded-lg cursor-pointer"
+              />
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Input
+                  id="borderWidthPx"
+                  name="borderWidthPx"
+                  type="number"
+                  min={0}
+                  max={16}
+                  step="any"
+                  value={borderWidth}
+                  onChange={(e) => setBorderWidth(Math.max(0, Number(e.target.value)))}
+                  className="w-20 h-10 text-xs rounded-xl bg-background/50 border-border/60 text-center font-mono"
+                />
+                <span className="text-xs text-muted-foreground font-mono">px</span>
+              </div>
+            </div>
+
+            {/* Quick chips for border width: 0, 0.25, 0.5, 0.75, 1, 1.5, 2 */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span className="text-[10px] uppercase font-mono text-muted-foreground mr-1">
+                Rýchly výber:
+              </span>
+              {[
+                { val: 0, label: "0px" },
+                { val: 0.25, label: "0.25px" },
+                { val: 0.5, label: "0.5px" },
+                { val: 0.75, label: "0.75px" },
+                { val: 1, label: "1px" },
+                { val: 1.5, label: "1.5px" },
+                { val: 2, label: "2px" },
+              ].map((chip) => (
+                <button
+                  key={chip.val}
+                  type="button"
+                  onClick={() => setBorderWidth(chip.val)}
+                  className={`px-2 py-0.5 text-[11px] rounded-md border font-mono transition-colors cursor-pointer ${
+                    borderWidth === chip.val
+                      ? "bg-[#c8d400]/20 border-[#c8d400] text-[#c8d400] font-bold shadow-xs"
+                      : "bg-[#070b0f] border-border/50 text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

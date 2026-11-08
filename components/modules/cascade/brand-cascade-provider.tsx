@@ -38,6 +38,7 @@ const defaultTokens: BrandCascadeTokens = {
   customRadiusPx: 3,
   borderWidth: "1px",
   borderWidthPx: 1,
+  borderStyle: "solid",
   colors: {
     primary: "#c8d400",
     secondary: "#17212a",

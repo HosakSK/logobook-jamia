@@ -46,6 +46,13 @@ export function computeBrandCssVariables(
   const radiusMode = shapes?.radiusMode || "rounded";
   const customRadiusPx = shapes?.customRadiusPx ?? 3;
   const borderWidthPx = shapes?.borderWidthPx ?? 1;
+  const borderStyle: "solid" | "dashed" | "dotted" =
+    (shapes as any)?.themeConfig?.borderStyle === "dashed" ||
+    (shapes as any)?.themeConfig?.borderStyle === "dotted"
+      ? (shapes as any).themeConfig.borderStyle
+      : (shapes as any)?.borderStyle === "dashed" || (shapes as any)?.borderStyle === "dotted"
+      ? (shapes as any).borderStyle
+      : "solid";
 
   const radiusValue = computeBrandRadiusValue(radiusMode, customRadiusPx);
   const borderWidthValue = `${Math.max(0, borderWidthPx)}px`;
@@ -128,6 +135,7 @@ export function computeBrandCssVariables(
     "--brand-radius": radiusValue,
     "--brand-radius-mode": radiusMode,
     "--brand-border-width": borderWidthValue,
+    "--brand-border-style": borderStyle,
     "--radius": radiusValue,
     "--radius-element": radiusValue,
     "--radius-card": radiusValue,
@@ -209,6 +217,13 @@ export function buildBrandCascadeTokens(
     rawMode === "square" || rawMode === "sharp" ? "sharp" : rawMode === "pill" ? "pill" : "rounded";
   const customRadiusPx = shapes?.customRadiusPx ?? 3;
   const borderWidthPx = shapes?.borderWidthPx ?? 1;
+  const borderStyle: "solid" | "dashed" | "dotted" =
+    (shapes as any)?.themeConfig?.borderStyle === "dashed" ||
+    (shapes as any)?.themeConfig?.borderStyle === "dotted"
+      ? (shapes as any).themeConfig.borderStyle
+      : (shapes as any)?.borderStyle === "dashed" || (shapes as any)?.borderStyle === "dotted"
+      ? (shapes as any).borderStyle
+      : "solid";
 
   // Resolve theme
   const theme = resolveManualTheme(
@@ -244,6 +259,7 @@ export function buildBrandCascadeTokens(
     customRadiusPx,
     borderWidth: `${Math.max(0, borderWidthPx)}px`,
     borderWidthPx,
+    borderStyle,
     manualBgColor: theme.bgColor,
     themeConfig: (shapes as any)?.themeConfig || { themeId: theme.themeId },
     theme,
@@ -344,6 +360,7 @@ export function resolveCascadeStyleObject(
     }
     if (overrides.borderWidthPx !== undefined && overrides.borderWidthPx !== null) {
       styles.borderWidth = `${overrides.borderWidthPx}px`;
+      styles.borderStyle = overrides.borderStyle || tokens?.borderStyle || "solid";
     }
   }
 

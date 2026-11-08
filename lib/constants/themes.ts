@@ -35,6 +35,7 @@ export interface ManualPatternConfig {
 export interface ManualThemeConfig {
   themeId: ManualThemeId;
   headingColor?: string;
+  borderStyle?: "solid" | "dashed" | "dotted";
   custom?: ManualCustomColors;
   pattern?: ManualPatternConfig;
 }
@@ -115,6 +116,7 @@ export const PRESET_THEMES: Record<Exclude<ManualThemeId, "custom">, ManualTheme
 export interface ResolvedTheme {
   themeId: ManualThemeId;
   isDark: boolean;
+  borderStyle: "solid" | "dashed" | "dotted";
   bgColor: string;
   surfaceColor: string;
   textColor: string;
@@ -182,6 +184,7 @@ export function resolveManualTheme(
     return {
       themeId: "custom",
       isDark,
+      borderStyle: themeConfig?.borderStyle || "solid",
       bgColor,
       surfaceColor,
       textColor,
@@ -200,6 +203,7 @@ export function resolveManualTheme(
   return {
     themeId: preset.id,
     isDark: preset.isDark,
+    borderStyle: themeConfig?.borderStyle || "solid",
     bgColor: preset.bgColor,
     surfaceColor: preset.surfaceColor,
     textColor: preset.textColor,

@@ -489,6 +489,7 @@ export async function updateGlobalShapesAction(
       radiusMode: formData.get("radiusMode")?.toString() || "rounded",
       customRadiusPx: formData.get("customRadiusPx")?.toString() || "3",
       borderWidthPx: formData.get("borderWidthPx")?.toString() || "1",
+      borderStyle: formData.get("borderStyle")?.toString() || "solid",
       semanticSuccess: formData.get("semanticSuccess")?.toString().trim() || undefined,
       semanticWarning: formData.get("semanticWarning")?.toString().trim() || undefined,
       semanticDanger: formData.get("semanticDanger")?.toString().trim() || undefined,
@@ -517,6 +518,10 @@ export async function updateGlobalShapesAction(
         parsedThemeConfig = null;
       }
     }
+    if (!parsedThemeConfig) {
+      parsedThemeConfig = {};
+    }
+    parsedThemeConfig.borderStyle = parsed.data.borderStyle;
 
     const payload: Record<string, any> = {
       brand: brand.id,
@@ -528,11 +533,8 @@ export async function updateGlobalShapesAction(
       semanticDanger: parsed.data.semanticDanger || "",
       semanticInfo: parsed.data.semanticInfo || "",
       manualBgColor: parsed.data.manualBgColor || "#0e161d",
+      themeConfig: parsedThemeConfig,
     };
-
-    if (parsedThemeConfig) {
-      payload.themeConfig = parsedThemeConfig;
-    }
 
     // Check if globalShapes record exists for this brand (using real brand.id)
     let existingRecordId: string | null = null;

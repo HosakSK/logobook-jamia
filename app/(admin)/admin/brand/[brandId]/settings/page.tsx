@@ -213,6 +213,7 @@ export default async function BrandSettingsPage({
         radiusMode: globalShapes.radiusMode || "rounded",
         customRadiusPx: globalShapes.customRadiusPx ?? 3,
         borderWidthPx: globalShapes.borderWidthPx ?? 1,
+        borderStyle: (globalShapes.themeConfig?.borderStyle || "solid") as "solid" | "dashed" | "dotted",
         semanticSuccess: globalShapes.semanticSuccess || "#009f80",
         semanticWarning: globalShapes.semanticWarning || "#c8d400",
         semanticDanger: globalShapes.semanticDanger || "#bb4934",

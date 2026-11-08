@@ -288,7 +288,7 @@ export function ModuleDispatcher({
   }
   if (styleOverrides?.borderWidthPx !== undefined && styleOverrides.borderWidthPx !== null) {
     containerStyle.borderWidth = `${styleOverrides.borderWidthPx}px`;
-    containerStyle.borderStyle = "solid";
+    containerStyle.borderStyle = styleOverrides.borderStyle || "var(--brand-border-style, solid)";
     if (!styleOverrides.borderColor) {
       containerStyle.borderColor = "var(--border)";
     }

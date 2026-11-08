@@ -21,6 +21,7 @@ export interface CascadeStyleOverrides {
   textColor?: string;
   borderColor?: string;
   borderWidthPx?: number;
+  borderStyle?: "solid" | "dashed" | "dotted";
   paddingY?: "none" | "small" | "normal" | "large";
   customCssClass?: string;
 }
@@ -44,6 +45,7 @@ export interface BrandCascadeTokens {
   customRadiusPx: number;
   borderWidth: string; // e.g. "1px"
   borderWidthPx: number;
+  borderStyle: "solid" | "dashed" | "dotted";
   colors: {
     primary: string;
     secondary: string;

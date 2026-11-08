@@ -458,7 +458,7 @@ export default function M03BannerModule({
           borderColor: typedConfig?.borderColor || preset.border,
           borderRadius: "var(--brand-radius, 3px)",
           borderWidth: "var(--brand-border-width, 1px)",
-          borderStyle: "solid",
+          borderStyle: "var(--brand-border-style, solid)" as any,
         }}
         aria-label={resolvedTitle}
       >

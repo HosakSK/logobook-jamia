@@ -31,8 +31,9 @@ export const globalShapesSchema = z.object({
       return "rounded" as const;
     })
     .default("rounded"),
-  customRadiusPx: z.coerce.number().min(0).max(64).default(3),
-  borderWidthPx: z.coerce.number().min(0).max(8).default(1),
+  customRadiusPx: z.coerce.number().min(0).max(9999).default(3),
+  borderWidthPx: z.coerce.number().min(0).max(16).default(1),
+  borderStyle: z.enum(["solid", "dashed", "dotted"]).optional().default("solid"),
   semanticSuccess: z.string().optional(),
   semanticWarning: z.string().optional(),
   semanticDanger: z.string().optional(),
