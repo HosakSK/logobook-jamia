@@ -63,7 +63,7 @@ export function ColorCard({
   index,
   total,
   dict,
-  brandRadius = "var(--brand-radius, 6px)",
+  brandRadius = "var(--admin-radius, 16px)",
   onEdit,
   onMoveUp,
   onMoveDown,

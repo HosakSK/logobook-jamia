@@ -466,6 +466,9 @@ export function BrandShapesForm({
 
         {/* Outer Manual Canvas Preview */}
         <div
+          data-manual-preview="true"
+          data-preserve-border="true"
+          data-preserve-radius="true"
           style={{
             backgroundColor: currentTheme.bgColor,
             color: currentTheme.textColor,

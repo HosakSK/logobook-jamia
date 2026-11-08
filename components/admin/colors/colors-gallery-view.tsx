@@ -49,7 +49,7 @@ export function ColorsGalleryView({
   brandName,
   locale,
   dict,
-  brandRadius,
+  brandRadius = "var(--admin-radius, 16px)",
 }: ColorsGalleryViewProps) {
   const router = useRouter();
   const [colors, setColors] = useState<BrandColor[]>(initialColors);

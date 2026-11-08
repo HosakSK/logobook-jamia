@@ -93,6 +93,27 @@
 
   /* Admin Studio Theme: permanently locked for entire admin navigation and panels */
   [data-admin-ui="true"], [data-admin-root], .admin-studio {
+    /* ======================================================================= */
+    /* LOGOBOOK ADMIN STUDIO DESIGN TOKENS (Centralized in one place)          */
+    /* ======================================================================= */
+    --admin-radius: 16px;
+    --admin-border-width: 1px;
+    --admin-border-style: dotted;
+    --admin-border-color: rgba(63, 85, 102, 0.45);
+
+    /* Enforce Logobook Studio 16px radius across standard variables */
+    --radius: var(--admin-radius);
+    --radius-xs: var(--admin-radius);
+    --radius-sm: var(--admin-radius);
+    --radius-md: var(--admin-radius);
+    --radius-lg: var(--admin-radius);
+    --radius-xl: var(--admin-radius);
+    --radius-2xl: var(--admin-radius);
+    --radius-3xl: var(--admin-radius);
+    --radius-element: var(--admin-radius);
+    --radius-card: var(--admin-radius);
+    --brand-radius: var(--admin-radius);
+
     --background: #0e161d;
     --foreground: #fafbfc;
     --card: #17212a;
@@ -145,6 +166,33 @@
     --bg-surface: #2b3b48;
     --shadow-card: 0 8px 30px -4px rgba(0, 0, 0, 0.35);
     color-scheme: dark;
+  }
+
+  /* Enforce 16px radius for all rounded elements in Admin Studio (except pill / full circles or live preview) */
+  :where([data-admin-ui="true"], [data-admin-root], .admin-studio) :where(
+    .rounded,
+    .rounded-xs,
+    .rounded-sm,
+    .rounded-md,
+    .rounded-lg,
+    .rounded-xl,
+    .rounded-2xl,
+    .rounded-3xl,
+    [class*="rounded-"]
+  ):not(.rounded-full):not([data-preserve-radius]):not([data-manual-preview] *):not([data-preserve-radius] *) {
+    border-radius: var(--admin-radius, 16px) !important;
+  }
+
+  /* Enforce dotted 1px border style for all border elements in Admin Studio (except explicit solid, dashed or live preview) */
+  :where([data-admin-ui="true"], [data-admin-root], .admin-studio) :where(
+    .border,
+    .border-t,
+    .border-b,
+    .border-l,
+    .border-r,
+    [class*="border-"]
+  ):not(.border-0):not(.border-none):not([class*="border-solid"]):not([class*="border-dashed"]):not([data-preserve-border]):not([data-manual-preview] *):not([data-preserve-border] *) {
+    border-style: var(--admin-border-style, dotted) !important;
   }
 
   /* Dark Theme (Default Studio UI and Dark Brand Manuals) */
