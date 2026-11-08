@@ -15,6 +15,7 @@ import {
   resolveColorCategory,
 } from "@/lib/validations/color";
 import { ColorShadesModal } from "@/components/admin/colors/color-shades-modal";
+import { WcagHoverPreview } from "@/components/admin/colors/wcag-hover-preview";
 import { Dictionary } from "@/lib/i18n";
 import {
   Copy,
@@ -175,17 +176,15 @@ export function ColorCard({
 
   return (
     <div
-      className="group border border-white/[0.08] bg-[#0e1620]/95 hover:bg-[#121c27] hover:border-white/[0.16] transition-all shadow-sm flex flex-col md:flex-row overflow-hidden"
+      className="group relative hover:z-30 border border-white/[0.08] bg-[#0e1620]/95 hover:bg-[#121c27] hover:border-white/[0.16] transition-all shadow-sm flex flex-col md:flex-row"
       style={{ borderRadius: brandRadius }}
     >
       {/* 1. Generous Color Block filling entire left ~28-30% of card */}
       <div
         onClick={handleCopyHex}
-        className="w-full md:w-56 lg:w-64 min-h-[140px] md:min-h-[160px] relative cursor-pointer group/swatch flex flex-col justify-between p-4 shrink-0 transition-opacity hover:opacity-95"
+        className="w-full md:w-56 lg:w-64 min-h-[140px] md:min-h-[160px] relative cursor-pointer group/swatch flex flex-col justify-between p-4 shrink-0 transition-opacity hover:opacity-95 rounded-t-[inherit] md:rounded-tr-none md:rounded-l-[inherit]"
         style={{
           backgroundColor: color.hex,
-          borderTopLeftRadius: brandRadius,
-          borderBottomLeftRadius: brandRadius,
         }}
         title={`Kliknutím skopírujete HEX (${color.hex})`}
       >
@@ -372,40 +371,54 @@ export function ColorCard({
             style={{ borderRadius: brandRadius }}
           >
             {/* White Target */}
-            <div
-              className="flex items-center gap-1.5"
-              title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 — Hodnotenie: ${contrast.whiteScore}`}
+            <WcagHoverPreview
+              colorHex={color.hex}
+              target="white"
+              ratio={contrast.whiteRatio}
+              score={contrast.whiteScore}
+              align="right"
             >
-              <span className="w-2.5 h-2.5 rounded-full bg-white shadow-xs shrink-0" />
-              <span className="text-[11px] font-bold text-white">{contrast.whiteRatio.toFixed(1)}:1</span>
-              <span
-                className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight ${getWcagScoreBadgeClass(
-                  contrast.whiteScore
-                )}`}
-                style={{ borderRadius: brandRadius }}
+              <div
+                className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
+                title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio.toFixed(1)}:1 (${contrast.whiteScore}) — Kliknite alebo prejdite myšou pre ukážku`}
               >
-                {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
-              </span>
-            </div>
+                <span className="w-2.5 h-2.5 rounded-full bg-white shadow-xs shrink-0" />
+                <span className="text-[11px] font-bold text-white">{contrast.whiteRatio.toFixed(1)}:1</span>
+                <span
+                  className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
+                    contrast.whiteScore
+                  )}`}
+                >
+                  {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
+                </span>
+              </div>
+            </WcagHoverPreview>
 
             <span className="text-white/15">|</span>
 
             {/* Black Target */}
-            <div
-              className="flex items-center gap-1.5"
-              title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio}:1 — Hodnotenie: ${contrast.blackScore}`}
+            <WcagHoverPreview
+              colorHex={color.hex}
+              target="black"
+              ratio={contrast.blackRatio}
+              score={contrast.blackScore}
+              align="right"
             >
-              <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/40 shadow-xs shrink-0" />
-              <span className="text-[11px] font-bold text-white">{contrast.blackRatio.toFixed(1)}:1</span>
-              <span
-                className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight ${getWcagScoreBadgeClass(
-                  contrast.blackScore
-                )}`}
-                style={{ borderRadius: brandRadius }}
+              <div
+                className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
+                title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio.toFixed(1)}:1 (${contrast.blackScore}) — Kliknite alebo prejdite myšou pre ukážku`}
               >
-                {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
-              </span>
-            </div>
+                <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/40 shadow-xs shrink-0" />
+                <span className="text-[11px] font-bold text-white">{contrast.blackRatio.toFixed(1)}:1</span>
+                <span
+                  className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
+                    contrast.blackScore
+                  )}`}
+                >
+                  {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
+                </span>
+              </div>
+            </WcagHoverPreview>
           </div>
         </div>
 
