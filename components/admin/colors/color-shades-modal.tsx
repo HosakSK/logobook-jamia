@@ -116,17 +116,8 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                   {color.hex}
                 </span>
               </div>
-              <p className="text-xs text-[#96abbe] mt-0.5 flex items-center gap-1.5 flex-wrap">
-                <span>Presne podľa metodiky</span>
-                <a
-                  href="https://blog.jirichlebus.cz/clanky/jak-tvorit-systematicke-barvy-pro-digitalni-produkty"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[#c8d400] hover:underline font-semibold inline-flex items-center gap-1"
-                >
-                  <span>Jiřího Chlebuse (L 0 až L 100 v HSLuv)</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+              <p className="text-xs text-[#96abbe] mt-0.5">
+                Digitálna paleta odtieňov (10 až 100 v priestore HSLuv)
               </p>
             </div>
           </div>
@@ -217,18 +208,18 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                         {/* 2. Top Tick Mark */}
                         <div className="h-3 w-px bg-[rgba(150,171,190,0.5)] mb-2 group-hover:bg-[#c8d400] transition-colors" />
 
-                        {/* 3. Swatch Box with L value */}
+                        {/* 3. Swatch Box with step value */}
                         <button
                           type="button"
                           onClick={() => handleCopyHex(s.id, s.hex)}
-                          className="w-full h-16 rounded-[4px] border border-black/20 flex flex-col items-center justify-center font-mono text-xs font-bold transition-transform hover:scale-105 hover:shadow-lg focus:outline-hidden relative cursor-pointer"
+                          className="w-full h-16 rounded-[4px] border border-black/20 flex flex-col items-center justify-center font-mono text-sm font-bold transition-transform hover:scale-105 hover:shadow-lg focus:outline-hidden relative cursor-pointer"
                           style={{
                             backgroundColor: s.hex,
                             color: s.isTextWhite ? "#FFFFFF" : "#000000",
                           }}
-                          title={`${colName}: ${s.hex} (L ${s.lightness}) - Kliknutím skopírujete`}
+                          title={`${colName}: ${s.hex} - Kliknutím skopírujete`}
                         >
-                          <span>L {s.lightness}</span>
+                          <span>{s.step}</span>
                           {isCopied && (
                             <span className="absolute inset-0 bg-black/60 backdrop-blur-xs rounded-[4px] flex items-center justify-center text-white text-[10px] font-bold">
                               ✓ Skús
@@ -271,13 +262,13 @@ export function ColorShadesModal({ color, isOpen, onClose }: ColorShadesModalPro
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <span
-                            className="h-8 w-8 rounded-[3px] border border-white/20 shrink-0 flex items-center justify-center font-mono text-[9px] font-bold"
+                            className="h-8 w-8 rounded-[3px] border border-white/20 shrink-0 flex items-center justify-center font-mono text-[11px] font-bold"
                             style={{
                               backgroundColor: s.hex,
                               color: s.isTextWhite ? "#FFFFFF" : "#000000",
                             }}
                           >
-                            L{s.lightness}
+                            {s.step}
                           </span>
                           <div className="min-w-0">
                             <div className="text-xs font-bold font-mono text-[#fafbfc] truncate group-hover:text-[#c8d400] transition-colors">

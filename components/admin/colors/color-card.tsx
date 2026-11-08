@@ -414,10 +414,7 @@ export function ColorCard({
           <div className="pt-3 border-t border-white/[0.06] space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-white">Systematická škála (10 až 100):</span>
-                <span className="text-[11px] text-slate-400 hidden sm:inline">
-                  Perceptuálna svetlosť L 7 až L 96 (Jiří Chlebus / IBM Carbon)
-                </span>
+                <span className="font-semibold text-white">Digitálna paleta</span>
               </div>
               <button
                 type="button"
@@ -438,28 +435,18 @@ export function ColorCard({
                   key={s.id}
                   type="button"
                   onClick={() => handleCopyStep(s.lightness, s.hex)}
-                  className="h-11 transition-all hover:scale-105 hover:z-10 relative flex flex-col justify-between p-1 text-left group/step cursor-pointer border border-white/5 hover:border-white/30 shadow-xs"
+                  className="h-12 sm:h-13 transition-all hover:scale-105 hover:z-10 relative flex items-center justify-center p-1 text-center group/step cursor-pointer border border-white/5 hover:border-white/30 shadow-xs"
                   style={{
                     backgroundColor: s.hex,
                     borderRadius: brandRadius,
                   }}
-                  title={`${s.label}: ${s.hex} (L ${s.lightness}) - kliknutím skopírujete`}
+                  title={`${color.name || color.role} ${s.step}: ${s.hex} - kliknutím skopírujete`}
                 >
                   <span
-                    className="text-[9px] font-mono font-bold leading-none px-1 py-0.5 shadow-xs self-start"
-                    style={{
-                      backgroundColor: s.isTextWhite ? "rgba(0,0,0,0.65)" : "rgba(255,255,255,0.75)",
-                      color: s.isTextWhite ? "#FFFFFF" : "#000000",
-                      borderRadius: brandRadius,
-                    }}
-                  >
-                    {s.step}
-                  </span>
-                  <span
-                    className="text-[8px] font-mono font-semibold opacity-75 leading-none self-end"
+                    className="text-xs sm:text-sm font-mono font-bold leading-none"
                     style={{ color: s.isTextWhite ? "#FFFFFF" : "#000000" }}
                   >
-                    L{s.lightness}
+                    {s.step}
                   </span>
                 </button>
               ))}

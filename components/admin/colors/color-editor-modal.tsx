@@ -372,28 +372,24 @@ export function ColorEditorModal({
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-[#fafbfc] font-semibold flex items-center gap-1 font-mono">
                   <Sliders className="h-3 w-3 text-[#c8d400]" />
-                  <span>Systematická škála svetlosti (10 až 100 • L 7 až L 96)</span>
+                  <span>Digitálna paleta</span>
                 </span>
-                <span className="text-[10px] text-[#96abbe] font-mono">10 stupňov HSLuv</span>
+                <span className="text-[10px] text-[#96abbe] font-mono">10 stupňov (10 – 100)</span>
               </div>
 
               {/* 10 Swatches Row */}
               <div className="grid grid-cols-10 gap-1 select-none">
                 {systematicScale.map((s) => (
                   <div key={s.id} className="flex flex-col items-center group">
-                    <div className="text-[9px] font-mono text-[#96abbe] group-hover:text-[#fafbfc] truncate w-full text-center">
-                      {s.step}
-                    </div>
-                    <div className="h-1.5 w-px bg-[rgba(150,171,190,0.4)] my-0.5" />
                     <div
-                      className="w-full h-8 rounded-[2px] flex items-center justify-center font-mono text-[9px] font-bold border border-black/20 shadow-xs cursor-pointer transition-transform hover:scale-110"
+                      className="w-full h-9 rounded-[3px] flex items-center justify-center font-mono text-[11px] font-bold border border-black/20 shadow-xs cursor-pointer transition-transform hover:scale-110"
                       style={{
                         backgroundColor: s.hex,
                         color: s.isTextWhite ? "#FFFFFF" : "#000000",
                       }}
-                      title={`${s.label}: ${s.hex} (L ${s.lightness})`}
+                      title={`${s.label}: ${s.hex}`}
                     >
-                      L{s.lightness}
+                      {s.step}
                     </div>
                   </div>
                 ))}
