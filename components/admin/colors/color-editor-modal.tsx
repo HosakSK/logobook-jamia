@@ -138,6 +138,12 @@ export function ColorEditorModal({
   const nearestRal: RalMatch | null = findNearestRal(hex);
   const systematicScale = generateSystematicScale(hex);
 
+  // Background and typography colors are canvas/text colors, not evaluated with AA/AA+ WCAG pills
+  const isBgOrTypography =
+    category === "BACKGROUND" ||
+    category === "TYPOGRAPHY" ||
+    ["BG_DAY", "BG_NIGHT", "TEXT_DAY", "TEXT_NIGHT"].includes(role);
+
   // Handle HEX change from color picker or input
   const handleHexChange = (newHex: string) => {
     setHex(newHex);
@@ -398,85 +404,91 @@ export function ColorEditorModal({
             </div>
 
             {/* Live WCAG Contrast & Nearest RAL info strip */}
-            <div className="pt-3 border-t border-[rgba(63,85,102,0.35)] grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              {/* WCAG Preview (White & Black targets) */}
-              <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#96abbe] uppercase font-mono tracking-wider">
-                    WCAG 2.1 Kontrast
-                  </span>
-                  <span className="text-[10px] font-mono text-[#96abbe]">
-                    Odporúčané:{" "}
-                    <strong className="text-[#fafbfc]">
-                      {contrast.preferredText === "white" ? "Biely text" : "Čierny text"}
-                    </strong>
-                  </span>
-                </div>
+            <div
+              className={`pt-3 border-t border-[rgba(63,85,102,0.35)] grid ${
+                !isBgOrTypography ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"
+              } gap-3 text-xs`}
+            >
+              {/* WCAG Preview (White & Black targets) - Omitted for background & typography */}
+              {!isBgOrTypography && (
+                <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#96abbe] uppercase font-mono tracking-wider">
+                      WCAG 2.1 Kontrast
+                    </span>
+                    <span className="text-[10px] font-mono text-[#96abbe]">
+                      Odporúčané:{" "}
+                      <strong className="text-[#fafbfc]">
+                        {contrast.preferredText === "white" ? "Biely text" : "Čierny text"}
+                      </strong>
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* White background */}
-                  <WcagHoverPreview
-                    colorHex={hex}
-                    target="white"
-                    ratio={contrast.whiteRatio}
-                    score={contrast.whiteScore}
-                    align="left"
-                  >
-                    <div
-                      className="p-1.5 rounded-[6px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1 w-full hover:border-[#c8d400]/50 transition-colors"
-                      title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 (${contrast.whiteScore})`}
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* White background */}
+                    <WcagHoverPreview
+                      colorHex={hex}
+                      target="white"
+                      ratio={contrast.whiteRatio}
+                      score={contrast.whiteScore}
+                      align="left"
                     >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="w-2.5 h-2.5 rounded-full bg-white border border-black/50 shrink-0" />
-                        <div className="min-w-0">
-                          <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Biela</div>
-                          <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
-                            {contrast.whiteRatio}:1
+                      <div
+                        className="p-1.5 rounded-[6px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1 w-full hover:border-[#c8d400]/50 transition-colors"
+                        title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio}:1 (${contrast.whiteScore})`}
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="w-2.5 h-2.5 rounded-full bg-white border border-black/50 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Biela</div>
+                            <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
+                              {contrast.whiteRatio}:1
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[3px] shrink-0 ${getWcagScoreBadgeClass(
+                            contrast.whiteScore
+                          )}`}
+                        >
+                          {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
+                        </span>
                       </div>
-                      <span
-                        className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[3px] shrink-0 ${getWcagScoreBadgeClass(
-                          contrast.whiteScore
-                        )}`}
-                      >
-                        {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
-                      </span>
-                    </div>
-                  </WcagHoverPreview>
+                    </WcagHoverPreview>
 
-                  {/* Black background */}
-                  <WcagHoverPreview
-                    colorHex={hex}
-                    target="black"
-                    ratio={contrast.blackRatio}
-                    score={contrast.blackScore}
-                    align="right"
-                  >
-                    <div
-                      className="p-1.5 rounded-[6px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1 w-full hover:border-[#c8d400]/50 transition-colors"
-                      title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio}:1 (${contrast.blackScore})`}
+                    {/* Black background */}
+                    <WcagHoverPreview
+                      colorHex={hex}
+                      target="black"
+                      ratio={contrast.blackRatio}
+                      score={contrast.blackScore}
+                      align="right"
                     >
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/50 shrink-0" />
-                        <div className="min-w-0">
-                          <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Čierna</div>
-                          <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
-                            {contrast.blackRatio}:1
+                      <div
+                        className="p-1.5 rounded-[6px] bg-[#070b0f] border border-[rgba(63,85,102,0.3)] flex items-center justify-between gap-1 w-full hover:border-[#c8d400]/50 transition-colors"
+                        title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio}:1 (${contrast.blackScore})`}
+                      >
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/50 shrink-0" />
+                          <div className="min-w-0">
+                            <div className="text-[9px] text-[#96abbe] font-mono leading-tight">Čierna</div>
+                            <div className="font-mono text-xs font-bold text-[#fafbfc] leading-tight">
+                              {contrast.blackRatio}:1
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[3px] shrink-0 ${getWcagScoreBadgeClass(
+                            contrast.blackScore
+                          )}`}
+                        >
+                          {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
+                        </span>
                       </div>
-                      <span
-                        className={`text-[9px] font-mono font-bold px-1 py-0.5 rounded-[3px] shrink-0 ${getWcagScoreBadgeClass(
-                          contrast.blackScore
-                        )}`}
-                      >
-                        {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
-                      </span>
-                    </div>
-                  </WcagHoverPreview>
+                    </WcagHoverPreview>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* RAL Match */}
               <div className="p-2.5 rounded-[2px] bg-[#17212a] border border-[rgba(63,85,102,0.4)] flex items-center justify-between">

@@ -108,6 +108,12 @@ export function ColorCard({
       ? color.hasScale
       : ["PRIMARY", "SECONDARY", "ACCENT", "DIGITAL"].includes(color.role);
 
+  // Background and typography colors are canvas/text colors, not evaluated with AA/AA+ WCAG pills
+  const isBgOrTypography =
+    category === "BACKGROUND" ||
+    category === "TYPOGRAPHY" ||
+    ["BG_DAY", "BG_NIGHT", "TEXT_DAY", "TEXT_NIGHT"].includes(color.role);
+
   const handleCopyHex = async (e?: React.MouseEvent) => {
     e?.stopPropagation();
     try {
@@ -365,61 +371,63 @@ export function ColorCard({
             </div>
           )}
 
-          {/* WCAG Pill alongside values */}
-          <div
-            className="flex items-center gap-2.5 px-3 py-1.5 bg-black/40 border border-white/10 backdrop-blur-sm text-xs font-mono ml-auto"
-            style={{ borderRadius: brandRadius }}
-          >
-            {/* White Target */}
-            <WcagHoverPreview
-              colorHex={color.hex}
-              target="white"
-              ratio={contrast.whiteRatio}
-              score={contrast.whiteScore}
-              align="right"
+          {/* WCAG Pill alongside values (Omitted for background and typography colors) */}
+          {!isBgOrTypography && (
+            <div
+              className="flex items-center gap-2.5 px-3 py-1.5 bg-black/40 border border-white/10 backdrop-blur-sm text-xs font-mono ml-auto"
+              style={{ borderRadius: brandRadius }}
             >
-              <div
-                className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
-                title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio.toFixed(1)}:1 (${contrast.whiteScore}) — Kliknite alebo prejdite myšou pre ukážku`}
+              {/* White Target */}
+              <WcagHoverPreview
+                colorHex={color.hex}
+                target="white"
+                ratio={contrast.whiteRatio}
+                score={contrast.whiteScore}
+                align="right"
               >
-                <span className="w-2.5 h-2.5 rounded-full bg-white shadow-xs shrink-0" />
-                <span className="text-[11px] font-bold text-white">{contrast.whiteRatio.toFixed(1)}:1</span>
-                <span
-                  className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
-                    contrast.whiteScore
-                  )}`}
+                <div
+                  className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
+                  title={`WCAG kontrast voči Bielej (#FFFFFF): ${contrast.whiteRatio.toFixed(1)}:1 (${contrast.whiteScore}) — Kliknite alebo prejdite myšou pre ukážku`}
                 >
-                  {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
-                </span>
-              </div>
-            </WcagHoverPreview>
+                  <span className="w-2.5 h-2.5 rounded-full bg-white shadow-xs shrink-0" />
+                  <span className="text-[11px] font-bold text-white">{contrast.whiteRatio.toFixed(1)}:1</span>
+                  <span
+                    className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
+                      contrast.whiteScore
+                    )}`}
+                  >
+                    {contrast.whiteScore === "AA Large" ? "AA+" : contrast.whiteScore}
+                  </span>
+                </div>
+              </WcagHoverPreview>
 
-            <span className="text-white/15">|</span>
+              <span className="text-white/15">|</span>
 
-            {/* Black Target */}
-            <WcagHoverPreview
-              colorHex={color.hex}
-              target="black"
-              ratio={contrast.blackRatio}
-              score={contrast.blackScore}
-              align="right"
-            >
-              <div
-                className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
-                title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio.toFixed(1)}:1 (${contrast.blackScore}) — Kliknite alebo prejdite myšou pre ukážku`}
+              {/* Black Target */}
+              <WcagHoverPreview
+                colorHex={color.hex}
+                target="black"
+                ratio={contrast.blackRatio}
+                score={contrast.blackScore}
+                align="right"
               >
-                <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/40 shadow-xs shrink-0" />
-                <span className="text-[11px] font-bold text-white">{contrast.blackRatio.toFixed(1)}:1</span>
-                <span
-                  className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
-                    contrast.blackScore
-                  )}`}
+                <div
+                  className="flex items-center gap-1.5 cursor-pointer hover:opacity-85 transition-opacity"
+                  title={`WCAG kontrast voči Čiernej (#000000): ${contrast.blackRatio.toFixed(1)}:1 (${contrast.blackScore}) — Kliknite alebo prejdite myšou pre ukážku`}
                 >
-                  {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
-                </span>
-              </div>
-            </WcagHoverPreview>
-          </div>
+                  <span className="w-2.5 h-2.5 rounded-full bg-black border border-white/40 shadow-xs shrink-0" />
+                  <span className="text-[11px] font-bold text-white">{contrast.blackRatio.toFixed(1)}:1</span>
+                  <span
+                    className={`px-1.5 py-0.5 text-[9px] font-bold tracking-tight rounded-[4px] ${getWcagScoreBadgeClass(
+                      contrast.blackScore
+                    )}`}
+                  >
+                    {contrast.blackScore === "AA Large" ? "AA+" : contrast.blackScore}
+                  </span>
+                </div>
+              </WcagHoverPreview>
+            </div>
+          )}
         </div>
 
         {/* Bottom Section: 10-100 Systematic Scale (Shown permanently when enabled) */}
